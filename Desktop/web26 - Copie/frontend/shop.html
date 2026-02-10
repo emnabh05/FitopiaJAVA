@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - Fitopia Supplements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Maven+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/shop.css">
+    <link rel="stylesheet" href="css/cart-drawer.css">
+</head>
+<body>
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        <div class="announcement-slider">
+            <div class="announcement-item">
+                ⭐⭐⭐⭐⭐ +50,000 CLIENTS SATISFAITS
+            </div>
+            <div class="announcement-item">
+                🚚 LIVRAISON GRATUITE À PARTIR DE 100DT
+            </div>
+            <div class="announcement-item">
+                💪 NO. 1 EN TUNISIE DE LA NUTRITION SPORTIVE
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <!-- Logo -->
+                <div class="header-logo">
+                    <a href="index.html">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>FITOPIA</span>
+                    </a>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="header-nav">
+                    <a href="index.html">ACCUEIL</a>
+                    <div class="dropdown">
+                        <a href="shop.html" class="active">CATÉGORIES <i class="fas fa-chevron-down"></i></a>
+                        <div class="dropdown-menu">
+                            <a href="#protein">WHEY PROTÉINE</a>
+                            <a href="#gainer">GAINER</a>
+                            <a href="#creatine">CRÉATINE</a>
+                            <a href="#pre-workout">PRE-WORKOUT</a>
+                            <a href="#bcaa">BCAA</a>
+                            <a href="#multivitamin">VITAMINES & MINÉRAUX</a>
+                        </div>
+                    </div>
+                    <a href="#brands">MARQUES</a>
+                    <a href="#sales">MEGA SALES</a>
+                    <a href="contact.html">CONTACT</a>
+                </nav>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                    <a href="#account" class="account-btn"><i class="fas fa-user"></i></a>
+                    <button class="cart-btn cart-toggle" type="button" aria-haspopup="dialog" aria-controls="cartDrawer">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </button>
+                </div>
+
+                <!-- Mobile Menu Toggle -->
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <h1>Tous les Produits</h1>
+            <p class="breadcrumb">Accueil / Collections</p>
+        </div>
+    </section>
+
+    <!-- Shop Section -->
+    <section class="shop-section">
+        <div class="container">
+            <div class="shop-layout">
+                <!-- Sidebar Filters -->
+                <aside class="shop-sidebar">
+                    <div class="filter-group">
+                        <h3>Catégories</h3>
+                        <div class="filter-options">
+                            <label><input type="checkbox" name="category" value="protein"> Protéine <span>(45)</span></label>
+                            <label><input type="checkbox" name="category" value="gainer"> Gainer <span>(28)</span></label>
+                            <label><input type="checkbox" name="category" value="creatine"> Créatine <span>(32)</span></label>
+                            <label><input type="checkbox" name="category" value="pre-workout"> Pre-Workout <span>(24)</span></label>
+                            <label><input type="checkbox" name="category" value="bcaa"> BCAA <span>(18)</span></label>
+                            <label><input type="checkbox" name="category" value="multivitamin"> Multivitamines <span>(15)</span></label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Marques</h3>
+                        <div class="filter-options">
+                            <label><input type="checkbox" name="brand" value="optimum"> Optimum Nutrition</label>
+                            <label><input type="checkbox" name="brand" value="myprotein"> MyProtein</label>
+                            <label><input type="checkbox" name="brand" value="bsn"> BSN</label>
+                            <label><input type="checkbox" name="brand" value="muscletech"> MuscleTech</label>
+                            <label><input type="checkbox" name="brand" value="dymatize"> Dymatize</label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h3>Prix</h3>
+                        <div class="price-range">
+                            <input type="range" min="0" max="500" value="250" class="price-slider">
+                            <div class="price-values">
+                                <span>0 DT</span>
+                                <span>500 DT</span>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Products Grid -->
+                <div class="shop-main">
+                    <div class="shop-toolbar">
+                        <div class="results-count">
+                            Affichage de <strong>1-12</strong> sur <strong>162</strong> résultats
+                        </div>
+                        <div class="shop-sort">
+                            <select>
+                                <option>Trier par popularité</option>
+                                <option>Trier par prix: croissant</option>
+                                <option>Trier par prix: décroissant</option>
+                                <option>Trier par nouveauté</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products will be loaded here dynamically -->
+                    </div>
+
+                    <div class="pagination">
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <button class="page-btn">4</button>
+                        <button class="page-btn">Suivant <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Drawer -->
+    <div id="cartOverlay" class="cart-overlay"></div>
+    <aside id="cartDrawer" class="cart-drawer" aria-hidden="true">
+        <div class="cart-drawer-header">
+            <h3>Votre panier</h3>
+            <button id="cartDrawerClose" class="cart-drawer-close" type="button" aria-label="Fermer">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="cart-drawer-body">
+            <div id="cartDrawerItems" class="cart-drawer-items"></div>
+            <div id="cartDrawerEmpty" class="cart-drawer-empty" style="display: none;">
+                <i class="fas fa-shopping-cart"></i>
+                <h4>Votre panier est vide</h4>
+                <p>Ajoutez des produits pour commencer.</p>
+            </div>
+        </div>
+        <div class="cart-drawer-footer">
+            <div class="drawer-discount">
+                <input id="drawerDiscountCode" type="text" placeholder="Code promo (ex: ali123)">
+                <button id="drawerApplyDiscount" type="button">Appliquer</button>
+            </div>
+            <div id="drawerDiscountMessage" class="drawer-discount-message"></div>
+
+            <div class="drawer-summary">
+                <div class="drawer-summary-row">
+                    <span>Sous-total</span>
+                    <strong id="drawerSubtotal">0.00 DT</strong>
+                </div>
+                <div class="drawer-summary-row">
+                    <span>Livraison</span>
+                    <strong id="drawerShipping">0.00 DT</strong>
+                </div>
+                <div class="drawer-summary-row" id="drawerDiscountRow" style="display: none;">
+                    <span>Reduction <span id="drawerDiscountPercent"></span></span>
+                    <strong id="drawerDiscountAmount">-0.00 DT</strong>
+                </div>
+                <div class="drawer-summary-row total">
+                    <span>Total</span>
+                    <strong id="drawerTotal">0.00 DT</strong>
+                </div>
+            </div>
+
+            <button id="drawerCheckoutBtn" class="drawer-checkout-btn" type="button">
+                Passer la commande
+            </button>
+            <a href="shop.html" class="drawer-continue-link">Continuer vos achats</a>
+        </div>
+    </aside>
+
+    <script src="js/shop.js"></script>
+    <script src="js/cart-drawer.js"></script>
+</body>
+</html>

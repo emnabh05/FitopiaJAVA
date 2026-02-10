@@ -1,0 +1,29 @@
+parameters:
+    supplements_directory: '%kernel.project_dir%/public/uploads/supplements'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
+    App\Service\FileUploader:
+        arguments:
+            $targetDirectory: '%supplements_directory%'
+
+    # PDO Session Handler
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+        arguments:
+            - 'mysql:host=localhost;dbname=fitopia_supplements'
+            - { db_username: root, db_password: '' }
+

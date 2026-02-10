@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Dashboard</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --dark-blue: #0B2C3D;
+            --vert-sapin: #1B5E4B;
+            --white: #FFFFFF;
+            --light-gray: #F5F7FA;
+            --border-color: #E4E7EB;
+            --text-dark: #2C3E50;
+            --text-light: #8892A0;
+            --shadow: 0 2px 14px rgba(11, 44, 61, 0.1);
+            --shadow-lg: 0 8px 24px rgba(11, 44, 61, 0.15);
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #0B2C3D 0%, #1B5E4B 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--white);
+            padding: 30px 0;
+            box-shadow: var(--shadow-lg);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0B2C3D, #1B5E4B);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+            margin: 0 auto 10px;
+        }
+        
+        .sidebar-logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+        }
+        
+        .sidebar-nav li {
+            margin: 0;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: linear-gradient(90deg, #f0f7ff, transparent);
+            color: var(--vert-sapin);
+            border-left: 4px solid var(--vert-sapin);
+            padding-left: 16px;
+        }
+        
+        .sidebar-nav i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        /* Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: var(--white);
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        
+        .page-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0B2C3D, #1B5E4B);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 94, 75, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--dark-blue);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--white);
+            border-color: var(--vert-sapin);
+        }
+        
+        .btn-danger {
+            background: #FF6B6B;
+            color: var(--white);
+        }
+        
+        .btn-danger:hover {
+            background: #EE5A52;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--vert-sapin);
+            color: var(--white);
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 94, 75, 0.4);
+        }
+        
+        /* Table */
+        .table-container {
+            background: var(--white);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: linear-gradient(90deg, #F5F7FA, #FFFFFF);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        th {
+            padding: 18px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--dark-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+        
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: #F9FBFC;
+        }
+        
+        .table-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+        }
+        
+        .btn-edit {
+            background: #4A90E2;
+            color: var(--white);
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-edit:hover {
+            background: #357ABD;
+        }
+        
+        /* Forms */
+        .form-container {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Open Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--vert-sapin);
+            box-shadow: 0 0 0 3px rgba(27, 94, 75, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 35px;
+        }
+        
+        /* Status Badge */
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .badge-active {
+            background: #D4EDDA;
+            color: #155724;
+        }
+        
+        .badge-inactive {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 30px;
+            color: var(--text-light);
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            color: #DDD;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state p {
+            margin-bottom: 25px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+        }
+        
+        .modal-body {
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 20px;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .header-actions {
+                width: 100%;
+            }
+            
+            .header-actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .table-wrapper {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="sidebar-logo-text">Fitopia</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="/dashboard.html" class="active"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="/products.html"><i class="fas fa-list"></i> Products</a></li>
+            <li><a href="/users.html"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="/settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Welcome back! Here's what's happening with your business today.</p>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px;">
+            <div style="background: var(--white); padding: 25px; border-radius: 15px; box-shadow: var(--shadow); border-left: 4px solid var(--vert-sapin);">
+                <p style="color: var(--text-light); font-size: 13px; text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Total Products</p>
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--dark-blue); margin: 0;">1,234</h3>
+                <p style="color: var(--vert-sapin); font-size: 12px; margin-top: 8px;"><i class="fas fa-arrow-up"></i> 12% from last month</p>
+            </div>
+            <div style="background: var(--white); padding: 25px; border-radius: 15px; box-shadow: var(--shadow); border-left: 4px solid #4A90E2;">
+                <p style="color: var(--text-light); font-size: 13px; text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Total Users</p>
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--dark-blue); margin: 0;">5,678</h3>
+                <p style="color: #4A90E2; font-size: 12px; margin-top: 8px;"><i class="fas fa-arrow-up"></i> 8% from last month</p>
+            </div>
+            <div style="background: var(--white); padding: 25px; border-radius: 15px; box-shadow: var(--shadow); border-left: 4px solid #FFB84D;">
+                <p style="color: var(--text-light); font-size: 13px; text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Total Revenue</p>
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--dark-blue); margin: 0;">$45.2K</h3>
+                <p style="color: #FFB84D; font-size: 12px; margin-top: 8px;"><i class="fas fa-arrow-up"></i> 23% from last month</p>
+            </div>
+            <div style="background: var(--white); padding: 25px; border-radius: 15px; box-shadow: var(--shadow); border-left: 4px solid #FF6B6B;">
+                <p style="color: var(--text-light); font-size: 13px; text-transform: uppercase; font-weight: 600; margin-bottom: 10px;">Conversion Rate</p>
+                <h3 style="font-size: 28px; font-weight: 700; color: var(--dark-blue); margin: 0;">3.2%</h3>
+                <p style="color: #FF6B6B; font-size: 12px; margin-top: 8px;"><i class="fas fa-arrow-down"></i> 2% from last month</p>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div style="background: var(--white); border-radius: 15px; padding: 30px; box-shadow: var(--shadow);">
+            <h2 style="font-size: 20px; font-weight: 700; color: var(--dark-blue); margin-bottom: 25px;">Recent Activity</h2>
+            <div style="border-left: 3px solid var(--vert-sapin); padding-left: 20px; margin-bottom: 20px;">
+                <p style="font-weight: 600; color: var(--dark-blue); margin: 0;"><i class="fas fa-plus-circle" style="color: var(--vert-sapin); margin-right: 10px;"></i>New product added</p>
+                <p style="color: var(--text-light); font-size: 12px; margin: 5px 0 0 28px;">Premium Fitness Tracker - 2 hours ago</p>
+            </div>
+            <div style="border-left: 3px solid #4A90E2; padding-left: 20px; margin-bottom: 20px;">
+                <p style="font-weight: 600; color: var(--dark-blue); margin: 0;"><i class="fas fa-user-plus" style="color: #4A90E2; margin-right: 10px;"></i>New user registered</p>
+                <p style="color: var(--text-light); font-size: 12px; margin: 5px 0 0 28px;">John Doe joined the platform - 4 hours ago</p>
+            </div>
+            <div style="border-left: 3px solid #FFB84D; padding-left: 20px;">
+                <p style="font-weight: 600; color: var(--dark-blue); margin: 0;"><i class="fas fa-edit" style="color: #FFB84D; margin-right: 10px;"></i>Product updated</p>
+                <p style="color: var(--text-light); font-size: 12px; margin: 5px 0 0 28px;">Yoga Mat price changed - 6 hours ago</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation active state
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            if (link.href === window.location.href) {
+                link.classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

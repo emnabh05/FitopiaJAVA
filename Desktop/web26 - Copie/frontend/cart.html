@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panier - Fitopia Supplements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Maven+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/shop.css">
+    <link rel="stylesheet" href="css/cart.css">
+</head>
+<body>
+    <script>
+        window.location.href = 'shop.html?cart=open';
+    </script>
+    <!-- Announcement Bar -->
+    <div class="announcement-bar">
+        <div class="announcement-slider">
+            <div class="announcement-item">
+                ⭐⭐⭐⭐⭐ +50,000 CLIENTS SATISFAITS
+            </div>
+            <div class="announcement-item">
+                🚚 LIVRAISON GRATUITE À PARTIR DE 100DT
+            </div>
+            <div class="announcement-item">
+                💪 NO. 1 EN TUNISIE DE LA NUTRITION SPORTIVE
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-logo">
+                    <a href="index.html">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>FITOPIA</span>
+                    </a>
+                </div>
+
+                <nav class="header-nav">
+                    <a href="index.html">ACCUEIL</a>
+                    <a href="shop.html">CATÉGORIES</a>
+                    <a href="#brands">MARQUES</a>
+                    <a href="#sales">MEGA SALES</a>
+                    <a href="contact.html">CONTACT</a>
+                </nav>
+
+                <div class="header-actions">
+                    <button class="search-btn"><i class="fas fa-search"></i></button>
+                    <a href="#account" class="account-btn"><i class="fas fa-user"></i></a>
+                    <a href="cart.html" class="cart-btn active">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count">0</span>
+                    </a>
+                </div>
+
+                <button class="mobile-menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Page Title -->
+    <section class="page-title">
+        <div class="container">
+            <h1>Votre Panier</h1>
+            <p class="breadcrumb">Accueil / Panier</p>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section class="cart-section">
+        <div class="container">
+            <div class="cart-layout">
+                <!-- Cart Items -->
+                <div class="cart-main">
+                    <div id="cartItems" class="cart-items">
+                        <!-- Cart items will be loaded here -->
+                    </div>
+
+                    <div id="emptyCart" class="empty-cart" style="display: none;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>Votre panier est vide</h3>
+                        <p>Ajoutez des produits pour commencer vos achats</p>
+                        <a href="shop.html" class="continue-shopping-btn">
+                            <i class="fas fa-arrow-left"></i> Continuer vos achats
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Cart Summary -->
+                <aside class="cart-summary">
+                    <h3>Résumé de la commande</h3>
+                    
+                    <div class="summary-row">
+                        <span>Sous-total</span>
+                        <span id="subtotal">0.00 DT</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Livraison</span>
+                        <span id="shipping">7.00 DT</span>
+                    </div>
+
+                    <div class="discount-section">
+                        <input type="text" id="discountCode" placeholder="Code promo (ex: ali123)" class="discount-input">
+                        <button id="applyDiscount" class="apply-discount-btn">Appliquer</button>
+                        <div id="discountMessage" class="discount-message"></div>
+                    </div>
+
+                    <div class="summary-row discount-row" id="discountRow" style="display: none;">
+                        <span>Réduction <span id="discountPercent"></span></span>
+                        <span id="discountAmount" class="discount-amount">-0.00 DT</span>
+                    </div>
+
+                    <div class="summary-row total-row">
+                        <span>Total</span>
+                        <span id="total" class="total-price">0.00 DT</span>
+                    </div>
+
+                    <button id="checkoutBtn" class="checkout-btn">
+                        <i class="fas fa-lock"></i> Passer la commande
+                    </button>
+
+                    <a href="shop.html" class="continue-shopping-link">
+                        <i class="fas fa-arrow-left"></i> Continuer vos achats
+                    </a>
+
+                    <div class="payment-methods">
+                        <img src="images/visa.png" alt="Visa" onerror="this.style.display='none'">
+                        <img src="images/mastercard.png" alt="Mastercard" onerror="this.style.display='none'">
+                        <img src="images/paypal.png" alt="PayPal" onerror="this.style.display='none'">
+                    </div>
+
+                    <div class="security-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Paiement 100% sécurisé</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/shop.js"></script>
+    <script src="js/cart.js"></script>
+</body>
+</html>

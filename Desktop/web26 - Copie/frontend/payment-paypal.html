@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement PayPal - Fitopia Supplements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Maven+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/shop.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+    <link rel="stylesheet" href="css/payment.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-logo">
+                    <a href="index.html">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>FITOPIA</span>
+                    </a>
+                </div>
+                <div class="checkout-steps">
+                    <div class="step active">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Panier</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step active">
+                        <i class="fas fa-user"></i>
+                        <span>Informations</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step active">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Paiement</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Payment Section -->
+    <section class="payment-section">
+        <div class="container">
+            <div class="payment-layout">
+                <!-- Payment Form -->
+                <div class="payment-main">
+                    <div class="payment-header paypal-header">
+                        <i class="fab fa-paypal"></i>
+                        <h2>Connexion PayPal</h2>
+                        <p>Connectez-vous à votre compte PayPal pour finaliser le paiement</p>
+                    </div>
+
+                    <form id="paypalForm" class="payment-form">
+                        <div class="form-group">
+                            <label for="paypalEmail">Email ou numéro de mobile *</label>
+                            <input type="email" id="paypalEmail" name="paypalEmail" 
+                                   placeholder="exemple@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="paypalPassword">Mot de passe *</label>
+                            <input type="password" id="paypalPassword" name="paypalPassword" 
+                                   placeholder="Entrez votre mot de passe" required>
+                        </div>
+
+                        <div class="paypal-links">
+                            <a href="#" class="paypal-link">Mot de passe oublié?</a>
+                        </div>
+
+                        <div class="payment-amount-display">
+                            <div class="amount-label">Montant à payer</div>
+                            <div class="amount-value" id="paypalAmount">0.00 DT</div>
+                        </div>
+
+                        <div class="security-info">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <strong>Paiement sécurisé PayPal</strong>
+                                <p>Vos informations financières ne sont jamais partagées</p>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="checkout.html" class="back-btn">
+                                <i class="fas fa-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="submit-payment-btn paypal-btn">
+                                <i class="fab fa-paypal"></i> Payer avec PayPal
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="paypal-info">
+                        <p>Vous n'avez pas de compte PayPal?</p>
+                        <a href="#" class="create-account-link">Créer un compte</a>
+                    </div>
+
+                    <div class="payment-logos">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" style="height: 40px;">
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <aside class="order-summary">
+                    <h3>Récapitulatif</h3>
+                    
+                    <div id="orderItems" class="order-items">
+                        <!-- Items will be loaded here -->
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="summary-row">
+                            <span>Sous-total</span>
+                            <span id="summarySubtotal">0.00 DT</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Livraison</span>
+                            <span id="summaryShipping">0.00 DT</span>
+                        </div>
+                        <div class="summary-row discount-row" id="summaryDiscountRow" style="display: none;">
+                            <span>Réduction</span>
+                            <span id="summaryDiscount">-0.00 DT</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total à payer</span>
+                            <span id="summaryTotal" class="total-price">0.00 DT</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/payment-paypal.js"></script>
+</body>
+</html>
+

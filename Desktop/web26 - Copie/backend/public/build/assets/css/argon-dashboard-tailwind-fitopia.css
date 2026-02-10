@@ -1,0 +1,195 @@
+/*
+ * Argon Dashboard Tailwind - Fitopia Edition
+ * Custom styling for Fitopia Supplements Management
+ * Colors: Blue Marine (#0B2C3D) and Vert Sapin (#1B5E4B)
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+
+/* Tailwind Base */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Root Variables */
+:root {
+    --blue-marine: #0B2C3D;
+    --vert-sapin: #1B5E4B;
+    --gradient-blue-marine: linear-gradient(to top left, #0B2C3D, #1B5E4B);
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f8fafc;
+    color: #64748b;
+}
+
+/* Fitopia Custom Colors */
+.bg-blue-marine {
+    background-color: var(--blue-marine) !important;
+}
+
+.text-blue-marine {
+    color: var(--blue-marine) !important;
+}
+
+.border-blue-marine {
+    border-color: var(--blue-marine) !important;
+}
+
+.bg-vert-sapin {
+    background-color: var(--vert-sapin) !important;
+}
+
+.text-vert-sapin {
+    color: var(--vert-sapin) !important;
+}
+
+.border-vert-sapin {
+    border-color: var(--vert-sapin) !important;
+}
+
+.hover\:bg-blue-marine:hover {
+    background-color: var(--blue-marine) !important;
+}
+
+.hover\:text-blue-marine:hover {
+    color: var(--blue-marine) !important;
+}
+
+.bg-gradient-blue-marine {
+    background-image: var(--gradient-blue-marine) !important;
+}
+
+/* Sidebar Styles */
+aside {
+    position: fixed;
+    top: 1rem;
+    left: -16rem;
+    width: 16rem;
+    height: calc(100vh - 2rem);
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 27px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease-in-out;
+    z-index: 990;
+    overflow-y: auto;
+}
+
+@media (min-width: 1280px) {
+    aside {
+        left: 1.5rem;
+    }
+}
+
+aside .h-19 {
+    height: 4.75rem;
+}
+
+/* Main Content */
+main {
+    margin-left: 0;
+    transition: all 0.2s ease-in-out;
+}
+
+@media (min-width: 1280px) {
+    main {
+        margin-left: 17rem;
+    }
+}
+
+/* Cards */
+.rounded-2xl {
+    border-radius: 1rem;
+}
+
+.shadow-xl {
+    box-shadow: 0 20px 27px rgba(0, 0, 0, 0.05);
+}
+
+/* Buttons */
+.hover\:scale-102:hover {
+    transform: scale(1.02);
+}
+
+/* Gradient Background */
+.min-h-75 {
+    min-height: 18.75rem;
+}
+
+/* Table Styles */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+table thead th {
+    padding: 0.75rem 1.5rem;
+    text-align: left;
+    font-size: 0.625rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94a3b8;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+table tbody td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: middle;
+}
+
+/* Form Controls */
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #374151;
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control.error {
+    border-color: #ef4444;
+}
+
+/* Error Messages */
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.error-message.show {
+    display: block;
+}
+
+/* Responsive */
+@media (max-width: 1279px) {
+    aside {
+        transform: translateX(-100%);
+    }
+    
+    aside[aria-expanded="true"] {
+        transform: translateX(0);
+    }
+}
+

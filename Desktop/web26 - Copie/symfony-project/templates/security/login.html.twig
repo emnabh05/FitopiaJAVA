@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .login-wrap {
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    padding: 3rem 0 4rem;
+  }
+  .login-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  .login-panel {
+    background: linear-gradient(135deg, #0b3a3d 0%, #0d5b50 55%, #0f7a5f 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 3rem;
+    box-shadow: 0 18px 40px rgba(14, 30, 37, 0.15);
+  }
+  .login-panel h2 {
+    font-weight: 800;
+    font-size: 2.2rem;
+  }
+  .login-panel p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+  }
+  .login-card {
+    background: #fff;
+    border-radius: 18px;
+    padding: 2.5rem;
+    box-shadow: 0 18px 50px rgba(14, 30, 37, 0.12);
+  }
+  .login-card h3 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+  }
+  @media (max-width: 991px) {
+    .login-grid {
+      grid-template-columns: 1fr;
+    }
+    .login-panel {
+      padding: 2.2rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container login-wrap">
+  <div class="login-grid w-100">
+    <div class="login-panel">
+      <img src="{{ asset('images/logo.png') }}" alt="Fitopia logo" style="width: 56px; height: 56px; background: #fff; border-radius: 12px; padding: 8px; margin-bottom: 1rem;">
+      <h2>Welcome Back</h2>
+      <p>Access your Fitopia account, track your progress, and manage your personalized journey.</p>
+      <div class="mt-4">
+        <ul class="list-unstyled">
+          <li class="mb-2"><i class="fa fa-check mr-2"></i> Smart plans tailored to your goals</li>
+          <li class="mb-2"><i class="fa fa-check mr-2"></i> Track workouts, nutrition, and progress</li>
+          <li class="mb-2"><i class="fa fa-check mr-2"></i> Connect with coaches and experts</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="login-card">
+        <h3 class="text-center">Sign in to Fitopia</h3>
+
+        {% if error %}
+            <div class="alert alert-danger">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        {% if app.user %}
+            <div class="alert alert-success text-center">
+                You are logged in as <strong>{{ app.user.userIdentifier }}</strong>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            <div class="mb-3">
+                <label for="inputEmail" class="form-label">Email</label>
+                <input
+                    type="email"
+                    value="{{ last_username }}"
+                    name="email"
+                    id="inputEmail"
+                    class="form-control"
+                    required
+                    autofocus
+                >
+            </div>
+
+            <div class="mb-3">
+                <label for="inputPassword" class="form-label">Password</label>
+                <input
+                    type="password"
+                    name="password"
+                    id="inputPassword"
+                    class="form-control"
+                    required
+                >
+            </div>
+
+            <input type="hidden" name="_csrf_token"
+                   value="{{ csrf_token('authenticate') }}"
+            >
+
+            <div class="d-grid gap-2 mt-4">
+                <button class="btn btn-dark btn-lg" type="submit">
+                    Login
+                </button>
+            </div>
+        </form>
+
+        <hr class="my-4">
+
+        <div class="text-center">
+            <p class="mb-2">Don't have an account?</p>
+            <a href="{{ path('app_register') }}" class="btn btn-outline-secondary w-100">
+                Create an Account
+            </a>
+        </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block footer %}{% endblock %}

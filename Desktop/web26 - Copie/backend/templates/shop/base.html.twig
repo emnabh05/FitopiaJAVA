@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Fitopia Shop{% endblock %}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="{{ asset('css/animate.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/owl.carousel.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/magnific-popup.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/bootstrap-datepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/jquery.timepicker.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/flaticon.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/style_fitopia.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/shop.css') }}">
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body>
+
+{% include 'shop/partials/topbar.html.twig' %}
+{% include 'shop/partials/navbar.html.twig' %}
+
+{% block body %}{% endblock %}
+
+{% include 'shop/partials/footer.html.twig' %}
+
+<div id="ftco-loader" class="fullscreen">
+    <svg class="circular" width="48px" height="48px">
+        <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4"/>
+        <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4"/>
+    </svg>
+</div>
+
+<script src="{{ asset('js/jquery.min.js') }}"></script>
+<script src="{{ asset('js/jquery-migrate-3.0.1.min.js') }}"></script>
+<script src="{{ asset('js/popper.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap.min.js') }}"></script>
+<script src="{{ asset('js/jquery.easing.1.3.js') }}"></script>
+<script src="{{ asset('js/jquery.waypoints.min.js') }}"></script>
+<script src="{{ asset('js/jquery.stellar.min.js') }}"></script>
+<script src="{{ asset('js/jquery.animateNumber.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap-datepicker.js') }}"></script>
+<script src="{{ asset('js/jquery.timepicker.min.js') }}"></script>
+<script src="{{ asset('js/owl.carousel.min.js') }}"></script>
+<script src="{{ asset('js/jquery.magnific-popup.min.js') }}"></script>
+<script src="{{ asset('js/scrollax.min.js') }}"></script>
+<script src="{{ asset('js/main.js') }}"></script>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8000';
+
+    // Update cart count on page load
+    $(document).ready(function() {
+        updateCartCount();
+    });
+
+    function updateCartCount() {
+        $.get('{{ path('app_shop_cart_get') }}', function(data) {
+            console.log('Cart data:', data);
+            $('#cart-count').text(data.count);
+        });
+    }
+</script>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>
+

@@ -1,0 +1,1092 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Explore Forums & Blogs | Fitopia{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .explore-hero-wrap {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1.5rem;
+    align-items: start;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .explore-hero {
+    background: linear-gradient(135deg, #0b3a3d 0%, #0d5b50 55%, #0f7a5f 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 2.2rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(14, 30, 37, 0.18);
+  }
+  .explore-hero::after {
+    content: "";
+    position: absolute;
+    right: -50px;
+    top: -50px;
+    width: 180px;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
+  .hero-logo-badge {
+    position: absolute;
+    right: 12%;
+    top: 8%;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  }
+  .hero-logo-badge img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+  }
+  .explore-hero h2 {
+    font-weight: 800;
+    margin-bottom: 0.6rem;
+  }
+  .explore-hero p {
+    opacity: 0.95;
+    margin-bottom: 0;
+  }
+  .hero-horizontal {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 2rem;
+    align-items: center;
+  }
+  .hero-copy {
+    min-width: 0;
+  }
+  .hero-media {
+    display: grid;
+    gap: 1rem;
+    justify-items: stretch;
+  }
+  .image-holder {
+    background: rgba(255,255,255,0.12);
+    border: 1px dashed rgba(255,255,255,0.35);
+    border-radius: 16px;
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+  }
+  .hero-actions-inline {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .hero-actions-inline .btn {
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .dm-panel {
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 12px 30px rgba(14, 30, 37, 0.08);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 520px;
+    height: 100%;
+    position: relative;
+  }
+  .dm-panel::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 180px;
+    height: 180px;
+    background: rgba(15, 122, 95, 0.08);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .dm-header {
+    padding: 1.1rem 1.3rem;
+    border-bottom: 1px solid #eef2f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    background: linear-gradient(135deg, rgba(15,122,95,0.12), rgba(15,122,95,0));
+  }
+  .dm-header h3 {
+    margin: 0;
+    font-weight: 800;
+    font-size: 1.05rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .dm-back-btn {
+    border: none;
+    background: #0b3a3d;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+  .dm-search {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #f8fafc;
+    border-radius: 999px;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid #e2e8f0;
+  }
+  .dm-search input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.85rem;
+  }
+  .dm-list {
+    max-height: 260px;
+    overflow: auto;
+  }
+  .dm-list.hidden {
+    display: none;
+  }
+  .dm-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eef2f6;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .dm-item.active {
+    background: #f1f5f9;
+  }
+  .dm-item:hover {
+    background: #f8fafc;
+    transform: translateY(-1px);
+  }
+  .dm-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f7a5f, #0b3a3d);
+    color: #fff;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+  }
+  .dm-meta strong {
+    display: block;
+  }
+  .dm-meta small {
+    color: #64748b;
+  }
+  .dm-badge {
+    min-width: 20px;
+    height: 20px;
+    border-radius: 999px;
+    background: #16a34a;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+  .dm-chat {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: #f8fafc;
+  }
+  .dm-thread {
+    padding: 1rem 1.1rem;
+    flex: 1;
+    overflow: auto;
+  }
+  .dm-bubble {
+    max-width: 78%;
+    padding: 0.65rem 0.9rem;
+    border-radius: 14px;
+    margin-bottom: 0.65rem;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(14, 30, 37, 0.08);
+    font-size: 0.9rem;
+  }
+  .dm-bubble.me {
+    margin-left: auto;
+    background: #0b3a3d;
+    color: #fff;
+  }
+  .dm-bubble small {
+    display: block;
+    margin-top: 0.3rem;
+    opacity: 0.7;
+    font-size: 0.7rem;
+  }
+  .dm-input {
+    border-top: 1px solid #eef2f6;
+    padding: 0.75rem 1rem;
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    background: #fff;
+  }
+  .dm-input input {
+    flex: 1;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.9rem;
+  }
+  .dm-input button {
+    border-radius: 999px;
+    background: #0b3a3d;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: 700;
+  }
+  .dm-empty {
+    padding: 1.5rem;
+    color: #64748b;
+    text-align: center;
+  }
+  .dm-empty i {
+    display: inline-flex;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    background: #e6f0ee;
+    color: #0b3a3d;
+    margin-bottom: 0.5rem;
+  }
+  .dm-user-list {
+    padding: 0.75rem 1rem 1rem;
+    border-top: 1px dashed #e2e8f0;
+  }
+  .dm-user-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .dm-user-item:last-child {
+    border-bottom: none;
+  }
+  .dm-user-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .dm-user-meta strong {
+    display: block;
+  }
+  .dm-user-meta small {
+    color: #94a3b8;
+  }
+  .dm-start-btn {
+    border: 1px solid #0b3a3d;
+    background: #0b3a3d;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .offline-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 12px 30px rgba(14, 30, 37, 0.08);
+    margin-top: 1.5rem;
+  }
+  .form-panel {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #eef2f6;
+    margin-top: 1.5rem;
+    display: none;
+  }
+  .form-panel.active {
+    display: block;
+  }
+  .icon-input {
+    position: relative;
+  }
+  .icon-input i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0f7a5f;
+  }
+  .icon-input input,
+  .icon-input textarea,
+  .icon-input select {
+    padding-left: 38px;
+  }
+  .section-title {
+    font-weight: 800;
+    margin: 2rem 0 1rem;
+  }
+  .feed-wrap {
+    display: grid;
+    gap: 1rem;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  .feed-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 12px 30px rgba(14, 30, 37, 0.08);
+  }
+  .feed-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 2rem auto 1rem;
+    max-width: 780px;
+  }
+  .feed-title {
+    font-weight: 800;
+    margin: 0;
+  }
+  .feed-sort {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: #fff;
+    border-radius: 999px;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid #eef2f6;
+  }
+  .feed-sort select {
+    border: none;
+    outline: none;
+    background: transparent;
+    font-weight: 600;
+  }
+  .post-top {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .user-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .avatar-chip {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f7a5f, #0b3a3d);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-weight: 700;
+  }
+  .user-meta {
+    line-height: 1.2;
+  }
+  .user-meta strong {
+    display: block;
+  }
+  .post-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 0.8rem 0 0.45rem;
+  }
+  .post-preview {
+    color: #52606d;
+    margin: 0;
+  }
+  .post-preview.expanded {
+    color: #0f172a;
+  }
+  .post-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin: 0.8rem 0 0.9rem;
+  }
+  .post-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+  }
+  .post-actions .btn {
+    border-radius: 999px;
+    padding: 0.4rem 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .post-actions .btn.is-active {
+    background: #0b3a3d;
+    color: #fff;
+    border-color: #0b3a3d;
+  }
+  .action-toast {
+    display: none;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 10px;
+    background: #e6fffa;
+    color: #0b3a3d;
+    font-weight: 700;
+    animation: toastPop 0.4s ease;
+  }
+  .action-toast.show {
+    display: inline-block;
+  }
+  @keyframes toastPop {
+    from { transform: translateY(-6px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .interaction-counts {
+    color: #64748b;
+    font-weight: 600;
+    margin-top: 0.6rem;
+  }
+  .interaction-counts span {
+    margin-right: 0.75rem;
+  }
+  .comment-list {
+    margin-top: 0.75rem;
+    padding-left: 0;
+    list-style: none;
+  }
+  .comment-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eef2f6;
+  }
+  .comment-item:last-child {
+    border-bottom: none;
+  }
+  .comment-author {
+    font-weight: 700;
+  }
+  .comment-text {
+    color: #52606d;
+  }
+  .comment-form {
+    margin-top: 0.85rem;
+  }
+  .link-btn {
+    border: none;
+    background: transparent;
+    color: #0f7a5f;
+    font-weight: 600;
+    padding: 0;
+  }
+  .trending-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #fff4e5;
+    color: #b45309;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .feed-image {
+    width: 100%;
+    border-radius: 16px;
+    margin: 0.9rem 0 0.6rem;
+    max-height: 360px;
+    object-fit: cover;
+  }
+  .comments-link {
+    display: block;
+    text-align: center;
+    color: #64748b;
+    font-weight: 600;
+    margin-top: 0.85rem;
+  }
+  .post-divider {
+    height: 1px;
+    background: #eef2f6;
+    margin: 0.9rem 0;
+  }
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: #0b3a3d;
+    color: #fff;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .category-pill {
+    display: inline-block;
+    background: #e6f0ee;
+    color: #0b3a3d;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .cta-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid #eef2f6;
+  }
+  @media (max-width: 991px) {
+    .hero-horizontal,
+    .explore-hero-wrap {
+      grid-template-columns: 1fr;
+    }
+    .hero-actions-inline { justify-content: flex-start; }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<section class="container-fluid py-5">
+  <div class="explore-hero-wrap">
+    <div class="explore-hero">
+      <div class="hero-logo-badge">
+        <img src="{{ asset('images/logo.png') }}" alt="Fitopia logo">
+      </div>
+      <div class="hero-horizontal">
+        <div class="hero-copy">
+          <h2>Votre experience peut inspirer toute la communaute FITOPIA !</h2>
+          <p>
+            Chere communaute FITOPIA, saviez-vous que votre parcours unique est une source
+            d'inspiration precieuse pour d'autres personnes sur la meme voie ?
+          </p>
+          <p class="mt-3">Pourquoi partager aujourd'hui ?</p>
+          <ul>
+            <li>Votre question pourrait etre celle que 10 autres personnes n'osent pas poser</li>
+            <li>Votre astuce simplifiera le parcours de quelqu'un d'autre</li>
+            <li>Votre reussite motivera ceux qui doutent de leurs capacites</li>
+          </ul>
+          <p class="mt-3">Vous n'avez pas besoin d'etre parfait pour etre utile</p>
+          <ul>
+            <li>Un simple "Comment avez-vous fait ?" peut ouvrir une discussion enrichissante</li>
+            <li>Une petite victoire ("J'ai marche 30 minutes aujourd'hui !") inspire les autres</li>
+            <li>Un doute partage devient une opportunite d'apprentissage collectif</li>
+          </ul>
+        </div>
+        <div class="hero-media">
+          <div class="image-holder" style="padding:0; overflow:hidden;">
+            <img src="{{ asset('images/forum.png') }}" alt="Forum inspiration" style="width:100%; height:100%; object-fit:cover; border-radius:16px;">
+          </div>
+          <div class="hero-actions-inline">
+            <button class="btn btn-primary" id="btn-express">Express yourself now</button>
+            <button class="btn btn-outline-light" id="btn-my-posts">My posts</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dm-panel">
+      <div class="dm-header">
+        <h3><i class="fa fa-commenting"></i> Direct Messages</h3>
+        <div class="dm-search">
+          <i class="fa fa-search"></i>
+          <input type="text" placeholder="Search" id="dm-search-input">
+        </div>
+      </div>
+      <div class="dm-list" id="dm-conversation-list">
+        {% if not app.user %}
+          <div class="dm-empty">
+            <i class="fa fa-lock"></i>
+            <div>Login to see your inbox.</div>
+          </div>
+        {% elseif dmConversationItems is empty %}
+          {# keep list empty when no conversations #}
+        {% else %}
+          {% for conv in dmConversationItems %}
+            <a class="dm-item {% if dmSelectedConversation and dmSelectedConversation.id == conv.id %}active{% endif %}" href="{{ path('explore_forums_blogs', {'dm': conv.id}) }}" data-user="{{ conv.displayName|lower }}">
+              <div class="dm-avatar">{{ conv.otherEmail|slice(0,1)|upper }}</div>
+              <div class="dm-meta">
+                <strong>{{ conv.displayName }}</strong>
+                <small>{{ dmLastMessage[conv.id]|default('')|slice(0, 28) }}</small>
+              </div>
+              <small class="text-muted">{{ dmLastMessageTime[conv.id]|default('') }}</small>
+              {% if dmUnreadCounts[conv.id]|default(0) > 0 %}
+                <span class="dm-badge">{{ dmUnreadCounts[conv.id] }}</span>
+              {% endif %}
+            </a>
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div class="dm-chat">
+        {% if not app.user %}
+          <div class="dm-empty">
+            <i class="fa fa-sign-in"></i>
+            <div>Sign in to chat.</div>
+          </div>
+        {% elseif not dmSelectedConversation %}
+          <div class="dm-empty">
+            <i class="fa fa-comments"></i>
+            <div>Select a conversation to start messaging.</div>
+            <small class="text-muted">Or start a new chat below.</small>
+          </div>
+          <div class="dm-user-list">
+            {% if dmUsers is defined %}
+              {% for u in dmUsers %}
+                {% if app.user.id != u.id %}
+                  {% set userName = (u.firstName ~ ' ' ~ u.lastName)|trim %}
+                  {% if userName is empty %}
+                    {% set userName = u.username ?: u.email %}
+                  {% endif %}
+                  <div class="dm-user-item">
+                    <div class="dm-user-meta">
+                      <div class="dm-avatar">{{ u.email|slice(0,1)|upper }}</div>
+                      <div>
+                        <strong>{{ userName }}</strong>
+                        <small>{{ u.email }}</small>
+                      </div>
+                    </div>
+                    <form method="post" action="{{ path('explore_dm_start', {'id': u.id}) }}">
+                      <button class="dm-start-btn" type="submit"><i class="fa fa-paper-plane"></i></button>
+                    </form>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        {% else %}
+          <div class="dm-header">
+            <div>
+              <strong>
+                {% if dmOtherName %}
+                  {{ dmOtherName }}
+                {% elseif dmOtherParticipant %}
+                  {{ (dmOtherParticipant.firstName ~ ' ' ~ dmOtherParticipant.lastName)|trim ?: (dmOtherParticipant.username ?: dmOtherParticipant.email) }}
+                {% else %}
+                  Conversation
+                {% endif %}
+              </strong>
+              <div class="text-muted">
+                Active now
+                {% if dmOtherBadge %}
+                  <span class="role-badge" style="margin-left:0.4rem;"><i class="fa fa-id-badge"></i> {{ dmOtherBadge }}</span>
+                {% endif %}
+              </div>
+            </div>
+            <div>
+              <a class="dm-back-btn" href="{{ path('explore_forums_blogs', {'dm': 0}) }}"><i class="fa fa-chevron-left"></i> Back</a>
+              <i class="fa fa-phone"></i>
+              <i class="fa fa-video-camera ml-2"></i>
+              <i class="fa fa-ellipsis-h ml-2"></i>
+            </div>
+          </div>
+          <div class="dm-thread">
+            {% if dmMessages is empty %}
+              <div class="text-muted">Say hello to start the conversation.</div>
+            {% else %}
+              {% for m in dmMessages %}
+                <div class="dm-bubble {% if m.sender.id == app.user.id %}me{% endif %}">
+                  {{ m.body }}
+                  <small>{{ m.createdAt|date('H:i') }}{% if m.sender.id == app.user.id %} · {{ m.status|capitalize }}{% endif %}</small>
+                  {% if m.attachmentPath %}
+                    {% if m.attachmentMime starts with 'image/' %}
+                      <img src="{{ asset(m.attachmentPath) }}" alt="Attachment" style="margin-top:0.5rem;max-width:100%;border-radius:12px;">
+                    {% else %}
+                      <div style="margin-top:0.4rem;">
+                        <a href="{{ asset(m.attachmentPath) }}" target="_blank" rel="noopener">View attachment</a>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                </div>
+              {% endfor %}
+            {% endif %}
+            <div id="dm-typing-indicator" class="text-muted" style="display:none;margin-top:0.5rem;">Typing...</div>
+          </div>
+          <form class="dm-input" method="post" action="{{ path('explore_dm_send', {'id': dmSelectedConversation.id}) }}" enctype="multipart/form-data">
+            <input type="text" name="body" placeholder="Your message" id="dm-input-field">
+            <input type="file" name="attachment" id="dm-attach" style="display:none;">
+            <label for="dm-attach" class="btn btn-outline-secondary btn-sm" style="border-radius:999px;">📎</label>
+            <button type="submit">Send</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {% if not app.user %}
+    <div class="offline-card" id="offline-card">
+      <h4 style="font-weight:800;">You are offline</h4>
+      <p>Please connect first to explore and share with the Fitopia community.</p>
+      <div class="hero-actions-inline">
+        <a href="{{ path('app_login') }}" class="btn btn-primary">Sign in</a>
+        <a href="{{ path('app_register') }}" class="btn btn-outline-primary">Don't have an account? Register now for free</a>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="form-panel" id="express-form-panel">
+    <h3 class="section-title">Share your post</h3>
+    {{ form_start(blogForm) }}
+      <div class="mb-3">
+        {{ form_label(blogForm.title) }}
+        <div class="icon-input">
+          <i class="fa fa-heading"></i>
+          {{ form_widget(blogForm.title, {'attr': {'class': 'form-control'}}) }}
+        </div>
+      </div>
+      <div class="mb-3">
+        {{ form_label(blogForm.content) }}
+        <div class="icon-input">
+          <i class="fa fa-align-left"></i>
+          {{ form_widget(blogForm.content, {'attr': {'class': 'form-control'}}) }}
+        </div>
+      </div>
+      <div class="mb-3">
+        {{ form_label(blogForm.excerpt) }}
+        <div class="icon-input">
+          <i class="fa fa-quote-left"></i>
+          {{ form_widget(blogForm.excerpt, {'attr': {'class': 'form-control'}}) }}
+        </div>
+      </div>
+      <div class="mb-3">
+        {{ form_label(blogForm.category) }}
+        <div class="icon-input">
+          <i class="fa fa-tags"></i>
+          {{ form_widget(blogForm.category, {'attr': {'class': 'form-control'}}) }}
+        </div>
+      </div>
+      <div class="mb-3">
+        {{ form_label(blogForm.featuredImageFile, 'Featured image') }}
+        <div class="icon-input">
+          <i class="fa fa-image"></i>
+          {{ form_widget(blogForm.featuredImageFile, {'attr': {'class': 'form-control'}}) }}
+        </div>
+      </div>
+      <button class="btn btn-primary">Publish</button>
+    {{ form_end(blogForm) }}
+  </div>
+
+  <div class="form-panel" id="my-posts-panel">
+    <h3 class="section-title">My Posts</h3>
+    {% if app.user is not defined or not app.user %}
+      <p>Please login to see your posts.</p>
+    {% else %}
+      {% if userPosts is empty %}
+        <p>You have not any post. Let's start our first post.</p>
+        <div class="mt-3">
+          <button class="btn btn-primary" id="btn-open-form">Create first post</button>
+        </div>
+      {% else %}
+        {% for p in userPosts %}
+          <div class="feed-card">
+            <strong>{{ p.title }}</strong>
+            <div class="text-muted mt-1">{{ p.createdAt|date('Y-m-d') }}</div>
+            {% if p.featuredImage %}
+              <img src="{{ asset('uploads/blog/' ~ p.featuredImage) }}" alt="Post image" class="feed-image">
+            {% endif %}
+            <p class="text-muted">{{ p.excerpt }}</p>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endif %}
+  </div>
+
+  <div class="feed-header">
+    <h3 class="feed-title">Explore Feed</h3>
+    <div class="feed-sort">
+      <i class="fa fa-filter"></i>
+      <label for="feed-sort" class="mb-0">Sort by</label>
+      <select id="feed-sort">
+        <option>Newest</option>
+        <option>Most Liked</option>
+        <option>Trending</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="feed-wrap">
+    {% if items is empty %}
+      <div class="feed-card">
+        <p>No posts yet. Be the first to share your experience.</p>
+      </div>
+    {% else %}
+      {% for item in items %}
+        <div class="feed-card">
+          <div class="post-top">
+            <div class="user-row">
+              <div class="avatar-chip">{{ item.email ? item.email|slice(0, 1)|upper : 'U' }}</div>
+              <div class="user-meta">
+                <strong>{{ item.email ?: 'Fitopia member' }}</strong>
+                <small class="text-muted">{{ item.date }}</small>
+              </div>
+            </div>
+          </div>
+          <div class="post-tags">
+            {% if item.category %}
+              <span class="category-pill">{{ item.category }}</span>
+            {% endif %}
+            <span class="role-badge"><i class="fa fa-id-badge"></i> {{ item.role }}</span>
+            {% if loop.first %}
+              <span class="trending-badge"><i class="fa fa-fire"></i> Trending</span>
+            {% endif %}
+          </div>
+          <div class="post-title">{{ item.title }}</div>
+          <p class="post-preview">
+            {{ item.excerpt ? item.excerpt : 'No preview available yet.' }}
+          </p>
+          <button class="link-btn js-read-more" type="button">Read more</button>
+          {% if item.image %}
+            <img src="{{ asset('uploads/blog/' ~ item.image) }}" alt="Post image" class="feed-image">
+          {% else %}
+            <div class="image-holder" style="color:#0b3a3d;background:#eef6f4;border-color:#cfe3dd;height:200px;">No image</div>
+          {% endif %}
+          <div class="post-actions">
+            <form method="post" action="{{ path('explore_interact', {'id': item.id}) }}">
+              <input type="hidden" name="_token" value="{{ csrf_token('interact_like_' ~ item.id) }}">
+              <input type="hidden" name="type" value="like">
+              <button class="btn btn-outline-secondary btn-sm{% if item.likedByMe %} is-active{% endif %} js-action-btn" data-action="like" type="submit">
+                <i class="fa fa-heart"></i> Like
+              </button>
+            </form>
+            <button class="btn btn-outline-secondary btn-sm js-toggle-comment" type="button" data-post-id="{{ item.id }}">
+              <i class="fa fa-comment"></i> Comment
+            </button>
+            <form method="post" action="{{ path('explore_interact', {'id': item.id}) }}">
+              <input type="hidden" name="_token" value="{{ csrf_token('interact_repost_' ~ item.id) }}">
+              <input type="hidden" name="type" value="repost">
+              <button class="btn btn-outline-secondary btn-sm{% if item.repostedByMe %} is-active{% endif %} js-action-btn" data-action="repost" type="submit">
+                <i class="fa fa-retweet"></i> Repost
+              </button>
+            </form>
+          </div>
+          <div class="action-toast" id="toast-{{ item.id }}"></div>
+          <div class="interaction-counts">
+            <span><i class="fa fa-heart"></i> {{ item.likes.count }} likes</span>
+            <span><i class="fa fa-comment"></i> {{ item.comments.count }} comments</span>
+            <span><i class="fa fa-retweet"></i> {{ item.reposts.count }} reposts</span>
+          </div>
+          {% if item.likes.count > 0 %}
+            <div class="text-muted">Liked by: {{ item.likes.users|slice(0, 3)|join(', ') }}{% if item.likes.count > 3 %} and others{% endif %}</div>
+          {% endif %}
+          {% if item.reposts.count > 0 %}
+            <div class="text-muted">Reposted by: {{ item.reposts.users|slice(0, 3)|join(', ') }}{% if item.reposts.count > 3 %} and others{% endif %}</div>
+          {% endif %}
+          <div class="comment-form" id="comment-form-{{ item.id }}" style="display:none;">
+            <form method="post" action="{{ path('explore_interact', {'id': item.id}) }}">
+              <input type="hidden" name="_token" value="{{ csrf_token('interact_comment_' ~ item.id) }}">
+              <input type="hidden" name="type" value="comment">
+              <div class="mb-2">
+                <textarea name="comment_text" class="form-control" rows="2" placeholder="Write your comment..."></textarea>
+              </div>
+              <button class="btn btn-primary btn-sm" type="submit">Post comment</button>
+            </form>
+          </div>
+          <div class="post-divider"></div>
+          <button class="link-btn comments-link js-toggle-comments" type="button" data-post-id="{{ item.id }}">
+            View all {{ item.comments.count }} comments
+          </button>
+          <ul class="comment-list" id="comment-list-{{ item.id }}" style="display:none;">
+            {% for c in item.comments.items|slice(0, 5) %}
+              <li class="comment-item">
+                <div class="comment-author">{{ c.user }}</div>
+                <div class="comment-text">{{ c.text }}</div>
+                <small class="text-muted">{{ c.date }}</small>
+              </li>
+            {% else %}
+              <li class="comment-item text-muted">No comments yet.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <h3 class="section-title">Share your story</h3>
+  <div class="cta-box">
+    <p>Your voice matters. Share a question, a tip, or a win to inspire the community.</p>
+    {% if app.user %}
+      <a href="{{ path('app_profile') }}" class="btn btn-primary">My profile</a>
+    {% else %}
+      <a href="{{ path('app_register') }}" class="btn btn-primary">Join Fitopia</a>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const expressBtn = document.getElementById('btn-express');
+    const myPostsBtn = document.getElementById('btn-my-posts');
+    const openFormBtn = document.getElementById('btn-open-form');
+    const expressPanel = document.getElementById('express-form-panel');
+    const myPostsPanel = document.getElementById('my-posts-panel');
+
+    function show(panel) {
+      if (!panel) return;
+      expressPanel.classList.remove('active');
+      myPostsPanel.classList.remove('active');
+      panel.classList.add('active');
+      panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    if (expressBtn) {
+      expressBtn.addEventListener('click', () => show(expressPanel));
+    }
+    if (myPostsBtn) {
+      myPostsBtn.addEventListener('click', () => show(myPostsPanel));
+    }
+    if (openFormBtn) {
+      openFormBtn.addEventListener('click', () => show(expressPanel));
+    }
+
+    const readMoreButtons = document.querySelectorAll('.js-read-more');
+    readMoreButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const preview = btn.closest('.feed-card')?.querySelector('.post-preview');
+        if (!preview) return;
+        preview.classList.toggle('expanded');
+        btn.textContent = preview.classList.contains('expanded') ? 'Show less' : 'Read more';
+      });
+    });
+
+    const toggleComments = document.querySelectorAll('.js-toggle-comments');
+    toggleComments.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-post-id');
+        const list = document.getElementById('comment-list-' + id);
+        if (!list) return;
+        const isHidden = list.style.display === 'none' || list.style.display === '';
+        list.style.display = isHidden ? 'block' : 'none';
+        btn.textContent = isHidden ? 'Hide comments' : btn.textContent.replace('Hide comments', 'View all comments');
+      });
+    });
+
+    const toggleCommentForms = document.querySelectorAll('.js-toggle-comment');
+    toggleCommentForms.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-post-id');
+        const form = document.getElementById('comment-form-' + id);
+        if (!form) return;
+        const isHidden = form.style.display === 'none' || form.style.display === '';
+        form.style.display = isHidden ? 'block' : 'none';
+      });
+    });
+
+    const actionButtons = document.querySelectorAll('.js-action-btn');
+    actionButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.feed-card');
+        const toast = card?.querySelector('.action-toast');
+        const action = btn.getAttribute('data-action') || 'Action';
+        if (toast) {
+          toast.textContent = action.charAt(0).toUpperCase() + action.slice(1) + ' saved';
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        btn.classList.toggle('is-active');
+      });
+    });
+
+    const commentForms = document.querySelectorAll('.comment-form form');
+    commentForms.forEach(form => {
+      form.addEventListener('submit', () => {
+        const card = form.closest('.feed-card');
+        const toast = card?.querySelector('.action-toast');
+        if (toast) {
+          toast.textContent = 'Comment added';
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+      });
+    });
+
+    const dmSearchInput = document.getElementById('dm-search-input');
+    if (dmSearchInput) {
+      dmSearchInput.addEventListener('input', () => {
+        const query = dmSearchInput.value.trim().toLowerCase();
+        const items = document.querySelectorAll('#dm-conversation-list .dm-item');
+        items.forEach(item => {
+          const name = item.getAttribute('data-user') || '';
+          const match = name.toLowerCase().includes(query);
+          item.style.display = match ? 'grid' : 'none';
+        });
+      });
+    }
+
+    const dmInput = document.getElementById('dm-input-field');
+    const dmTypingIndicator = document.getElementById('dm-typing-indicator');
+    const dmConversationId = "{{ dmSelectedConversation ? dmSelectedConversation.id : '' }}";
+
+    if (dmInput && dmConversationId) {
+      let typingTimeout;
+      dmInput.addEventListener('input', () => {
+        clearTimeout(typingTimeout);
+        fetch(`/explore/messages/${dmConversationId}/typing`, { method: 'POST' });
+        typingTimeout = setTimeout(() => {}, 2000);
+      });
+
+      setInterval(async () => {
+        try {
+          const res = await fetch(`/explore/messages/${dmConversationId}/poll`);
+          if (!res.ok) return;
+          const data = await res.json();
+          if (!data.messages) return;
+
+          const thread = document.querySelector('.dm-thread');
+          if (!thread) return;
+          const existing = thread.querySelectorAll('.dm-bubble').length;
+          if (data.messages.length !== existing) {
+            thread.innerHTML = data.messages.map(m => {
+              const align = m.isMine ? 'me' : '';
+              const status = m.isMine ? ` · ${m.status}` : '';
+              const attachment = m.attachment
+                ? (m.attachmentMime && m.attachmentMime.startsWith('image/')
+                    ? `<img src="/${m.attachment}" style="margin-top:0.5rem;max-width:100%;border-radius:12px;">`
+                    : `<div style="margin-top:0.4rem;"><a href="/${m.attachment}" target="_blank">View attachment</a></div>`)
+                : '';
+              return `<div class="dm-bubble ${align}">${m.body}<small>${m.createdAt}${status}</small>${attachment}</div>`;
+            }).join('');
+          }
+          if (dmTypingIndicator) {
+            dmTypingIndicator.style.display = data.typing ? 'block' : 'none';
+          }
+        } catch (e) {}
+      }, 3000);
+    }
+  });
+</script>
+{% endblock %}
