@@ -3,6 +3,10 @@
     -fx-background-color: #eef2f1;
 }
 
+.back-sidebar-shell {
+    -fx-padding: 16 0 16 16;
+}
+
 .app-scroll,
 .app-scroll .viewport {
     -fx-background-color: transparent;
@@ -11,8 +15,13 @@
 /* SIDEBAR */
 .back-sidebar {
     -fx-background-color: linear-gradient(to bottom, #073f42, #0f6a60);
-    -fx-pref-width: 300;
-    -fx-padding: 26 22 26 22;
+    -fx-background-radius: 26;
+    -fx-border-color: rgba(255,255,255,0.10);
+    -fx-border-width: 1;
+    -fx-border-radius: 26;
+    -fx-pref-width: 264;
+    -fx-padding: 24 22 18 22;
+    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.18), 24, 0.16, 0, 6);
 }
 
 .back-sidebar-logo {
@@ -67,6 +76,12 @@
     -fx-background-color: rgba(255,255,255,0.18);
 }
 
+.back-sidebar-footer {
+    -fx-padding: 18 0 4 0;
+    -fx-border-color: rgba(255,255,255,0.12) transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
 /* LOGOUT */
 .back-logout-button {
     -fx-background-color: white;
@@ -76,6 +91,11 @@
     -fx-font-weight: 800;
     -fx-padding: 14 18;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.10), 10, 0.10, 0, 2);
+}
+
+.back-logout-button:hover {
+    -fx-background-color: #f4fbf8;
 }
 
 /* HERO */
@@ -229,7 +249,7 @@
 .back-field-label {
     -fx-text-fill: #182033;
     -fx-font-size: 14px;
-    -fx-font-weight: 900;
+    -fx-font-weight: 800;
 }
 
 .back-field-label-red {

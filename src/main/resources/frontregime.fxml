@@ -86,10 +86,7 @@
                                         </VBox>
                                         <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                             <Label styleClass="field-label" text="Date du repas"/>
-                                            <HBox spacing="10.0">
-                                                <DatePicker fx:id="dpDateRepas" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
-                                                <TextField fx:id="tfRepasHeure" promptText="HH:mm" styleClass="text-input"/>
-                                            </HBox>
+                                            <DatePicker fx:id="dpDateRepas" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
                                         </VBox>
                                         <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                             <Label styleClass="field-label field-label-accent" text="Type de repas"/>
@@ -167,10 +164,7 @@
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                         <Label styleClass="field-label" text="Date du repas"/>
-                                        <HBox spacing="10.0">
-                                            <DatePicker fx:id="dpDateRepasEdit" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
-                                            <TextField fx:id="tfRepasHeureEdit" promptText="HH:mm" styleClass="text-input"/>
-                                        </HBox>
+                                        <DatePicker fx:id="dpDateRepasEdit" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                         <Label styleClass="field-label" text="Type de repas"/>

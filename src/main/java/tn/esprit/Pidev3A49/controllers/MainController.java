@@ -24,13 +24,11 @@ import tn.esprit.Pidev3A49.services.ServiceUser;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class MainController {
 
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final LocalTime DEFAULT_REPAS_TIME = LocalTime.of(9, 0);
     private static final List<String> TYPE_REPAS_OPTIONS = List.of(
             "petit_de", "breakfast", "dejeuner", "diner", "evening", "collat", "extra_meal"
     );
@@ -65,8 +63,6 @@ public class MainController {
     @FXML private ComboBox<User> cbRepasUserEdit;
     @FXML private DatePicker dpDateRepas;
     @FXML private DatePicker dpDateRepasEdit;
-    @FXML private TextField tfRepasHeure;
-    @FXML private TextField tfRepasHeureEdit;
     @FXML private ComboBox<String> cbTypeRepas;
     @FXML private ComboBox<String> cbTypeRepasEdit;
     @FXML private TextField tfRepasNom;
@@ -304,7 +300,6 @@ public class MainController {
     private void viderFormulaireRepas() {
         cbRepasUser.getSelectionModel().clearSelection();
         dpDateRepas.setValue(null);
-        tfRepasHeure.clear();
         cbTypeRepas.getSelectionModel().clearSelection();
         tfRepasNom.clear();
         taRepasDescription.clear();
@@ -320,7 +315,6 @@ public class MainController {
         tfRepasId.clear();
         cbRepasUserEdit.getSelectionModel().clearSelection();
         dpDateRepasEdit.setValue(null);
-        tfRepasHeureEdit.clear();
         cbTypeRepasEdit.getSelectionModel().clearSelection();
         tfRepasNomEdit.clear();
         taRepasDescriptionEdit.clear();
@@ -445,10 +439,8 @@ public class MainController {
         selectionnerUser(cbRepasUserEdit, repas.getUserId());
         if (repas.getDateRepas() != null) {
             dpDateRepasEdit.setValue(repas.getDateRepas().toLocalDate());
-            tfRepasHeureEdit.setText(repas.getDateRepas().toLocalTime().format(TIME_FORMATTER));
         } else {
             dpDateRepasEdit.setValue(null);
-            tfRepasHeureEdit.clear();
         }
         cbTypeRepasEdit.setValue(repas.getTypeRepas());
         tfRepasNomEdit.setText(repas.getNomRepas());
@@ -475,7 +467,6 @@ public class MainController {
     private Repas construireRepas(boolean editMode) {
         User user = editMode ? cbRepasUserEdit.getValue() : cbRepasUser.getValue();
         DatePicker datePicker = editMode ? dpDateRepasEdit : dpDateRepas;
-        TextField heureField = editMode ? tfRepasHeureEdit : tfRepasHeure;
         ComboBox<String> typeCombo = editMode ? cbTypeRepasEdit : cbTypeRepas;
         TextField nomField = editMode ? tfRepasNomEdit : tfRepasNom;
         TextArea commentaireField = editMode ? taRepasDescriptionEdit : taRepasDescription;
@@ -487,12 +478,11 @@ public class MainController {
 
         if (user == null) throw new IllegalArgumentException("Selectionnez un utilisateur.");
         if (datePicker.getValue() == null) throw new IllegalArgumentException("Selectionnez une date.");
-        LocalTime heure = parseTime(heureField.getText());
         RegimeAlimentaire regime = regimeCombo.getValue();
 
         return new Repas(
                 user.getId(),
-                LocalDateTime.of(datePicker.getValue(), heure),
+                resolveRepasDateTime(editMode, datePicker.getValue()),
                 typeCombo.getValue(),
                 nomField.getText(),
                 parseInteger(caloriesField.getText()),
@@ -542,13 +532,15 @@ public class MainController {
         }
     }
 
-    private LocalTime parseTime(String value) {
-        try {
-            if (value == null || value.isBlank()) return LocalTime.of(9, 0);
-            return LocalTime.parse(value.trim(), TIME_FORMATTER);
-        } catch (DateTimeParseException exception) {
-            throw new IllegalArgumentException("Format heure invalide. Utilisez HH:mm.");
+    private LocalDateTime resolveRepasDateTime(boolean editMode, LocalDate date) {
+        LocalTime time = DEFAULT_REPAS_TIME;
+        if (editMode) {
+            Repas selectedRepas = tableRepasEdit.getSelectionModel().getSelectedItem();
+            if (selectedRepas != null && selectedRepas.getDateRepas() != null) {
+                time = selectedRepas.getDateRepas().toLocalTime();
+            }
         }
+        return LocalDateTime.of(date, time);
     }
 
     private Integer parseInteger(String value) {
