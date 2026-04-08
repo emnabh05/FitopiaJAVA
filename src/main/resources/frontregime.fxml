@@ -19,8 +19,10 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<!--suppress XMLErrors -->
+<!--suppress XMLWarnings -->
 <BorderPane prefHeight="920.0" prefWidth="1600.0" stylesheets="@styles/admin-theme.css" styleClass="app-root"
-            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
     <left>
         <VBox prefWidth="280.0" spacing="22.0" styleClass="sidebar">

@@ -584,14 +584,21 @@ public class MainController {
     }
 
     private void activerBoutonModule(Button boutonActif, Button... autres) {
-        boutonActif.getStyleClass().setAll("sidebar-nav-button", "sidebar-nav-button-active");
-        for (Button button : autres) button.getStyleClass().setAll("sidebar-nav-button");
+        setStyleFlag(boutonActif, "sidebar-nav-button-active", true);
+        for (Button button : autres) setStyleFlag(button, "sidebar-nav-button-active", false);
     }
 
     private void activerBoutonAction(Button boutonActif, Button... boutons) {
-        for (Button button : boutons) {
-            if (button == boutonActif) button.getStyleClass().setAll("action-card", "action-card-active");
-            else button.getStyleClass().setAll("action-card");
+        // Keep option cards visually identical; switching only changes the visible panel.
+    }
+
+    private void setStyleFlag(Button button, String styleClass, boolean active) {
+        if (active) {
+            if (!button.getStyleClass().contains(styleClass)) {
+                button.getStyleClass().add(styleClass);
+            }
+        } else {
+            button.getStyleClass().remove(styleClass);
         }
     }
 

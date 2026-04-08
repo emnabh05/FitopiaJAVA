@@ -336,3 +336,723 @@
     -fx-font-size: 14px;
     -fx-text-fill: #253242;
 }
+
+.back-root {
+    -fx-background-color: linear-gradient(to bottom right, #f5fbf8, #edf6f3);
+}
+
+.back-root .sidebar {
+    -fx-background-color: linear-gradient(to bottom, #0f4b4b, #135a55);
+    -fx-padding: 26 24 28 24;
+}
+
+.back-root .sidebar-logo {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 14;
+    -fx-min-width: 44;
+    -fx-min-height: 44;
+    -fx-text-fill: #1b6b60;
+    -fx-font-size: 18px;
+}
+
+.back-root .sidebar-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+}
+
+.back-root .sidebar-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255,255,255,0.76);
+}
+
+.back-root .user-card {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 16;
+    -fx-padding: 12 14 12 14;
+}
+
+.back-root .user-mail {
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+}
+
+.back-root .sidebar-nav-button {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-background-radius: 16;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-padding: 16 18 16 18;
+}
+
+.back-root .sidebar-nav-button-active {
+    -fx-background-color: rgba(255,255,255,0.12);
+}
+
+.back-root .logout-button {
+    -fx-background-radius: 14;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.back-root .hero-banner {
+    -fx-background-color: linear-gradient(to right, #0f5551, #198066);
+    -fx-background-radius: 22;
+    -fx-padding: 30 40 30 40;
+    -fx-effect: dropshadow(gaussian, rgba(17, 84, 79, 0.14), 28, 0.20, 0, 8);
+}
+
+.back-root .hero-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+}
+
+.back-root .hero-subtitle {
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
+}
+
+.back-root .action-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 20;
+    -fx-border-color: #e6efeb;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-padding: 28 24 28 24;
+    -fx-pref-height: 158;
+    -fx-effect: dropshadow(gaussian, rgba(24, 63, 65, 0.07), 22, 0.16, 0, 6);
+}
+
+.back-root .action-card-active {
+    -fx-border-color: #5db8a7;
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(49, 161, 138, 0.12), 20, 0.14, 0, 5);
+}
+
+.back-root .panel-card {
+    -fx-background-color: rgba(255, 255, 255, 0.98);
+    -fx-background-radius: 24;
+    -fx-border-color: #e1eee8;
+    -fx-border-radius: 24;
+    -fx-border-width: 1;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(gaussian, rgba(14, 54, 57, 0.07), 28, 0.16, 0, 8);
+}
+
+.back-root .section-title {
+    -fx-font-size: 25px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1d2436;
+}
+
+.back-root .section-subtitle {
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #7a8595;
+}
+
+.back-root .status-banner {
+    -fx-background-color: linear-gradient(to right, #14524f, #1d826f);
+    -fx-background-radius: 14;
+    -fx-padding: 18 22 18 22;
+}
+
+.back-root .status-banner-text {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.back-root .section-block {
+    -fx-background-color: #fcfefd;
+    -fx-background-radius: 20;
+    -fx-border-color: #dceae5;
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-padding: 18 18 16 18;
+}
+
+.back-root .section-block-title {
+    -fx-font-size: 17px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #214f56;
+}
+
+.back-root .field-card,
+.back-root .metric-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16;
+    -fx-border-color: #e3eeea;
+    -fx-border-width: 1;
+    -fx-border-radius: 16;
+    -fx-padding: 12 14 12 14;
+}
+
+.back-root .field-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1d2638;
+}
+
+.back-root .field-label-danger {
+    -fx-text-fill: #bf403c;
+}
+
+.back-root .field-label-accent {
+    -fx-text-fill: #17866a;
+}
+
+.back-root .text-input,
+.back-root .combo-input,
+.back-root .date-input,
+.back-root .text-area-input {
+    -fx-background-color: #ffffff;
+    -fx-background-insets: 0;
+    -fx-background-radius: 14;
+    -fx-border-color: #d9e7e0;
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #223044;
+    -fx-prompt-text-fill: #a7b0bf;
+    -fx-padding: 12 14 12 14;
+}
+
+.back-root .text-input:focused,
+.back-root .combo-input:focused,
+.back-root .date-input:focused,
+.back-root .text-area-input:focused {
+    -fx-border-color: #57a995;
+    -fx-effect: dropshadow(gaussian, rgba(73, 161, 138, 0.14), 12, 0.15, 0, 2);
+}
+
+.back-root .combo-box > .list-cell,
+.back-root .date-picker > .text-field {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #223044;
+}
+
+.back-root .combo-box .arrow-button,
+.back-root .date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 12;
+}
+
+.back-root .combo-box .arrow,
+.back-root .date-picker .arrow {
+    -fx-background-color: #2b4950;
+}
+
+.back-root .text-area-input .content {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16;
+}
+
+.back-root .primary-button {
+    -fx-background-color: linear-gradient(to right, #11544f, #19836e);
+    -fx-background-radius: 14;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+    -fx-padding: 14 26 14 26;
+    -fx-effect: dropshadow(gaussian, rgba(18, 91, 79, 0.18), 18, 0.18, 0, 5);
+}
+
+.back-root .secondary-button,
+.back-root .danger-button {
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+}
+
+.back-root .data-table {
+    -fx-background-color: #fbfdfc;
+    -fx-background-radius: 22;
+    -fx-border-color: #dbe9e3;
+    -fx-border-radius: 22;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+}
+
+.back-root .back-main-panel {
+    -fx-padding: 28 28 24 28;
+}
+
+.back-root .back-status-banner {
+    -fx-background-radius: 16;
+    -fx-padding: 16 20 16 20;
+}
+
+.back-root .status-banner-text-strong {
+    -fx-font-weight: 900;
+}
+
+.back-root .back-section-shell {
+    -fx-padding: 18;
+}
+
+.back-root .back-block-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #204e57;
+}
+
+.back-root .back-field-card {
+    -fx-padding: 14;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+}
+
+.back-root .back-field-card-wide {
+    -fx-padding: 14 16 14 16;
+}
+
+.back-root .back-metric-card {
+    -fx-padding: 14 16 14 16;
+}
+
+.back-root .back-label-red {
+    -fx-text-fill: #c13f39;
+}
+
+.back-root .back-label-green {
+    -fx-text-fill: #1a8a6c;
+}
+
+.back-root .back-label-dark {
+    -fx-text-fill: #1d273b;
+}
+
+.back-root .back-input {
+    -fx-min-height: 46;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-padding: 12 16 12 16;
+}
+
+.back-root .back-time-input {
+    -fx-pref-width: 110;
+}
+
+.back-root .back-input .content {
+    -fx-background-radius: 14;
+}
+
+.back-root .agenda-hero {
+    -fx-background-color: linear-gradient(to right, #0b3a3d, #0d5b50, #0f7a5f);
+    -fx-background-radius: 16;
+    -fx-padding: 32 40 32 40;
+    -fx-effect: dropshadow(gaussian, rgba(14, 30, 37, 0.18), 40, 0.18, 0, 8);
+}
+
+.back-root .option-grid {
+    -fx-padding: 8 0 0 0;
+}
+
+.back-root .option-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 14;
+    -fx-border-color: #eef2f6;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 24 24 24 24;
+    -fx-pref-height: 180;
+    -fx-alignment: top-left;
+    -fx-content-display: graphic-only;
+    -fx-wrap-text: false;
+    -fx-effect: dropshadow(gaussian, rgba(14, 30, 37, 0.08), 26, 0.14, 0, 8);
+}
+
+.back-root .option-card.selected,
+.back-root .option-card.action-card-active {
+    -fx-border-color: #0f7a5f;
+    -fx-effect: dropshadow(gaussian, rgba(15, 122, 95, 0.15), 10, 0.10, 0, 0);
+}
+
+.back-root .option-icon {
+    -fx-min-width: 42;
+    -fx-min-height: 42;
+    -fx-alignment: center;
+    -fx-background-color: #e6f0ee;
+    -fx-background-radius: 10;
+    -fx-text-fill: #0b3a3d;
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+}
+
+.back-root .option-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0f172a;
+}
+
+.back-root .option-desc {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6b7280;
+}
+
+.back-root .panel {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16;
+    -fx-border-color: #eef2f6;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 28 28 28 28;
+    -fx-effect: dropshadow(gaussian, rgba(14, 30, 37, 0.08), 26, 0.14, 0, 8);
+}
+
+.back-root .form-wrap {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f9fcfb);
+    -fx-background-radius: 18;
+    -fx-border-color: #dbe7e3;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 20 20 20 20;
+    -fx-effect: dropshadow(gaussian, rgba(10, 44, 37, 0.08), 20, 0.10, 0, 6);
+}
+
+.back-root .form-hero {
+    -fx-background-color: linear-gradient(to right, #0b3a3d, #0d5b50, #0f7a5f);
+    -fx-background-radius: 14;
+    -fx-padding: 16 20 16 20;
+}
+
+.back-root .form-hero-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+}
+
+.back-root .form-section {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 14;
+    -fx-border-color: #dbe7e3;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-padding: 16 16 16 16;
+}
+
+.back-root .section-title-form {
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0b3a3d;
+}
+
+.back-root .field-card {
+    -fx-background-color: #fcfefd;
+    -fx-background-radius: 12;
+    -fx-border-color: #e6efeb;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-padding: 12 12 12 12;
+}
+
+.back-root .field-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #0f172a;
+}
+
+.back-root .form-control,
+.back-root .form-control.text-field,
+.back-root .form-control.combo-box,
+.back-root .form-control.date-picker,
+.back-root .form-control.text-area {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12;
+    -fx-border-color: #d8e4df;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
+    -fx-min-height: 44;
+    -fx-padding: 10 12 10 12;
+}
+
+.back-root .form-control:focused {
+    -fx-border-color: #14b88a;
+    -fx-effect: dropshadow(gaussian, rgba(20, 184, 138, 0.16), 0, 0, 0, 0);
+}
+
+.back-root .submit-row {
+    -fx-padding: 4 0 0 0;
+}
+
+.back-root .action-btn,
+.back-root .primary-button.action-btn {
+    -fx-background-color: linear-gradient(to right, #0b3a3d, #0f7a5f);
+    -fx-background-radius: 10;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-padding: 12 20 12 20;
+    -fx-effect: dropshadow(gaussian, rgba(11, 58, 61, 0.24), 18, 0.16, 0, 6);
+}
+
+.back-root .back-sidebar {
+    -fx-background-color: linear-gradient(to bottom, #0f4d4d, #145a54);
+}
+
+.back-root .back-sidebar-logo {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-alignment: center;
+    -fx-text-fill: #1a7d66;
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-sidebar-title {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-sidebar-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.7);
+    -fx-font-size: 12px;
+}
+
+.back-root .back-user-card {
+    -fx-background-color: rgba(255,255,255,0.12);
+    -fx-background-radius: 18;
+    -fx-padding: 16 18 16 18;
+}
+
+.back-root .back-user-label {
+    -fx-font-size: 1;
+    -fx-padding: 0;
+}
+
+.back-root .back-user-mail {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+}
+
+.back-root .back-nav-button {
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-background-radius: 16;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 800;
+    -fx-padding: 16 18 16 18;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.back-root .back-nav-button.sidebar-nav-button-active {
+    -fx-background-color: rgba(255,255,255,0.14);
+}
+
+.back-root .back-logout-button {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-text-fill: #0f4d4d;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 14 18 14 18;
+}
+
+.back-root .back-content-root {
+    -fx-min-width: 1180px;
+}
+
+.back-root .back-hero-banner {
+    -fx-background-color: linear-gradient(to right, #0e5150, #1b866a);
+    -fx-background-radius: 22;
+    -fx-padding: 34 42 34 42;
+    -fx-effect: dropshadow(gaussian, rgba(14, 30, 37, 0.16), 28, 0.18, 0, 8);
+}
+
+.back-root .back-hero-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-hero-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.88);
+    -fx-font-size: 16px;
+    -fx-font-weight: 500;
+}
+
+.back-root .back-option-grid {
+    -fx-padding: 8 0 4 0;
+}
+
+.back-root .back-option-card {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-border-color: #edf2f4;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-pref-height: 176;
+    -fx-padding: 24 26 24 26;
+    -fx-alignment: top-left;
+    -fx-content-display: graphic-only;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.06), 24, 0.16, 0, 8);
+}
+
+.back-root .back-option-card.selected,
+.back-root .back-option-card.action-card-active {
+    -fx-border-color: #61c4b3;
+    -fx-border-width: 2;
+}
+
+.back-root .back-option-icon {
+    -fx-min-width: 46;
+    -fx-min-height: 46;
+    -fx-background-color: #edf6f3;
+    -fx-background-radius: 12;
+    -fx-alignment: center;
+    -fx-text-fill: #0b3a3d;
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-option-title {
+    -fx-text-fill: #0f172a;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-option-desc {
+    -fx-text-fill: #7a8494;
+    -fx-font-size: 14px;
+    -fx-font-weight: 500;
+}
+
+.back-root .back-panel {
+    -fx-background-color: white;
+    -fx-background-radius: 22;
+    -fx-border-color: #edf2f4;
+    -fx-border-radius: 22;
+    -fx-border-width: 1;
+    -fx-padding: 28 30 28 30;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.06), 24, 0.16, 0, 8);
+}
+
+.back-root .back-panel-title {
+    -fx-text-fill: #111827;
+    -fx-font-size: 25px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-panel-subtitle {
+    -fx-text-fill: #7b8596;
+    -fx-font-size: 16px;
+}
+
+.back-root .back-form-wrap {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #fbfefd);
+    -fx-background-radius: 20;
+    -fx-border-color: #dce8e3;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 20 20 20 20;
+}
+
+.back-root .back-form-hero {
+    -fx-background-color: linear-gradient(to right, #0e514f, #197e69);
+    -fx-background-radius: 16;
+    -fx-padding: 16 20 16 20;
+}
+
+.back-root .back-form-hero-text {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+}
+
+.back-root .back-form-hero-strong {
+    -fx-font-weight: 900;
+}
+
+.back-root .back-form-hero-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+}
+
+.back-root .back-form-section {
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-border-color: #e2ece7;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 16 16 16 16;
+}
+
+.back-root .back-form-section-title {
+    -fx-text-fill: #173f46;
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-field-card,
+.back-root .back-metric-card {
+    -fx-background-color: #fcfefd;
+    -fx-background-radius: 16;
+    -fx-border-color: #e4eeea;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 14 14 14 14;
+}
+
+.back-root .back-field-card-full {
+    -fx-padding: 14 16 14 16;
+}
+
+.back-root .back-field-label {
+    -fx-text-fill: #172033;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+}
+
+.back-root .back-field-label-red {
+    -fx-text-fill: #c13b33;
+}
+
+.back-root .back-field-label-green {
+    -fx-text-fill: #178566;
+}
+
+.back-root .back-form-control {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #d8e4df;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-min-height: 46;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #243142;
+    -fx-prompt-text-fill: #b0b8c6;
+    -fx-padding: 10 14 10 14;
+}
+
+.back-root .back-form-control:focused {
+    -fx-border-color: #14b88a;
+}
+
+.back-root .back-text-area {
+    -fx-pref-height: 72;
+}
+
+.back-root .back-text-area .content {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+}
+
+.back-root .back-submit-row {
+    -fx-padding: 2 0 0 0;
+}
+
+.back-root .back-submit-button {
+    -fx-background-color: linear-gradient(to right, #0c4e4a, #107a63);
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-padding: 14 22 14 22;
+    -fx-effect: dropshadow(gaussian, rgba(11, 58, 61, 0.24), 18, 0.16, 0, 6);
+}

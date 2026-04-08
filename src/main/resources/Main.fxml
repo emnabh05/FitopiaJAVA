@@ -6,8 +6,10 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
+<!--suppress XMLErrors -->
+<!--suppress XMLWarnings -->
 <StackPane prefHeight="920.0" prefWidth="1600.0" stylesheets="@styles/admin-theme.css" styleClass="landing-root"
-           xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+           xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="tn.esprit.Pidev3A49.controllers.NavigationController">
     <children>
         <VBox alignment="CENTER" maxWidth="520.0" spacing="28.0" styleClass="landing-card">

@@ -1,0 +1,294 @@
+/* ROOT */
+.back-root {
+    -fx-background-color: #eef2f1;
+}
+
+.app-scroll,
+.app-scroll .viewport {
+    -fx-background-color: transparent;
+}
+
+/* SIDEBAR */
+.back-sidebar {
+    -fx-background-color: linear-gradient(to bottom, #073f42, #0f6a60);
+    -fx-pref-width: 300;
+    -fx-padding: 26 22 26 22;
+}
+
+.back-sidebar-logo {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-alignment: center;
+    -fx-text-fill: #0f6a60;
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+}
+
+.back-sidebar-title {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+}
+
+.back-user-card {
+    -fx-background-color: rgba(255,255,255,0.12);
+    -fx-background-radius: 18;
+    -fx-padding: 12 14 12 14;
+}
+
+.back-user-label {
+    -fx-text-fill: rgba(255,255,255,0.70);
+    -fx-font-size: 12px;
+}
+
+.back-user-mail {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+}
+
+/* NAV BUTTONS */
+.back-nav-button {
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-background-radius: 16;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-padding: 16 18;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.back-nav-button:hover {
+    -fx-background-color: rgba(255,255,255,0.16);
+}
+
+.sidebar-nav-button-active {
+    -fx-background-color: rgba(255,255,255,0.18);
+}
+
+/* LOGOUT */
+.back-logout-button {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-text-fill: #073f42;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 14 18;
+    -fx-cursor: hand;
+}
+
+/* HERO */
+.back-hero-banner {
+    -fx-background-color: linear-gradient(to right, #0a4e4d, #177a62);
+    -fx-background-radius: 24;
+    -fx-padding: 38 44;
+}
+
+.back-hero-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+}
+
+.back-hero-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.88);
+    -fx-font-size: 16px;
+}
+
+/* CARDS ACTION */
+.back-option-card {
+    -fx-background-color: white;
+    -fx-background-radius: 20;
+    -fx-border-color: #e3ebe8;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-pref-height: 190;
+    -fx-padding: 28;
+    -fx-alignment: top-left;
+    -fx-content-display: graphic-only;
+    -fx-cursor: hand;
+}
+
+.back-option-card:hover {
+    -fx-border-color: #62bda9;
+}
+
+
+.back-option-card-active {
+    -fx-border-color: #62bda9;
+    -fx-border-width: 2;
+}
+.action-card-active {
+    -fx-border-color: #62bda9;
+    -fx-border-width: 2;
+}
+
+.back-option-icon {
+    -fx-min-width: 50;
+    -fx-min-height: 50;
+    -fx-background-color: #edf5f3;
+    -fx-background-radius: 14;
+    -fx-alignment: center;
+    -fx-text-fill: #0d4745;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+}
+
+.back-option-title {
+    -fx-text-fill: #111827;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+}
+
+.back-option-desc {
+    -fx-text-fill: #73808f;
+    -fx-font-size: 14px;
+}
+
+/* PANEL */
+.back-panel {
+    -fx-background-color: #fbfcfc;
+    -fx-background-radius: 24;
+    -fx-border-color: #e1e9e6;
+    -fx-border-radius: 24;
+    -fx-border-width: 1;
+    -fx-padding: 28;
+}
+
+.back-panel-title {
+    -fx-text-fill: #172033;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+}
+
+.back-panel-subtitle {
+    -fx-text-fill: #73808f;
+    -fx-font-size: 15px;
+}
+
+/* FORM */
+.back-form-wrap {
+    -fx-background-color: #f9fbfb;
+    -fx-background-radius: 22;
+    -fx-border-color: #d9e6e2;
+    -fx-border-radius: 22;
+    -fx-border-width: 1;
+    -fx-padding: 26;
+}
+
+/* CONNECTED USER BAR */
+.back-form-hero {
+    -fx-background-color: linear-gradient(to right, #0b4d4d, #177d62);
+    -fx-background-radius: 16;
+    -fx-padding: 16 20;
+}
+
+.back-form-hero-text {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.back-form-hero-strong {
+    -fx-font-weight: 900;
+}
+
+.back-form-hero-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+}
+
+/* FORM SECTIONS */
+.back-form-section {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 18;
+    -fx-border-color: #dfe9e5;
+    -fx-border-radius: 18;
+    -fx-border-width: 1;
+    -fx-padding: 18;
+}
+
+.back-form-section-title {
+    -fx-text-fill: #123f44;
+    -fx-font-size: 17px;
+    -fx-font-weight: 900;
+}
+
+/* INPUT CARDS */
+.back-field-card,
+.back-metric-card {
+    -fx-background-color: #fdfefe;
+    -fx-background-radius: 16;
+    -fx-border-color: #dfe9e5;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 16;
+}
+
+.back-field-label {
+    -fx-text-fill: #182033;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+}
+
+.back-field-label-red {
+    -fx-text-fill: #bb2d22;
+}
+
+.back-field-label-green {
+    -fx-text-fill: #168163;
+}
+
+/* INPUTS */
+.back-form-control {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #cfded8;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-min-height: 50;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1f2937;
+    -fx-prompt-text-fill: #a0acb8;
+    -fx-padding: 0 14;
+}
+
+.back-form-control {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #cfded8;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-min-height: 50;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #1f2937;
+    -fx-prompt-text-fill: #a0acb8;
+    -fx-padding: 0 14;
+}
+
+.back-text-area {
+    -fx-min-height: 80;
+}
+
+.back-text-area .content {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+}
+
+/* BUTTON */
+.back-submit-button {
+    -fx-background-color: linear-gradient(to right, #0b4d4d, #177b62);
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-padding: 14 24;
+    -fx-cursor: hand;
+}
+
+.back-submit-button:hover {
+    -fx-opacity: 0.95;
+}
