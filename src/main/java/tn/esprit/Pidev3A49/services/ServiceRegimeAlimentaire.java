@@ -3,6 +3,7 @@ package tn.esprit.Pidev3A49.services;
 import tn.esprit.Pidev3A49.Models.RegimeAlimentaire;
 import tn.esprit.Pidev3A49.interfaces.IServices;
 import tn.esprit.Pidev3A49.utils.MyDataBase;
+import tn.esprit.Pidev3A49.utils.SchemaInitializer;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +15,8 @@ import java.util.List;
 
 public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
 
+    private static final String TABLE_NAME = SchemaInitializer.REGIME_TABLE;
+
     private final Connection cnx;
 
     public ServiceRegimeAlimentaire() {
@@ -24,9 +27,9 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
     public void add(RegimeAlimentaire regimeAlimentaire) {
         validate(regimeAlimentaire);
         String qry = """
-                INSERT INTO regime_alimentaire (nom, description, objectif_calorique, actif)
+                INSERT INTO %s (nom, description, objectif_calorique, actif)
                 VALUES (?, ?, ?, ?)
-                """;
+                """.formatted(TABLE_NAME);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry, Statement.RETURN_GENERATED_KEYS)) {
             pstm.setString(1, regimeAlimentaire.getNom());
@@ -48,7 +51,7 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
     @Override
     public List<RegimeAlimentaire> getAll() {
         List<RegimeAlimentaire> regimes = new ArrayList<>();
-        String qry = "SELECT * FROM regime_alimentaire ORDER BY id DESC";
+        String qry = "SELECT * FROM " + TABLE_NAME + " ORDER BY id DESC";
 
         try (Statement stm = cnx.createStatement();
              ResultSet rs = stm.executeQuery(qry)) {
@@ -64,7 +67,7 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
 
     @Override
     public RegimeAlimentaire getById(int id) {
-        String qry = "SELECT * FROM regime_alimentaire WHERE id = ?";
+        String qry = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setInt(1, id);
@@ -85,10 +88,10 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
     public void update(RegimeAlimentaire regimeAlimentaire) {
         validate(regimeAlimentaire);
         String qry = """
-                UPDATE regime_alimentaire
+                UPDATE %s
                 SET nom = ?, description = ?, objectif_calorique = ?, actif = ?
                 WHERE id = ?
-                """;
+                """.formatted(TABLE_NAME);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setString(1, regimeAlimentaire.getNom());
@@ -104,7 +107,7 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
 
     @Override
     public void delete(RegimeAlimentaire regimeAlimentaire) {
-        String qry = "DELETE FROM regime_alimentaire WHERE id = ?";
+        String qry = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setInt(1, regimeAlimentaire.getId());
