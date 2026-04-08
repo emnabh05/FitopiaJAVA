@@ -1,7 +1,14 @@
 package tn.esprit.Pidev3A49.controllers;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -12,8 +19,17 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.paint.Color;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import tn.esprit.Pidev3A49.Models.Repas;
 import tn.esprit.Pidev3A49.Models.RegimeAlimentaire;
 import tn.esprit.Pidev3A49.Models.User;
@@ -21,19 +37,49 @@ import tn.esprit.Pidev3A49.services.ServiceRepas;
 import tn.esprit.Pidev3A49.services.ServiceRegimeAlimentaire;
 import tn.esprit.Pidev3A49.services.ServiceUser;
 
+import java.text.Normalizer;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class MainController {
 
     private static final LocalTime DEFAULT_REPAS_TIME = LocalTime.of(9, 0);
+    private static final String TYPE_PETIT_DEJEUNER = "Petit dejeuner";
+    private static final String TYPE_DEJEUNER = "Dejeuner";
+    private static final String TYPE_DINER = "Diner";
+    private static final String TYPE_COLLATION = "Collation";
+    private static final String FILTER_ALL_TYPES = "Tous les types";
+    private static final String SORT_RECENT = "Date recente ↓";
+    private static final String SORT_OLD = "Date ancienne ↑";
+    private static final String SORT_CALORIES_HIGH = "Calories elevees";
+    private static final String SORT_CALORIES_LOW = "Calories faibles";
+    private static final String SORT_NAME = "Nom A-Z";
     private static final List<String> TYPE_REPAS_OPTIONS = List.of(
-            "petit_de", "breakfast", "dejeuner", "diner", "evening", "collat", "extra_meal"
+            TYPE_PETIT_DEJEUNER, TYPE_DEJEUNER, TYPE_DINER, TYPE_COLLATION
+    );
+    private static final List<String> SORT_REPAS_OPTIONS = List.of(
+            SORT_RECENT, SORT_OLD, SORT_CALORIES_HIGH, SORT_CALORIES_LOW, SORT_NAME
     );
     private static final List<String> TYPE_SANTE_OPTIONS = List.of(
             "normal", "surpoids", "obesite", "sous_poids", "diabetique", "cardiaque", "autre"
+    );
+    private static final Map<String, String> TYPE_COLOR_BY_LABEL = Map.of(
+            TYPE_PETIT_DEJEUNER, "#0f4b4b",
+            TYPE_DEJEUNER, "#178764",
+            TYPE_DINER, "#166b61",
+            TYPE_COLLATION, "#31b67d"
     );
 
     @FXML private VBox viewRepas;
@@ -80,6 +126,16 @@ public class MainController {
     @FXML private TextField tfRepasLipides;
     @FXML private TextField tfRepasLipidesEdit;
     @FXML private Label lblRepasSelectionDelete;
+    @FXML private TextField tfRepasSearch;
+    @FXML private ComboBox<String> cbRepasExploreTypeFilter;
+    @FXML private ComboBox<String> cbRepasExploreSort;
+    @FXML private Button btnRepasStatistics;
+    @FXML private Label lblRepasExploreCount;
+    @FXML private Label lblRepasStatTotal;
+    @FXML private Label lblRepasStatCalories;
+    @FXML private Label lblRepasStatType;
+    @FXML private TilePane tileRepasCards;
+    @FXML private VBox boxRepasExploreEmpty;
 
     @FXML private TableView<Repas> tableRepas;
     @FXML private TableView<Repas> tableRepasEdit;
@@ -156,11 +212,14 @@ public class MainController {
     private final ServiceRepas serviceRepas = new ServiceRepas();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceUser serviceUser = new ServiceUser();
+    private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
+    private List<Repas> repasExplorerView = List.of();
 
     @FXML
     public void initialize() {
         initialiserColonnes();
         initialiserCombos();
+        initialiserExplorateurRepas();
         initialiserSelections();
         rafraichirDonnees();
         afficherModuleRepas();
@@ -203,6 +262,7 @@ public class MainController {
         cbRepasRegime.setItems(FXCollections.observableArrayList(regimes));
         cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
 
+        allRepas.setAll(repas);
         tableRepas.setItems(FXCollections.observableArrayList(repas));
         tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
         tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
@@ -210,6 +270,7 @@ public class MainController {
         tableRegimes.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
+        actualiserExplorateurRepas();
     }
 
     @FXML
@@ -378,7 +439,7 @@ public class MainController {
         id.setCellValueFactory(new PropertyValueFactory<>("id"));
         user.setCellValueFactory(new PropertyValueFactory<>("userEmail"));
         nom.setCellValueFactory(new PropertyValueFactory<>("nomRepas"));
-        type.setCellValueFactory(new PropertyValueFactory<>("typeRepas"));
+        type.setCellValueFactory(cellData -> new SimpleStringProperty(normaliserTypeRepas(cellData.getValue().getTypeRepas())));
         date.setCellValueFactory(new PropertyValueFactory<>("dateDisplay"));
         calories.setCellValueFactory(new PropertyValueFactory<>("calories"));
         regime.setCellValueFactory(new PropertyValueFactory<>("regimeDisplay"));
@@ -403,6 +464,15 @@ public class MainController {
         cbTypeRepasEdit.setItems(FXCollections.observableArrayList(TYPE_REPAS_OPTIONS));
         cbRegimeTypeSante.setItems(FXCollections.observableArrayList(TYPE_SANTE_OPTIONS));
         cbRegimeTypeSanteEdit.setItems(FXCollections.observableArrayList(TYPE_SANTE_OPTIONS));
+        if (cbRepasExploreTypeFilter != null) {
+            cbRepasExploreTypeFilter.setItems(FXCollections.observableArrayList(FILTER_ALL_TYPES));
+            cbRepasExploreTypeFilter.getItems().addAll(TYPE_REPAS_OPTIONS);
+            cbRepasExploreTypeFilter.setValue(FILTER_ALL_TYPES);
+        }
+        if (cbRepasExploreSort != null) {
+            cbRepasExploreSort.setItems(FXCollections.observableArrayList(SORT_REPAS_OPTIONS));
+            cbRepasExploreSort.setValue(SORT_RECENT);
+        }
 
         StringConverter<User> userConverter = new StringConverter<>() {
             @Override public String toString(User user) { return user == null ? "" : user.getDisplayName(); }
@@ -419,6 +489,18 @@ public class MainController {
         };
         cbRepasRegime.setConverter(regimeConverter);
         cbRepasRegimeEdit.setConverter(regimeConverter);
+    }
+
+    private void initialiserExplorateurRepas() {
+        if (tfRepasSearch != null) {
+            tfRepasSearch.textProperty().addListener((observable, oldValue, newValue) -> actualiserExplorateurRepas());
+        }
+        if (cbRepasExploreTypeFilter != null) {
+            cbRepasExploreTypeFilter.valueProperty().addListener((observable, oldValue, newValue) -> actualiserExplorateurRepas());
+        }
+        if (cbRepasExploreSort != null) {
+            cbRepasExploreSort.valueProperty().addListener((observable, oldValue, newValue) -> actualiserExplorateurRepas());
+        }
     }
 
     private void initialiserSelections() {
@@ -442,7 +524,7 @@ public class MainController {
         } else {
             dpDateRepasEdit.setValue(null);
         }
-        cbTypeRepasEdit.setValue(repas.getTypeRepas());
+        cbTypeRepasEdit.setValue(normaliserTypeRepas(repas.getTypeRepas()));
         tfRepasNomEdit.setText(repas.getNomRepas());
         taRepasDescriptionEdit.setText(repas.getCommentaire());
         selectionnerRegime(cbRepasRegimeEdit, repas.getRegimeId());
@@ -478,12 +560,13 @@ public class MainController {
 
         if (user == null) throw new IllegalArgumentException("Selectionnez un utilisateur.");
         if (datePicker.getValue() == null) throw new IllegalArgumentException("Selectionnez une date.");
+        if (typeCombo.getValue() == null || typeCombo.getValue().isBlank()) throw new IllegalArgumentException("Selectionnez un type de repas.");
         RegimeAlimentaire regime = regimeCombo.getValue();
 
         return new Repas(
                 user.getId(),
                 resolveRepasDateTime(editMode, datePicker.getValue()),
-                typeCombo.getValue(),
+                normaliserTypeRepas(typeCombo.getValue()),
                 nomField.getText(),
                 parseInteger(caloriesField.getText()),
                 parseInteger(proteinesField.getText()),
@@ -530,6 +613,452 @@ public class MainController {
         for (RegimeAlimentaire regime : comboBox.getItems()) {
             if (regime.getId() == regimeId) { comboBox.setValue(regime); return; }
         }
+    }
+
+    @FXML
+    private void afficherStatistiquesRepas() {
+        if (repasExplorerView.isEmpty()) {
+            showInfo("Aucun repas a analyser pour le moment.");
+            return;
+        }
+
+        Map<String, Long> stats = TYPE_REPAS_OPTIONS.stream()
+                .collect(Collectors.toMap(type -> type, this::compterRepasParType, (left, right) -> left, LinkedHashMap::new));
+
+        PieChart chart = new PieChart();
+        chart.setLegendVisible(true);
+        chart.setLabelsVisible(true);
+        stats.forEach((type, count) -> {
+            if (count > 0) {
+                chart.getData().add(new PieChart.Data(type, count));
+            }
+        });
+
+        Label title = new Label("Repartition des repas par type");
+        title.getStyleClass().add("repas-chart-title");
+
+        Label subtitle = new Label(repasExplorerView.size() + " repas analyses");
+        subtitle.getStyleClass().add("repas-chart-subtitle");
+
+        Button closeButton = new Button("Fermer");
+        closeButton.getStyleClass().add("repas-chart-close-button");
+
+        VBox root = new VBox(18, title, subtitle, chart, closeButton);
+        root.setPadding(new Insets(24));
+        root.setAlignment(Pos.TOP_LEFT);
+        root.getStyleClass().add("repas-chart-dialog");
+
+        Scene scene = new Scene(root, 720, 760);
+        if (paneRepasExplore.getScene() != null) {
+            scene.getStylesheets().addAll(paneRepasExplore.getScene().getStylesheets());
+        }
+
+        Stage stage = new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        if (paneRepasExplore.getScene() != null && paneRepasExplore.getScene().getWindow() instanceof Stage owner) {
+            stage.initOwner(owner);
+        }
+        stage.setTitle("Statistiques repas");
+        stage.setScene(scene);
+        closeButton.setOnAction(event -> stage.close());
+        stage.show();
+
+        Platform.runLater(() -> appliquerCouleursChart(chart));
+    }
+
+    private void actualiserExplorateurRepas() {
+        if (tileRepasCards == null) {
+            return;
+        }
+
+        String search = tfRepasSearch == null ? "" : tfRepasSearch.getText();
+        String typeFilter = cbRepasExploreTypeFilter == null ? FILTER_ALL_TYPES : cbRepasExploreTypeFilter.getValue();
+        String sortValue = cbRepasExploreSort == null ? SORT_RECENT : cbRepasExploreSort.getValue();
+
+        repasExplorerView = allRepas.stream()
+                .filter(repas -> correspondRechercheRepas(repas, search))
+                .filter(repas -> correspondFiltreType(repas, typeFilter))
+                .sorted(comparateurRepas(sortValue))
+                .toList();
+
+        tileRepasCards.getChildren().setAll(repasExplorerView.stream()
+                .map(this::creerCarteRepas)
+                .toList());
+
+        boolean empty = repasExplorerView.isEmpty();
+        if (boxRepasExploreEmpty != null) {
+            boxRepasExploreEmpty.setManaged(empty);
+            boxRepasExploreEmpty.setVisible(empty);
+        }
+        if (btnRepasStatistics != null) {
+            btnRepasStatistics.setDisable(empty);
+        }
+
+        mettreAJourStatistiquesRepas();
+    }
+
+    private VBox creerCarteRepas(Repas repas) {
+        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Repas sans nom"));
+        title.getStyleClass().add("repas-card-title");
+
+        Label email = new Label(valeurOuDefaut(repas.getUserEmail(), "Utilisateur inconnu"));
+        email.getStyleClass().add("repas-card-email");
+
+        Label type = new Label(normaliserTypeRepas(repas.getTypeRepas()));
+        type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
+
+        HBox topRow = new HBox(12, email, type);
+        topRow.getStyleClass().add("repas-card-top-row");
+        topRow.setAlignment(Pos.CENTER_LEFT);
+
+        HBox nutritionRow = new HBox(
+                10,
+                creerMetricChip("Calories", toMetricValue(repas.getCalories(), "kcal")),
+                creerMetricChip("Proteines", toMetricValue(repas.getProteines(), "g")),
+                creerMetricChip("Glucides", toMetricValue(repas.getGlucides(), "g")),
+                creerMetricChip("Lipides", toMetricValue(repas.getLipides(), "g"))
+        );
+        nutritionRow.getStyleClass().add("repas-card-metrics-row");
+
+        Label date = new Label(repas.getDateDisplay());
+        date.getStyleClass().add("repas-card-date");
+
+        Label details = new Label(construireDetailsRepas(repas));
+        details.getStyleClass().add("repas-card-details");
+        details.setWrapText(true);
+
+        Button pdfButton = new Button("Exporter PDF");
+        pdfButton.getStyleClass().add("repas-pdf-button");
+        pdfButton.setOnAction(event -> exporterRepasEnPdf(repas));
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, javafx.scene.layout.Priority.ALWAYS);
+        HBox footer = new HBox(12, date, spacer, pdfButton);
+        footer.getStyleClass().add("repas-card-footer");
+        footer.setAlignment(Pos.CENTER_LEFT);
+
+        VBox card = new VBox(14, title, topRow, details, nutritionRow, footer);
+        card.getStyleClass().add("repas-browser-card");
+        card.setPrefWidth(520);
+        card.setMaxWidth(Double.MAX_VALUE);
+        return card;
+    }
+
+    private void mettreAJourStatistiquesRepas() {
+        int total = repasExplorerView.size();
+        long averageCalories = total == 0 ? 0 : Math.round(
+                repasExplorerView.stream()
+                        .map(Repas::getCalories)
+                        .filter(value -> value != null)
+                        .mapToInt(Integer::intValue)
+                        .average()
+                        .orElse(0)
+        );
+
+        String topType = repasExplorerView.stream()
+                .collect(Collectors.groupingBy(repas -> normaliserTypeRepas(repas.getTypeRepas()), LinkedHashMap::new, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse("--");
+
+        if (lblRepasExploreCount != null) {
+            lblRepasExploreCount.setText(total == 0 ? "Aucun repas affiche" : total + " repas affiches");
+        }
+        if (lblRepasStatTotal != null) {
+            lblRepasStatTotal.setText(String.valueOf(total));
+        }
+        if (lblRepasStatCalories != null) {
+            lblRepasStatCalories.setText(averageCalories + " kcal");
+        }
+        if (lblRepasStatType != null) {
+            lblRepasStatType.setText(topType);
+        }
+    }
+
+    private VBox creerMetricChip(String label, String value) {
+        Label chipLabel = new Label(label);
+        chipLabel.getStyleClass().add("repas-metric-chip-label");
+
+        Label chipValue = new Label(value);
+        chipValue.getStyleClass().add("repas-metric-chip-value");
+
+        VBox chip = new VBox(2, chipLabel, chipValue);
+        chip.getStyleClass().add("repas-metric-chip");
+        return chip;
+    }
+
+    private String toMetricValue(Integer value, String unit) {
+        return (value == null ? 0 : value) + " " + unit;
+    }
+
+    private void exporterRepasEnPdf(Repas repas) {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Enregistrer le PDF du repas");
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("PDF", "*.pdf"));
+        chooser.setInitialFileName(genererNomPdfRepas(repas));
+
+        Stage owner = paneRepasExplore != null && paneRepasExplore.getScene() != null && paneRepasExplore.getScene().getWindow() instanceof Stage stage
+                ? stage
+                : null;
+        File file = chooser.showSaveDialog(owner);
+        if (file == null) {
+            return;
+        }
+
+        try {
+            genererPdfRepas(repas, file);
+            showInfo("PDF genere avec succes : " + file.getName());
+        } catch (IOException exception) {
+            showError("Erreur PDF", "Impossible de generer le PDF : " + exception.getMessage());
+        }
+    }
+
+    private String genererNomPdfRepas(Repas repas) {
+        String mealName = normaliserNomFichier(valeurOuDefaut(repas.getNomRepas(), "repas"));
+        return mealName + "-" + repas.getId() + ".pdf";
+    }
+
+    private void genererPdfRepas(Repas repas, File file) throws IOException {
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+
+            try (PDPageContentStream content = new PDPageContentStream(document, page)) {
+                float width = page.getMediaBox().getWidth();
+                float height = page.getMediaBox().getHeight();
+                float margin = 52f;
+                float y = height - margin;
+
+                dessinerFondEntete(content, width, height);
+
+                y = ecrireTexte(content, PDType1Font.HELVETICA_BOLD, 26, margin, y, new Color(0.07, 0.20, 0.23, 1.0), "Fiche repas");
+                y -= 8;
+                y = ecrireTexte(content, PDType1Font.HELVETICA, 13, margin, y, new Color(0.42, 0.50, 0.57, 1.0),
+                        "Document nutritionnel exporte depuis Fitopia");
+
+                y -= 36;
+                dessinerBlocInfo(content, margin, y, width - (margin * 2), 116, "Informations generales");
+                y -= 26;
+                y = ecrireLigneInfo(content, margin + 18, y, "Repas", valeurOuDefaut(repas.getNomRepas(), "--"));
+                y = ecrireLigneInfo(content, margin + 18, y, "Utilisateur", valeurOuDefaut(repas.getUserEmail(), "--"));
+                y = ecrireLigneInfo(content, margin + 18, y, "Type", normaliserTypeRepas(repas.getTypeRepas()));
+                y = ecrireLigneInfo(content, margin + 18, y, "Date", valeurOuDefaut(repas.getDateDisplay(), "--"));
+
+                y -= 26;
+                dessinerBlocInfo(content, margin, y, width - (margin * 2), 116, "Valeurs nutritionnelles");
+                y -= 26;
+                y = ecrireLigneInfo(content, margin + 18, y, "Calories", toMetricValue(repas.getCalories(), "kcal"));
+                y = ecrireLigneInfo(content, margin + 18, y, "Proteines", toMetricValue(repas.getProteines(), "g"));
+                y = ecrireLigneInfo(content, margin + 18, y, "Glucides", toMetricValue(repas.getGlucides(), "g"));
+                y = ecrireLigneInfo(content, margin + 18, y, "Lipides", toMetricValue(repas.getLipides(), "g"));
+
+                y -= 26;
+                dessinerBlocInfo(content, margin, y, width - (margin * 2), 138, "Commentaires");
+                y -= 26;
+                y = ecrireParagraphe(content, margin + 18, y, width - (margin * 2) - 36,
+                        valeurOuDefaut(construireDetailsRepas(repas), "Aucun commentaire"));
+
+                ecrireTexte(content, PDType1Font.HELVETICA_OBLIQUE, 10, margin, 56, new Color(0.47, 0.55, 0.61, 1.0),
+                        "Fitopia • Export genere le " + LocalDateTime.now().withNano(0));
+            }
+
+            document.save(file);
+        }
+    }
+
+    private void dessinerFondEntete(PDPageContentStream content, float width, float height) throws IOException {
+        content.setNonStrokingColor(12, 77, 74);
+        content.addRect(0, height - 110, width, 110);
+        content.fill();
+
+        content.setNonStrokingColor(24, 136, 104);
+        content.addRect(0, height - 124, width, 14);
+        content.fill();
+    }
+
+    private void dessinerBlocInfo(PDPageContentStream content, float x, float yTop, float width, float height, String title) throws IOException {
+        float bottom = yTop - height;
+        content.setNonStrokingColor(250, 252, 251);
+        content.addRect(x, bottom, width, height);
+        content.fill();
+
+        content.setStrokingColor(220, 234, 229);
+        content.addRect(x, bottom, width, height);
+        content.stroke();
+
+        ecrireTexte(content, PDType1Font.HELVETICA_BOLD, 16, x + 18, yTop - 18, new Color(0.09, 0.23, 0.27, 1.0), title);
+    }
+
+    private float ecrireLigneInfo(PDPageContentStream content, float x, float y, String label, String value) throws IOException {
+        ecrireTexte(content, PDType1Font.HELVETICA_BOLD, 12, x, y, new Color(0.11, 0.25, 0.29, 1.0), label + " :");
+        ecrireTexte(content, PDType1Font.HELVETICA, 12, x + 120, y, new Color(0.28, 0.35, 0.40, 1.0), value);
+        return y - 20;
+    }
+
+    private float ecrireParagraphe(PDPageContentStream content, float x, float y, float maxWidth, String text) throws IOException {
+        List<String> lines = decouperLignes(text, maxWidth, PDType1Font.HELVETICA, 12);
+        float currentY = y;
+        for (String line : lines) {
+            ecrireTexte(content, PDType1Font.HELVETICA, 12, x, currentY, new Color(0.28, 0.35, 0.40, 1.0), line);
+            currentY -= 17;
+        }
+        return currentY;
+    }
+
+    private float ecrireTexte(PDPageContentStream content, PDType1Font font, float fontSize, float x, float y, Color color, String text) throws IOException {
+        content.beginText();
+        content.setFont(font, fontSize);
+        content.setNonStrokingColor((float) color.getRed(), (float) color.getGreen(), (float) color.getBlue());
+        content.newLineAtOffset(x, y);
+        content.showText(safePdfText(text));
+        content.endText();
+        return y;
+    }
+
+    private List<String> decouperLignes(String text, float maxWidth, PDType1Font font, float fontSize) throws IOException {
+        String[] words = safePdfText(valeurOuDefaut(text, "")).split("\\s+");
+        List<String> lines = new java.util.ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        for (String word : words) {
+            String candidate = current.isEmpty() ? word : current + " " + word;
+            float width = font.getStringWidth(candidate) / 1000 * fontSize;
+            if (width > maxWidth && !current.isEmpty()) {
+                lines.add(current.toString());
+                current = new StringBuilder(word);
+            } else {
+                current = new StringBuilder(candidate);
+            }
+        }
+        if (!current.isEmpty()) {
+            lines.add(current.toString());
+        }
+        return lines;
+    }
+
+    private String normaliserNomFichier(String value) {
+        return normaliserTexte(value).replace(" ", "-").replaceAll("[^a-z0-9\\-]", "");
+    }
+
+    private String safePdfText(String value) {
+        if (value == null) {
+            return "";
+        }
+        return Normalizer.normalize(value, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .replace("•", "-")
+                .replace("’", "'")
+                .replace("“", "\"")
+                .replace("”", "\"");
+    }
+
+    private boolean correspondRechercheRepas(Repas repas, String search) {
+        if (search == null || search.isBlank()) {
+            return true;
+        }
+        String query = normaliserTexte(search);
+        return normaliserTexte(repas.getNomRepas()).contains(query)
+                || normaliserTexte(repas.getUserEmail()).contains(query)
+                || normaliserTexte(normaliserTypeRepas(repas.getTypeRepas())).contains(query)
+                || normaliserTexte(repas.getCommentaire()).contains(query)
+                || normaliserTexte(repas.getDateDisplay()).contains(query);
+    }
+
+    private boolean correspondFiltreType(Repas repas, String filter) {
+        return filter == null || FILTER_ALL_TYPES.equals(filter) || normaliserTypeRepas(repas.getTypeRepas()).equals(filter);
+    }
+
+    private Comparator<Repas> comparateurRepas(String sortValue) {
+        Comparator<Repas> byDate = Comparator.comparing(
+                Repas::getDateRepas,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        );
+        Comparator<Repas> byCalories = Comparator.comparing(
+                Repas::getCalories,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        );
+        Comparator<Repas> byName = Comparator.comparing(
+                repas -> valeurOuDefaut(repas.getNomRepas(), ""),
+                String.CASE_INSENSITIVE_ORDER
+        );
+
+        if (SORT_OLD.equals(sortValue)) {
+            return byDate;
+        }
+        if (SORT_CALORIES_HIGH.equals(sortValue)) {
+            return byCalories.reversed();
+        }
+        if (SORT_CALORIES_LOW.equals(sortValue)) {
+            return byCalories;
+        }
+        if (SORT_NAME.equals(sortValue)) {
+            return byName;
+        }
+        return byDate.reversed();
+    }
+
+    private long compterRepasParType(String type) {
+        return repasExplorerView.stream()
+                .filter(repas -> normaliserTypeRepas(repas.getTypeRepas()).equals(type))
+                .count();
+    }
+
+    private void appliquerCouleursChart(PieChart chart) {
+        for (PieChart.Data data : chart.getData()) {
+            String color = TYPE_COLOR_BY_LABEL.getOrDefault(data.getName(), "#178764");
+            if (data.getNode() != null) {
+                data.getNode().setStyle("-fx-pie-color: " + color + ";");
+            }
+        }
+    }
+
+    private String construireDetailsRepas(Repas repas) {
+        String commentaire = valeurOuDefaut(repas.getCommentaire(), "");
+        String regime = valeurOuDefaut(repas.getRegimeDisplay(), "");
+        if (!commentaire.isBlank() && !regime.isBlank()) {
+            return commentaire + " • " + regime;
+        }
+        if (!commentaire.isBlank()) {
+            return commentaire;
+        }
+        if (!regime.isBlank()) {
+            return regime;
+        }
+        return "Aucun detail supplementaire";
+    }
+
+    private String normaliserTypeRepas(String value) {
+        String normalized = normaliserTexte(value).replace("_", " ").replace("-", " ");
+        return switch (normalized) {
+            case "petit de", "petit dej", "petit dejeuner", "breakfast" -> TYPE_PETIT_DEJEUNER;
+            case "dejeuner", "dej", "lunch" -> TYPE_DEJEUNER;
+            case "diner", "dinner", "evening", "souper" -> TYPE_DINER;
+            case "collation", "collat", "snack", "extra meal", "extra meal " , "extra_meal" -> TYPE_COLLATION;
+            default -> value == null || value.isBlank() ? TYPE_COLLATION : value.trim();
+        };
+    }
+
+    private String slugTypeRepas(String value) {
+        return switch (normaliserTypeRepas(value)) {
+            case TYPE_PETIT_DEJEUNER -> "petit-dejeuner";
+            case TYPE_DEJEUNER -> "dejeuner";
+            case TYPE_DINER -> "diner";
+            default -> "collation";
+        };
+    }
+
+    private String normaliserTexte(String value) {
+        if (value == null) {
+            return "";
+        }
+        String normalized = Normalizer.normalize(value, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        return normalized.toLowerCase(Locale.ROOT).trim();
+    }
+
+    private String valeurOuDefaut(String value, String fallback) {
+        return value == null || value.isBlank() ? fallback : value;
     }
 
     private LocalDateTime resolveRepasDateTime(boolean editMode, LocalDate date) {

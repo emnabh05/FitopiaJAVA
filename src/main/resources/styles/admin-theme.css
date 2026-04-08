@@ -1056,3 +1056,238 @@
     -fx-padding: 14 22 14 22;
     -fx-effect: dropshadow(gaussian, rgba(11, 58, 61, 0.24), 18, 0.16, 0, 6);
 }
+
+.repas-browser-panel {
+    -fx-padding: 24;
+}
+
+.repas-toolbar {
+    -fx-background-color: #f6fbf9;
+    -fx-background-radius: 22;
+    -fx-border-color: #dceae5;
+    -fx-border-radius: 22;
+    -fx-padding: 14;
+}
+
+.repas-toolbar-search,
+.repas-toolbar-control {
+    -fx-min-height: 48;
+}
+
+.repas-statistics-button {
+    -fx-padding: 13 22 13 22;
+}
+
+.repas-stat-strip {
+    -fx-padding: 2 0 4 0;
+}
+
+.repas-stat-card {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f8fcfa);
+    -fx-background-radius: 20;
+    -fx-border-color: #dceae5;
+    -fx-border-radius: 20;
+    -fx-padding: 16 18 16 18;
+}
+
+.repas-stat-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #6f7c89;
+}
+
+.repas-stat-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #15323a;
+}
+
+.repas-card-grid {
+    -fx-pref-columns: 2;
+}
+
+.repas-browser-card {
+    -fx-background-color: white;
+    -fx-background-radius: 24;
+    -fx-border-color: #dfece7;
+    -fx-border-radius: 24;
+    -fx-padding: 20 20 18 20;
+    -fx-effect: dropshadow(gaussian, rgba(19, 50, 59, 0.07), 24, 0.16, 0, 8);
+}
+
+.repas-card-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #162033;
+}
+
+.repas-card-meta-text {
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #708198;
+}
+
+.repas-card-date {
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #8593a6;
+}
+
+.repas-card-details {
+    -fx-font-size: 14px;
+    -fx-text-fill: #5f6c7b;
+    -fx-line-spacing: 2px;
+}
+
+.repas-type-pill {
+    -fx-background-radius: 999;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.repas-type-pill-petit-dejeuner {
+    -fx-background-color: #0f4b4b;
+}
+
+.repas-type-pill-dejeuner {
+    -fx-background-color: #1d9d77;
+}
+
+.repas-type-pill-diner {
+    -fx-background-color: #166b61;
+}
+
+.repas-type-pill-collation {
+    -fx-background-color: #31b67d;
+}
+
+.repas-empty-state {
+    -fx-background-color: #f8fcfa;
+    -fx-background-radius: 22;
+    -fx-border-color: #dceae5;
+    -fx-border-radius: 22;
+    -fx-padding: 26 20 26 20;
+}
+
+.repas-empty-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #17343d;
+}
+
+.repas-empty-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #708092;
+}
+
+.repas-chart-dialog {
+    -fx-background-color: linear-gradient(to bottom, #ffffff, #f7fbf9);
+}
+
+.repas-chart-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #102736;
+}
+
+.repas-chart-subtitle {
+    -fx-font-size: 15px;
+    -fx-text-fill: #6f7c89;
+}
+
+.repas-chart-close-button {
+    -fx-background-color: linear-gradient(to right, #0f4d4d, #167b62);
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 22 12 22;
+    -fx-cursor: hand;
+}
+
+.repas-browser-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f8fcfa);
+    -fx-border-color: #dcebe6;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(15, 39, 54, 0.08), 26, 0.18, 0, 8);
+}
+
+.repas-card-top-row {
+    -fx-alignment: center-left;
+}
+
+.repas-card-email {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #6e7f95;
+}
+
+.repas-card-details {
+    -fx-font-size: 14px;
+    -fx-text-fill: #516172;
+}
+
+.repas-card-metrics-row {
+    -fx-padding: 4 0 0 0;
+}
+
+.repas-metric-chip {
+    -fx-background-color: #f0f7f4;
+    -fx-background-radius: 16;
+    -fx-border-color: #d8e8e1;
+    -fx-border-radius: 16;
+    -fx-padding: 10 12 10 12;
+}
+
+.repas-metric-chip-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #7d8b98;
+}
+
+.repas-metric-chip-value {
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #17353e;
+}
+
+.repas-card-footer {
+    -fx-padding: 6 0 0 0;
+}
+
+.repas-pdf-button {
+    -fx-background-color: linear-gradient(to right, #b72418, #cf3324);
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-padding: 12 18 12 18;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(183, 36, 24, 0.20), 16, 0.16, 0, 5);
+}
+
+.repas-pdf-button:hover {
+    -fx-background-color: linear-gradient(to right, #c12a1d, #d63c2d);
+}
+
+.repas-type-pill {
+    -fx-effect: dropshadow(gaussian, rgba(14, 89, 66, 0.15), 10, 0.12, 0, 2);
+}
+
+.repas-type-pill-petit-dejeuner {
+    -fx-background-color: linear-gradient(to right, #0a4a43, #0e6a5c);
+}
+
+.repas-type-pill-dejeuner {
+    -fx-background-color: linear-gradient(to right, #157356, #24a470);
+}
+
+.repas-type-pill-diner {
+    -fx-background-color: linear-gradient(to right, #12564b, #177c69);
+}
+
+.repas-type-pill-collation {
+    -fx-background-color: linear-gradient(to right, #1f8f63, #39c486);
+}

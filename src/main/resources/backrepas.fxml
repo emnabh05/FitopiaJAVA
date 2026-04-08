@@ -17,6 +17,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
 <!--suppress XMLErrors -->
@@ -316,10 +317,39 @@
                                     <Button onAction="#supprimerRepas" styleClass="danger-button" text="Supprimer definitivement" />
                                 </HBox>
                             </VBox>
-                            <VBox fx:id="paneRepasExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
-                                <Label styleClass="section-title" text="Explorer les repas" />
-                                <Label styleClass="section-subtitle" text="Vue explore du module nutrition avec utilisateur, date et regime lie." />
-                                <TableView fx:id="tableRepas" prefHeight="580.0" styleClass="data-table">
+                            <VBox fx:id="paneRepasExplore" managed="false" spacing="18.0" styleClass="panel-card repas-browser-panel" visible="false">
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="section-title" text="Explorer les repas" />
+                                        <Label fx:id="lblRepasExploreCount" styleClass="section-subtitle" text="0 repas affiches" />
+                                    </VBox>
+                                    <Button fx:id="btnRepasStatistics" onAction="#afficherStatistiquesRepas" styleClass="primary-button repas-statistics-button" text="Statistiques" />
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="repas-toolbar">
+                                    <ComboBox fx:id="cbRepasExploreSort" prefWidth="190.0" styleClass="combo-input repas-toolbar-control" />
+                                    <TextField fx:id="tfRepasSearch" promptText="Rechercher nom, email, type..." styleClass="text-input repas-toolbar-search" HBox.hgrow="ALWAYS" />
+                                    <ComboBox fx:id="cbRepasExploreTypeFilter" prefWidth="180.0" styleClass="combo-input repas-toolbar-control" />
+                                </HBox>
+                                <HBox spacing="14.0" styleClass="repas-stat-strip">
+                                    <VBox spacing="6.0" styleClass="repas-stat-card" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="repas-stat-label" text="Repas visibles" />
+                                        <Label fx:id="lblRepasStatTotal" styleClass="repas-stat-value" text="0" />
+                                    </VBox>
+                                    <VBox spacing="6.0" styleClass="repas-stat-card" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="repas-stat-label" text="Calories moyennes" />
+                                        <Label fx:id="lblRepasStatCalories" styleClass="repas-stat-value" text="0 kcal" />
+                                    </VBox>
+                                    <VBox spacing="6.0" styleClass="repas-stat-card" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="repas-stat-label" text="Type dominant" />
+                                        <Label fx:id="lblRepasStatType" styleClass="repas-stat-value" text="--" />
+                                    </VBox>
+                                </HBox>
+                                <TilePane fx:id="tileRepasCards" hgap="18.0" prefColumns="2" prefTileWidth="500.0" styleClass="repas-card-grid" vgap="18.0" />
+                                <VBox fx:id="boxRepasExploreEmpty" alignment="CENTER" managed="false" spacing="8.0" styleClass="repas-empty-state" visible="false">
+                                    <Label styleClass="repas-empty-title" text="Aucun repas trouve" />
+                                    <Label styleClass="repas-empty-subtitle" text="Ajustez la recherche ou le filtre pour afficher des repas." wrapText="true" />
+                                </VBox>
+                                <TableView fx:id="tableRepas" managed="false" prefHeight="0.0" styleClass="data-table" visible="false">
                                     <columns>
                                         <TableColumn fx:id="colRepasId" prefWidth="60.0" text="ID" />
                                         <TableColumn fx:id="colRepasUser" prefWidth="200.0" text="Utilisateur" />
