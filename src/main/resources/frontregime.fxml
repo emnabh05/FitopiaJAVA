@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="920.0" prefWidth="1600.0" stylesheets="@styles/admin-theme.css" styleClass="app-root"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
+    <left>
+        <VBox prefWidth="280.0" spacing="22.0" styleClass="sidebar">
+            <padding><Insets bottom="28.0" left="24.0" right="24.0" top="26.0"/></padding>
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                <Label minHeight="46.0" minWidth="46.0" prefHeight="46.0" prefWidth="46.0" styleClass="sidebar-logo" text="F"/>
+                <VBox spacing="4.0">
+                    <Label styleClass="sidebar-title" text="Fitopia Front"/>
+                    <Label styleClass="sidebar-subtitle" text="Module regime et consultation"/>
+                </VBox>
+            </HBox>
+            <VBox spacing="10.0" styleClass="user-card">
+                <Label styleClass="user-label" text="Connecte en tant que"/>
+                <Label styleClass="user-mail" text="ahmed@gmail.com"/>
+            </VBox>
+            <VBox spacing="10.0">
+                <Button fx:id="btnModuleRepas" maxWidth="1.7976931348623157E308" onAction="#afficherModuleRepas" styleClass="sidebar-nav-button sidebar-nav-button-active" text="Gestion des repas"/>
+                <Button fx:id="btnModuleRegimes" maxWidth="1.7976931348623157E308" onAction="#afficherModuleRegimes" styleClass="sidebar-nav-button" text="Diet planner"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button maxWidth="1.7976931348623157E308" onAction="#rafraichirDonnees" styleClass="logout-button" text="Actualiser"/>
+        </VBox>
+    </left>
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="app-scroll" vbarPolicy="AS_NEEDED">
+            <content>
+                <StackPane>
+                    <VBox fx:id="viewRepas" fillWidth="true" spacing="22.0" styleClass="content-root">
+                        <padding><Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/></padding>
+                        <VBox spacing="8.0" styleClass="hero-banner">
+                            <Label styleClass="hero-title" text="Gestion des repas"/>
+                            <Label styleClass="hero-subtitle" text="Design et logique repris du module Symfony nutrition."/>
+                        </VBox>
+                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+                            <Button fx:id="btnActionCreerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherCreationRepas" styleClass="action-card action-card-active" text="Creer un repas&#10;Ajoutez un nouveau repas pour un utilisateur." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionModifierRepas" maxWidth="1.7976931348623157E308" onAction="#afficherModificationRepas" styleClass="action-card" text="Modifier un repas&#10;Mettez a jour les informations d'un repas existant." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionSupprimerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionRepas" styleClass="action-card" text="Supprimer un repas&#10;Retirez un repas de la base de donnees." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Button fx:id="btnActionExplorerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationRepas" styleClass="action-card" text="Explorer les repas&#10;Consultez la liste de tous les repas enregistres." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <StackPane>
+                            <VBox fx:id="paneRepasCreate" spacing="18.0" styleClass="panel-card">
+                                <Label styleClass="section-title" text="Creer un repas"/>
+                                <Label styleClass="section-subtitle" text="Formulaire inspire de l'admin Symfony et de la page diet planner."/>
+                                <HBox alignment="CENTER_LEFT" styleClass="status-banner">
+                                    <Label styleClass="status-banner-text" text="Vous etes connecte en tant que ahmed@gmail.com"/>
+                                </HBox>
+                                <VBox spacing="16.0" styleClass="section-block">
+                                    <Label styleClass="section-block-title" text="Informations principales"/>
+                                    <GridPane hgap="16.0" vgap="16.0">
+                                        <columnConstraints>
+                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        </columnConstraints>
+                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <Label styleClass="field-label field-label-danger" text="Utilisateur"/>
+                                            <ComboBox fx:id="cbRepasUser" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <Label styleClass="field-label" text="Date du repas"/>
+                                            <HBox spacing="10.0">
+                                                <DatePicker fx:id="dpDateRepas" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
+                                                <TextField fx:id="tfRepasHeure" promptText="HH:mm" styleClass="text-input"/>
+                                            </HBox>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <Label styleClass="field-label field-label-accent" text="Type de repas"/>
+                                            <ComboBox fx:id="cbTypeRepas" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <Label styleClass="field-label" text="Nom du repas"/>
+                                            <TextField fx:id="tfRepasNom" promptText="Ex: Salade proteinee" styleClass="text-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                            <Label styleClass="field-label" text="Commentaire"/>
+                                            <TextArea fx:id="taRepasDescription" prefHeight="96.0" promptText="Commentaire court..." styleClass="text-area-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                            <Label styleClass="field-label" text="Regime associe"/>
+                                            <ComboBox fx:id="cbRepasRegime" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                        </VBox>
+                                    </GridPane>
+                                </VBox>
+                                <VBox spacing="16.0" styleClass="section-block">
+                                    <Label styleClass="section-block-title" text="Valeurs nutritionnelles"/>
+                                    <GridPane hgap="14.0" vgap="14.0">
+                                        <columnConstraints>
+                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
+                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
+                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
+                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
+                                        </columnConstraints>
+                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <Label styleClass="field-label" text="Calories"/>
+                                            <TextField fx:id="tfRepasCalories" promptText="650" styleClass="text-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <Label styleClass="field-label" text="Proteines (g)"/>
+                                            <TextField fx:id="tfRepasProteines" promptText="28" styleClass="text-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                            <Label styleClass="field-label" text="Glucides (g)"/>
+                                            <TextField fx:id="tfRepasGlucides" promptText="42" styleClass="text-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                                            <Label styleClass="field-label" text="Lipides (g)"/>
+                                            <TextField fx:id="tfRepasLipides" promptText="14" styleClass="text-input"/>
+                                        </VBox>
+                                    </GridPane>
+                                </VBox>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRepas" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#ajouterRepas" styleClass="primary-button" text="Creer le repas"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRepasEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Modifier un repas"/>
+                                <Label styleClass="section-subtitle" text="Selectionnez un repas puis modifiez les champs comme dans l'admin Symfony."/>
+                                <TextField fx:id="tfRepasId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableRepasEdit" prefHeight="290.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRepasIdEdit" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasUserEdit" prefWidth="190.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRepasNomEdit" prefWidth="170.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasTypeEdit" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDateEdit" prefWidth="140.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasCaloriesEdit" prefWidth="90.0" text="Calories"/>
+                                        <TableColumn fx:id="colRepasRegimeIdEdit" prefWidth="210.0" text="Regime"/>
+                                    </columns>
+                                </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Utilisateur"/>
+                                        <ComboBox fx:id="cbRepasUserEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Date du repas"/>
+                                        <HBox spacing="10.0">
+                                            <DatePicker fx:id="dpDateRepasEdit" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
+                                            <TextField fx:id="tfRepasHeureEdit" promptText="HH:mm" styleClass="text-input"/>
+                                        </HBox>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Type de repas"/>
+                                        <ComboBox fx:id="cbTypeRepasEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Nom du repas"/>
+                                        <TextField fx:id="tfRepasNomEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Commentaire"/>
+                                        <TextArea fx:id="taRepasDescriptionEdit" prefHeight="96.0" styleClass="text-area-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Regime associe"/>
+                                        <ComboBox fx:id="cbRepasRegimeEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Calories"/>
+                                        <TextField fx:id="tfRepasCaloriesEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <HBox spacing="12.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                        <VBox spacing="8.0" styleClass="metric-card">
+                                            <Label styleClass="field-label" text="Proteines"/>
+                                            <TextField fx:id="tfRepasProteinesEdit" styleClass="text-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="metric-card">
+                                            <Label styleClass="field-label" text="Glucides"/>
+                                            <TextField fx:id="tfRepasGlucidesEdit" styleClass="text-input"/>
+                                        </VBox>
+                                        <VBox spacing="8.0" styleClass="metric-card">
+                                            <Label styleClass="field-label" text="Lipides"/>
+                                            <TextField fx:id="tfRepasLipidesEdit" styleClass="text-input"/>
+                                        </VBox>
+                                    </HBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRepasModification" styleClass="secondary-button" text="Reinitialiser"/>
+                                    <Button onAction="#modifierRepas" styleClass="primary-button" text="Mettre a jour"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRepasDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Supprimer un repas"/>
+                                <Label styleClass="section-subtitle" text="Selectionnez un repas dans la liste puis confirmez sa suppression."/>
+                                <TableView fx:id="tableRepasDelete" prefHeight="500.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRepasIdDelete" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasUserDelete" prefWidth="200.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRepasNomDelete" prefWidth="180.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasTypeDelete" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDateDelete" prefWidth="140.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasCaloriesDelete" prefWidth="90.0" text="Calories"/>
+                                        <TableColumn fx:id="colRepasRegimeIdDelete" prefWidth="220.0" text="Regime"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblRepasSelectionDelete" styleClass="hint-label" text="Aucun repas selectionne"/>
+                                    <Button onAction="#supprimerRepas" styleClass="danger-button" text="Supprimer definitivement"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRepasExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Explorer les repas"/>
+                                <Label styleClass="section-subtitle" text="Vue explore du module nutrition avec utilisateur, date et regime lie."/>
+                                <TableView fx:id="tableRepas" prefHeight="580.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRepasId" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasUser" prefWidth="200.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRepasNom" prefWidth="170.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasType" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDate" prefWidth="140.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasCalories" prefWidth="90.0" text="Calories"/>
+                                        <TableColumn fx:id="colRepasProteines" prefWidth="90.0" text="Proteines"/>
+                                        <TableColumn fx:id="colRepasGlucides" prefWidth="90.0" text="Glucides"/>
+                                        <TableColumn fx:id="colRepasLipides" prefWidth="90.0" text="Lipides"/>
+                                        <TableColumn fx:id="colRepasRegimeId" prefWidth="220.0" text="Regime"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                    <VBox fx:id="viewRegimes" fillWidth="true" managed="false" spacing="22.0" styleClass="content-root" visible="false">
+                        <padding><Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/></padding>
+                        <VBox spacing="8.0" styleClass="hero-banner">
+                            <Label styleClass="hero-title" text="Diet planner - Regimes"/>
+                            <Label styleClass="hero-subtitle" text="Structure reprise de la page Symfony diet planner avec les vraies donnees regime."/>
+                        </VBox>
+                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+                            <Button fx:id="btnActionCreerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherCreationRegime" styleClass="action-card action-card-active" text="Creer un regime&#10;Ajoutez un nouveau profil nutritionnel." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionModifierRegime" maxWidth="1.7976931348623157E308" onAction="#afficherModificationRegime" styleClass="action-card" text="Modifier un regime&#10;Mettez a jour les donnees du planner." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionSupprimerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionRegime" styleClass="action-card" text="Supprimer un regime&#10;Retirez un regime de la base de donnees." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Button fx:id="btnActionExplorerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationRegime" styleClass="action-card" text="Explorer les regimes&#10;Consultez la liste complete des regimes." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <StackPane>
+                            <VBox fx:id="paneRegimeCreate" spacing="18.0" styleClass="panel-card">
+                                <Label styleClass="section-title" text="Creer un regime alimentaire"/>
+                                <Label styleClass="section-subtitle" text="Version JavaFX inspiree du diet planner Symfony."/>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Utilisateur"/>
+                                        <ComboBox fx:id="cbRegimeUser" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Type sante"/>
+                                        <ComboBox fx:id="cbRegimeTypeSante" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Taille (cm)"/>
+                                        <TextField fx:id="tfRegimeTaille" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Poids (kg)"/>
+                                        <TextField fx:id="tfRegimePoids" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Age"/>
+                                        <TextField fx:id="tfRegimeAge" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="BMI"/>
+                                        <TextField fx:id="tfRegimeBmi" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Calories cibles"/>
+                                        <TextField fx:id="tfRegimeCaloriesCibles" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Repas adequats"/>
+                                        <TextArea fx:id="taRegimeRepasAdequats" prefHeight="100.0" styleClass="text-area-input"/>
+                                    </VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRegime" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#ajouterRegime" styleClass="primary-button" text="Creer le regime"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRegimeEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Modifier un regime"/>
+                                <Label styleClass="section-subtitle" text="Selectionnez un regime puis mettez a jour ses donnees."/>
+                                <TextField fx:id="tfRegimeId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableRegimesEdit" prefHeight="290.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRegimeIdEdit" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRegimeUserEdit" prefWidth="210.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRegimeTypeEdit" prefWidth="150.0" text="Type sante"/>
+                                        <TableColumn fx:id="colRegimeCaloriesEdit" prefWidth="130.0" text="Calories"/>
+                                        <TableColumn fx:id="colRegimeBmiEdit" prefWidth="100.0" text="BMI"/>
+                                        <TableColumn fx:id="colRegimeRepasEdit" prefWidth="260.0" text="Repas adequats"/>
+                                    </columns>
+                                </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Utilisateur"/>
+                                        <ComboBox fx:id="cbRegimeUserEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Type sante"/>
+                                        <ComboBox fx:id="cbRegimeTypeSanteEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Taille (cm)"/>
+                                        <TextField fx:id="tfRegimeTailleEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Poids (kg)"/>
+                                        <TextField fx:id="tfRegimePoidsEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Age"/>
+                                        <TextField fx:id="tfRegimeAgeEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="BMI"/>
+                                        <TextField fx:id="tfRegimeBmiEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Calories cibles"/>
+                                        <TextField fx:id="tfRegimeCaloriesCiblesEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Repas adequats"/>
+                                        <TextArea fx:id="taRegimeRepasAdequatsEdit" prefHeight="100.0" styleClass="text-area-input"/>
+                                    </VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRegimeModification" styleClass="secondary-button" text="Reinitialiser"/>
+                                    <Button onAction="#modifierRegime" styleClass="primary-button" text="Mettre a jour"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRegimeDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Supprimer un regime"/>
+                                <Label styleClass="section-subtitle" text="Selectionnez un regime dans le planner puis supprimez-le."/>
+                                <TableView fx:id="tableRegimesDelete" prefHeight="500.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRegimeIdDelete" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRegimeUserDelete" prefWidth="210.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRegimeTypeDelete" prefWidth="150.0" text="Type sante"/>
+                                        <TableColumn fx:id="colRegimeCaloriesDelete" prefWidth="130.0" text="Calories"/>
+                                        <TableColumn fx:id="colRegimeBmiDelete" prefWidth="100.0" text="BMI"/>
+                                        <TableColumn fx:id="colRegimeRepasDelete" prefWidth="280.0" text="Repas adequats"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblRegimeSelectionDelete" styleClass="hint-label" text="Aucun regime selectionne"/>
+                                    <Button onAction="#supprimerRegime" styleClass="danger-button" text="Supprimer definitivement"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRegimeExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Explorer les regimes"/>
+                                <Label styleClass="section-subtitle" text="Lecture des regimes enregistres depuis la base Symfony."/>
+                                <TableView fx:id="tableRegimes" prefHeight="580.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRegimeId" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRegimeUser" prefWidth="210.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRegimeType" prefWidth="150.0" text="Type sante"/>
+                                        <TableColumn fx:id="colRegimeCalories" prefWidth="130.0" text="Calories"/>
+                                        <TableColumn fx:id="colRegimeBmi" prefWidth="90.0" text="BMI"/>
+                                        <TableColumn fx:id="colRegimeTaille" prefWidth="90.0" text="Taille"/>
+                                        <TableColumn fx:id="colRegimePoids" prefWidth="90.0" text="Poids"/>
+                                        <TableColumn fx:id="colRegimeAge" prefWidth="80.0" text="Age"/>
+                                        <TableColumn fx:id="colRegimeRepas" prefWidth="320.0" text="Repas adequats"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                </StackPane>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

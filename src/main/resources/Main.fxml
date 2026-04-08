@@ -2,135 +2,22 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="1100.0" xmlns:fx="http://javafx.com/fxml"
-            fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
-    <top>
-        <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Fitopia - CRUD Repas &amp; Regime Alimentaire">
-            <BorderPane.margin>
-                <Insets bottom="10.0" left="16.0" right="16.0" top="16.0"/>
-            </BorderPane.margin>
-        </Label>
-    </top>
-    <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE">
-            <tabs>
-                <Tab text="Regimes alimentaires">
-                    <content>
-                        <VBox spacing="14.0">
-                            <padding>
-                                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
-                            </padding>
-                            <SplitPane dividerPositions="0.38">
-                                <items>
-                                    <VBox spacing="12.0">
-                                        <GridPane hgap="10.0" vgap="10.0">
-                                            <Label text="ID" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                            <TextField fx:id="tfRegimeId" editable="false" promptText="Auto" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                                            <Label text="Nom" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                            <TextField fx:id="tfRegimeNom" promptText="Nom du regime" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                                            <Label text="Description" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                                            <TextArea fx:id="taRegimeDescription" prefHeight="120.0" promptText="Description du regime" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-                                            <Label text="Objectif calorique" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                                            <TextField fx:id="tfRegimeObjectifCalorique" promptText="Ex: 2200" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                                            <Label text="Actif" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                                            <CheckBox fx:id="chkRegimeActif" selected="true" text="Regime actif" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                                        </GridPane>
-                                        <HBox spacing="10.0">
-                                            <Button mnemonicParsing="false" onAction="#ajouterRegime" text="Ajouter"/>
-                                            <Button mnemonicParsing="false" onAction="#modifierRegime" text="Modifier"/>
-                                            <Button mnemonicParsing="false" onAction="#supprimerRegime" text="Supprimer"/>
-                                            <Button mnemonicParsing="false" onAction="#viderFormulaireRegime" text="Vider"/>
-                                        </HBox>
-                                    </VBox>
-                                    <TableView fx:id="tableRegimes">
-                                        <columns>
-                                            <TableColumn fx:id="colRegimeId" prefWidth="70.0" text="ID"/>
-                                            <TableColumn fx:id="colRegimeNom" prefWidth="150.0" text="Nom"/>
-                                            <TableColumn fx:id="colRegimeDescription" prefWidth="230.0" text="Description"/>
-                                            <TableColumn fx:id="colRegimeObjectifCalorique" prefWidth="140.0" text="Objectif"/>
-                                            <TableColumn fx:id="colRegimeActif" prefWidth="90.0" text="Actif"/>
-                                        </columns>
-                                    </TableView>
-                                </items>
-                            </SplitPane>
-                        </VBox>
-                    </content>
-                </Tab>
-                <Tab text="Repas">
-                    <content>
-                        <VBox spacing="14.0">
-                            <padding>
-                                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
-                            </padding>
-                            <SplitPane dividerPositions="0.38">
-                                <items>
-                                    <VBox spacing="12.0">
-                                        <GridPane hgap="10.0" vgap="10.0">
-                                            <Label text="ID" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                            <TextField fx:id="tfRepasId" editable="false" promptText="Auto" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                                            <Label text="Nom" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                            <TextField fx:id="tfRepasNom" promptText="Nom du repas" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                                            <Label text="Description" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                                            <TextArea fx:id="taRepasDescription" prefHeight="120.0" promptText="Description du repas" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-                                            <Label text="Calories" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                                            <TextField fx:id="tfRepasCalories" promptText="Ex: 650" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                                            <Label text="Type de repas" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                                            <ComboBox fx:id="cbTypeRepas" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-
-                                            <Label text="Date repas" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-                                            <DatePicker fx:id="dpDateRepas" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-
-                                            <Label text="Regime lie" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-                                            <ComboBox fx:id="cbRepasRegime" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-                                        </GridPane>
-                                        <HBox spacing="10.0">
-                                            <Button mnemonicParsing="false" onAction="#ajouterRepas" text="Ajouter"/>
-                                            <Button mnemonicParsing="false" onAction="#modifierRepas" text="Modifier"/>
-                                            <Button mnemonicParsing="false" onAction="#supprimerRepas" text="Supprimer"/>
-                                            <Button mnemonicParsing="false" onAction="#viderFormulaireRepas" text="Vider"/>
-                                        </HBox>
-                                    </VBox>
-                                    <TableView fx:id="tableRepas">
-                                        <columns>
-                                            <TableColumn fx:id="colRepasId" prefWidth="60.0" text="ID"/>
-                                            <TableColumn fx:id="colRepasNom" prefWidth="130.0" text="Nom"/>
-                                            <TableColumn fx:id="colRepasDescription" prefWidth="200.0" text="Description"/>
-                                            <TableColumn fx:id="colRepasCalories" prefWidth="90.0" text="Calories"/>
-                                            <TableColumn fx:id="colRepasType" prefWidth="110.0" text="Type"/>
-                                            <TableColumn fx:id="colRepasDate" prefWidth="120.0" text="Date"/>
-                                            <TableColumn fx:id="colRepasRegimeId" prefWidth="110.0" text="Regime ID"/>
-                                        </columns>
-                                    </TableView>
-                                </items>
-                            </SplitPane>
-                        </VBox>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
-    </center>
-</BorderPane>
+<StackPane prefHeight="920.0" prefWidth="1600.0" stylesheets="@styles/admin-theme.css" styleClass="landing-root"
+           xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="tn.esprit.Pidev3A49.controllers.NavigationController">
+    <children>
+        <VBox alignment="CENTER" maxWidth="520.0" spacing="28.0" styleClass="landing-card">
+            <padding>
+                <Insets bottom="42.0" left="42.0" right="42.0" top="42.0"/>
+            </padding>
+            <Label styleClass="landing-title" text="Choix de la vue"/>
+            <Label styleClass="landing-subtitle" text="Selectionnez l'espace a ouvrir dans l'application." wrapText="true"/>
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#ouvrirFront" styleClass="landing-button landing-button-front" text="Front"/>
+            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#ouvrirBack" styleClass="landing-button landing-button-back" text="Back"/>
+        </VBox>
+    </children>
+</StackPane>
