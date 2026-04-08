@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -88,7 +89,7 @@
                                             </columnConstraints>
                                             <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                                 <Label styleClass="field-label" text="Categorie"/>
-                                                <TextField fx:id="tfSupplementCategory" promptText="Ex: Proteine" styleClass="text-input"/>
+                                                <ComboBox fx:id="cbSupplementCategory" maxWidth="1.7976931348623157E308" promptText="Choisir une categorie" styleClass="combo-input" visibleRowCount="8"/>
                                             </VBox>
                                             <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                                 <Label styleClass="field-label" text="Nom du supplement"/>
@@ -96,7 +97,7 @@
                                             </VBox>
                                             <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                                 <Label styleClass="field-label" text="Marque"/>
-                                                <TextField fx:id="tfSupplementBrand" promptText="Ex: Optimum Nutrition" styleClass="text-input"/>
+                                                <ComboBox fx:id="cbSupplementBrand" maxWidth="1.7976931348623157E308" promptText="Choisir une marque" styleClass="combo-input" visibleRowCount="8"/>
                                             </VBox>
                                             <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                                 <Label styleClass="field-label" text="Description"/>
@@ -141,7 +142,7 @@
                                     <Label styleClass="section-title" text="Modifier un supplement"/>
                                     <Label styleClass="section-subtitle" text="Selectionnez un supplement dans le tableau, puis mettez a jour ses informations."/>
                                     <TextField fx:id="tfSupplementId" editable="false" managed="false" visible="false"/>
-                                    <TableView fx:id="tableSupplementsEdit" prefHeight="280.0" styleClass="data-table">
+                                    <TableView fx:id="tableSupplementsEdit" fixedCellSize="52.0" minHeight="250.0" prefHeight="250.0" maxHeight="250.0" styleClass="data-table">
                                         <columns>
                                             <TableColumn fx:id="colSupplementIdEdit" prefWidth="70.0" text="ID"/>
                                             <TableColumn fx:id="colSupplementNameEdit" prefWidth="220.0" text="Nom"/>
@@ -159,7 +160,7 @@
                                         </columnConstraints>
                                         <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
                                             <Label styleClass="field-label" text="Categorie"/>
-                                            <TextField fx:id="tfSupplementCategoryEdit" styleClass="text-input"/>
+                                            <ComboBox fx:id="cbSupplementCategoryEdit" maxWidth="1.7976931348623157E308" promptText="Choisir une categorie" styleClass="combo-input" visibleRowCount="8"/>
                                         </VBox>
                                         <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
                                             <Label styleClass="field-label" text="Nom du supplement"/>
@@ -167,7 +168,7 @@
                                         </VBox>
                                         <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
                                             <Label styleClass="field-label" text="Marque"/>
-                                            <TextField fx:id="tfSupplementBrandEdit" styleClass="text-input"/>
+                                            <ComboBox fx:id="cbSupplementBrandEdit" maxWidth="1.7976931348623157E308" promptText="Choisir une marque" styleClass="combo-input" visibleRowCount="8"/>
                                         </VBox>
                                         <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                             <Label styleClass="field-label" text="Description"/>
@@ -224,7 +225,7 @@
                                 <VBox fx:id="paneSupplementExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
                                     <Label styleClass="section-title" text="Explorer les supplements"/>
                                     <Label styleClass="section-subtitle" text="Consultez la liste complete des supplements enregistres et leurs details."/>
-                                    <TableView fx:id="tableSupplements" prefHeight="320.0" styleClass="data-table">
+                                    <TableView fx:id="tableSupplements" fixedCellSize="52.0" minHeight="250.0" prefHeight="250.0" maxHeight="250.0" styleClass="data-table">
                                         <columns>
                                             <TableColumn fx:id="colSupplementId" prefWidth="70.0" text="ID"/>
                                             <TableColumn fx:id="colSupplementName" prefWidth="220.0" text="Nom"/>
