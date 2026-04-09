@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 public class MainController {
 
+    // Static filter options used by the exercise view.
     private static final List<String> MUSCLE_GROUPS = List.of(
             "Poitrine", "Dos", "Jambes", "Epaules", "Bras", "Abdominaux", "Fessiers", "Cardio"
     );
