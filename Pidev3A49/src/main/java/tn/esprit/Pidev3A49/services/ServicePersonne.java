@@ -61,4 +61,22 @@ public class ServicePersonne implements IServices<Personne> {
 
         return personnes;
     }
+
+    @Override
+    public void update(Personne personne) {
+        String qry = "UPDATE `personne` SET `nom`=?, `prenom`=?, `age`=? WHERE `id`=?";
+
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(qry);
+
+            pstm.setString(1, personne.getNom());
+            pstm.setString(2, personne.getPrenom());
+            pstm.setInt(3, personne.getAge());
+            pstm.setInt(4, personne.getId());
+
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
