@@ -79,4 +79,18 @@ public class ServicePersonne implements IServices<Personne> {
             System.out.println(e.getMessage());
         }
     }
+
+    @Override
+    public void delete(Personne personne) {
+        String qry = "DELETE FROM `personne` WHERE `id`=?";
+
+        try {
+            PreparedStatement pstm = cnx.prepareStatement(qry);
+            pstm.setInt(1, personne.getId());
+
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }
