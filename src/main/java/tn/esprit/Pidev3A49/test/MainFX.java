@@ -15,6 +15,7 @@ public class MainFX extends Application {
         // Load the root scene from the shared FXML file.
         FXMLLoader loader = new FXMLLoader(MainFX.class.getResource("/Main.fxml"));
         Scene scene = new Scene(loader.load());
+        // Keep the application title consistent across launches.
         stage.setTitle("Fitopia");
         stage.setScene(scene);
         stage.show();
