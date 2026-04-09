@@ -2,9 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -150,33 +152,103 @@
                     </children>
                 </VBox>
 
-                <HBox alignment="CENTER_LEFT"
-                      spacing="18.0"
-                      style="-fx-background-color: rgba(255,255,255,0.88); -fx-background-radius: 22; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-radius: 22;">
-                    <padding>
-                        <Insets top="16.0" right="18.0" bottom="16.0" left="24.0"/>
-                    </padding>
-
+                <HBox spacing="22.0" alignment="TOP_LEFT">
                     <children>
-                        <VBox spacing="4.0">
+                        <VBox prefWidth="232.0"
+                              spacing="14.0">
                             <children>
-                                <Label text="Showing 86 of 86 products"
-                                       style="-fx-text-fill: #5E7380; -fx-font-size: 14px; -fx-font-weight: 700;"/>
-                                <Label text="Main catalog area only. Search and left filters intentionally skipped for now."
-                                       style="-fx-text-fill: #8DA0AA; -fx-font-size: 13px;"/>
+                                <VBox spacing="12.0"
+                                      style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 22; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-radius: 22;">
+                                    <padding>
+                                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
+                                    </padding>
+                                    <children>
+                                        <TextField promptText="Search supplement name..."
+                                                   prefHeight="42.0"
+                                                   style="-fx-background-color: #F8FAFC; -fx-background-radius: 14; -fx-border-color: #DEE7ED; -fx-border-radius: 14; -fx-font-size: 13px; -fx-prompt-text-fill: #98A7B3;"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="14.0"
+                                      style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 22; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-radius: 22;">
+                                    <padding>
+                                        <Insets top="16.0" right="16.0" bottom="18.0" left="16.0"/>
+                                    </padding>
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label text="Categories"
+                                                       style="-fx-text-fill: #163848; -fx-font-size: 16px; -fx-font-weight: 800;"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label text="⌄"
+                                                       style="-fx-text-fill: #425C6A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                            </children>
+                                        </HBox>
+
+                                        <VBox spacing="10.0">
+                                            <children>
+                                                <CheckBox text="Accessoires"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Acides Amines"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Amino Acids"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Boosteur de Testo"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Bruleurs de graisses"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Carbs"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Creatine"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Creatine monohydrate"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Joint flex"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Mass gainer"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Protein"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Pre-workout"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                                <CheckBox text="Ramadhan Deal"
+                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
                             </children>
                         </VBox>
-                        <Region HBox.hgrow="ALWAYS"/>
-                        <ComboBox prefWidth="220.0"
-                                  promptText="Sort by Name (A-Z)"
-                                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #D4E5DE; -fx-border-radius: 14; -fx-font-size: 14px;"/>
-                    </children>
-                </HBox>
 
-                <FlowPane prefWrapLength="1210.0"
-                          hgap="22.0"
-                          vgap="22.0">
-                    <children>
+                        <VBox spacing="18.0" prefWidth="958.0">
+                            <children>
+                                <HBox alignment="CENTER_LEFT"
+                                      spacing="18.0"
+                                      style="-fx-background-color: rgba(255,255,255,0.88); -fx-background-radius: 22; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-radius: 22;">
+                                    <padding>
+                                        <Insets top="16.0" right="18.0" bottom="16.0" left="24.0"/>
+                                    </padding>
+
+                                    <children>
+                                        <VBox spacing="4.0">
+                                            <children>
+                                                <Label text="Showing 86 of 86 products"
+                                                       style="-fx-text-fill: #5E7380; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                                <Label text="Search and categories added on the left. Suggestion blocks still left for later."
+                                                       style="-fx-text-fill: #8DA0AA; -fx-font-size: 13px;"/>
+                                            </children>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <ComboBox prefWidth="220.0"
+                                                  promptText="Sort by Name (A-Z)"
+                                                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #D4E5DE; -fx-border-radius: 14; -fx-font-size: 14px;"/>
+                                    </children>
+                                </HBox>
+
+                                <FlowPane prefWrapLength="958.0"
+                                          hgap="22.0"
+                                          vgap="22.0">
+                                    <children>
                         <VBox prefWidth="272.0"
                               spacing="16.0"
                               style="-fx-background-color: white; -fx-background-radius: 26; -fx-border-color: rgba(8, 67, 58, 0.08); -fx-border-radius: 26; -fx-effect: dropshadow(gaussian, rgba(7, 35, 29, 0.12), 22, 0.22, 0, 10);">
@@ -414,8 +486,12 @@
                                 </VBox>
                             </children>
                         </VBox>
+                                    </children>
+                                </FlowPane>
+                            </children>
+                        </VBox>
                     </children>
-                </FlowPane>
+                </HBox>
             </children>
         </VBox>
     </content>
