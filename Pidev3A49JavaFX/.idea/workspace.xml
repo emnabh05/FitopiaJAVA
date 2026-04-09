@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="cc3b8f76-1c8d-4c13-b508-e7a36d51f623" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/Pidev3A49/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Pidev3A49/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/controllers/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/controllers/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/services/ServiceRegimeAlimentaire.java" beforeDir="false" afterPath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/services/ServiceRegimeAlimentaire.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/services/ServiceRepas.java" beforeDir="false" afterPath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/services/ServiceRepas.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/utils/SchemaInitializer.java" beforeDir="false" afterPath="$PROJECT_DIR$/Pidev3A49/src/main/java/tn/esprit/Pidev3A49/utils/SchemaInitializer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Pidev3A49/src/main/resources/Main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/Pidev3A49/src/main/resources/Main.fxml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="30" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/Pidev3A49" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="3C2da3deNGwG9AVjns82LNSkngI" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "modifcrud",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "C:/Users/user/Downloads/Pidev3A49JavaFX",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "preferences.JavaFX",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cc3b8f76-1c8d-4c13-b508-e7a36d51f623" name="Changes" comment="" />
+      <created>1775587658455</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1775587658455</updated>
+      <workItem from="1775587659717" duration="5192000" />
+      <workItem from="1775596437441" duration="273000" />
+      <workItem from="1775596730409" duration="516000" />
+      <workItem from="1775599487680" duration="4000" />
+      <workItem from="1775599504982" duration="633000" />
+      <workItem from="1775600168171" duration="579000" />
+      <workItem from="1775638295013" duration="1345000" />
+      <workItem from="1775639657730" duration="2310000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
