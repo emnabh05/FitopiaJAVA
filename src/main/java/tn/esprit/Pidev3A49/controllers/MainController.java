@@ -221,6 +221,7 @@ public class MainController {
     private final ServiceFitnessExercise serviceFitnessExercise = new ServiceFitnessExercise();
 
     private List<FitnessExercise> filteredExercises = new ArrayList<>();
+    // The UI starts on the first page of exercise results.
     private int currentExercisePage = 1;
 
     @FXML
