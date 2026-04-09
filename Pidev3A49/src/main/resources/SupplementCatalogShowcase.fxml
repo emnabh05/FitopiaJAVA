@@ -44,6 +44,7 @@
                                         prefHeight="42.0"
                                         style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
                                 <Button text="Ranking"
+                                        onAction="#openMonthlyRanking"
                                         prefHeight="42.0"
                                         style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
                                 <Button text="Cart"
