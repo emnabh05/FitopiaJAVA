@@ -225,6 +225,7 @@ public class MainController {
     private int currentExercisePage = 1;
 
     @FXML
+    // JavaFX injects controls before this setup routine runs.
     public void initialize() {
         initialiserSession();
         initialiserTableRegimes();
