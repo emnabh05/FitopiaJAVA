@@ -42,6 +42,7 @@ public class MainController {
     );
     private static final List<String> DIFFICULTY_LEVELS = List.of("Debutant", "Intermediaire", "Avance");
     private static final String FILTER_ALL = "Tous";
+    // Pagination keeps the exercise grid readable.
     private static final int EXERCISE_PAGE_SIZE = 6;
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
