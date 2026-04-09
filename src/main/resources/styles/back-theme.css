@@ -1,10 +1,11 @@
 /* ROOT */
 .back-root {
-    -fx-background-color: #eef2f1;
+    -fx-background-color: linear-gradient(to right, #edf1ef, #fcfcfb);
+    -fx-font-family: "Segoe UI";
 }
 
 .back-sidebar-shell {
-    -fx-padding: 16 0 16 16;
+    -fx-padding: 4 0 4 4;
 }
 
 .app-scroll,
@@ -14,35 +15,66 @@
 
 /* SIDEBAR */
 .back-sidebar {
-    -fx-background-color: linear-gradient(to bottom, #073f42, #0f6a60);
-    -fx-background-radius: 26;
-    -fx-border-color: rgba(255,255,255,0.10);
-    -fx-border-width: 1;
-    -fx-border-radius: 26;
-    -fx-pref-width: 264;
-    -fx-padding: 24 22 18 22;
-    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.18), 24, 0.16, 0, 6);
+    -fx-background-color: linear-gradient(to bottom, #0b4b4a, #0e6158);
+    -fx-background-radius: 0 28 28 0;
+    -fx-pref-width: 326;
+    -fx-padding: 28 22 30 22;
+    -fx-effect: dropshadow(gaussian, rgba(5, 43, 44, 0.22), 26, 0.18, 0, 10);
 }
 
-.back-sidebar-logo {
+.back-sidebar-logo,
+.back-sidebar-logo-box {
     -fx-background-color: white;
     -fx-background-radius: 14;
     -fx-alignment: center;
-    -fx-text-fill: #0f6a60;
-    -fx-font-size: 18px;
+    -fx-min-width: 46;
+    -fx-min-height: 46;
+    -fx-pref-width: 46;
+    -fx-pref-height: 46;
+}
+
+.back-sidebar-logo-mark {
+    -fx-text-fill: #0c5b55;
+    -fx-font-size: 16px;
     -fx-font-weight: 900;
+}
+
+.back-sidebar-logo-caption {
+    -fx-text-fill: #7e8a8f;
+    -fx-font-size: 6.5px;
+    -fx-font-weight: 800;
 }
 
 .back-sidebar-title {
     -fx-text-fill: white;
-    -fx-font-size: 20px;
+    -fx-font-size: 18px;
     -fx-font-weight: 900;
 }
 
+.back-sidebar-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.72);
+    -fx-font-size: 12px;
+}
+
 .back-user-card {
-    -fx-background-color: rgba(255,255,255,0.12);
+    -fx-background-color: rgba(255,255,255,0.16);
     -fx-background-radius: 18;
-    -fx-padding: 12 14 12 14;
+    -fx-padding: 14 16 14 16;
+    -fx-alignment: center-left;
+}
+
+.back-user-avatar {
+    -fx-background-color: linear-gradient(to bottom, #7caeb2, #3f6a72);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255,255,255,0.55);
+    -fx-border-width: 2;
+    -fx-border-radius: 999;
+}
+
+.back-user-avatar-text {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
 }
 
 .back-user-label {
@@ -58,44 +90,78 @@
 
 /* NAV BUTTONS */
 .back-nav-button {
-    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-background-color: transparent;
     -fx-background-radius: 16;
     -fx-text-fill: white;
     -fx-font-size: 15px;
     -fx-font-weight: 800;
-    -fx-padding: 16 18;
+    -fx-padding: 10 14;
     -fx-alignment: center-left;
+    -fx-content-display: left;
+    -fx-graphic-text-gap: 12;
     -fx-cursor: hand;
 }
 
 .back-nav-button:hover {
-    -fx-background-color: rgba(255,255,255,0.16);
+    -fx-background-color: rgba(255,255,255,0.08);
+}
+
+.back-nav-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+    -fx-min-width: 20;
+    -fx-alignment: center;
+}
+
+.back-sidebar-section-button {
+    -fx-background-color: rgba(255,255,255,0.20);
+    -fx-padding: 18 18 18 18;
+    -fx-font-size: 16px;
+    -fx-min-height: 62;
+}
+
+.back-menu-link {
+    -fx-padding: 8 12 8 12;
+    -fx-font-size: 14px;
+}
+
+.back-menu-featured {
+    -fx-padding: 16 16 16 16;
+    -fx-min-height: 74;
 }
 
 .sidebar-nav-button-active {
-    -fx-background-color: rgba(255,255,255,0.18);
+    -fx-background-color: rgba(142, 191, 184, 0.36);
+    -fx-effect: dropshadow(gaussian, rgba(5, 30, 31, 0.18), 12, 0.12, 0, 2);
 }
 
 .back-sidebar-footer {
-    -fx-padding: 18 0 4 0;
-    -fx-border-color: rgba(255,255,255,0.12) transparent transparent transparent;
-    -fx-border-width: 1 0 0 0;
+    -fx-padding: 8 0 0 4;
 }
 
 /* LOGOUT */
 .back-logout-button {
     -fx-background-color: white;
     -fx-background-radius: 14;
-    -fx-text-fill: #073f42;
-    -fx-font-size: 14px;
-    -fx-font-weight: 800;
-    -fx-padding: 14 18;
+    -fx-text-fill: #133642;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+    -fx-padding: 14 20;
+    -fx-content-display: left;
+    -fx-graphic-text-gap: 10;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.10), 10, 0.10, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.12), 12, 0.12, 0, 4);
 }
 
 .back-logout-button:hover {
-    -fx-background-color: #f4fbf8;
+    -fx-background-color: #f5faf8;
+}
+
+.back-logout-icon {
+    -fx-text-fill: #133642;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
 }
 
 /* HERO */
@@ -116,7 +182,7 @@
     -fx-font-size: 16px;
 }
 
-/* CARDS ACTION */
+/* ACTION CARDS */
 .back-option-card {
     -fx-background-color: white;
     -fx-background-radius: 20;
@@ -134,11 +200,11 @@
     -fx-border-color: #62bda9;
 }
 
-
 .back-option-card-active {
     -fx-border-color: #62bda9;
     -fx-border-width: 2;
 }
+
 .action-card-active {
     -fx-border-color: #62bda9;
     -fx-border-width: 2;
@@ -229,6 +295,12 @@
     -fx-padding: 18;
 }
 
+.back-form-section-icon {
+    -fx-text-fill: #177b62;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+}
+
 .back-form-section-title {
     -fx-text-fill: #123f44;
     -fx-font-size: 17px;
@@ -246,6 +318,10 @@
     -fx-padding: 16;
 }
 
+.back-field-card-full {
+    -fx-max-width: Infinity;
+}
+
 .back-field-label {
     -fx-text-fill: #182033;
     -fx-font-size: 14px;
@@ -261,7 +337,10 @@
 }
 
 /* INPUTS */
-.back-form-control {
+.back-form-control,
+.text-input,
+.combo-input,
+.date-input {
     -fx-background-color: white;
     -fx-background-radius: 14;
     -fx-border-color: #cfded8;
@@ -275,31 +354,41 @@
     -fx-padding: 0 14;
 }
 
-.back-form-control {
+/*noinspection CssInvalidPseudoSelector*/
+.back-form-control:focused,
+.text-input:focused,
+.combo-input:focused,
+.date-input:focused {
+    -fx-border-color: #62bda9;
+}
+
+.back-text-area,
+.text-area-input {
     -fx-background-color: white;
     -fx-background-radius: 14;
     -fx-border-color: #cfded8;
     -fx-border-radius: 14;
     -fx-border-width: 1;
-    -fx-min-height: 50;
     -fx-font-size: 14px;
     -fx-font-weight: 600;
     -fx-text-fill: #1f2937;
     -fx-prompt-text-fill: #a0acb8;
-    -fx-padding: 0 14;
+    -fx-padding: 10 14;
 }
 
 .back-text-area {
     -fx-min-height: 80;
 }
 
-.back-text-area .content {
+.back-text-area .content,
+.text-area-input .content {
     -fx-background-color: white;
     -fx-background-radius: 14;
 }
 
-/* BUTTON */
-.back-submit-button {
+/* MAIN BUTTONS */
+.back-submit-button,
+.primary-button {
     -fx-background-color: linear-gradient(to right, #0b4d4d, #177b62);
     -fx-background-radius: 14;
     -fx-text-fill: white;
@@ -309,29 +398,171 @@
     -fx-cursor: hand;
 }
 
-.back-submit-button:hover {
+.back-submit-button:hover,
+.primary-button:hover {
     -fx-opacity: 0.95;
 }
 
-.repas-browser-panel {
+.secondary-button {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-color: #d5e2dc;
+    -fx-border-radius: 14;
+    -fx-border-width: 1;
+    -fx-text-fill: #17343d;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 13 20;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #f6faf8;
+}
+
+.danger-button {
+    -fx-background-color: linear-gradient(to right, #d62019, #ef2a20);
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-padding: 13 20;
+    -fx-cursor: hand;
+}
+
+/* TABLE / GENERIC PANELS */
+.panel-card {
+    -fx-background-color: #fbfcfc;
+    -fx-background-radius: 24;
+    -fx-border-color: #e1e9e6;
+    -fx-border-radius: 24;
+    -fx-border-width: 1;
     -fx-padding: 24;
 }
 
+.field-card,
+.metric-card {
+    -fx-background-color: #fdfefe;
+    -fx-background-radius: 16;
+    -fx-border-color: #dfe9e5;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+    -fx-padding: 16;
+}
+
+.field-label {
+    -fx-text-fill: #182033;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.hint-label {
+    -fx-text-fill: #728198;
+    -fx-font-size: 14px;
+}
+
+.data-table {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-border-color: #dfe9e5;
+    -fx-border-radius: 16;
+    -fx-border-width: 1;
+}
+
+.data-table .column-header-background {
+    -fx-background-color: #f3f8f6;
+    -fx-background-radius: 16 16 0 0;
+}
+
+.data-table .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 12 10;
+}
+
+.data-table .column-header .label {
+    -fx-text-fill: #17343d;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+}
+
+.data-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #edf3f0 transparent;
+    -fx-padding: 6 0;
+}
+
+/*noinspection CssInvalidPseudoSelector*/
+.data-table .table-row-cell:selected {
+    -fx-background-color: #eef7f3;
+}
+
+.data-table .table-cell {
+    -fx-text-fill: #425466;
+    -fx-font-size: 13px;
+    -fx-padding: 10 12;
+}
+
+/* SECTION TITLES */
+.section-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #172033;
+}
+
+.section-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #7a8793;
+}
+
+/* EXPLORE REPAS PANEL */
+.repas-browser-panel,
+.repas-delete-panel,
+.repas-edit-panel {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 24;
+    -fx-border-color: #e1eee9;
+    -fx-border-radius: 24;
+    -fx-border-width: 1;
+    -fx-padding: 26;
+    -fx-effect: dropshadow(gaussian, rgba(12, 48, 52, 0.08), 26, 0.14, 0, 8);
+}
+
 .repas-toolbar {
-    -fx-background-color: #f4faf8;
+    -fx-background-color: linear-gradient(to right, #f9fcfb, #f7fbfb);
     -fx-background-radius: 20;
     -fx-border-color: #d8e7e1;
     -fx-border-radius: 20;
-    -fx-padding: 14;
+    -fx-border-width: 1;
+    -fx-padding: 14 16 14 16;
 }
 
 .repas-toolbar-search,
 .repas-toolbar-control {
-    -fx-min-height: 48;
+    -fx-min-height: 54;
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
 }
 
 .repas-statistics-button {
-    -fx-padding: 13 22 13 22;
+    -fx-background-color: linear-gradient(to right, #158763, #21a374);
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-padding: 12 22 12 20;
+    -fx-cursor: hand;
+    -fx-content-display: left;
+    -fx-graphic-text-gap: 8;
+}
+
+.repas-statistics-button:hover {
+    -fx-opacity: 0.93;
+}
+
+.repas-statistics-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
 }
 
 .repas-stat-strip {
@@ -363,59 +594,79 @@
 }
 
 .repas-browser-card {
-    -fx-background-color: white;
-    -fx-background-radius: 22;
-    -fx-border-color: #dbe7e1;
-    -fx-border-radius: 22;
-    -fx-padding: 20 20 18 20;
-    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.08), 24, 0.16, 0, 8);
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 20;
+    -fx-border-color: #d8e8e1;
+    -fx-border-radius: 20;
+    -fx-border-width: 1;
+    -fx-padding: 20 22 18 22;
 }
 
 .repas-card-title {
-    -fx-font-size: 20px;
+    -fx-font-size: 19px;
     -fx-font-weight: 900;
     -fx-text-fill: #172033;
 }
 
-.repas-card-meta-text {
-    -fx-font-size: 15px;
-    -fx-font-weight: 600;
-    -fx-text-fill: #728198;
+.repas-card-meta-row {
+    -fx-alignment: center-left;
 }
 
+.repas-card-email,
+.repas-card-calories,
 .repas-card-date {
     -fx-font-size: 15px;
-    -fx-font-weight: 700;
-    -fx-text-fill: #8793a3;
+    -fx-font-weight: 500;
+    -fx-text-fill: #71829a;
 }
 
-.repas-card-details {
-    -fx-font-size: 14px;
-    -fx-text-fill: #617081;
+.repas-card-separator {
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #8a98a7;
+}
+
+.repas-card-footer {
+    -fx-padding: 8 0 0 0;
 }
 
 .repas-type-pill {
     -fx-background-radius: 999;
-    -fx-padding: 6 12 6 12;
-    -fx-font-size: 13px;
+    -fx-padding: 6 14 6 14;
+    -fx-font-size: 12px;
     -fx-font-weight: 900;
     -fx-text-fill: white;
 }
 
 .repas-type-pill-petit-dejeuner {
-    -fx-background-color: #0f4b4b;
+    -fx-background-color: #178966;
 }
 
 .repas-type-pill-dejeuner {
-    -fx-background-color: #1d9d77;
+    -fx-background-color: #178966;
 }
 
 .repas-type-pill-diner {
-    -fx-background-color: #166b61;
+    -fx-background-color: #147a63;
 }
 
 .repas-type-pill-collation {
-    -fx-background-color: #31b67d;
+    -fx-background-color: #1d9670;
+}
+
+.repas-pdf-button {
+    -fx-background-color: linear-gradient(to right, #c22118, #da2d21);
+    -fx-background-radius: 12;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+    -fx-padding: 10 18;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(194, 33, 24, 0.18), 16, 0.14, 0, 5);
+}
+
+.repas-pdf-button:hover {
+    -fx-opacity: 0.94;
 }
 
 .repas-empty-state {
@@ -462,87 +713,98 @@
     -fx-cursor: hand;
 }
 
-.repas-browser-card {
-    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f8fcfa);
-    -fx-border-color: #d8e7e1;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.09), 26, 0.18, 0, 8);
+/* EDIT / DELETE REPAS */
+.repas-edit-grid,
+.repas-delete-grid {
+    -fx-pref-columns: 1;
 }
 
-.repas-card-top-row {
-    -fx-alignment: center-left;
-}
-
-.repas-card-email {
-    -fx-font-size: 16px;
-    -fx-font-weight: 600;
-    -fx-text-fill: #728198;
-}
-
-.repas-card-details {
-    -fx-font-size: 14px;
-    -fx-text-fill: #5a6877;
-}
-
-.repas-card-metrics-row {
-    -fx-padding: 4 0 0 0;
-}
-
-.repas-metric-chip {
-    -fx-background-color: #eef7f3;
-    -fx-background-radius: 16;
-    -fx-border-color: #d7e7e0;
-    -fx-border-radius: 16;
-    -fx-padding: 10 12 10 12;
-}
-
-.repas-metric-chip-label {
-    -fx-font-size: 11px;
-    -fx-font-weight: 800;
-    -fx-text-fill: #7a8896;
-}
-
-.repas-metric-chip-value {
-    -fx-font-size: 14px;
+.repas-delete-heading,
+.repas-edit-heading {
+    -fx-font-size: 24px;
     -fx-font-weight: 900;
-    -fx-text-fill: #16333c;
+    -fx-text-fill: #172033;
 }
 
-.repas-card-footer {
-    -fx-padding: 6 0 0 0;
+.repas-delete-card,
+.repas-edit-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #fbfefd);
+    -fx-background-radius: 22;
+    -fx-border-color: #dbe9e3;
+    -fx-border-radius: 22;
+    -fx-border-width: 1;
+    -fx-padding: 20 22 20 22;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.05), 18, 0.12, 0, 4);
 }
 
-.repas-pdf-button {
-    -fx-background-color: linear-gradient(to right, #b72418, #cf3324);
+.repas-edit-card-selected {
+    -fx-border-color: #1a8c73;
+    -fx-border-width: 2;
+}
+
+.repas-delete-title {
+    -fx-font-size: 19px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #172033;
+}
+
+.repas-delete-meta {
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
+    -fx-text-fill: #71829a;
+}
+
+.repas-delete-calories-pill {
+    -fx-background-color: linear-gradient(to right, #13725b, #1f9e73);
+    -fx-background-radius: 999;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.repas-delete-button {
+    -fx-background-color: linear-gradient(to right, #df241c, #ee2f23);
     -fx-background-radius: 14;
     -fx-text-fill: white;
-    -fx-font-size: 14px;
+    -fx-font-size: 15px;
     -fx-font-weight: 900;
-    -fx-padding: 12 18 12 18;
+    -fx-padding: 13 24 13 24;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(183, 36, 24, 0.20), 16, 0.16, 0, 5);
+    -fx-effect: dropshadow(gaussian, rgba(223, 36, 28, 0.22), 18, 0.15, 0, 6);
 }
 
-.repas-pdf-button:hover {
-    -fx-background-color: linear-gradient(to right, #c12a1d, #d63c2d);
+.repas-delete-button:hover {
+    -fx-opacity: 0.94;
 }
 
-.repas-type-pill {
-    -fx-effect: dropshadow(gaussian, rgba(14, 89, 66, 0.15), 10, 0.12, 0, 2);
+.repas-edit-button {
+    -fx-background-color: linear-gradient(to right, #0d6053, #147564);
+    -fx-background-radius: 14;
+    -fx-text-fill: white;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+    -fx-padding: 13 24 13 24;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(13, 96, 83, 0.20), 18, 0.14, 0, 6);
 }
 
-.repas-type-pill-petit-dejeuner {
-    -fx-background-color: linear-gradient(to right, #0a4a43, #0e6a5c);
+.repas-edit-button:hover {
+    -fx-opacity: 0.94;
 }
 
-.repas-type-pill-dejeuner {
-    -fx-background-color: linear-gradient(to right, #157356, #24a470);
+.repas-edit-form-shell {
+    -fx-background-color: #f9fbfb;
+    -fx-background-radius: 22;
+    -fx-border-color: #d9e6e2;
+    -fx-border-radius: 22;
+    -fx-border-width: 1;
+    -fx-padding: 26;
 }
 
-.repas-type-pill-diner {
-    -fx-background-color: linear-gradient(to right, #12564b, #177c69);
-}
-
-.repas-type-pill-collation {
-    -fx-background-color: linear-gradient(to right, #1f8f63, #39c486);
+.repas-edit-form-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #172033;
 }

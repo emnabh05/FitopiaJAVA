@@ -14,6 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.Node;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -76,14 +78,15 @@ public class MainController {
             "normal", "surpoids", "obesite", "sous_poids", "diabetique", "cardiaque", "autre"
     );
     private static final Map<String, String> TYPE_COLOR_BY_LABEL = Map.of(
-            TYPE_PETIT_DEJEUNER, "#0f4b4b",
-            TYPE_DEJEUNER, "#178764",
-            TYPE_DINER, "#166b61",
-            TYPE_COLLATION, "#31b67d"
+            TYPE_PETIT_DEJEUNER, "#0d4f49",
+            TYPE_DEJEUNER, "#14725d",
+            TYPE_DINER, "#1f8d6a",
+            TYPE_COLLATION, "#39b77d"
     );
 
     @FXML private VBox viewRepas;
     @FXML private VBox viewRegimes;
+    @FXML private ScrollPane appScrollPane;
     @FXML private VBox paneRepasCreate;
     @FXML private VBox paneRepasEdit;
     @FXML private VBox paneRepasDelete;
@@ -126,14 +129,16 @@ public class MainController {
     @FXML private TextField tfRepasLipides;
     @FXML private TextField tfRepasLipidesEdit;
     @FXML private Label lblRepasSelectionDelete;
+    @FXML private VBox tileRepasEditCards;
+    @FXML private VBox boxRepasEditEmpty;
+    @FXML private VBox boxRepasEditForm;
+    @FXML private VBox tileRepasDeleteCards;
+    @FXML private VBox boxRepasDeleteEmpty;
     @FXML private TextField tfRepasSearch;
     @FXML private ComboBox<String> cbRepasExploreTypeFilter;
     @FXML private ComboBox<String> cbRepasExploreSort;
     @FXML private Button btnRepasStatistics;
     @FXML private Label lblRepasExploreCount;
-    @FXML private Label lblRepasStatTotal;
-    @FXML private Label lblRepasStatCalories;
-    @FXML private Label lblRepasStatType;
     @FXML private TilePane tileRepasCards;
     @FXML private VBox boxRepasExploreEmpty;
 
@@ -214,6 +219,7 @@ public class MainController {
     private final ServiceUser serviceUser = new ServiceUser();
     private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
     private List<Repas> repasExplorerView = List.of();
+    private Integer repasEditSelectionId;
 
     @FXML
     public void initialize() {
@@ -266,10 +272,13 @@ public class MainController {
         tableRepas.setItems(FXCollections.observableArrayList(repas));
         tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
         tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
+        restaurerSelectionRepasEdit(repas);
 
         tableRegimes.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
+        actualiserModificationRepas();
+        actualiserSuppressionRepas();
         actualiserExplorateurRepas();
     }
 
@@ -305,11 +314,7 @@ public class MainController {
         try {
             Repas repas = tableRepasDelete.getSelectionModel().getSelectedItem();
             if (repas == null) throw new IllegalArgumentException("Selectionnez un repas a supprimer.");
-            serviceRepas.delete(repas);
-            rafraichirDonnees();
-            viderFormulaireRepasModification();
-            lblRepasSelectionDelete.setText("Aucun repas selectionne");
-            showInfo("Repas supprime avec succes.");
+            supprimerRepasSelectionne(repas);
         } catch (Exception exception) {
             showError("Erreur repas", exception.getMessage());
         }
@@ -384,7 +389,13 @@ public class MainController {
         tfRepasProteinesEdit.clear();
         tfRepasGlucidesEdit.clear();
         tfRepasLipidesEdit.clear();
+        repasEditSelectionId = null;
         tableRepasEdit.getSelectionModel().clearSelection();
+        if (boxRepasEditForm != null) {
+            boxRepasEditForm.setManaged(false);
+            boxRepasEditForm.setVisible(false);
+        }
+        actualiserModificationRepas();
     }
 
     @FXML
@@ -505,15 +516,40 @@ public class MainController {
 
     private void initialiserSelections() {
         tableRepasEdit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) remplirFormulaireRepas(newValue);
+            repasEditSelectionId = newValue == null ? null : newValue.getId();
+            if (newValue != null) {
+                remplirFormulaireRepas(newValue);
+            }
+            if (boxRepasEditForm != null) {
+                boolean hasSelection = newValue != null;
+                boxRepasEditForm.setManaged(hasSelection);
+                boxRepasEditForm.setVisible(hasSelection);
+            }
+            actualiserModificationRepas();
         });
-        tableRepasDelete.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                lblRepasSelectionDelete.setText(newValue == null ? "Aucun repas selectionne" : "Repas selectionne: " + newValue.getNomRepas()));
         tableRegimesEdit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) remplirFormulaireRegime(newValue);
         });
         tableRegimesDelete.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 lblRegimeSelectionDelete.setText(newValue == null ? "Aucun regime selectionne" : "Regime selectionne: #" + newValue.getId()));
+    }
+
+    private void restaurerSelectionRepasEdit(List<Repas> repas) {
+        if (tableRepasEdit == null) {
+            return;
+        }
+        if (repasEditSelectionId == null) {
+            tableRepasEdit.getSelectionModel().clearSelection();
+            return;
+        }
+        for (Repas item : repas) {
+            if (item.getId() == repasEditSelectionId) {
+                tableRepasEdit.getSelectionModel().select(item);
+                return;
+            }
+        }
+        repasEditSelectionId = null;
+        tableRepasEdit.getSelectionModel().clearSelection();
     }
 
     private void remplirFormulaireRepas(Repas repas) {
@@ -693,8 +729,32 @@ public class MainController {
         if (btnRepasStatistics != null) {
             btnRepasStatistics.setDisable(empty);
         }
+        mettreAJourCompteurRepas();
+    }
 
-        mettreAJourStatistiquesRepas();
+    private void actualiserModificationRepas() {
+        if (tileRepasEditCards == null) {
+            return;
+        }
+
+        List<Repas> repasToEdit = allRepas.stream()
+                .sorted(comparateurRepas(SORT_RECENT))
+                .toList();
+
+        tileRepasEditCards.getChildren().setAll(repasToEdit.stream()
+                .map(this::creerCarteModificationRepas)
+                .toList());
+
+        boolean empty = repasToEdit.isEmpty();
+        if (boxRepasEditEmpty != null) {
+            boxRepasEditEmpty.setManaged(empty);
+            boxRepasEditEmpty.setVisible(empty);
+        }
+        if (boxRepasEditForm != null) {
+            boolean hasSelection = repasEditSelectionId != null && !empty;
+            boxRepasEditForm.setManaged(hasSelection);
+            boxRepasEditForm.setVisible(hasSelection);
+        }
     }
 
     private VBox creerCarteRepas(Repas repas) {
@@ -704,28 +764,24 @@ public class MainController {
         Label email = new Label(valeurOuDefaut(repas.getUserEmail(), "Utilisateur inconnu"));
         email.getStyleClass().add("repas-card-email");
 
-        Label type = new Label(normaliserTypeRepas(repas.getTypeRepas()));
+        Label separatorBeforeType = new Label("·");
+        separatorBeforeType.getStyleClass().add("repas-card-separator");
+
+        Label type = new Label(libelleBadgeTypeRepas(repas.getTypeRepas()));
         type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
 
-        HBox topRow = new HBox(12, email, type);
-        topRow.getStyleClass().add("repas-card-top-row");
-        topRow.setAlignment(Pos.CENTER_LEFT);
+        Label separatorBeforeCalories = new Label("·");
+        separatorBeforeCalories.getStyleClass().add("repas-card-separator");
 
-        HBox nutritionRow = new HBox(
-                10,
-                creerMetricChip("Calories", toMetricValue(repas.getCalories(), "kcal")),
-                creerMetricChip("Proteines", toMetricValue(repas.getProteines(), "g")),
-                creerMetricChip("Glucides", toMetricValue(repas.getGlucides(), "g")),
-                creerMetricChip("Lipides", toMetricValue(repas.getLipides(), "g"))
-        );
-        nutritionRow.getStyleClass().add("repas-card-metrics-row");
+        Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
+        calories.getStyleClass().add("repas-card-calories");
+
+        HBox metaRow = new HBox(10, email, separatorBeforeType, type, separatorBeforeCalories, calories);
+        metaRow.getStyleClass().add("repas-card-meta-row");
+        metaRow.setAlignment(Pos.CENTER_LEFT);
 
         Label date = new Label(repas.getDateDisplay());
         date.getStyleClass().add("repas-card-date");
-
-        Label details = new Label(construireDetailsRepas(repas));
-        details.getStyleClass().add("repas-card-details");
-        details.setWrapText(true);
 
         Button pdfButton = new Button("Exporter PDF");
         pdfButton.getStyleClass().add("repas-pdf-button");
@@ -737,43 +793,197 @@ public class MainController {
         footer.getStyleClass().add("repas-card-footer");
         footer.setAlignment(Pos.CENTER_LEFT);
 
-        VBox card = new VBox(14, title, topRow, details, nutritionRow, footer);
+        VBox card = new VBox(18, title, metaRow, footer);
         card.getStyleClass().add("repas-browser-card");
         card.setPrefWidth(520);
         card.setMaxWidth(Double.MAX_VALUE);
         return card;
     }
 
-    private void mettreAJourStatistiquesRepas() {
+    private HBox creerCarteModificationRepas(Repas repas) {
+        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Repas sans nom"));
+        title.getStyleClass().add("repas-delete-title");
+
+        Label meta = new Label(valeurOuDefaut(repas.getDateDisplay(), "--") + " · " + valeurOuDefaut(repas.getUserEmail(), "Utilisateur inconnu"));
+        meta.getStyleClass().add("repas-delete-meta");
+
+        Label type = new Label(libelleBadgeTypeRepas(repas.getTypeRepas()));
+        type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
+
+        Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
+        calories.getStyleClass().add("repas-delete-calories-pill");
+
+        HBox badges = new HBox(10, type, calories);
+        badges.setAlignment(Pos.CENTER_LEFT);
+
+        VBox content = new VBox(10, title, meta, badges);
+        content.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(content, javafx.scene.layout.Priority.ALWAYS);
+
+        Button editButton = new Button("Modifier");
+        editButton.getStyleClass().add("repas-edit-button");
+        editButton.setOnAction(event -> selectionnerRepasPourModification(repas));
+
+        HBox card = new HBox(16, content, editButton);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.getStyleClass().add("repas-edit-card");
+        card.setOnMouseClicked(event -> selectionnerRepasPourModification(repas));
+        if (repasEditSelectionId != null && repasEditSelectionId.equals(repas.getId())) {
+            card.getStyleClass().add("repas-edit-card-selected");
+        }
+        card.setMaxWidth(Double.MAX_VALUE);
+        return card;
+    }
+
+    private void selectionnerRepasPourModification(Repas repas) {
+        afficherModificationRepas();
+        repasEditSelectionId = repas.getId();
+        if (tableRepasEdit != null) {
+            tableRepasEdit.getSelectionModel().select(repas);
+        }
+        remplirFormulaireRepas(repas);
+        if (boxRepasEditForm != null) {
+            boxRepasEditForm.setManaged(true);
+            boxRepasEditForm.setVisible(true);
+            scrollToNode(boxRepasEditForm);
+        }
+        actualiserModificationRepas();
+    }
+
+    private void scrollToNode(Node node) {
+        if (appScrollPane == null || node == null || appScrollPane.getContent() == null) {
+            return;
+        }
+
+        Platform.runLater(() -> {
+            Node content = appScrollPane.getContent();
+            double contentHeight = content.getBoundsInLocal().getHeight();
+            double viewportHeight = appScrollPane.getViewportBounds().getHeight();
+            double scrollableHeight = contentHeight - viewportHeight;
+            if (scrollableHeight <= 0) {
+                appScrollPane.setVvalue(0);
+                return;
+            }
+
+            double targetY = content.sceneToLocal(node.localToScene(node.getBoundsInLocal())).getMinY();
+            double targetValue = targetY / scrollableHeight;
+            appScrollPane.setVvalue(Math.max(0, Math.min(targetValue, 1)));
+        });
+    }
+
+    private HBox creerCarteSuppressionRepasStylee(Repas repas) {
+        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Repas sans nom"));
+        title.getStyleClass().add("repas-delete-title");
+
+        Label meta = new Label(valeurOuDefaut(repas.getDateDisplay(), "--") + " · " + valeurOuDefaut(repas.getUserEmail(), "Utilisateur inconnu"));
+        meta.getStyleClass().add("repas-delete-meta");
+
+        Label type = new Label(libelleBadgeTypeRepas(repas.getTypeRepas()));
+        type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
+
+        Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
+        calories.getStyleClass().add("repas-delete-calories-pill");
+
+        HBox badges = new HBox(10, type, calories);
+        badges.setAlignment(Pos.CENTER_LEFT);
+
+        VBox content = new VBox(10, title, meta, badges);
+        content.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(content, javafx.scene.layout.Priority.ALWAYS);
+
+        Button deleteButton = new Button("Supprimer");
+        deleteButton.getStyleClass().add("repas-delete-button");
+        deleteButton.setOnAction(event -> confirmerSuppressionDepuisCarte(repas));
+
+        HBox card = new HBox(16, content, deleteButton);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.getStyleClass().add("repas-delete-card");
+        card.setMaxWidth(Double.MAX_VALUE);
+        return card;
+    }
+
+    private void actualiserSuppressionRepas() {
+        if (tileRepasDeleteCards == null) {
+            return;
+        }
+
+        List<Repas> repasToDelete = allRepas.stream()
+                .sorted(comparateurRepas(SORT_RECENT))
+                .toList();
+
+        tileRepasDeleteCards.getChildren().setAll(repasToDelete.stream()
+                .map(this::creerCarteSuppressionRepasStylee)
+                .toList());
+
+        boolean empty = repasToDelete.isEmpty();
+        if (boxRepasDeleteEmpty != null) {
+            boxRepasDeleteEmpty.setManaged(empty);
+            boxRepasDeleteEmpty.setVisible(empty);
+        }
+    }
+
+    private HBox creerCarteSuppressionRepas(Repas repas) {
+        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Repas sans nom"));
+        title.getStyleClass().add("repas-delete-title");
+
+        Label meta = new Label(valeurOuDefaut(repas.getDateDisplay(), "--") + " · " + valeurOuDefaut(repas.getUserEmail(), "Utilisateur inconnu"));
+        meta.getStyleClass().add("repas-delete-meta");
+
+        Label type = new Label(normaliserTypeRepas(repas.getTypeRepas()));
+        type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
+
+        Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
+        calories.getStyleClass().add("repas-delete-calories-pill");
+
+        HBox badges = new HBox(10, type, calories);
+        badges.setAlignment(Pos.CENTER_LEFT);
+
+        VBox content = new VBox(10, title, meta, badges);
+        content.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(content, javafx.scene.layout.Priority.ALWAYS);
+
+        Button deleteButton = new Button("Supprimer");
+        deleteButton.getStyleClass().add("repas-delete-button");
+        deleteButton.setOnAction(event -> confirmerSuppressionDepuisCarte(repas));
+
+        HBox card = new HBox(16, content, deleteButton);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.getStyleClass().add("repas-delete-card");
+        card.setMaxWidth(Double.MAX_VALUE);
+        return card;
+    }
+
+    private void confirmerSuppressionDepuisCarte(Repas repas) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Supprimer un repas");
+        alert.setHeaderText("Confirmer la suppression");
+        alert.setContentText("Voulez-vous supprimer le repas \"" + valeurOuDefaut(repas.getNomRepas(), "Sans nom") + "\" ?");
+        alert.showAndWait()
+                .filter(response -> response.getButtonData().isDefaultButton())
+                .ifPresent(response -> supprimerRepasSelectionne(repas));
+    }
+
+    private void supprimerRepasSelectionne(Repas repas) {
+        try {
+            if (repasEditSelectionId != null && repasEditSelectionId.equals(repas.getId())) {
+                repasEditSelectionId = null;
+            }
+            serviceRepas.delete(repas);
+            rafraichirDonnees();
+            viderFormulaireRepasModification();
+            if (lblRepasSelectionDelete != null) {
+                lblRepasSelectionDelete.setText("Aucun repas selectionne");
+            }
+            showInfo("Repas supprime avec succes.");
+        } catch (Exception exception) {
+            showError("Erreur repas", exception.getMessage());
+        }
+    }
+
+    private void mettreAJourCompteurRepas() {
         int total = repasExplorerView.size();
-        long averageCalories = total == 0 ? 0 : Math.round(
-                repasExplorerView.stream()
-                        .map(Repas::getCalories)
-                        .filter(value -> value != null)
-                        .mapToInt(Integer::intValue)
-                        .average()
-                        .orElse(0)
-        );
-
-        String topType = repasExplorerView.stream()
-                .collect(Collectors.groupingBy(repas -> normaliserTypeRepas(repas.getTypeRepas()), LinkedHashMap::new, Collectors.counting()))
-                .entrySet()
-                .stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("--");
-
         if (lblRepasExploreCount != null) {
             lblRepasExploreCount.setText(total == 0 ? "Aucun repas affiche" : total + " repas affiches");
-        }
-        if (lblRepasStatTotal != null) {
-            lblRepasStatTotal.setText(String.valueOf(total));
-        }
-        if (lblRepasStatCalories != null) {
-            lblRepasStatCalories.setText(averageCalories + " kcal");
-        }
-        if (lblRepasStatType != null) {
-            lblRepasStatType.setText(topType);
         }
     }
 
@@ -1005,11 +1215,14 @@ public class MainController {
     }
 
     private void appliquerCouleursChart(PieChart chart) {
-        for (PieChart.Data data : chart.getData()) {
+        for (int i = 0; i < chart.getData().size(); i++) {
+            PieChart.Data data = chart.getData().get(i);
             String color = TYPE_COLOR_BY_LABEL.getOrDefault(data.getName(), "#178764");
             if (data.getNode() != null) {
                 data.getNode().setStyle("-fx-pie-color: " + color + ";");
             }
+            chart.lookupAll(".default-color" + i + ".chart-legend-item-symbol")
+                    .forEach(node -> node.setStyle("-fx-background-color: " + color + ";"));
         }
     }
 
@@ -1036,6 +1249,15 @@ public class MainController {
             case "diner", "dinner", "evening", "souper" -> TYPE_DINER;
             case "collation", "collat", "snack", "extra meal", "extra meal " , "extra_meal" -> TYPE_COLLATION;
             default -> value == null || value.isBlank() ? TYPE_COLLATION : value.trim();
+        };
+    }
+
+    private String libelleBadgeTypeRepas(String value) {
+        return switch (normaliserTypeRepas(value)) {
+            case TYPE_PETIT_DEJEUNER -> "breakfast";
+            case TYPE_DEJEUNER -> "lunch";
+            case TYPE_DINER -> "evening";
+            default -> "collat";
         };
     }
 
@@ -1114,6 +1336,9 @@ public class MainController {
     }
 
     private void setStyleFlag(Button button, String styleClass, boolean active) {
+        if (button == null) {
+            return;
+        }
         if (active) {
             if (!button.getStyleClass().contains(styleClass)) {
                 button.getStyleClass().add(styleClass);
