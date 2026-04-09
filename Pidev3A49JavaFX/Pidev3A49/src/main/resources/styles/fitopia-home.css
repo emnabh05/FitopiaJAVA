@@ -55,6 +55,21 @@
     -fx-text-fill: white;
 }
 
+.nav-link-button {
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255, 255, 255, 0.16);
+    -fx-border-radius: 999;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-padding: 8 14 8 14;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+
 .hero-card {
     -fx-background-color: linear-gradient(to bottom right, #0d393a, #167568);
     -fx-background-radius: 32;
@@ -142,6 +157,64 @@
     -fx-padding: 24;
     -fx-border-color: #dce9e3;
     -fx-border-radius: 28;
+}
+
+.planner-section {
+    -fx-background-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.96), rgba(239, 248, 245, 0.96));
+}
+
+.planner-pill {
+    -fx-background-color: #12695f;
+    -fx-background-radius: 999;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-padding: 10 18 10 18;
+}
+
+.planner-status {
+    -fx-text-fill: #50606f;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.planner-table {
+    -fx-background-color: white;
+    -fx-background-radius: 22;
+    -fx-border-color: #dce9e3;
+    -fx-border-radius: 22;
+    -fx-padding: 8;
+}
+
+.planner-table .column-header-background {
+    -fx-background-color: #eff7f4;
+    -fx-background-radius: 18 18 0 0;
+}
+
+.planner-table .column-header,
+.planner-table .filler {
+    -fx-background-color: transparent;
+    -fx-size: 42;
+    -fx-border-color: transparent transparent #dce9e3 transparent;
+}
+
+.planner-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #eef3f1 transparent;
+}
+
+.planner-table .table-row-cell:selected {
+    -fx-background-color: #dff4ec;
+}
+
+.danger-front-button {
+    -fx-background-color: linear-gradient(to right, #b84b5b, #d76a6a);
+    -fx-background-radius: 16;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
 }
 
 .section-kicker {
