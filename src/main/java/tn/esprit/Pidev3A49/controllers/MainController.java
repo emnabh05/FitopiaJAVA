@@ -44,6 +44,7 @@ public class MainController {
     private static final String FILTER_ALL = "Tous";
     // Pagination keeps the exercise grid readable.
     private static final int EXERCISE_PAGE_SIZE = 6;
+    // Shared formatter for exercise timestamps in the UI.
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @FXML private VBox viewRepas;
