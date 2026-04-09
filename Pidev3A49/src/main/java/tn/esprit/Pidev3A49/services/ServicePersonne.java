@@ -6,7 +6,11 @@ import tn.esprit.Pidev3A49.utils.MyDataBase;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ServicePersonne implements IServices<Personne> {
     private Connection cnx;
@@ -31,5 +35,30 @@ public class ServicePersonne implements IServices<Personne> {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    @Override
+    public List<Personne> getAll() {
+        List<Personne> personnes = new ArrayList<>();
+        String qry = "SELECT * FROM `personne`";
+
+        try {
+            Statement stm = cnx.createStatement();
+            ResultSet rs = stm.executeQuery(qry);
+
+            while (rs.next()) {
+                Personne p = new Personne();
+                p.setId(rs.getInt(1));
+                p.setNom(rs.getString("nom"));
+                p.setPrenom(rs.getString(3));
+                p.setAge(rs.getInt("age"));
+
+                personnes.add(p);
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return personnes;
     }
 }
