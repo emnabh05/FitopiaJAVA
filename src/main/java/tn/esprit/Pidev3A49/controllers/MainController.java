@@ -11,6 +11,7 @@ import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -26,6 +27,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
@@ -137,6 +139,17 @@ public class MainController {
     @FXML private Button btnActionModifierRegime;
     @FXML private Button btnActionSupprimerRegime;
     @FXML private Button btnActionExplorerRegime;
+
+    @FXML private Label lblPlannerTaille;
+    @FXML private Label lblPlannerPoids;
+    @FXML private Label lblPlannerAge;
+    @FXML private Label lblSummaryKcal;
+    @FXML private Label lblSummaryP;
+    @FXML private Label lblSummaryC;
+    @FXML private Label lblSummaryF;
+    @FXML private ComboBox<String> cbRegimeSort;
+    @FXML private ComboBox<String> cbRegimeTypeSearch;
+    @FXML private TextField tfRegimeSearchGlobal;
 
     @FXML private TextField tfRepasId;
     @FXML private ComboBox<User> cbRepasUser;
@@ -338,10 +351,20 @@ public class MainController {
 
         tableRegimes.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
+        tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
-        appliquerSelectionsFrontParDefaut();
-        filtrerRegimesPourUtilisateur(cbRepasUser == null ? null : cbRepasUser.getValue(), cbRepasRegime);
-        filtrerRegimesPourUtilisateur(cbRepasUserEdit == null ? null : cbRepasUserEdit.getValue(), cbRepasRegimeEdit);
+
+        if (cbRegimeSort != null && cbRegimeSort.getItems().isEmpty()) {
+            cbRegimeSort.setItems(FXCollections.observableArrayList("Calories \u2193", "Calories \u2191", "Recent"));
+            cbRegimeSort.setValue("Calories \u2193");
+        }
+        if (cbRegimeTypeSearch != null && cbRegimeTypeSearch.getItems().isEmpty()) {
+            List<String> types = new java.util.ArrayList<>(List.of("Tous les types"));
+            types.addAll(TYPE_SANTE_OPTIONS);
+            cbRegimeTypeSearch.setItems(FXCollections.observableArrayList(types));
+            cbRegimeTypeSearch.setValue("Tous les types");
+        }
+
         actualiserModificationRepas();
         actualiserSuppressionRepas();
         actualiserExplorateurRepas();
@@ -349,6 +372,19 @@ public class MainController {
         actualiserContexteRepasSelectionne(false);
         actualiserContexteRepasSelectionne(true);
         actualiserSelectionRepasJointure();
+        
+        // Refresh Diet list in Dashboard
+        if (tileRegimeCards != null) {
+            String search = tfRegimeSearchGlobal == null ? "" : tfRegimeSearchGlobal.getText().toLowerCase();
+            String typeFilter = cbRegimeTypeSearch == null ? "Tous les types" : cbRegimeTypeSearch.getValue();
+            
+            List<RegimeAlimentaire> filtered = regimes.stream()
+                .filter(r -> search.isEmpty() || (r.getTypeSante() != null && r.getTypeSante().toLowerCase().contains(search)) || String.valueOf(r.getId()).contains(search))
+                .filter(r -> typeFilter.equals("Tous les types") || typeFilter.equals(r.getTypeSante()))
+                .toList();
+            
+            tileRegimeCards.getChildren().setAll(filtered.stream().map(this::creerCarteRegime).toList());
+        }
     }
 
     private void initialiserSelectionRepasJointure() {
@@ -886,87 +922,74 @@ public class MainController {
         }
         if (lblPlannerWelcome != null) {
             lblPlannerWelcome.setText(referenceUser == null
-                    ? "Creez un regime puis reliez vos repas pour lancer le suivi nutritionnel."
-                    : "Page personnalisee pour " + valeurOuDefaut(referenceUser.getEmail(), "cet utilisateur") + ". Creez votre regime, ajoutez vos repas et suivez vos macros du jour.");
+                    ? "Créez un régime puis reliez vos repas pour lancer le suivi nutritionnel."
+                    : "Page personnalisée pour " + valeurOuDefaut(referenceUser.getEmail(), "utilisateur") + ".");
         }
 
         if (activeRegime == null) {
             setTextIfPresent(lblPlannerHealthBadge, "No regime");
-            setTextIfPresent(lblPlannerRegimeTitle, "Aucun regime actif pour le moment.");
-            setTextIfPresent(lblPlannerRegimeSubtitle, "Creez un regime pour obtenir un lien logique avec les repas.");
-            setTextIfPresent(lblPlannerTargetCalories, "--");
+            setTextIfPresent(lblPlannerRegimeTitle, "My Regime");
+            setTextIfPresent(lblPlannerTargetCalories, "-- kcal/j");
             setTextIfPresent(lblPlannerBmi, "--");
-            setTextIfPresent(lblPlannerMealsHint, "--");
-            setTextIfPresent(lblPlannerRecommendedMeals, "Aucune recommandation disponible tant qu'aucun regime n'est cree.");
-            setTextIfPresent(lblPlannerGoalTitle, "Ajoutez un regime et des repas pour demarrer.");
-            setTextIfPresent(lblPlannerGoalBody, "Le planner calculera ensuite automatiquement les calories, macros et recommandations.");
-            setTextIfPresent(lblPlannerGoalHint, "Associez les repas au meme utilisateur pour conserver une progression coherente.");
-            setTextIfPresent(lblRepasContextTitle, "Aucun regime actif selectionne.");
-            setTextIfPresent(lblRepasContextBody, "Choisissez un utilisateur puis un regime pour mieux guider les repas.");
-            setTextIfPresent(lblRepasContextTarget, "Ajoutez un regime pour activer le contexte nutritionnel.");
+            setTextIfPresent(lblPlannerTaille, "-- cm");
+            setTextIfPresent(lblPlannerPoids, "-- kg");
+            setTextIfPresent(lblPlannerAge, "-- ans");
+            setTextIfPresent(lblPlannerRecommendedMeals, "Aucune recommandation disponible.");
+            setTextIfPresent(lblSummaryKcal, "0 kcal");
+            setTextIfPresent(lblSummaryP, "P 0 g");
+            setTextIfPresent(lblSummaryC, "C 0 g");
+            setTextIfPresent(lblSummaryF, "F 0 g");
             mettreAJourProgression("0 / 0 kcal", 0, pbPlannerCalories, lblPlannerCaloriesProgress);
-            mettreAJourProgression("0 / 0 g", 0, pbPlannerProteines, lblPlannerProteinesProgress);
-            mettreAJourProgression("0 / 0 g", 0, pbPlannerGlucides, lblPlannerGlucidesProgress);
-            mettreAJourProgression("0 / 0 g", 0, pbPlannerLipides, lblPlannerLipidesProgress);
         } else {
-            int caloriesTarget = activeRegime.getCaloriesCibles() == null ? 2000 : activeRegime.getCaloriesCibles();
-            int proteinesTarget = Math.max(1, (int) Math.round(caloriesTarget * 0.30 / 4.0));
-            int glucidesTarget = Math.max(1, (int) Math.round(caloriesTarget * 0.45 / 4.0));
-            int lipidesTarget = Math.max(1, (int) Math.round(caloriesTarget * 0.25 / 9.0));
-
-            int totalCalories = sommeRepas(repasDuJour, Repas::getCalories);
-            int totalProteines = sommeRepas(repasDuJour, Repas::getProteines);
-            int totalGlucides = sommeRepas(repasDuJour, Repas::getGlucides);
-            int totalLipides = sommeRepas(repasDuJour, Repas::getLipides);
-            int remainingCalories = caloriesTarget - totalCalories;
+            int target = activeRegime.getCaloriesCibles() == null ? 2000 : activeRegime.getCaloriesCibles();
+            int curKcal = sommeRepas(repasDuJour, Repas::getCalories);
+            int curP = sommeRepas(repasDuJour, Repas::getProteines);
+            int curC = sommeRepas(repasDuJour, Repas::getGlucides);
+            int curF = sommeRepas(repasDuJour, Repas::getLipides);
+            int rem = Math.max(0, target - curKcal);
 
             setTextIfPresent(lblPlannerHealthBadge, humaniserTypeSante(activeRegime.getTypeSante()));
-            setTextIfPresent(lblPlannerRegimeTitle, "Regime #" + activeRegime.getId() + " pour " + valeurOuDefaut(activeRegime.getUserEmail(), "utilisateur"));
-            setTextIfPresent(lblPlannerRegimeSubtitle, "Le resume du jour utilise ce regime comme reference pour relier objectifs, calories et repas.");
-            setTextIfPresent(lblPlannerTargetCalories, caloriesTarget + " kcal");
-            setTextIfPresent(lblPlannerBmi, activeRegime.getBmi() == null ? "--" : String.format(Locale.US, "%.1f", activeRegime.getBmi()));
-            setTextIfPresent(lblPlannerMealsHint, compterElementsRepas(activeRegime.getRepasAdequats()) + " idees");
-            setTextIfPresent(lblPlannerRecommendedMeals, valeurOuDefaut(activeRegime.getRepasAdequats(), "Aucune suggestion enregistree."));
-            setTextIfPresent(lblPlannerGoalTitle, remainingCalories > 0 ? "Il reste " + remainingCalories + " kcal pour atteindre l'objectif." : "Objectif calories atteint aujourd'hui.");
-            setTextIfPresent(lblPlannerGoalBody, repasDuJour.isEmpty()
-                    ? "Aucun repas du jour n'est encore associe a ce regime."
-                    : repasDuJour.size() + " repas du jour sont deja relies a ce regime.");
-            setTextIfPresent(lblPlannerGoalHint, "Regime actif: " + humaniserTypeSante(activeRegime.getTypeSante()) + " | Repas adequats: " + valeurOuDefaut(activeRegime.getRepasAdequats(), "--"));
-            setTextIfPresent(lblRepasContextTitle, "Regime actif #" + activeRegime.getId() + " - " + humaniserTypeSante(activeRegime.getTypeSante()));
-            setTextIfPresent(lblRepasContextBody, "Les repas de " + valeurOuDefaut(activeRegime.getUserEmail(), "cet utilisateur") + " peuvent maintenant etre relies au bon objectif nutritionnel.");
-            setTextIfPresent(lblRepasContextTarget, "Objectif du jour: " + caloriesTarget + " kcal | Recommandations: " + valeurOuDefaut(activeRegime.getRepasAdequats(), "--"));
-            mettreAJourProgression(totalCalories + " / " + caloriesTarget + " kcal", ratio(totalCalories, caloriesTarget), pbPlannerCalories, lblPlannerCaloriesProgress);
-            mettreAJourProgression(totalProteines + " / " + proteinesTarget + " g", ratio(totalProteines, proteinesTarget), pbPlannerProteines, lblPlannerProteinesProgress);
-            mettreAJourProgression(totalGlucides + " / " + glucidesTarget + " g", ratio(totalGlucides, glucidesTarget), pbPlannerGlucides, lblPlannerGlucidesProgress);
-            mettreAJourProgression(totalLipides + " / " + lipidesTarget + " g", ratio(totalLipides, lipidesTarget), pbPlannerLipides, lblPlannerLipidesProgress);
+            setTextIfPresent(lblPlannerRegimeTitle, "My Regime");
+            setTextIfPresent(lblPlannerTargetCalories, target + " kcal/j");
+            setTextIfPresent(lblPlannerBmi, activeRegime.getBmi() == null ? "--" : String.format(Locale.US, "%.0f", activeRegime.getBmi()));
+            setTextIfPresent(lblPlannerTaille, (activeRegime.getTaille() == null ? "--" : activeRegime.getTaille()) + " cm");
+            setTextIfPresent(lblPlannerPoids, (activeRegime.getPoids() == null ? "--" : activeRegime.getPoids()) + " kg");
+            setTextIfPresent(lblPlannerAge, (activeRegime.getAge() == null ? "--" : activeRegime.getAge()) + " ans");
+            setTextIfPresent(lblPlannerRecommendedMeals, valeurOuDefaut(activeRegime.getRepasAdequats(), "Suggestions disponibles..."));
+            
+            setTextIfPresent(lblSummaryKcal, curKcal + " kcal");
+            setTextIfPresent(lblSummaryP, "P " + curP + " g");
+            setTextIfPresent(lblSummaryC, "C " + curC + " g");
+            setTextIfPresent(lblSummaryF, "F " + curF + " g");
+
+            mettreAJourProgression(curKcal + " / " + target + " kcal (" + rem + " restantes)", ratio(curKcal, target), pbPlannerCalories, lblPlannerCaloriesProgress);
         }
 
         if (lblPlannerMealsSubtitle != null) {
-            lblPlannerMealsSubtitle.setText(repasDuJour.isEmpty()
-                    ? "Aucun repas n'a encore ete enregistre aujourd'hui. Voici les derniers repas disponibles."
-                    : repasDuJour.size() + " repas relies au planner pour aujourd'hui.");
+            lblPlannerMealsSubtitle.setText(repasDuJour.isEmpty() ? "Aucun repas aujourd'hui." : repasDuJour.size() + " repas aujourd'hui.");
         }
-        if (lblPlannerRegimesSubtitle != null) {
-            lblPlannerRegimesSubtitle.setText(allRegimes.isEmpty()
-                    ? "Aucun regime enregistre pour le moment."
-                    : allRegimes.size() + " regimes disponibles dans le planner.");
-        }
+
         if (plannerMealsListBox != null) {
             plannerMealsListBox.getChildren().setAll(repasAffiches.isEmpty()
-                    ? List.of(creerMessagePlanner("Aucun repas disponible pour le moment."))
+                    ? List.of(creerMessagePlanner("Aucun repas disponible."))
                     : repasAffiches.stream().map(this::creerCarteMiniRepas).toList());
         }
 
+        // Logic for refreshing current view lists
+        rafraichirListesDashboard();
+    }
+
+    private void rafraichirListesDashboard() {
         if (tileRegimeCards != null) {
-            tileRegimeCards.getChildren().setAll(allRegimes.stream().map(this::creerCarteRegime).toList());
-        }
-        
-        if (lblRegimeExploreCount != null) {
-            lblRegimeExploreCount.setText(allRegimes.size() + " régimes trouvés");
-        }
-        
-        if (tileRegimeExploreCards != null) {
-            tileRegimeExploreCards.getChildren().setAll(allRegimes.stream().map(this::creerCarteRegime).toList());
+            String search = tfRegimeSearchGlobal == null ? "" : tfRegimeSearchGlobal.getText().toLowerCase();
+            String typeFilter = cbRegimeTypeSearch == null ? "Tous les types" : cbRegimeTypeSearch.getValue();
+            
+            List<RegimeAlimentaire> filtered = allRegimes.stream()
+                .filter(r -> search.isEmpty() || (r.getTypeSante() != null && r.getTypeSante().toLowerCase().contains(search)) || String.valueOf(r.getId()).contains(search))
+                .filter(r -> typeFilter.equals("Tous les types") || typeFilter.equals(r.getTypeSante()))
+                .toList();
+            
+            tileRegimeCards.getChildren().setAll(filtered.stream().map(this::creerCarteRegime).toList());
         }
     }
 
@@ -1262,39 +1285,63 @@ public class MainController {
     }
 
     private VBox creerCarteRegime(RegimeAlimentaire regime) {
-        Label title = new Label("Regime #" + regime.getId());
-        title.getStyleClass().add("planner-meal-title");
-
-        Label type = new Label(humaniserTypeSante(regime.getTypeSante()));
-        type.getStyleClass().add("planner-meal-meta");
-        type.setStyle("-fx-font-weight: bold; -fx-text-fill: #0c3f44;");
-
-        Label metrics = new Label(String.format(Locale.US, "BMI: %.1f | %d kcal", 
-            regime.getBmi() == null ? 0 : regime.getBmi(), 
-            regime.getCaloriesCibles() == null ? 0 : regime.getCaloriesCibles()));
-        metrics.getStyleClass().add("planner-meal-meta");
-
-        Label details = new Label(valeurOuDefaut(regime.getRepasAdequats(), "Aucune recommendation"));
-        details.getStyleClass().add("planner-meal-meta");
-        details.setWrapText(true);
-        details.setMaxWidth(300);
-
-        HBox actions = new HBox(8);
-        actions.setAlignment(Pos.CENTER_RIGHT);
-        Button editBtn = new Button("Modifier");
-        editBtn.getStyleClass().add("navbar-btn-green");
-        editBtn.setStyle("-fx-font-size: 10px; -fx-padding: 4 8;");
-        editBtn.setOnAction(e -> {
+        HBox container = new HBox(12);
+        container.getStyleClass().add("regime-list-card");
+        container.setStyle("-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 12; -fx-border-color: #f1f5f9; -fx-alignment: CENTER_LEFT;");
+        
+        StackPane iconBox = new StackPane(new Label("&#128153;"));
+        iconBox.setStyle("-fx-background-color: #f1f5f9; -fx-background-radius: 8; -fx-padding: 10;");
+        
+        VBox texts = new VBox(2);
+        Label title = new Label("Régime #" + regime.getId());
+        title.setStyle("-fx-font-weight: 800; -fx-text-fill: #1e293b; -fx-font-size: 14px;");
+        
+        Label meta = new Label(humaniserTypeSante(regime.getTypeSante()) + " · " + (regime.getCaloriesCibles()==null?0:regime.getCaloriesCibles()) + " kcal/j");
+        meta.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
+        texts.getChildren().addAll(title, meta);
+        
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        Button voirBtn = new Button("Voir");
+        voirBtn.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12;");
+        voirBtn.setOnAction(e -> {
             tfRegimeId.setText(String.valueOf(regime.getId()));
-            remplirFormulaireRegime(regime);
-            afficherVue(paneRegimeEdit, paneRegimeCreate, paneRegimeEdit, paneRegimeDelete, paneRegimeExplore);
+            actualiserDashboardPlanner();
         });
-        actions.getChildren().add(editBtn);
+        
+        Button modBtn = new Button("Modifier");
+        modBtn.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12;");
+        modBtn.setOnAction(e -> modifierRegimeDepuisCarte(regime));
+        
+        Button supBtn = new Button("Supprimer");
+        supBtn.setStyle("-fx-background-color: #fdf2f2; -fx-text-fill: #ef4444; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12;");
+        supBtn.setOnAction(e -> confirmerSuppressionRegimeDepuisCarte(regime));
 
-        VBox box = new VBox(8, title, type, metrics, details, actions);
-        box.getStyleClass().add("planner-meal-card");
-        box.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12;");
-        return box;
+        HBox actions = new HBox(6, voirBtn, modBtn, supBtn);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+        
+        container.getChildren().addAll(iconBox, texts, spacer, actions);
+        VBox card = new VBox(container);
+        card.setStyle("-fx-padding: 2;");
+        return card;
+    }
+
+    private void modifierRegimeDepuisCarte(RegimeAlimentaire r) {
+        remplirFormulaireRegime(r);
+        afficherVue(paneRegimeEdit, paneRegimeCreate, paneRegimeEdit, paneRegimeDelete, paneRegimeExplore);
+    }
+    
+    private void confirmerSuppressionRegimeDepuisCarte(RegimeAlimentaire r) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Suppression");
+        alert.setHeaderText("Supprimer le régime #" + r.getId() + " ?");
+        alert.showAndWait().ifPresent(rs -> {
+            if (rs == ButtonType.OK) {
+                serviceRegime.delete(r);
+                rafraichirDonnees();
+            }
+        });
     }
 
     private VBox creerMessagePlanner(String text) {
