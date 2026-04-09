@@ -327,6 +327,7 @@
     -fx-border-color: transparent transparent #edf3f1 transparent;
 }
 
+/*noinspection CssInvalidPseudoSelector*/
 .data-table .table-row-cell:selected {
     -fx-background-color: #dff2eb;
 }
@@ -519,6 +520,7 @@
     -fx-padding: 12 14 12 14;
 }
 
+/*noinspection CssInvalidPseudoSelector*/
 .back-root .text-input:focused,
 .back-root .combo-input:focused,
 .back-root .date-input:focused,
@@ -767,6 +769,7 @@
     -fx-padding: 10 12 10 12;
 }
 
+/*noinspection CssInvalidPseudoSelector*/
 .back-root .form-control:focused {
     -fx-border-color: #14b88a;
     -fx-effect: dropshadow(gaussian, rgba(20, 184, 138, 0.16), 0, 0, 0, 0);
@@ -1030,6 +1033,7 @@
     -fx-padding: 10 14 10 14;
 }
 
+/*noinspection CssInvalidPseudoSelector*/
 .back-root .back-form-control:focused {
     -fx-border-color: #14b88a;
 }
@@ -1290,4 +1294,407 @@
 
 .repas-type-pill-collation {
     -fx-background-color: linear-gradient(to right, #1f8f63, #39c486);
+}
+
+.planner-root {
+    -fx-background-color: linear-gradient(to bottom right, #eef3fb, #f8fbff);
+}
+
+.planner-scroll,
+.planner-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.planner-top-strip {
+    -fx-background-color: #12384a;
+}
+
+.planner-top-strip-text,
+.planner-top-strip-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.planner-top-strip-icon {
+    -fx-background-color: rgba(255,255,255,0.10);
+    -fx-background-radius: 999;
+    -fx-padding: 4 9 4 9;
+}
+
+.planner-nav-shell {
+    -fx-background-color: rgba(255,255,255,0.94);
+    -fx-border-color: rgba(16, 47, 70, 0.06);
+    -fx-border-width: 0 0 1 0;
+}
+
+.planner-logo-badge {
+    -fx-background-color: linear-gradient(to bottom right, #0f3448, #1f6b79);
+    -fx-background-radius: 18;
+}
+
+.planner-logo-letter {
+    -fx-text-fill: white;
+    -fx-font-size: 23px;
+    -fx-font-weight: 900;
+}
+
+.planner-brand-title {
+    -fx-text-fill: #103246;
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+}
+
+.planner-brand-subtitle {
+    -fx-text-fill: #7b8da1;
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+}
+
+.planner-nav-group {
+    -fx-padding: 0 0 0 20;
+}
+
+.planner-nav-button,
+.planner-nav-outline-button {
+    -fx-background-radius: 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 18 12 18;
+    -fx-cursor: hand;
+}
+
+.planner-nav-button {
+    -fx-background-color: white;
+    -fx-border-color: #b9d3ea;
+    -fx-border-radius: 16;
+    -fx-text-fill: #21415c;
+}
+
+.planner-nav-button-active {
+    -fx-background-color: linear-gradient(to right, #103649, #195c66);
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+}
+
+.planner-nav-outline-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #b9d3ea;
+    -fx-border-radius: 16;
+    -fx-text-fill: #21415c;
+}
+
+.planner-profile-chip {
+    -fx-background-color: #f5f9fd;
+    -fx-background-radius: 18;
+    -fx-padding: 10 16 10 16;
+}
+
+.planner-profile-caption {
+    -fx-text-fill: #7a8ca0;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.planner-profile-value {
+    -fx-text-fill: #19344d;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+}
+
+.planner-page {
+    -fx-min-width: 1180px;
+}
+
+.planner-hero {
+    -fx-background-color: linear-gradient(to right, #f6f9ff, #edf4ff 42%, #e9f7f6 100%);
+    -fx-background-radius: 30;
+    -fx-padding: 28 30 28 30;
+    -fx-border-color: rgba(160, 188, 215, 0.55);
+    -fx-border-radius: 30;
+    -fx-effect: dropshadow(gaussian, rgba(30, 58, 92, 0.10), 28, 0.18, 0, 10);
+}
+
+.planner-hero-alt {
+    -fx-background-color: linear-gradient(to right, #f9fbff, #eef4ff 45%, #eef8f3 100%);
+}
+
+.planner-hero-title {
+    -fx-text-fill: #17324a;
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+}
+
+.planner-hero-subtitle {
+    -fx-text-fill: #66788d;
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+}
+
+.planner-hero-button,
+.planner-hero-secondary-button,
+.planner-card-link-button,
+.planner-switch-button {
+    -fx-background-radius: 16;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 18 12 18;
+    -fx-cursor: hand;
+}
+
+.planner-hero-button {
+    -fx-background-color: linear-gradient(to right, #123b4e, #195f68);
+    -fx-text-fill: white;
+}
+
+.planner-hero-secondary-button,
+.planner-card-link-button {
+    -fx-background-color: white;
+    -fx-border-color: #c7d8ea;
+    -fx-border-radius: 16;
+    -fx-text-fill: #21415c;
+}
+
+.planner-card,
+.planner-tip-card,
+.planner-form-card {
+    -fx-background-color: rgba(255,255,255,0.96);
+    -fx-background-radius: 28;
+    -fx-border-color: #dbe6f0;
+    -fx-border-radius: 28;
+    -fx-padding: 22;
+    -fx-effect: dropshadow(gaussian, rgba(31, 57, 87, 0.08), 28, 0.16, 0, 8);
+}
+
+.planner-spotlight-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f6fbff);
+}
+
+.planner-context-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff, #f8fcfb);
+}
+
+.planner-card-heading {
+    -fx-text-fill: #1d3148;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+}
+
+.planner-card-body {
+    -fx-text-fill: #6d7e92;
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+}
+
+.planner-spotlight-title,
+.planner-goal-title {
+    -fx-text-fill: #193147;
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+}
+
+.planner-status-pill {
+    -fx-background-color: #e6f4ee;
+    -fx-background-radius: 999;
+    -fx-text-fill: #15634c;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+    -fx-padding: 6 12 6 12;
+}
+
+.planner-mini-stat {
+    -fx-background-color: #f5f9fd;
+    -fx-background-radius: 18;
+    -fx-padding: 12 14 12 14;
+}
+
+.planner-mini-stat-label,
+.planner-progress-label,
+.planner-note-title {
+    -fx-text-fill: #7b8da1;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.planner-mini-stat-value,
+.planner-progress-value,
+.planner-note-text {
+    -fx-text-fill: #20384f;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.planner-note-box,
+.planner-inline-context {
+    -fx-background-color: #f4f8fc;
+    -fx-background-radius: 18;
+    -fx-border-color: #d9e6f0;
+    -fx-border-radius: 18;
+    -fx-padding: 12 14 12 14;
+}
+
+.planner-step-chip {
+    -fx-background-color: white;
+    -fx-border-color: #d8e4ee;
+    -fx-border-radius: 999;
+    -fx-background-radius: 999;
+    -fx-text-fill: #233d58;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-padding: 8 14 8 14;
+}
+
+.planner-progress-card {
+    -fx-background-color: #f7fbff;
+    -fx-background-radius: 20;
+    -fx-padding: 14;
+}
+
+.planner-progress-bar {
+    -fx-accent: #1d7c6d;
+}
+
+.planner-progress-bar > .bar {
+    -fx-background-radius: 999;
+}
+
+.planner-progress-bar > .track {
+    -fx-background-color: #dfe9f2;
+    -fx-background-radius: 999;
+}
+
+.planner-switch-button {
+    -fx-background-color: white;
+    -fx-border-color: #c8d9eb;
+    -fx-border-radius: 16;
+    -fx-text-fill: #23425d;
+}
+
+.planner-switch-button-active {
+    -fx-background-color: linear-gradient(to right, #113a4d, #196066);
+    -fx-border-color: transparent;
+    -fx-text-fill: white;
+}
+
+.planner-switch-button-danger {
+    -fx-border-color: #e6c0c5;
+    -fx-text-fill: #a13848;
+}
+
+.planner-inline-context {
+    -fx-text-fill: #35516a;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.planner-meal-card {
+    -fx-background-color: #f8fbfe;
+    -fx-background-radius: 18;
+    -fx-border-color: #dde8f1;
+    -fx-border-radius: 18;
+    -fx-padding: 12 14 12 14;
+}
+
+.planner-meal-title {
+    -fx-text-fill: #1c3348;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+}
+
+.planner-meal-meta {
+    -fx-text-fill: #728499;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.planner-meal-kcal {
+    -fx-text-fill: #145a63;
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+}
+/* --- FITOPIA NAVBAR CUSTOM STYLES --- */
+.navbar-container {
+    -fx-background-color: white;
+}
+
+.navbar-shell {
+    -fx-background-color: white;
+    -fx-padding: 15 30 15 30;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);
+}
+
+.navbar-logo-icon {
+    -fx-text-fill: #1D3A5F;
+    -fx-font-size: 24px;
+}
+
+.navbar-logo-text {
+    -fx-text-fill: #1D3A5F;
+    -fx-font-size: 10px;
+    -fx-font-weight: 900;
+}
+
+.navbar-link {
+    -fx-text-fill: #1D3A5F;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-padding: 0 0 8 0;
+    -fx-cursor: hand;
+}
+
+.navbar-link:hover {
+    -fx-text-fill: #4CA1ED;
+}
+
+.navbar-link-active {
+    -fx-padding: 0 0 6 0;
+    -fx-border-color: transparent transparent #4CA1ED transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.navbar-btn-blue, .navbar-btn-green, .navbar-btn-red {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-text-fill: #1D3A5F;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s;
+}
+
+.navbar-btn-blue {
+    -fx-border-color: #4CA1ED;
+    -fx-min-height: 65;
+    -fx-max-height: 65;
+    -fx-padding: 0 10;
+}
+
+.navbar-btn-blue:hover {
+    -fx-background-color: #4CA1ED;
+    -fx-text-fill: white;
+}
+
+.navbar-btn-green {
+    -fx-border-color: #4CAF50;
+    -fx-min-height: 50;
+    -fx-max-height: 50;
+    -fx-padding: 0 16;
+}
+
+.navbar-btn-green:hover {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.navbar-btn-red {
+    -fx-border-color: #F44336;
+    -fx-min-height: 50;
+    -fx-max-height: 50;
+    -fx-padding: 0 16;
+}
+
+.navbar-btn-red:hover {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
 }

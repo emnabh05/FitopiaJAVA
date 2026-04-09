@@ -1,264 +1,164 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.TilePane?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
 <!--suppress XMLErrors -->
 <!--suppress XMLWarnings -->
-<BorderPane prefHeight="920.0" prefWidth="1600.0" stylesheets="@styles/admin-theme.css" styleClass="app-root"
-            xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane prefHeight="980.0" prefWidth="1600.0" stylesheets="@styles/admin-theme.css" styleClass="planner-root"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
-    <left>
-        <VBox prefWidth="280.0" spacing="22.0" styleClass="sidebar">
-            <padding><Insets bottom="28.0" left="24.0" right="24.0" top="26.0"/></padding>
-            <HBox alignment="CENTER_LEFT" spacing="14.0">
-                <Label minHeight="46.0" minWidth="46.0" prefHeight="46.0" prefWidth="46.0" styleClass="sidebar-logo" text="F"/>
-                <VBox spacing="4.0">
-                    <Label styleClass="sidebar-title" text="Fitopia Front"/>
-                    <Label styleClass="sidebar-subtitle" text="Module regime et consultation"/>
+    <top>
+        <VBox styleClass="navbar-container">
+            <!-- Main Navbar matching the image -->
+            <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="navbar-shell">
+                <!-- Logo -->
+                <VBox alignment="CENTER" spacing="2.0">
+                    <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                    <Label text="FITOPIA" styleClass="navbar-logo-text" />
                 </VBox>
+                <Region prefWidth="30" />
+                <!-- Links -->
+                <VBox alignment="CENTER" spacing="2.0">
+                    <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                </VBox>
+                <Region prefWidth="5" />
+                <VBox alignment="CENTER" spacing="2.0">
+                    <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+                </VBox>
+                <Region prefWidth="30" />
+                <!-- Action Buttons -->
+                <Button fx:id="btnModuleRegimes" onAction="#afficherModuleRegimes" text="EXPLORE&#10;OUR&#10;DIET&amp;EATING&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button fx:id="btnModuleRepas" onAction="#afficherModuleRepas" text="EXPLORE&#10;OUR&#10;DAILY&#10;MEALS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button text="EXPLORE&#10;OUR&#10;FITNESS&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button text="EXPLORE&#10;OUR&#10;EVENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button text="EXPLORE&#10;FORUMS&amp;BLOGS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                
+                <Region HBox.hgrow="ALWAYS" />
+                <!-- Right Actions -->
+                <Button onAction="#rafraichirDonnees" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                <Button text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
             </HBox>
-            <VBox spacing="10.0" styleClass="user-card">
-                <Label styleClass="user-label" text="Connecte en tant que"/>
-                <Label styleClass="user-mail" text="ahmed@gmail.com"/>
-            </VBox>
-            <VBox spacing="10.0">
-                <Button fx:id="btnModuleRepas" maxWidth="1.7976931348623157E308" onAction="#afficherModuleRepas" styleClass="sidebar-nav-button sidebar-nav-button-active" text="Gestion des repas"/>
-                <Button fx:id="btnModuleRegimes" maxWidth="1.7976931348623157E308" onAction="#afficherModuleRegimes" styleClass="sidebar-nav-button" text="Diet planner"/>
-            </VBox>
-            <Region VBox.vgrow="ALWAYS"/>
-            <Button maxWidth="1.7976931348623157E308" onAction="#rafraichirDonnees" styleClass="logout-button" text="Actualiser"/>
         </VBox>
-    </left>
+    </top>
+    
     <center>
-        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="app-scroll" vbarPolicy="AS_NEEDED">
-            <content>
-                <StackPane>
-                    <VBox fx:id="viewRepas" fillWidth="true" spacing="22.0" styleClass="content-root">
-                        <padding><Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/></padding>
-                        <VBox spacing="8.0" styleClass="hero-banner">
-                            <Label styleClass="hero-title" text="Gestion des repas"/>
-                            <Label styleClass="hero-subtitle" text="Design et logique repris du module Symfony nutrition."/>
-                        </VBox>
-                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                            </columnConstraints>
-                            <Button fx:id="btnActionCreerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherCreationRepas" styleClass="action-card action-card-active" text="Creer un repas&#10;Ajoutez un nouveau repas pour un utilisateur." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                            <Button fx:id="btnActionModifierRepas" maxWidth="1.7976931348623157E308" onAction="#afficherModificationRepas" styleClass="action-card" text="Modifier un repas&#10;Mettez a jour les informations d'un repas existant." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                            <Button fx:id="btnActionSupprimerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionRepas" styleClass="action-card" text="Supprimer un repas&#10;Retirez un repas de la base de donnees." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                            <Button fx:id="btnActionExplorerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationRepas" styleClass="action-card" text="Explorer les repas&#10;Consultez la liste de tous les repas enregistres." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        </GridPane>
-                        <StackPane>
-                            <VBox fx:id="paneRepasCreate" spacing="18.0" styleClass="panel-card">
-                                <Label styleClass="section-title" text="Creer un repas"/>
-                                <Label styleClass="section-subtitle" text="Formulaire inspire de l'admin Symfony et de la page diet planner."/>
-                                <HBox alignment="CENTER_LEFT" styleClass="status-banner">
-                                    <Label styleClass="status-banner-text" text="Vous etes connecte en tant que ahmed@gmail.com"/>
-                                </HBox>
-                                <VBox spacing="16.0" styleClass="section-block">
-                                    <Label styleClass="section-block-title" text="Informations principales"/>
-                                    <GridPane hgap="16.0" vgap="16.0">
-                                        <columnConstraints>
-                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                        </columnConstraints>
-                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                            <Label styleClass="field-label field-label-danger" text="Utilisateur"/>
-                                            <ComboBox fx:id="cbRepasUser" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                            <Label styleClass="field-label" text="Date du repas"/>
-                                            <DatePicker fx:id="dpDateRepas" HBox.hgrow="ALWAYS" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                            <Label styleClass="field-label field-label-accent" text="Type de repas"/>
-                                            <ComboBox fx:id="cbTypeRepas" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                            <Label styleClass="field-label" text="Nom du repas"/>
-                                            <TextField fx:id="tfRepasNom" promptText="Ex: Salade proteinee" styleClass="text-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                            <Label styleClass="field-label" text="Commentaire"/>
-                                            <TextArea fx:id="taRepasDescription" prefHeight="96.0" promptText="Commentaire court..." styleClass="text-area-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                            <Label styleClass="field-label" text="Regime associe"/>
-                                            <ComboBox fx:id="cbRepasRegime" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
-                                        </VBox>
-                                    </GridPane>
-                                </VBox>
-                                <VBox spacing="16.0" styleClass="section-block">
-                                    <Label styleClass="section-block-title" text="Valeurs nutritionnelles"/>
-                                    <GridPane hgap="14.0" vgap="14.0">
-                                        <columnConstraints>
-                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
-                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
-                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
-                                            <ColumnConstraints hgrow="ALWAYS" percentWidth="25.0"/>
-                                        </columnConstraints>
-                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                            <Label styleClass="field-label" text="Calories"/>
-                                            <TextField fx:id="tfRepasCalories" promptText="650" styleClass="text-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                            <Label styleClass="field-label" text="Proteines (g)"/>
-                                            <TextField fx:id="tfRepasProteines" promptText="28" styleClass="text-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                                            <Label styleClass="field-label" text="Glucides (g)"/>
-                                            <TextField fx:id="tfRepasGlucides" promptText="42" styleClass="text-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="3" GridPane.rowIndex="0">
-                                            <Label styleClass="field-label" text="Lipides (g)"/>
-                                            <TextField fx:id="tfRepasLipides" promptText="14" styleClass="text-input"/>
-                                        </VBox>
-                                    </GridPane>
-                                </VBox>
-                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                                    <Button onAction="#viderFormulaireRepas" styleClass="secondary-button" text="Vider"/>
-                                    <Button onAction="#ajouterRepas" styleClass="primary-button" text="Creer le repas"/>
-                                </HBox>
-                            </VBox>
-                            <VBox fx:id="paneRepasEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
-                                <Label styleClass="section-title" text="Modifier un repas"/>
-                                <Label styleClass="section-subtitle" text="Selectionnez un repas puis modifiez les champs comme dans l'admin Symfony."/>
-                                <TextField fx:id="tfRepasId" editable="false" managed="false" visible="false"/>
-                                <TableView fx:id="tableRepasEdit" prefHeight="290.0" styleClass="data-table">
-                                    <columns>
-                                        <TableColumn fx:id="colRepasIdEdit" prefWidth="60.0" text="ID"/>
-                                        <TableColumn fx:id="colRepasUserEdit" prefWidth="190.0" text="Utilisateur"/>
-                                        <TableColumn fx:id="colRepasNomEdit" prefWidth="170.0" text="Nom"/>
-                                        <TableColumn fx:id="colRepasTypeEdit" prefWidth="120.0" text="Type"/>
-                                        <TableColumn fx:id="colRepasDateEdit" prefWidth="140.0" text="Date"/>
-                                        <TableColumn fx:id="colRepasCaloriesEdit" prefWidth="90.0" text="Calories"/>
-                                        <TableColumn fx:id="colRepasRegimeIdEdit" prefWidth="210.0" text="Regime"/>
-                                    </columns>
-                                </TableView>
-                                <GridPane hgap="16.0" vgap="16.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                    </columnConstraints>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                        <Label styleClass="field-label" text="Utilisateur"/>
-                                        <ComboBox fx:id="cbRepasUserEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                        <Label styleClass="field-label" text="Date du repas"/>
-                                        <DatePicker fx:id="dpDateRepasEdit" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                        <Label styleClass="field-label" text="Type de repas"/>
-                                        <ComboBox fx:id="cbTypeRepasEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                        <Label styleClass="field-label" text="Nom du repas"/>
-                                        <TextField fx:id="tfRepasNomEdit" styleClass="text-input"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                        <Label styleClass="field-label" text="Commentaire"/>
-                                        <TextArea fx:id="taRepasDescriptionEdit" prefHeight="96.0" styleClass="text-area-input"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                        <Label styleClass="field-label" text="Regime associe"/>
-                                        <ComboBox fx:id="cbRepasRegimeEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                                        <Label styleClass="field-label" text="Calories"/>
-                                        <TextField fx:id="tfRepasCaloriesEdit" styleClass="text-input"/>
-                                    </VBox>
-                                    <HBox spacing="12.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                        <VBox spacing="8.0" styleClass="metric-card">
-                                            <Label styleClass="field-label" text="Proteines"/>
-                                            <TextField fx:id="tfRepasProteinesEdit" styleClass="text-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="metric-card">
-                                            <Label styleClass="field-label" text="Glucides"/>
-                                            <TextField fx:id="tfRepasGlucidesEdit" styleClass="text-input"/>
-                                        </VBox>
-                                        <VBox spacing="8.0" styleClass="metric-card">
-                                            <Label styleClass="field-label" text="Lipides"/>
-                                            <TextField fx:id="tfRepasLipidesEdit" styleClass="text-input"/>
-                                        </VBox>
-                                    </HBox>
-                                </GridPane>
-                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                                    <Button onAction="#viderFormulaireRepasModification" styleClass="secondary-button" text="Reinitialiser"/>
-                                    <Button onAction="#modifierRepas" styleClass="primary-button" text="Mettre a jour"/>
-                                </HBox>
-                            </VBox>
-                            <VBox fx:id="paneRepasDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
-                                <Label styleClass="section-title" text="Supprimer un repas"/>
-                                <Label styleClass="section-subtitle" text="Selectionnez un repas dans la liste puis confirmez sa suppression."/>
-                                <TableView fx:id="tableRepasDelete" prefHeight="500.0" styleClass="data-table">
-                                    <columns>
-                                        <TableColumn fx:id="colRepasIdDelete" prefWidth="60.0" text="ID"/>
-                                        <TableColumn fx:id="colRepasUserDelete" prefWidth="200.0" text="Utilisateur"/>
-                                        <TableColumn fx:id="colRepasNomDelete" prefWidth="180.0" text="Nom"/>
-                                        <TableColumn fx:id="colRepasTypeDelete" prefWidth="120.0" text="Type"/>
-                                        <TableColumn fx:id="colRepasDateDelete" prefWidth="140.0" text="Date"/>
-                                        <TableColumn fx:id="colRepasCaloriesDelete" prefWidth="90.0" text="Calories"/>
-                                        <TableColumn fx:id="colRepasRegimeIdDelete" prefWidth="220.0" text="Regime"/>
-                                    </columns>
-                                </TableView>
-                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                                    <Label fx:id="lblRepasSelectionDelete" styleClass="hint-label" text="Aucun repas selectionne"/>
-                                    <Button onAction="#supprimerRepas" styleClass="danger-button" text="Supprimer definitivement"/>
-                                </HBox>
-                            </VBox>
-                            <VBox fx:id="paneRepasExplore" managed="false" spacing="18.0" styleClass="panel-card repas-browser-panel" visible="false">
-                                <HBox alignment="CENTER_LEFT" spacing="12.0">
-                                    <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-                                        <Label styleClass="section-title" text="Explorer les repas"/>
-                                        <Label fx:id="lblRepasExploreCount" styleClass="section-subtitle" text="0 repas affiches"/>
-                                    </VBox>
-                                    <Button fx:id="btnRepasStatistics" onAction="#afficherStatistiquesRepas" styleClass="primary-button repas-statistics-button" text="Statistiques"/>
-                                </HBox>
-                                <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="repas-toolbar">
-                                    <ComboBox fx:id="cbRepasExploreSort" prefWidth="190.0" styleClass="combo-input repas-toolbar-control"/>
-                                    <TextField fx:id="tfRepasSearch" promptText="Rechercher nom, email, type..." styleClass="text-input repas-toolbar-search" HBox.hgrow="ALWAYS"/>
-                                    <ComboBox fx:id="cbRepasExploreTypeFilter" prefWidth="180.0" styleClass="combo-input repas-toolbar-control"/>
-                                </HBox>
-                                <HBox spacing="14.0" styleClass="repas-stat-strip">
-                                    <VBox spacing="6.0" styleClass="repas-stat-card" HBox.hgrow="ALWAYS">
-                                        <Label styleClass="repas-stat-label" text="Repas visibles"/>
-                                        <Label fx:id="lblRepasStatTotal" styleClass="repas-stat-value" text="0"/>
-                                    </VBox>
-                                    <VBox spacing="6.0" styleClass="repas-stat-card" HBox.hgrow="ALWAYS">
-                                        <Label styleClass="repas-stat-label" text="Calories moyennes"/>
-                                        <Label fx:id="lblRepasStatCalories" styleClass="repas-stat-value" text="0 kcal"/>
-                                    </VBox>
-                                    <VBox spacing="6.0" styleClass="repas-stat-card" HBox.hgrow="ALWAYS">
-                                        <Label styleClass="repas-stat-label" text="Type dominant"/>
-                                        <Label fx:id="lblRepasStatType" styleClass="repas-stat-value" text="--"/>
-                                    </VBox>
-                                </HBox>
-                                <TilePane fx:id="tileRepasCards" hgap="18.0" prefColumns="2" prefTileWidth="500.0" styleClass="repas-card-grid" vgap="18.0"/>
-                                <VBox fx:id="boxRepasExploreEmpty" alignment="CENTER" managed="false" spacing="8.0" styleClass="repas-empty-state" visible="false">
-                                    <Label styleClass="repas-empty-title" text="Aucun repas trouve"/>
-                                    <Label styleClass="repas-empty-subtitle" text="Ajustez la recherche ou le filtre pour afficher des repas." wrapText="true"/>
-                                </VBox>
-                                <TableView fx:id="tableRepas" managed="false" prefHeight="0.0" styleClass="data-table" visible="false">
+        <StackPane>
+            <ScrollPane fx:id="appScrollPane" fitToHeight="true" fitToWidth="true" style="-fx-background-color: #f3f6fb; -fx-background: #f3f6fb;">
+                <content>
+                    <StackPane>
+                         <VBox fx:id="viewRepas" visible="false" managed="false"/>
+                         
+                         <VBox fx:id="viewRegimes" fillWidth="true" spacing="20.0" style="-fx-background-color: #f3f6fb; -fx-padding: 40;" visible="true" managed="true">
+                             
+                             <!-- Hero & Intro -->
+                             <VBox spacing="8">
+                                 <Label text="Diet &amp; Eating Planner" style="-fx-font-weight: 800; -fx-font-size: 38px; -fx-text-fill: #1f2937;" />
+                                 <Label text="Welcome. This page is personalized for you." style="-fx-text-fill: #6b7280; -fx-font-size: 14px;" />
+                                 
+                                 <!-- Info banner -->
+                                 <VBox style="-fx-background-color: linear-gradient(to bottom right, #f4fbf9, #eef4ff); -fx-border-color: #dbe7f4; -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 15; -fx-spacing: 12;" translateY="12">
+                                     <Label text="Comment utiliser cette page :" style="-fx-font-weight: 800; -fx-text-fill: #0c3f44; -fx-font-size: 14px;"/>
+                                     <Label text="Cette interface vous guide pas à pas pour définir votre régime, suivre vos repas du jour et vérifier votre progression nutritionnelle." style="-fx-text-fill: #334155;"/>
+                                     <HBox spacing="10">
+                                         <Label text=" 1. Ajoutez/sélectionnez régime" style="-fx-background-color: white; -fx-border-color: #d7e2ef; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 4 12; -fx-font-size: 11px; -fx-font-weight: 600;" />
+                                         <Label text=" 2. Ajoutez vos repas" style="-fx-background-color: white; -fx-border-color: #d7e2ef; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 4 12; -fx-font-size: 11px; -fx-font-weight: 600;" />
+                                         <Label text=" 3. Suivez macros et calories" style="-fx-background-color: white; -fx-border-color: #d7e2ef; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 4 12; -fx-font-size: 11px; -fx-font-weight: 600;" />
+                                     </HBox>
+                                 </VBox>
+                             </VBox>
+
+                             <!-- 2 Column Grid -->
+                             <GridPane hgap="24" vgap="24" style="-fx-padding: 24 0 0 0;">
+                                 <columnConstraints>
+                                     <ColumnConstraints hgrow="ALWAYS" percentWidth="55"/>
+                                     <ColumnConstraints hgrow="ALWAYS" percentWidth="45"/>
+                                 </columnConstraints>
+                                 
+                                 <!-- LEFT COL -->
+                                 <VBox spacing="24" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                     <!-- Card 1: My Diet Hero -->
+                                      <VBox style="-fx-background-color: linear-gradient(to bottom right, #0c3f44, #14725d); -fx-background-radius: 14; -fx-padding: 24; -fx-effect: dropshadow(gaussian, rgba(12,63,68,0.2), 20, 0, 0, 10);">
+                                            <HBox alignment="TOP_RIGHT">
+                                                 <Label fx:id="lblPlannerHealthBadge" text="Normal" style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-padding: 4 12; -fx-background-radius: 20; -fx-font-size: 11px; -fx-font-weight: 700;"/>
+                                            </HBox>
+                                            <Label fx:id="lblPlannerRegimeTitle" text="Mon Régime Actuel" style="-fx-font-size: 20px; -fx-font-weight: 900; -fx-text-fill: white;"/>
+                                            <Label fx:id="lblPlannerRegimeSubtitle" text="Votre plan nutritionnel personnalisé" style="-fx-font-size: 13px; -fx-text-fill: #cbd5e1; -fx-padding: 4 0 16 0;"/>
+                                            <HBox spacing="16">
+                                                <VBox>
+                                                    <Label text="Objectif Calories" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
+                                                    <Label fx:id="lblPlannerTargetCalories" text="2400 kcal" style="-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white;"/>
+                                                </VBox>
+                                                <VBox>
+                                                    <Label text="Votre BMI" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
+                                                    <Label fx:id="lblPlannerBmi" text="22.5" style="-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white;"/>
+                                                </VBox>
+                                                <VBox>
+                                                    <Label text="Suggestions" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
+                                                    <Label fx:id="lblPlannerMealsHint" text="8 idées" style="-fx-font-size: 16px; -fx-font-weight: 800; -fx-text-fill: white;"/>
+                                                </VBox>
+                                            </HBox>
+                                            <VBox style="-fx-padding: 16 0 0 0;">
+                                                 <Label text="Repas recommandés :" style="-fx-font-size: 11px; -fx-text-fill: #94a3b8; -fx-padding: 0 0 4 0;"/>
+                                                 <Label fx:id="lblPlannerRecommendedMeals" text="Salade César, Poulet grillé..." wrapText="true" style="-fx-font-size: 12px; -fx-text-fill: #e2e8f0; -fx-font-style: italic;"/>
+                                            </VBox>
+                                      </VBox>
+                                     
+                                     <!-- Card 2: Today's Summary -->
+                                     <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 20, 0, 0, 10);">
+                                          <HBox style="-fx-padding: 14 18; -fx-border-color: transparent transparent #e2e8f0 transparent; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
+                                               <Label text="Today's Summary" style="-fx-font-weight: 800; -fx-text-fill: #1f2937; -fx-font-size: 15px;"/>
+                                          </HBox>
+                                          <VBox style="-fx-padding: 18;" spacing="18">
+                                                <Label text="Cette section montre votre progression du jour. Les pourcentages indiquent votre avancement par rapport à vos objectifs." wrapText="true" style="-fx-padding: 8 12; -fx-background-color: #f8fbff; -fx-border-color: #d5e2ee; -fx-border-style: dashed; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #475569;"/>
+                                                <HBox spacing="30">
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <HBox alignment="CENTER_LEFT">
+                                                            <Label text="Calories" style="-fx-font-size:12px; -fx-text-fill:#6b7280;"/>
+                                                            <Region HBox.hgrow="ALWAYS" />
+                                                            <Label fx:id="lblPlannerCaloriesProgress" text="0/0" style="-fx-font-size:10px; -fx-text-fill:#6b7280;"/>
+                                                        </HBox>
+                                                        <ProgressBar fx:id="pbPlannerCalories" progress="0.0" maxWidth="Infinity" style="-fx-accent: #0c3f44;"/>
+                                                    </VBox>
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <HBox alignment="CENTER_LEFT">
+                                                            <Label text="Proteins" style="-fx-font-size:12px; -fx-text-fill:#6b7280;"/>
+                                                            <Region HBox.hgrow="ALWAYS" />
+                                                            <Label fx:id="lblPlannerProteinesProgress" text="0/0" style="-fx-font-size:10px; -fx-text-fill:#6b7280;"/>
+                                                        </HBox>
+                                                        <ProgressBar fx:id="pbPlannerProteines" progress="0.0" maxWidth="Infinity" style="-fx-accent: #0c3f44;"/>
+                                                    </VBox>
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <HBox alignment="CENTER_LEFT">
+                                                            <Label text="Carbs" style="-fx-font-size:12px; -fx-text-fill:#6b7280;"/>
+                                                            <Region HBox.hgrow="ALWAYS" />
+                                                            <Label fx:id="lblPlannerGlucidesProgress" text="0/0" style="-fx-font-size:10px; -fx-text-fill:#6b7280;"/>
+                                                        </HBox>
+                                                        <ProgressBar fx:id="pbPlannerGlucides" progress="0.0" maxWidth="Infinity" style="-fx-accent: #0c3f44;"/>
+                                                    </VBox>
+                                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                                        <HBox alignment="CENTER_LEFT">
+                                                            <Label text="Fats" style="-fx-font-size:12px; -fx-text-fill:#6b7280;"/>
+                                                            <Region HBox.hgrow="ALWAYS" />
+                                                            <Label fx:id="lblPlannerLipidesProgress" text="0/0" style="-fx-font-size:10px; -fx-text-fill:#6b7280;"/>
+                                                        </HBox>
+                                                        <ProgressBar fx:id="pbPlannerLipides" progress="0.0" maxWidth="Infinity" style="-fx-accent: #0c3f44;"/>
+                                                    </VBox>
+                                                </HBox>
+                                          </VBox>
+                                     </VBox>
+                                     
+                                     <!-- Card 3: Today's Meals List -->
+                                     <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 20, 0, 0, 10);">
+                                          <HBox style="-fx-padding: 14 18; -fx-border-color: transparent transparent #e2e8f0 transparent; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
+                                               <Label text="Today's Meals List" style="-fx-font-weight: 800; -fx-text-fill: #1f2937; -fx-font-size: 15px;"/>
+                                               <Region HBox.hgrow="ALWAYS" />
+                                               <Button text="Checklist du jour" style="-fx-background-color: #f0f4f8; -fx-border-color: #cbd5e1; -fx-text-fill: #0c3f44; -fx-background-radius: 8; -fx-border-radius: 8; -fx-font-weight: 700; -fx-font-size: 11px;"/>
+                                          </HBox>
+                                          <VBox style="-fx-padding: 18;" spacing="14">
+                                               <Label fx:id="lblPlannerMealsSubtitle" text="Vos derniers repas enregistrés." style="-fx-font-size: 13px; -fx-text-fill: #475569;" />
+                                               <VBox fx:id="plannerMealsListBox" spacing="10" />
+                                               <TableView fx:id="tableRepas" managed="false" prefHeight="0.0" styleClass="data-table" visible="false">
                                     <columns>
                                         <TableColumn fx:id="colRepasId" prefWidth="60.0" text="ID"/>
                                         <TableColumn fx:id="colRepasUser" prefWidth="200.0" text="Utilisateur"/>
@@ -272,73 +172,131 @@
                                         <TableColumn fx:id="colRepasRegimeId" prefWidth="220.0" text="Regime"/>
                                     </columns>
                                 </TableView>
-                            </VBox>
-                        </StackPane>
-                    </VBox>
-                    <VBox fx:id="viewRegimes" fillWidth="true" managed="false" spacing="22.0" styleClass="content-root" visible="false">
-                        <padding><Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/></padding>
-                        <VBox spacing="8.0" styleClass="hero-banner">
-                            <Label styleClass="hero-title" text="Diet planner - Regimes"/>
-                            <Label styleClass="hero-subtitle" text="Structure reprise de la page Symfony diet planner avec les vraies donnees regime."/>
-                        </VBox>
-                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
-                            <columnConstraints>
-                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                            </columnConstraints>
-                            <Button fx:id="btnActionCreerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherCreationRegime" styleClass="action-card action-card-active" text="Creer un regime&#10;Ajoutez un nouveau profil nutritionnel." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                            <Button fx:id="btnActionModifierRegime" maxWidth="1.7976931348623157E308" onAction="#afficherModificationRegime" styleClass="action-card" text="Modifier un regime&#10;Mettez a jour les donnees du planner." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-                            <Button fx:id="btnActionSupprimerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionRegime" styleClass="action-card" text="Supprimer un regime&#10;Retirez un regime de la base de donnees." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                            <Button fx:id="btnActionExplorerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationRegime" styleClass="action-card" text="Explorer les regimes&#10;Consultez la liste complete des regimes." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                        </GridPane>
-                        <StackPane>
-                            <VBox fx:id="paneRegimeCreate" spacing="18.0" styleClass="panel-card">
-                                <Label styleClass="section-title" text="Creer un regime alimentaire"/>
-                                <Label styleClass="section-subtitle" text="Version JavaFX inspiree du diet planner Symfony."/>
+                                               <HBox alignment="CENTER_RIGHT" spacing="10">
+                                                   <!-- Action bound to create repas form! -->
+                                                   <Button text="+ Ajouter un repas" onAction="#afficherCreationRepas" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 700; -fx-background-radius: 8; -fx-padding: 8 16;" />
+                                               </HBox>
+                                          </VBox>
+                                     </VBox>
+                                 </VBox>
+
+                                 <!-- RIGHT COL -->
+                                 <VBox spacing="24" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                     <!-- Card 1: Badges -->
+                                     <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 20, 0, 0, 10);">
+                                          <HBox style="-fx-padding: 14 18; -fx-border-color: transparent transparent #e2e8f0 transparent; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
+                                               <Label text="Badges du jour" style="-fx-font-weight: 800; -fx-text-fill: #1f2937; -fx-font-size: 15px;"/>
+                                          </HBox>
+                                          <VBox style="-fx-padding: 18;" spacing="10">
+                                                <VBox style="-fx-background-color: #ecfdf5; -fx-border-color: #22c55e; -fx-border-style: dashed; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8 12;">
+                                                    <Label text="Semaine parfaite" style="-fx-font-weight: 700; -fx-text-fill: #111827;"/>
+                                                    <Label text="Calories dans la cible aujourd'hui." style="-fx-font-size: 11px; -fx-text-fill: #6b7280;"/>
+                                                </VBox>
+                                                <VBox style="-fx-background-color: #f9fafb; -fx-border-color: #e5e7eb; -fx-border-style: dashed; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 8 12; -fx-opacity: 0.85;">
+                                                    <Label text="Hydratation OK" style="-fx-font-weight: 700; -fx-text-fill: #111827;"/>
+                                                    <Label text="Au moins 3 repas/collations enregistrés." style="-fx-font-size: 11px; -fx-text-fill: #6b7280;"/>
+                                                </VBox>
+                                          </VBox>
+                                     </VBox>
+                                     
+                                     <!-- Card 2: Mes Régimes -->
+                                     <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 20, 0, 0, 10);">
+                                          <HBox style="-fx-padding: 14 18; -fx-border-color: transparent transparent #e2e8f0 transparent; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT" spacing="10">
+                                               <Label text="Mes régimes" style="-fx-font-weight: 800; -fx-text-fill: #1f2937; -fx-font-size: 15px;"/>
+                                               <Region HBox.hgrow="ALWAYS" />
+                                               <Button text="+ Ajouter un régime" onAction="#afficherCreationRegime" style="-fx-background-color: #e8f3f0; -fx-text-fill: #0c3f44; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 6 12;" />
+                                          </HBox>
+                                          <VBox style="-fx-padding: 18;" spacing="18">
+                                                <Label text="Gérez tous vos régimes ici. Modifiez, supprimez et explorez vos plannings nutritionnels." wrapText="true" style="-fx-padding: 8 12; -fx-background-color: #f8fbff; -fx-border-color: #d5e2ee; -fx-border-style: dashed; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #475569;"/>
+                                                
+                                                <Label fx:id="lblRegimeExploreCount" text="0 régimes trouvés" style="-fx-font-size: 12; -fx-text-fill: #6b7280;" />
+                                                <TilePane fx:id="tileRegimeCards" hgap="12" vgap="12" prefColumns="1" />
+                                                <TableView fx:id="tableRegimes" prefHeight="580.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRegimeId" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRegimeUser" prefWidth="210.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRegimeType" prefWidth="150.0" text="Type sante"/>
+                                        <TableColumn fx:id="colRegimeCalories" prefWidth="130.0" text="Calories"/>
+                                        <TableColumn fx:id="colRegimeBmi" prefWidth="90.0" text="BMI"/>
+                                        <TableColumn fx:id="colRegimeTaille" prefWidth="90.0" text="Taille"/>
+                                        <TableColumn fx:id="colRegimePoids" prefWidth="90.0" text="Poids"/>
+                                        <TableColumn fx:id="colRegimeAge" prefWidth="80.0" text="Age"/>
+                                        <TableColumn fx:id="colRegimeRepas" prefWidth="320.0" text="Repas adequats"/>
+                                    </columns>
+                                </TableView>
+                                          </VBox>
+                                     </VBox>
+                                 </VBox>
+                             </GridPane>
+                         </VBox>
+                    </StackPane>
+                </content>
+            </ScrollPane>
+            
+            <!-- OVERLAY FOR FORMS -->
+            <StackPane pickOnBounds="false">
+                <!-- 1. AJOUTER REGIME -->
+                <VBox fx:id="paneRegimeCreate" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card planner-form-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
+                                <Label styleClass="section-title" text="Ajouter un regime"/>
+                                <Label styleClass="section-subtitle" text="Les champs auto s'ajustent pendant la saisie."/>
                                 <GridPane hgap="16.0" vgap="16.0">
                                     <columnConstraints>
-                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
-                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="33.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="33.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="34.0"/>
                                     </columnConstraints>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnSpan="3">
                                         <Label styleClass="field-label" text="Utilisateur"/>
                                         <ComboBox fx:id="cbRegimeUser" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
                                     </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                                        <Label styleClass="field-label" text="Type sante"/>
-                                        <ComboBox fx:id="cbRegimeTypeSante" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
-                                    </VBox>
-                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.rowIndex="1">
                                         <Label styleClass="field-label" text="Taille (cm)"/>
-                                        <TextField fx:id="tfRegimeTaille" styleClass="text-input"/>
+                                        <TextField fx:id="tfRegimeTaille" promptText="175" styleClass="text-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                         <Label styleClass="field-label" text="Poids (kg)"/>
-                                        <TextField fx:id="tfRegimePoids" styleClass="text-input"/>
+                                        <TextField fx:id="tfRegimePoids" promptText="72" styleClass="text-input"/>
                                     </VBox>
-                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="2" GridPane.rowIndex="1">
                                         <Label styleClass="field-label" text="Age"/>
-                                        <TextField fx:id="tfRegimeAge" styleClass="text-input"/>
+                                        <TextField fx:id="tfRegimeAge" promptText="29" styleClass="text-input"/>
                                     </VBox>
-                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                        <Label styleClass="field-label" text="BMI"/>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="BMI (auto)"/>
                                         <TextField fx:id="tfRegimeBmi" styleClass="text-input"/>
                                     </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="3">
-                                        <Label styleClass="field-label" text="Calories cibles"/>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Type sante (auto)"/>
+                                        <ComboBox fx:id="cbRegimeTypeSante" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Calories cibles (auto)"/>
                                         <TextField fx:id="tfRegimeCaloriesCibles" styleClass="text-input"/>
                                     </VBox>
-                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="3">
-                                        <Label styleClass="field-label" text="Repas adequats"/>
-                                        <TextArea fx:id="taRegimeRepasAdequats" prefHeight="100.0" styleClass="text-area-input"/>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnSpan="3" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Repas adequats (auto)"/>
+                                        <TextArea fx:id="taRegimeRepasAdequats" prefHeight="110.0" styleClass="text-area-input"/>
                                     </VBox>
                                 </GridPane>
                                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                                    <Button onAction="#viderFormulaireRegime" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#viderFormulaireRegime" styleClass="secondary-button" text="Annuler"/>
                                     <Button onAction="#ajouterRegime" styleClass="primary-button" text="Creer le regime"/>
                                 </HBox>
                             </VBox>
-                            <VBox fx:id="paneRegimeEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- 2. MODIFIER REGIME -->
+                <VBox fx:id="paneRegimeEdit" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
                                 <Label styleClass="section-title" text="Modifier un regime"/>
                                 <Label styleClass="section-subtitle" text="Selectionnez un regime puis mettez a jour ses donnees."/>
                                 <TextField fx:id="tfRegimeId" editable="false" managed="false" visible="false"/>
@@ -395,13 +353,22 @@
                                     <Button onAction="#modifierRegime" styleClass="primary-button" text="Mettre a jour"/>
                                 </HBox>
                             </VBox>
-                            <VBox fx:id="paneRegimeDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- 3. SUPPRIMER REGIME -->
+                <VBox fx:id="paneRegimeDelete" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
                                 <Label styleClass="section-title" text="Supprimer un regime"/>
                                 <Label styleClass="section-subtitle" text="Selectionnez un regime dans le planner puis supprimez-le."/>
-                                <TableView fx:id="tableRegimesDelete" prefHeight="500.0" styleClass="data-table">
+                                <TableView fx:id="tableRegimesDelete" prefHeight="400.0" styleClass="data-table">
                                     <columns>
                                         <TableColumn fx:id="colRegimeIdDelete" prefWidth="60.0" text="ID"/>
-                                        <TableColumn fx:id="colRegimeUserDelete" prefWidth="210.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRegimeUserDelete" prefWidth="200.0" text="Utilisateur"/>
                                         <TableColumn fx:id="colRegimeTypeDelete" prefWidth="150.0" text="Type sante"/>
                                         <TableColumn fx:id="colRegimeCaloriesDelete" prefWidth="130.0" text="Calories"/>
                                         <TableColumn fx:id="colRegimeBmiDelete" prefWidth="100.0" text="BMI"/>
@@ -413,27 +380,169 @@
                                     <Button onAction="#supprimerRegime" styleClass="danger-button" text="Supprimer definitivement"/>
                                 </HBox>
                             </VBox>
-                            <VBox fx:id="paneRegimeExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- 4. EXPLORER REGIMES -->
+                <VBox fx:id="paneRegimeExplore" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
                                 <Label styleClass="section-title" text="Explorer les regimes"/>
-                                <Label styleClass="section-subtitle" text="Lecture des regimes enregistres depuis la base Symfony."/>
-                                <TableView fx:id="tableRegimes" prefHeight="580.0" styleClass="data-table">
+                                <Label styleClass="section-subtitle" text="Lecture des regimes enregistres depuis la base Fitopia."/>
+                                <TilePane fx:id="tileRegimeExploreCards" hgap="12" vgap="12" prefColumns="1" />
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- 5. AJOUTER REPAS (SÉLECTION) -->
+                <VBox fx:id="paneRepasCreate" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
+                                <Label styleClass="section-title" text="Ajouter un repas existant"/>
+                                <Label styleClass="section-subtitle" text="Sélectionnez un repas déjà enregistré pour l'ajouter à la journée en cours."/>
+                                <VBox spacing="10" style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-style: dashed; -fx-border-radius: 8;">
+                                     <Label text="Choisissez un repas dans la liste, puis cliquez sur 'Ajouter ce repas'. Vous pouvez comparer l'impact calorique avant validation." wrapText="true" style="-fx-font-size: 11px; -fx-text-fill: #475569;"/>
+                                </VBox>
+                                <VBox spacing="10">
+                                    <TextField fx:id="tfRepasSelectionSearch" promptText="Rechercher un repas..." styleClass="text-input"/>
+                                    <ScrollPane fitToWidth="true" prefHeight="450.0" style="-fx-background-color: transparent; -fx-background: transparent;">
+                                        <content>
+                                            <TilePane fx:id="tileRepasSelectionCards" hgap="14.0" vgap="14.0" prefColumns="2" style="-fx-padding: 5;"/>
+                                        </content>
+                                    </ScrollPane>
+                                </VBox>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- 6. MODIFIER REPAS -->
+                <VBox fx:id="paneRepasEdit" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
+                                <Label styleClass="section-title" text="Modifier un repas"/>
+                                <Label styleClass="section-subtitle" text="Mettez à jour les données du repas sélectionné."/>
+                                <TextField fx:id="tfRepasId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableRepasEdit" prefHeight="290.0" styleClass="data-table">
                                     <columns>
-                                        <TableColumn fx:id="colRegimeId" prefWidth="60.0" text="ID"/>
-                                        <TableColumn fx:id="colRegimeUser" prefWidth="210.0" text="Utilisateur"/>
-                                        <TableColumn fx:id="colRegimeType" prefWidth="150.0" text="Type sante"/>
-                                        <TableColumn fx:id="colRegimeCalories" prefWidth="130.0" text="Calories"/>
-                                        <TableColumn fx:id="colRegimeBmi" prefWidth="90.0" text="BMI"/>
-                                        <TableColumn fx:id="colRegimeTaille" prefWidth="90.0" text="Taille"/>
-                                        <TableColumn fx:id="colRegimePoids" prefWidth="90.0" text="Poids"/>
-                                        <TableColumn fx:id="colRegimeAge" prefWidth="80.0" text="Age"/>
-                                        <TableColumn fx:id="colRegimeRepas" prefWidth="320.0" text="Repas adequats"/>
+                                        <TableColumn fx:id="colRepasIdEdit" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasUserEdit" prefWidth="190.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRepasNomEdit" prefWidth="170.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasTypeEdit" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDateEdit" prefWidth="140.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasCaloriesEdit" prefWidth="90.0" text="Calories"/>
+                                        <TableColumn fx:id="colRepasRegimeIdEdit" prefWidth="210.0" text="Regime"/>
                                     </columns>
                                 </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Utilisateur"/>
+                                        <ComboBox fx:id="cbRepasUserEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Date du repas"/>
+                                        <DatePicker fx:id="dpDateRepasEdit" maxWidth="1.7976931348623157E308" styleClass="date-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Type de repas"/>
+                                        <ComboBox fx:id="cbTypeRepasEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label styleClass="field-label" text="Nom du repas"/>
+                                        <TextField fx:id="tfRepasNomEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                        <Label styleClass="field-label" text="Commentaire"/>
+                                        <TextArea fx:id="taRepasDescriptionEdit" prefHeight="96.0" styleClass="text-area-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Regime associe"/>
+                                        <ComboBox fx:id="cbRepasRegimeEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                        <Label styleClass="field-label" text="Calories"/>
+                                        <TextField fx:id="tfRepasCaloriesEdit" styleClass="text-input"/>
+                                    </VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRepasModification" styleClass="secondary-button" text="Annuler"/>
+                                    <Button onAction="#modifierRepas" styleClass="primary-button" text="Mettre à jour"/>
+                                </HBox>
                             </VBox>
-                        </StackPane>
-                    </VBox>
-                </StackPane>
-            </content>
-        </ScrollPane>
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- 7. SUPPRIMER REPAS -->
+                <VBox fx:id="paneRepasDelete" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
+                                <Label styleClass="section-title" text="Supprimer un repas"/>
+                                <Label styleClass="section-subtitle" text="Voulez-vous vraiment supprimer ce repas ?"/>
+                                <TableView fx:id="tableRepasDelete" prefHeight="400.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRepasIdDelete" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasUserDelete" prefWidth="200.0" text="Utilisateur"/>
+                                        <TableColumn fx:id="colRepasNomDelete" prefWidth="180.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasTypeDelete" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDateDelete" prefWidth="140.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasCaloriesDelete" prefWidth="90.0" text="Calories"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblRepasSelectionDelete" styleClass="hint-label" text="Aucun repas sélectionné"/>
+                                    <Button onAction="#supprimerRepas" styleClass="danger-button" text="Supprimer définitivement"/>
+                                </HBox>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
+                <!-- 8. EXPLORER REPAS -->
+                <VBox fx:id="paneRepasExplore" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox maxWidth="850" spacing="18.0" styleClass="panel-card" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <HBox alignment="CENTER_RIGHT"><Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8;"/></HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="section-title" text="Explorer les repas"/>
+                                        <Label fx:id="lblRepasExploreCount" styleClass="section-subtitle" text="0 repas affichés"/>
+                                    </VBox>
+                                    <Button onAction="#afficherStatistiquesRepas" styleClass="primary-button" text="Statistiques"/>
+                                </HBox>
+                                <HBox alignment="CENTER_LEFT" spacing="14.0">
+                                    <ComboBox fx:id="cbRepasExploreSort" prefWidth="190.0" styleClass="combo-input"/>
+                                    <TextField fx:id="tfRepasSearch" promptText="Rechercher..." styleClass="text-input" HBox.hgrow="ALWAYS"/>
+                                    <ComboBox fx:id="cbRepasExploreTypeFilter" prefWidth="180.0" styleClass="combo-input"/>
+                                </HBox>
+                                <TilePane fx:id="tileRepasCards" hgap="18.0" vgap="18.0" prefColumns="2" />
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </VBox>
+            </StackPane>
+            
+            <!-- Floating Buttons absolute positioned -->
+            <Button text="Scanner photo IA" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 12 20; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.3), 10, 0, 0, 5);"
+                    StackPane.alignment="BOTTOM_RIGHT" translateX="-24" translateY="-80" />
+            <Button text="Chat Régime IA" style="-fx-background-color: #0b3a3d; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 12 20; -fx-font-weight: bold; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.3), 10, 0, 0, 5);"
+                    StackPane.alignment="BOTTOM_RIGHT" translateX="-24" translateY="-24" />
+        </StackPane>
     </center>
+
 </BorderPane>

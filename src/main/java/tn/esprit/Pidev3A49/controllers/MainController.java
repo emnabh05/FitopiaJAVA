@@ -15,6 +15,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.Node;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -23,6 +24,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
@@ -50,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -95,6 +98,34 @@ public class MainController {
     @FXML private VBox paneRegimeEdit;
     @FXML private VBox paneRegimeDelete;
     @FXML private VBox paneRegimeExplore;
+    @FXML private Label lblHeaderUser;
+    @FXML private Label lblPlannerWelcome;
+    @FXML private Label lblPlannerHealthBadge;
+    @FXML private Label lblPlannerRegimeTitle;
+    @FXML private Label lblPlannerRegimeSubtitle;
+    @FXML private Label lblPlannerTargetCalories;
+    @FXML private Label lblPlannerBmi;
+    @FXML private Label lblPlannerMealsHint;
+    @FXML private Label lblPlannerRecommendedMeals;
+    @FXML private Label lblPlannerGoalTitle;
+    @FXML private Label lblPlannerGoalBody;
+    @FXML private Label lblPlannerGoalHint;
+    @FXML private ProgressBar pbPlannerCalories;
+    @FXML private ProgressBar pbPlannerProteines;
+    @FXML private ProgressBar pbPlannerGlucides;
+    @FXML private ProgressBar pbPlannerLipides;
+    @FXML private Label lblPlannerCaloriesProgress;
+    @FXML private Label lblPlannerProteinesProgress;
+    @FXML private Label lblPlannerGlucidesProgress;
+    @FXML private Label lblPlannerLipidesProgress;
+    @FXML private Label lblPlannerMealsSubtitle;
+    @FXML private VBox plannerMealsListBox;
+    @FXML private Label lblPlannerRegimesSubtitle;
+    @FXML private Label lblRepasContextTitle;
+    @FXML private Label lblRepasContextBody;
+    @FXML private Label lblRepasContextTarget;
+    @FXML private Label lblRepasRegimeContext;
+    @FXML private Label lblRepasRegimeContextEdit;
 
     @FXML private Button btnModuleRepas;
     @FXML private Button btnModuleRegimes;
@@ -138,6 +169,9 @@ public class MainController {
     @FXML private ComboBox<String> cbRepasExploreTypeFilter;
     @FXML private ComboBox<String> cbRepasExploreSort;
     @FXML private Button btnRepasStatistics;
+    @FXML private Label lblRegimeExploreCount;
+    @FXML private TilePane tileRegimeCards;
+    @FXML private TilePane tileRegimeExploreCards;
     @FXML private Label lblRepasExploreCount;
     @FXML private TilePane tileRepasCards;
     @FXML private VBox boxRepasExploreEmpty;
@@ -214,10 +248,22 @@ public class MainController {
     @FXML private TableColumn<RegimeAlimentaire, Double> colRegimeBmiDelete;
     @FXML private TableColumn<RegimeAlimentaire, String> colRegimeRepasDelete;
 
+    @FXML private TableView<Repas> tableRepasSelection;
+    @FXML private TableColumn<Repas, Integer> colRepasSelectionId;
+    @FXML private TableColumn<Repas, String> colRepasSelectionNom;
+    @FXML private TableColumn<Repas, String> colRepasSelectionType;
+    @FXML private TableColumn<Repas, Integer> colRepasSelectionCalories;
+    @FXML private TableColumn<Repas, String> colRepasSelectionDate;
+    @FXML private TextField tfRepasSelectionSearch;
+    @FXML private Label lblRepasSelectionInfo;
+    @FXML private TilePane tileRepasSelectionCards;
+
     private final ServiceRepas serviceRepas = new ServiceRepas();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceUser serviceUser = new ServiceUser();
     private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
+    private List<User> allUsers = List.of();
+    private List<RegimeAlimentaire> allRegimes = List.of();
     private List<Repas> repasExplorerView = List.of();
     private Integer repasEditSelectionId;
 
@@ -226,11 +272,13 @@ public class MainController {
         initialiserColonnes();
         initialiserCombos();
         initialiserExplorateurRepas();
+        initialiserCalculsRegimeAutomatiques();
+        initialiserValidationRepas();
+        initialiserInteractionsRepasRegime();
         initialiserSelections();
+        initialiserSelectionRepasJointure();
         rafraichirDonnees();
-        afficherModuleRepas();
-        afficherCreationRepas();
-        afficherCreationRegime();
+        masquerTousLesFormulaires();
     }
 
     public void ouvrirBackRepas() {
@@ -240,7 +288,7 @@ public class MainController {
 
     public void ouvrirFrontRegimes() {
         afficherModuleRegimes();
-        afficherCreationRegime();
+        masquerTousLesFormulaires();
     }
 
     @FXML private void afficherModuleRepas() { afficherVue(viewRepas, viewRegimes); activerBoutonModule(btnModuleRepas, btnModuleRegimes); }
@@ -255,18 +303,32 @@ public class MainController {
     @FXML private void afficherExplorationRegime() { afficherPaneRegime(paneRegimeExplore, btnActionExplorerRegime); }
 
     @FXML
+    private void masquerTousLesFormulaires() {
+        if (paneRegimeCreate != null) { paneRegimeCreate.setVisible(false); paneRegimeCreate.setManaged(false); }
+        if (paneRegimeEdit != null) { paneRegimeEdit.setVisible(false); paneRegimeEdit.setManaged(false); }
+        if (paneRegimeDelete != null) { paneRegimeDelete.setVisible(false); paneRegimeDelete.setManaged(false); }
+        if (paneRegimeExplore != null) { paneRegimeExplore.setVisible(false); paneRegimeExplore.setManaged(false); }
+        if (paneRepasCreate != null) { paneRepasCreate.setVisible(false); paneRepasCreate.setManaged(false); }
+        if (paneRepasEdit != null) { paneRepasEdit.setVisible(false); paneRepasEdit.setManaged(false); }
+        if (paneRepasDelete != null) { paneRepasDelete.setVisible(false); paneRepasDelete.setManaged(false); }
+        if (paneRepasExplore != null) { paneRepasExplore.setVisible(false); paneRepasExplore.setManaged(false); }
+    }
+
+    @FXML
     private void rafraichirDonnees() {
         List<User> users = serviceUser.getAll();
         List<RegimeAlimentaire> regimes = serviceRegime.getAll();
         List<Repas> repas = serviceRepas.getAll();
+        allUsers = List.copyOf(users);
+        allRegimes = List.copyOf(regimes);
 
-        cbRepasUser.setItems(FXCollections.observableArrayList(users));
-        cbRepasUserEdit.setItems(FXCollections.observableArrayList(users));
-        cbRegimeUser.setItems(FXCollections.observableArrayList(users));
-        cbRegimeUserEdit.setItems(FXCollections.observableArrayList(users));
+        if (cbRepasUser != null) cbRepasUser.setItems(FXCollections.observableArrayList(users));
+        if (cbRepasUserEdit != null) cbRepasUserEdit.setItems(FXCollections.observableArrayList(users));
+        if (cbRegimeUser != null) cbRegimeUser.setItems(FXCollections.observableArrayList(users));
+        if (cbRegimeUserEdit != null) cbRegimeUserEdit.setItems(FXCollections.observableArrayList(users));
 
-        cbRepasRegime.setItems(FXCollections.observableArrayList(regimes));
-        cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
+        if (cbRepasRegime != null) cbRepasRegime.setItems(FXCollections.observableArrayList(regimes));
+        if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
 
         allRepas.setAll(repas);
         tableRepas.setItems(FXCollections.observableArrayList(repas));
@@ -277,9 +339,99 @@ public class MainController {
         tableRegimes.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
         tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
+        appliquerSelectionsFrontParDefaut();
+        filtrerRegimesPourUtilisateur(cbRepasUser == null ? null : cbRepasUser.getValue(), cbRepasRegime);
+        filtrerRegimesPourUtilisateur(cbRepasUserEdit == null ? null : cbRepasUserEdit.getValue(), cbRepasRegimeEdit);
         actualiserModificationRepas();
         actualiserSuppressionRepas();
         actualiserExplorateurRepas();
+        actualiserDashboardPlanner();
+        actualiserContexteRepasSelectionne(false);
+        actualiserContexteRepasSelectionne(true);
+        actualiserSelectionRepasJointure();
+    }
+
+    private void initialiserSelectionRepasJointure() {
+        if (tableRepasSelection == null) return;
+        
+        colRepasSelectionId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colRepasSelectionNom.setCellValueFactory(new PropertyValueFactory<>("nomRepas"));
+        colRepasSelectionType.setCellValueFactory(new PropertyValueFactory<>("typeRepas"));
+        colRepasSelectionCalories.setCellValueFactory(new PropertyValueFactory<>("calories"));
+        colRepasSelectionDate.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getDateDisplay()));
+        
+        tableRepasSelection.getSelectionModel().selectedItemProperty().addListener((obs, old, newValue) -> {
+            if (lblRepasSelectionInfo != null) {
+                lblRepasSelectionInfo.setText(newValue == null ? "Aucun repas sélectionné" : "Repas choisi: " + newValue.getNomRepas());
+            }
+        });
+        
+        if (tfRepasSelectionSearch != null) {
+            tfRepasSelectionSearch.textProperty().addListener((obs, old, newValue) -> {
+                if (newValue == null || newValue.isBlank()) {
+                    tableRepasSelection.setItems(allRepas);
+                } else {
+                    tableRepasSelection.setItems(allRepas.filtered(repas -> 
+                        (repas.getNomRepas() != null && repas.getNomRepas().toLowerCase().contains(newValue.toLowerCase())) ||
+                        (repas.getTypeRepas() != null && repas.getTypeRepas().toLowerCase().contains(newValue.toLowerCase()))
+                    ));
+                }
+            });
+        }
+    }
+
+    private void actualiserSelectionRepasJointure() {
+        if (tileRepasSelectionCards == null) return;
+        
+        String search = tfRepasSelectionSearch == null ? "" : tfRepasSelectionSearch.getText();
+        List<Repas> selectionList = allRepas.stream()
+                .filter(repas -> correspondRechercheRepas(repas, search))
+                .limit(20) // limiter pour perf
+                .toList();
+
+        tileRepasSelectionCards.getChildren().setAll(selectionList.stream()
+                .map(this::creerCarteSelectionRepas)
+                .toList());
+    }
+
+    @FXML
+    private void associerRepasAuRegime() {
+        try {
+            Repas repas = tableRepasSelection.getSelectionModel().getSelectedItem();
+            if (repas == null) throw new IllegalArgumentException("Veuillez sélectionner un repas dans la liste.");
+            clonerRepasPourAujourdhui(repas);
+        } catch (Exception exception) {
+            showError("Liaison Repas", exception.getMessage());
+        }
+    }
+
+    private void clonerRepasPourAujourdhui(Repas source) {
+        try {
+            User refUser = determinerUtilisateurReference();
+            RegimeAlimentaire activeRegime = determinerRegimeReference(refUser);
+            
+            if (activeRegime == null) throw new IllegalStateException("Aucun regime actif trouve. Creez-en un d'abord.");
+            
+            Repas nouveau = new Repas(
+                refUser.getId(),
+                LocalDateTime.now(),
+                source.getTypeRepas(),
+                source.getNomRepas(),
+                source.getCalories(),
+                source.getProteines(),
+                source.getGlucides(),
+                source.getLipides(),
+                "Ajoute via historique",
+                activeRegime.getId()
+            );
+            
+            serviceRepas.add(nouveau);
+            rafraichirDonnees();
+            showInfo("Repas '" + source.getNomRepas() + "' ajoute a votre journee !");
+            masquerTousLesFormulaires();
+        } catch (Exception exception) {
+            showError("Erreur ajout", exception.getMessage());
+        }
     }
 
     @FXML
@@ -289,6 +441,7 @@ public class MainController {
             rafraichirDonnees();
             viderFormulaireRepas();
             showInfo("Repas ajoute avec succes.");
+            masquerTousLesFormulaires();
         } catch (Exception exception) {
             showError("Erreur repas", exception.getMessage());
         }
@@ -327,6 +480,7 @@ public class MainController {
             rafraichirDonnees();
             viderFormulaireRegime();
             showInfo("Regime ajoute avec succes.");
+            masquerTousLesFormulaires();
         } catch (Exception exception) {
             showError("Erreur regime", exception.getMessage());
         }
@@ -342,6 +496,7 @@ public class MainController {
             rafraichirDonnees();
             viderFormulaireRegimeModification();
             showInfo("Regime mis a jour avec succes.");
+            masquerTousLesFormulaires();
         } catch (Exception exception) {
             showError("Erreur regime", exception.getMessage());
         }
@@ -364,16 +519,16 @@ public class MainController {
 
     @FXML
     private void viderFormulaireRepas() {
-        cbRepasUser.getSelectionModel().clearSelection();
-        dpDateRepas.setValue(null);
-        cbTypeRepas.getSelectionModel().clearSelection();
-        tfRepasNom.clear();
-        taRepasDescription.clear();
-        cbRepasRegime.getSelectionModel().clearSelection();
-        tfRepasCalories.clear();
-        tfRepasProteines.clear();
-        tfRepasGlucides.clear();
-        tfRepasLipides.clear();
+        if (cbRepasUser != null) cbRepasUser.getSelectionModel().clearSelection();
+        if (dpDateRepas != null) dpDateRepas.setValue(null);
+        if (cbTypeRepas != null) cbTypeRepas.getSelectionModel().clearSelection();
+        if (tfRepasNom != null) tfRepasNom.clear();
+        if (taRepasDescription != null) taRepasDescription.clear();
+        if (cbRepasRegime != null) cbRepasRegime.getSelectionModel().clearSelection();
+        if (tfRepasCalories != null) tfRepasCalories.clear();
+        if (tfRepasProteines != null) tfRepasProteines.clear();
+        if (tfRepasGlucides != null) tfRepasGlucides.clear();
+        if (tfRepasLipides != null) tfRepasLipides.clear();
     }
 
     @FXML
@@ -425,19 +580,33 @@ public class MainController {
     }
 
     private void initialiserColonnes() {
-        initialiserColonnesRepas(colRepasId, colRepasUser, colRepasNom, colRepasType, colRepasDate, colRepasCalories, colRepasRegimeId);
-        initialiserColonnesRepas(colRepasIdEdit, colRepasUserEdit, colRepasNomEdit, colRepasTypeEdit, colRepasDateEdit, colRepasCaloriesEdit, colRepasRegimeIdEdit);
-        initialiserColonnesRepas(colRepasIdDelete, colRepasUserDelete, colRepasNomDelete, colRepasTypeDelete, colRepasDateDelete, colRepasCaloriesDelete, colRepasRegimeIdDelete);
-        colRepasProteines.setCellValueFactory(new PropertyValueFactory<>("proteines"));
-        colRepasGlucides.setCellValueFactory(new PropertyValueFactory<>("glucides"));
-        colRepasLipides.setCellValueFactory(new PropertyValueFactory<>("lipides"));
+        if (colRepasId != null && colRepasUser != null && colRepasNom != null && colRepasType != null && colRepasDate != null && colRepasCalories != null) {
+            initialiserColonnesRepas(colRepasId, colRepasUser, colRepasNom, colRepasType, colRepasDate, colRepasCalories, colRepasRegimeId);
+        }
+        if (colRepasIdEdit != null && colRepasUserEdit != null && colRepasNomEdit != null && colRepasTypeEdit != null && colRepasDateEdit != null && colRepasCaloriesEdit != null) {
+            initialiserColonnesRepas(colRepasIdEdit, colRepasUserEdit, colRepasNomEdit, colRepasTypeEdit, colRepasDateEdit, colRepasCaloriesEdit, colRepasRegimeIdEdit);
+        }
+        if (colRepasIdDelete != null && colRepasUserDelete != null && colRepasNomDelete != null && colRepasTypeDelete != null && colRepasDateDelete != null && colRepasCaloriesDelete != null) {
+            initialiserColonnesRepas(colRepasIdDelete, colRepasUserDelete, colRepasNomDelete, colRepasTypeDelete, colRepasDateDelete, colRepasCaloriesDelete, colRepasRegimeIdDelete);
+        }
+        
+        if (colRepasProteines != null) colRepasProteines.setCellValueFactory(new PropertyValueFactory<>("proteines"));
+        if (colRepasGlucides != null) colRepasGlucides.setCellValueFactory(new PropertyValueFactory<>("glucides"));
+        if (colRepasLipides != null) colRepasLipides.setCellValueFactory(new PropertyValueFactory<>("lipides"));
 
-        initialiserColonnesRegimes(colRegimeId, colRegimeUser, colRegimeType, colRegimeCalories, colRegimeBmi, colRegimeRepas);
-        initialiserColonnesRegimes(colRegimeIdEdit, colRegimeUserEdit, colRegimeTypeEdit, colRegimeCaloriesEdit, colRegimeBmiEdit, colRegimeRepasEdit);
-        initialiserColonnesRegimes(colRegimeIdDelete, colRegimeUserDelete, colRegimeTypeDelete, colRegimeCaloriesDelete, colRegimeBmiDelete, colRegimeRepasDelete);
-        colRegimeTaille.setCellValueFactory(new PropertyValueFactory<>("taille"));
-        colRegimePoids.setCellValueFactory(new PropertyValueFactory<>("poids"));
-        colRegimeAge.setCellValueFactory(new PropertyValueFactory<>("age"));
+        if (colRegimeId != null && colRegimeUser != null && colRegimeType != null && colRegimeCalories != null && colRegimeBmi != null && colRegimeRepas != null) {
+             initialiserColonnesRegimes(colRegimeId, colRegimeUser, colRegimeType, colRegimeCalories, colRegimeBmi, colRegimeRepas);
+        }
+        if (colRegimeIdEdit != null && colRegimeUserEdit != null && colRegimeTypeEdit != null && colRegimeCaloriesEdit != null && colRegimeBmiEdit != null && colRegimeRepasEdit != null) {
+            initialiserColonnesRegimes(colRegimeIdEdit, colRegimeUserEdit, colRegimeTypeEdit, colRegimeCaloriesEdit, colRegimeBmiEdit, colRegimeRepasEdit);
+        }
+        if (colRegimeIdDelete != null && colRegimeUserDelete != null && colRegimeTypeDelete != null && colRegimeCaloriesDelete != null && colRegimeBmiDelete != null && colRegimeRepasDelete != null) {
+            initialiserColonnesRegimes(colRegimeIdDelete, colRegimeUserDelete, colRegimeTypeDelete, colRegimeCaloriesDelete, colRegimeBmiDelete, colRegimeRepasDelete);
+        }
+        
+        if (colRegimeTaille != null) colRegimeTaille.setCellValueFactory(new PropertyValueFactory<>("taille"));
+        if (colRegimePoids != null) colRegimePoids.setCellValueFactory(new PropertyValueFactory<>("poids"));
+        if (colRegimeAge != null) colRegimeAge.setCellValueFactory(new PropertyValueFactory<>("age"));
     }
 
     private void initialiserColonnesRepas(TableColumn<Repas, Integer> id,
@@ -447,13 +616,13 @@ public class MainController {
                                           TableColumn<Repas, String> date,
                                           TableColumn<Repas, Integer> calories,
                                           TableColumn<Repas, String> regime) {
-        id.setCellValueFactory(new PropertyValueFactory<>("id"));
-        user.setCellValueFactory(new PropertyValueFactory<>("userEmail"));
-        nom.setCellValueFactory(new PropertyValueFactory<>("nomRepas"));
-        type.setCellValueFactory(cellData -> new SimpleStringProperty(normaliserTypeRepas(cellData.getValue().getTypeRepas())));
-        date.setCellValueFactory(new PropertyValueFactory<>("dateDisplay"));
-        calories.setCellValueFactory(new PropertyValueFactory<>("calories"));
-        regime.setCellValueFactory(new PropertyValueFactory<>("regimeDisplay"));
+        if (id != null) id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        if (user != null) user.setCellValueFactory(new PropertyValueFactory<>("userEmail"));
+        if (nom != null) nom.setCellValueFactory(new PropertyValueFactory<>("nomRepas"));
+        if (type != null) type.setCellValueFactory(cellData -> new SimpleStringProperty(normaliserTypeRepas(cellData.getValue().getTypeRepas())));
+        if (date != null) date.setCellValueFactory(new PropertyValueFactory<>("dateDisplay"));
+        if (calories != null) calories.setCellValueFactory(new PropertyValueFactory<>("calories"));
+        if (regime != null) regime.setCellValueFactory(new PropertyValueFactory<>("regimeDisplay"));
     }
 
     private void initialiserColonnesRegimes(TableColumn<RegimeAlimentaire, Integer> id,
@@ -462,19 +631,19 @@ public class MainController {
                                             TableColumn<RegimeAlimentaire, Integer> calories,
                                             TableColumn<RegimeAlimentaire, Double> bmi,
                                             TableColumn<RegimeAlimentaire, String> repas) {
-        id.setCellValueFactory(new PropertyValueFactory<>("id"));
-        user.setCellValueFactory(new PropertyValueFactory<>("userEmail"));
-        type.setCellValueFactory(new PropertyValueFactory<>("typeSante"));
-        calories.setCellValueFactory(new PropertyValueFactory<>("caloriesCibles"));
-        bmi.setCellValueFactory(new PropertyValueFactory<>("bmi"));
-        repas.setCellValueFactory(new PropertyValueFactory<>("repasAdequats"));
+        if (id != null) id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        if (user != null) user.setCellValueFactory(new PropertyValueFactory<>("userEmail"));
+        if (type != null) type.setCellValueFactory(new PropertyValueFactory<>("typeSante"));
+        if (calories != null) calories.setCellValueFactory(new PropertyValueFactory<>("caloriesCibles"));
+        if (bmi != null) bmi.setCellValueFactory(new PropertyValueFactory<>("bmi"));
+        if (repas != null) repas.setCellValueFactory(new PropertyValueFactory<>("repasAdequats"));
     }
 
     private void initialiserCombos() {
-        cbTypeRepas.setItems(FXCollections.observableArrayList(TYPE_REPAS_OPTIONS));
-        cbTypeRepasEdit.setItems(FXCollections.observableArrayList(TYPE_REPAS_OPTIONS));
-        cbRegimeTypeSante.setItems(FXCollections.observableArrayList(TYPE_SANTE_OPTIONS));
-        cbRegimeTypeSanteEdit.setItems(FXCollections.observableArrayList(TYPE_SANTE_OPTIONS));
+        if (cbTypeRepas != null) cbTypeRepas.setItems(FXCollections.observableArrayList(TYPE_REPAS_OPTIONS));
+        if (cbTypeRepasEdit != null) cbTypeRepasEdit.setItems(FXCollections.observableArrayList(TYPE_REPAS_OPTIONS));
+        if (cbRegimeTypeSante != null) cbRegimeTypeSante.setItems(FXCollections.observableArrayList(TYPE_SANTE_OPTIONS));
+        if (cbRegimeTypeSanteEdit != null) cbRegimeTypeSanteEdit.setItems(FXCollections.observableArrayList(TYPE_SANTE_OPTIONS));
         if (cbRepasExploreTypeFilter != null) {
             cbRepasExploreTypeFilter.setItems(FXCollections.observableArrayList(FILTER_ALL_TYPES));
             cbRepasExploreTypeFilter.getItems().addAll(TYPE_REPAS_OPTIONS);
@@ -489,17 +658,189 @@ public class MainController {
             @Override public String toString(User user) { return user == null ? "" : user.getDisplayName(); }
             @Override public User fromString(String string) { return null; }
         };
-        cbRepasUser.setConverter(userConverter);
-        cbRepasUserEdit.setConverter(userConverter);
-        cbRegimeUser.setConverter(userConverter);
-        cbRegimeUserEdit.setConverter(userConverter);
+        if (cbRepasUser != null) cbRepasUser.setConverter(userConverter);
+        if (cbRepasUserEdit != null) cbRepasUserEdit.setConverter(userConverter);
+        if (cbRegimeUser != null) cbRegimeUser.setConverter(userConverter);
+        if (cbRegimeUserEdit != null) cbRegimeUserEdit.setConverter(userConverter);
 
         StringConverter<RegimeAlimentaire> regimeConverter = new StringConverter<>() {
             @Override public String toString(RegimeAlimentaire regime) { return regime == null ? "" : regime.getDisplayLabel(); }
             @Override public RegimeAlimentaire fromString(String string) { return null; }
         };
-        cbRepasRegime.setConverter(regimeConverter);
-        cbRepasRegimeEdit.setConverter(regimeConverter);
+        if (cbRepasRegime != null) cbRepasRegime.setConverter(regimeConverter);
+        if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setConverter(regimeConverter);
+    }
+
+    private void initialiserCalculsRegimeAutomatiques() {
+        configurerCalculAutomatiqueRegime(tfRegimeTaille, tfRegimePoids, tfRegimeAge, tfRegimeBmi, cbRegimeTypeSante, tfRegimeCaloriesCibles, taRegimeRepasAdequats);
+        configurerCalculAutomatiqueRegime(tfRegimeTailleEdit, tfRegimePoidsEdit, tfRegimeAgeEdit, tfRegimeBmiEdit, cbRegimeTypeSanteEdit, tfRegimeCaloriesCiblesEdit, taRegimeRepasAdequatsEdit);
+    }
+
+    private void initialiserValidationRepas() {
+        configurerValidationRepas(tfRepasNom, taRepasDescription, tfRepasProteines, tfRepasGlucides, tfRepasLipides, tfRepasCalories);
+        configurerValidationRepas(tfRepasNomEdit, taRepasDescriptionEdit, tfRepasProteinesEdit, tfRepasGlucidesEdit, tfRepasLipidesEdit, tfRepasCaloriesEdit);
+    }
+
+    private void configurerValidationRepas(TextField nomField, TextArea descField, TextField protField, TextField glucField, TextField lipField, TextField calField) {
+        if (nomField == null || descField == null || protField == null || glucField == null || lipField == null || calField == null) return;
+        
+        calField.setEditable(false); // Calcul automatique, donc on l'empeche d'editer manuellement
+
+        nomField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() < 5) {
+                nomField.setStyle("-fx-border-color: #bb2d22; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-font-weight: 900;");
+            } else {
+                nomField.setStyle("-fx-border-color: #168163; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-font-weight: 900;");
+            }
+        });
+
+        descField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() < 10) {
+                descField.setStyle("-fx-border-color: #bb2d22; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-font-weight: 900;");
+            } else {
+                descField.setStyle("-fx-border-color: #168163; -fx-border-width: 2px; -fx-border-radius: 8px; -fx-font-weight: 900;");
+            }
+        });
+
+        Runnable calculCalories = () -> {
+            try {
+                int prot = protField.getText().isEmpty() ? 0 : Integer.parseInt(protField.getText());
+                int gluc = glucField.getText().isEmpty() ? 0 : Integer.parseInt(glucField.getText());
+                int lip = lipField.getText().isEmpty() ? 0 : Integer.parseInt(lipField.getText());
+                int total = (prot * 4) + (gluc * 4) + (lip * 9);
+                calField.setText(String.valueOf(total));
+            } catch (NumberFormatException ignored) { }
+        };
+
+        protField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                protField.setText(newValue.replaceAll("[^\\d]", ""));
+            } else {
+                calculCalories.run();
+                protField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
+            }
+        });
+
+        glucField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                glucField.setText(newValue.replaceAll("[^\\d]", ""));
+            } else {
+                calculCalories.run();
+                glucField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
+            }
+        });
+
+        lipField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                lipField.setText(newValue.replaceAll("[^\\d]", ""));
+            } else {
+                calculCalories.run();
+                lipField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
+            }
+        });
+    }
+
+    private void configurerCalculAutomatiqueRegime(TextField tailleField,
+                                                   TextField poidsField,
+                                                   TextField ageField,
+                                                   TextField bmiField,
+                                                   ComboBox<String> typeField,
+                                                   TextField caloriesField,
+                                                   TextArea repasField) {
+        if (tailleField == null || poidsField == null || ageField == null || bmiField == null || typeField == null || caloriesField == null || repasField == null) {
+            return;
+        }
+        Runnable refresh = () -> mettreAJourCalculRegime(tailleField, poidsField, ageField, bmiField, typeField, caloriesField, repasField);
+        tailleField.textProperty().addListener((observable, oldValue, newValue) -> refresh.run());
+        poidsField.textProperty().addListener((observable, oldValue, newValue) -> refresh.run());
+        ageField.textProperty().addListener((observable, oldValue, newValue) -> refresh.run());
+    }
+
+    private void mettreAJourCalculRegime(TextField tailleField,
+                                         TextField poidsField,
+                                         TextField ageField,
+                                         TextField bmiField,
+                                         ComboBox<String> typeField,
+                                         TextField caloriesField,
+                                         TextArea repasField) {
+        Double taille = parseDoubleSafe(tailleField.getText());
+        Double poids = parseDoubleSafe(poidsField.getText());
+        Integer age = parseIntegerSafe(ageField.getText());
+        if (taille == null || poids == null || taille <= 0 || poids <= 0) {
+            bmiField.clear();
+            if (caloriesField != null) {
+                caloriesField.clear();
+            }
+            if (repasField != null && (repasField.getText() == null || repasField.getText().isBlank())) {
+                repasField.clear();
+            }
+            return;
+        }
+
+        double bmi = poids / Math.pow(taille / 100.0, 2);
+        String typeSante = determinerTypeSanteAutomatique(bmi);
+        int calories = calculerCaloriesCibles(poids, age, bmi);
+
+        bmiField.setText(String.format(Locale.US, "%.1f", bmi));
+        typeField.setValue(typeSante);
+        caloriesField.setText(String.valueOf(calories));
+        repasField.setText(genererRepasAdequats(typeSante, age));
+    }
+
+    private void initialiserInteractionsRepasRegime() {
+        if (cbRepasUser != null) {
+            cbRepasUser.valueProperty().addListener((observable, oldValue, newValue) -> {
+                filtrerRegimesPourUtilisateur(newValue, cbRepasRegime);
+                actualiserContexteRepasSelectionne(false);
+            });
+        }
+        if (cbRepasUserEdit != null) {
+            cbRepasUserEdit.valueProperty().addListener((observable, oldValue, newValue) -> {
+                filtrerRegimesPourUtilisateur(newValue, cbRepasRegimeEdit);
+                actualiserContexteRepasSelectionne(true);
+            });
+        }
+        if (cbRepasRegime != null) {
+            cbRepasRegime.valueProperty().addListener((observable, oldValue, newValue) -> actualiserContexteRepasSelectionne(false));
+        }
+        if (cbRepasRegimeEdit != null) {
+            cbRepasRegimeEdit.valueProperty().addListener((observable, oldValue, newValue) -> actualiserContexteRepasSelectionne(true));
+        }
+    }
+
+    private void filtrerRegimesPourUtilisateur(User user, ComboBox<RegimeAlimentaire> comboBox) {
+        if (comboBox == null) {
+            return;
+        }
+        Integer currentRegimeId = comboBox.getValue() == null ? null : comboBox.getValue().getId();
+        List<RegimeAlimentaire> filtered = allRegimes.stream()
+                .filter(regime -> user == null || (regime.getUserId() != null && regime.getUserId() == user.getId()))
+                .toList();
+        comboBox.setItems(FXCollections.observableArrayList(filtered));
+        if (currentRegimeId != null) {
+            selectionnerRegime(comboBox, currentRegimeId);
+        }
+        if (comboBox.getValue() == null && !filtered.isEmpty()) {
+            comboBox.setValue(filtered.get(0));
+        }
+    }
+
+    private void appliquerSelectionsFrontParDefaut() {
+        User referenceUser = determinerUtilisateurReference();
+        if (referenceUser != null) {
+            if (cbRegimeUser != null && cbRegimeUser.getValue() == null) {
+                cbRegimeUser.setValue(referenceUser);
+            }
+            if (cbRepasUser != null && cbRepasUser.getValue() == null) {
+                cbRepasUser.setValue(referenceUser);
+            }
+        }
+        if (dpDateRepas != null && dpDateRepas.getValue() == null) {
+            dpDateRepas.setValue(LocalDate.now());
+        }
+        if (cbTypeRepas != null && cbTypeRepas.getValue() == null) {
+            cbTypeRepas.setValue(TYPE_PETIT_DEJEUNER);
+        }
     }
 
     private void initialiserExplorateurRepas() {
@@ -532,6 +873,126 @@ public class MainController {
         });
         tableRegimesDelete.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
                 lblRegimeSelectionDelete.setText(newValue == null ? "Aucun regime selectionne" : "Regime selectionne: #" + newValue.getId()));
+    }
+
+    private void actualiserDashboardPlanner() {
+        User referenceUser = determinerUtilisateurReference();
+        RegimeAlimentaire activeRegime = determinerRegimeReference(referenceUser);
+        List<Repas> repasDuJour = filtrerRepasDuJour(referenceUser);
+        List<Repas> repasAffiches = repasDuJour.isEmpty() ? derniersRepas(referenceUser, 3) : repasDuJour.stream().limit(3).toList();
+
+        if (lblHeaderUser != null) {
+            lblHeaderUser.setText(referenceUser == null ? "Nutrition profile" : valeurOuDefaut(referenceUser.getEmail(), "Nutrition profile"));
+        }
+        if (lblPlannerWelcome != null) {
+            lblPlannerWelcome.setText(referenceUser == null
+                    ? "Creez un regime puis reliez vos repas pour lancer le suivi nutritionnel."
+                    : "Page personnalisee pour " + valeurOuDefaut(referenceUser.getEmail(), "cet utilisateur") + ". Creez votre regime, ajoutez vos repas et suivez vos macros du jour.");
+        }
+
+        if (activeRegime == null) {
+            setTextIfPresent(lblPlannerHealthBadge, "No regime");
+            setTextIfPresent(lblPlannerRegimeTitle, "Aucun regime actif pour le moment.");
+            setTextIfPresent(lblPlannerRegimeSubtitle, "Creez un regime pour obtenir un lien logique avec les repas.");
+            setTextIfPresent(lblPlannerTargetCalories, "--");
+            setTextIfPresent(lblPlannerBmi, "--");
+            setTextIfPresent(lblPlannerMealsHint, "--");
+            setTextIfPresent(lblPlannerRecommendedMeals, "Aucune recommandation disponible tant qu'aucun regime n'est cree.");
+            setTextIfPresent(lblPlannerGoalTitle, "Ajoutez un regime et des repas pour demarrer.");
+            setTextIfPresent(lblPlannerGoalBody, "Le planner calculera ensuite automatiquement les calories, macros et recommandations.");
+            setTextIfPresent(lblPlannerGoalHint, "Associez les repas au meme utilisateur pour conserver une progression coherente.");
+            setTextIfPresent(lblRepasContextTitle, "Aucun regime actif selectionne.");
+            setTextIfPresent(lblRepasContextBody, "Choisissez un utilisateur puis un regime pour mieux guider les repas.");
+            setTextIfPresent(lblRepasContextTarget, "Ajoutez un regime pour activer le contexte nutritionnel.");
+            mettreAJourProgression("0 / 0 kcal", 0, pbPlannerCalories, lblPlannerCaloriesProgress);
+            mettreAJourProgression("0 / 0 g", 0, pbPlannerProteines, lblPlannerProteinesProgress);
+            mettreAJourProgression("0 / 0 g", 0, pbPlannerGlucides, lblPlannerGlucidesProgress);
+            mettreAJourProgression("0 / 0 g", 0, pbPlannerLipides, lblPlannerLipidesProgress);
+        } else {
+            int caloriesTarget = activeRegime.getCaloriesCibles() == null ? 2000 : activeRegime.getCaloriesCibles();
+            int proteinesTarget = Math.max(1, (int) Math.round(caloriesTarget * 0.30 / 4.0));
+            int glucidesTarget = Math.max(1, (int) Math.round(caloriesTarget * 0.45 / 4.0));
+            int lipidesTarget = Math.max(1, (int) Math.round(caloriesTarget * 0.25 / 9.0));
+
+            int totalCalories = sommeRepas(repasDuJour, Repas::getCalories);
+            int totalProteines = sommeRepas(repasDuJour, Repas::getProteines);
+            int totalGlucides = sommeRepas(repasDuJour, Repas::getGlucides);
+            int totalLipides = sommeRepas(repasDuJour, Repas::getLipides);
+            int remainingCalories = caloriesTarget - totalCalories;
+
+            setTextIfPresent(lblPlannerHealthBadge, humaniserTypeSante(activeRegime.getTypeSante()));
+            setTextIfPresent(lblPlannerRegimeTitle, "Regime #" + activeRegime.getId() + " pour " + valeurOuDefaut(activeRegime.getUserEmail(), "utilisateur"));
+            setTextIfPresent(lblPlannerRegimeSubtitle, "Le resume du jour utilise ce regime comme reference pour relier objectifs, calories et repas.");
+            setTextIfPresent(lblPlannerTargetCalories, caloriesTarget + " kcal");
+            setTextIfPresent(lblPlannerBmi, activeRegime.getBmi() == null ? "--" : String.format(Locale.US, "%.1f", activeRegime.getBmi()));
+            setTextIfPresent(lblPlannerMealsHint, compterElementsRepas(activeRegime.getRepasAdequats()) + " idees");
+            setTextIfPresent(lblPlannerRecommendedMeals, valeurOuDefaut(activeRegime.getRepasAdequats(), "Aucune suggestion enregistree."));
+            setTextIfPresent(lblPlannerGoalTitle, remainingCalories > 0 ? "Il reste " + remainingCalories + " kcal pour atteindre l'objectif." : "Objectif calories atteint aujourd'hui.");
+            setTextIfPresent(lblPlannerGoalBody, repasDuJour.isEmpty()
+                    ? "Aucun repas du jour n'est encore associe a ce regime."
+                    : repasDuJour.size() + " repas du jour sont deja relies a ce regime.");
+            setTextIfPresent(lblPlannerGoalHint, "Regime actif: " + humaniserTypeSante(activeRegime.getTypeSante()) + " | Repas adequats: " + valeurOuDefaut(activeRegime.getRepasAdequats(), "--"));
+            setTextIfPresent(lblRepasContextTitle, "Regime actif #" + activeRegime.getId() + " - " + humaniserTypeSante(activeRegime.getTypeSante()));
+            setTextIfPresent(lblRepasContextBody, "Les repas de " + valeurOuDefaut(activeRegime.getUserEmail(), "cet utilisateur") + " peuvent maintenant etre relies au bon objectif nutritionnel.");
+            setTextIfPresent(lblRepasContextTarget, "Objectif du jour: " + caloriesTarget + " kcal | Recommandations: " + valeurOuDefaut(activeRegime.getRepasAdequats(), "--"));
+            mettreAJourProgression(totalCalories + " / " + caloriesTarget + " kcal", ratio(totalCalories, caloriesTarget), pbPlannerCalories, lblPlannerCaloriesProgress);
+            mettreAJourProgression(totalProteines + " / " + proteinesTarget + " g", ratio(totalProteines, proteinesTarget), pbPlannerProteines, lblPlannerProteinesProgress);
+            mettreAJourProgression(totalGlucides + " / " + glucidesTarget + " g", ratio(totalGlucides, glucidesTarget), pbPlannerGlucides, lblPlannerGlucidesProgress);
+            mettreAJourProgression(totalLipides + " / " + lipidesTarget + " g", ratio(totalLipides, lipidesTarget), pbPlannerLipides, lblPlannerLipidesProgress);
+        }
+
+        if (lblPlannerMealsSubtitle != null) {
+            lblPlannerMealsSubtitle.setText(repasDuJour.isEmpty()
+                    ? "Aucun repas n'a encore ete enregistre aujourd'hui. Voici les derniers repas disponibles."
+                    : repasDuJour.size() + " repas relies au planner pour aujourd'hui.");
+        }
+        if (lblPlannerRegimesSubtitle != null) {
+            lblPlannerRegimesSubtitle.setText(allRegimes.isEmpty()
+                    ? "Aucun regime enregistre pour le moment."
+                    : allRegimes.size() + " regimes disponibles dans le planner.");
+        }
+        if (plannerMealsListBox != null) {
+            plannerMealsListBox.getChildren().setAll(repasAffiches.isEmpty()
+                    ? List.of(creerMessagePlanner("Aucun repas disponible pour le moment."))
+                    : repasAffiches.stream().map(this::creerCarteMiniRepas).toList());
+        }
+
+        if (tileRegimeCards != null) {
+            tileRegimeCards.getChildren().setAll(allRegimes.stream().map(this::creerCarteRegime).toList());
+        }
+        
+        if (lblRegimeExploreCount != null) {
+            lblRegimeExploreCount.setText(allRegimes.size() + " régimes trouvés");
+        }
+        
+        if (tileRegimeExploreCards != null) {
+            tileRegimeExploreCards.getChildren().setAll(allRegimes.stream().map(this::creerCarteRegime).toList());
+        }
+    }
+
+    private void actualiserContexteRepasSelectionne(boolean editMode) {
+        Label label = editMode ? lblRepasRegimeContextEdit : lblRepasRegimeContext;
+        ComboBox<User> userCombo = editMode ? cbRepasUserEdit : cbRepasUser;
+        ComboBox<RegimeAlimentaire> regimeCombo = editMode ? cbRepasRegimeEdit : cbRepasRegime;
+        if (label == null) {
+            return;
+        }
+        User user = userCombo == null ? null : userCombo.getValue();
+        RegimeAlimentaire regime = regimeCombo == null ? null : regimeCombo.getValue();
+        if (regime != null) {
+            label.setText("Regime #" + regime.getId() + " | " + humaniserTypeSante(regime.getTypeSante())
+                    + " | " + (regime.getCaloriesCibles() == null ? 0 : regime.getCaloriesCibles()) + " kcal | "
+                    + valeurOuDefaut(regime.getRepasAdequats(), "Aucune suggestion"));
+            return;
+        }
+        if (user != null) {
+            long count = allRegimes.stream().filter(item -> item.getUserId() != null && item.getUserId() == user.getId()).count();
+            label.setText(count == 0
+                    ? "Aucun regime n'est disponible pour cet utilisateur. Creez d'abord un regime."
+                    : count + " regime(s) disponible(s) pour cet utilisateur. Selectionnez-en un pour relier le repas au planner.");
+            return;
+        }
+        label.setText("Selectionnez un utilisateur puis un regime pour afficher le contexte nutritionnel.");
     }
 
     private void restaurerSelectionRepasEdit(List<Repas> repas) {
@@ -651,6 +1112,199 @@ public class MainController {
         }
     }
 
+    private User determinerUtilisateurReference() {
+        Integer userId = allRegimes.stream()
+                .map(RegimeAlimentaire::getUserId)
+                .filter(java.util.Objects::nonNull)
+                .findFirst()
+                .orElseGet(() -> allRepas.stream()
+                        .map(Repas::getUserId)
+                        .filter(java.util.Objects::nonNull)
+                        .findFirst()
+                        .orElse(null));
+        if (userId == null) {
+            return allUsers.isEmpty() ? null : allUsers.get(0);
+        }
+        return allUsers.stream()
+                .filter(user -> user.getId() == userId)
+                .findFirst()
+                .orElse(allUsers.isEmpty() ? null : allUsers.get(0));
+    }
+
+    private RegimeAlimentaire determinerRegimeReference(User user) {
+        return allRegimes.stream()
+                .filter(regime -> user == null || (regime.getUserId() != null && regime.getUserId() == user.getId()))
+                .findFirst()
+                .orElse(allRegimes.isEmpty() ? null : allRegimes.get(0));
+    }
+
+    private List<Repas> filtrerRepasDuJour(User user) {
+        LocalDate today = LocalDate.now();
+        return allRepas.stream()
+                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
+                .filter(repas -> repas.getDateRepas() != null && repas.getDateRepas().toLocalDate().equals(today))
+                .toList();
+    }
+
+    private List<Repas> derniersRepas(User user, int limit) {
+        return allRepas.stream()
+                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
+                .limit(limit)
+                .toList();
+    }
+
+    private int sommeRepas(List<Repas> repas, Function<Repas, Integer> extractor) {
+        return repas.stream()
+                .map(extractor)
+                .filter(java.util.Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .sum();
+    }
+
+    private String determinerTypeSanteAutomatique(double bmi) {
+        if (bmi < 18.5) {
+            return "sous_poids";
+        }
+        if (bmi < 25) {
+            return "normal";
+        }
+        if (bmi < 30) {
+            return "surpoids";
+        }
+        return "obesite";
+    }
+
+    private int calculerCaloriesCibles(double poids, Integer age, double bmi) {
+        int calories = (int) Math.round(poids * 30);
+        if (bmi < 18.5) {
+            calories += 250;
+        } else if (bmi >= 30) {
+            calories -= 350;
+        } else if (bmi >= 25) {
+            calories -= 200;
+        }
+        if (age != null && age > 45) {
+            calories -= 80;
+        }
+        return Math.max(calories, 1200);
+    }
+
+    private String genererRepasAdequats(String typeSante, Integer age) {
+        String base = switch (typeSante == null ? "" : typeSante) {
+            case "sous_poids" -> "Petit dejeuner complet; collation proteinee; dejeuner riche en glucides complexes; diner equilibre";
+            case "surpoids" -> "Petit dejeuner riche en fibres; dejeuner leger; diner pauvre en sucres; collation fruit";
+            case "obesite" -> "Petit dejeuner controle; legumes et proteines maigres; diner tres leger; collation yaourt nature";
+            default -> "Petit dejeuner equilibre; dejeuner complet; collation saine; diner leger";
+        };
+        if (age != null && age >= 45) {
+            return base + "; hydratation et fibres renforcees";
+        }
+        return base;
+    }
+
+    private String humaniserTypeSante(String value) {
+        if (value == null || value.isBlank()) {
+            return "Non defini";
+        }
+        String normalized = value.replace('_', ' ');
+        return normalized.substring(0, 1).toUpperCase(Locale.ROOT) + normalized.substring(1);
+    }
+
+    private int compterElementsRepas(String value) {
+        if (value == null || value.isBlank()) {
+            return 0;
+        }
+        return (int) java.util.Arrays.stream(value.split("[,;\\n]"))
+                .map(String::trim)
+                .filter(item -> !item.isBlank())
+                .count();
+    }
+
+    private double ratio(int value, int target) {
+        if (target <= 0) {
+            return 0;
+        }
+        return Math.min(1.0, value / (double) target);
+    }
+
+    private void mettreAJourProgression(String text, double progress, ProgressBar bar, Label label) {
+        if (bar != null) {
+            bar.setProgress(progress);
+        }
+        setTextIfPresent(label, text);
+    }
+
+    private void setTextIfPresent(Label label, String value) {
+        if (label != null) {
+            label.setText(value);
+        }
+    }
+
+    private VBox creerCarteMiniRepas(Repas repas) {
+        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Repas sans nom"));
+        title.getStyleClass().add("planner-meal-title");
+
+        Label meta = new Label(libelleBadgeTypeRepas(repas.getTypeRepas()) + " | " + valeurOuDefaut(repas.getDateDisplay(), "--"));
+        meta.getStyleClass().add("planner-meal-meta");
+
+        Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
+        calories.getStyleClass().add("planner-meal-kcal");
+
+        // Barre de calories "remplie jusqu'au complet" (as requested)
+        ProgressBar pb = new ProgressBar(1.0);
+        pb.setMaxWidth(Double.MAX_VALUE);
+        pb.setPrefHeight(6);
+        pb.setStyle("-fx-accent: #0c3f44;"); // matching brand color
+        
+        VBox box = new VBox(6, title, meta, calories, pb);
+        box.getStyleClass().add("planner-meal-card");
+        return box;
+    }
+
+    private VBox creerCarteRegime(RegimeAlimentaire regime) {
+        Label title = new Label("Regime #" + regime.getId());
+        title.getStyleClass().add("planner-meal-title");
+
+        Label type = new Label(humaniserTypeSante(regime.getTypeSante()));
+        type.getStyleClass().add("planner-meal-meta");
+        type.setStyle("-fx-font-weight: bold; -fx-text-fill: #0c3f44;");
+
+        Label metrics = new Label(String.format(Locale.US, "BMI: %.1f | %d kcal", 
+            regime.getBmi() == null ? 0 : regime.getBmi(), 
+            regime.getCaloriesCibles() == null ? 0 : regime.getCaloriesCibles()));
+        metrics.getStyleClass().add("planner-meal-meta");
+
+        Label details = new Label(valeurOuDefaut(regime.getRepasAdequats(), "Aucune recommendation"));
+        details.getStyleClass().add("planner-meal-meta");
+        details.setWrapText(true);
+        details.setMaxWidth(300);
+
+        HBox actions = new HBox(8);
+        actions.setAlignment(Pos.CENTER_RIGHT);
+        Button editBtn = new Button("Modifier");
+        editBtn.getStyleClass().add("navbar-btn-green");
+        editBtn.setStyle("-fx-font-size: 10px; -fx-padding: 4 8;");
+        editBtn.setOnAction(e -> {
+            tfRegimeId.setText(String.valueOf(regime.getId()));
+            remplirFormulaireRegime(regime);
+            afficherVue(paneRegimeEdit, paneRegimeCreate, paneRegimeEdit, paneRegimeDelete, paneRegimeExplore);
+        });
+        actions.getChildren().add(editBtn);
+
+        VBox box = new VBox(8, title, type, metrics, details, actions);
+        box.getStyleClass().add("planner-meal-card");
+        box.setStyle("-fx-background-color: white; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12;");
+        return box;
+    }
+
+    private VBox creerMessagePlanner(String text) {
+        Label label = new Label(text);
+        label.getStyleClass().add("planner-meal-meta");
+        VBox box = new VBox(label);
+        box.getStyleClass().add("planner-meal-card");
+        return box;
+    }
+
     @FXML
     private void afficherStatistiquesRepas() {
         if (repasExplorerView.isEmpty()) {
@@ -717,6 +1371,8 @@ public class MainController {
                 .sorted(comparateurRepas(sortValue))
                 .toList();
 
+        if (tileRepasCards == null) return;
+        
         tileRepasCards.getChildren().setAll(repasExplorerView.stream()
                 .map(this::creerCarteRepas)
                 .toList());
@@ -730,6 +1386,64 @@ public class MainController {
             btnRepasStatistics.setDisable(empty);
         }
         mettreAJourCompteurRepas();
+    }
+
+    private VBox creerCarteSelectionRepas(Repas repas) {
+        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Sans nom"));
+        title.getStyleClass().add("repas-card-title");
+        title.setStyle("-fx-font-size: 16px; -fx-text-fill: #1e293b;");
+
+        Label type = new Label(libelleBadgeTypeRepas(repas.getTypeRepas()));
+        type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
+        type.setStyle("-fx-font-size: 10px; -fx-padding: 3 8;");
+
+        HBox header = new HBox(8, title, new Region(), type);
+        HBox.setHgrow(header.getChildren().get(1), Priority.ALWAYS);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label kcal = new Label("🔥 " + toMetricValue(repas.getCalories(), "kcal"));
+        kcal.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #0c3f44;");
+
+        HBox macros = new HBox(6);
+        macros.getChildren().addAll(
+            creerPill("P " + toText(repas.getProteines()) + "g", "#eef2ff", "#4338ca"),
+            creerPill("C " + toText(repas.getGlucides()) + "g", "#f0fdf4", "#15803d"),
+            creerPill("F " + toText(repas.getLipides()) + "g", "#fff7ed", "#c2410c")
+        );
+
+        User refUser = determinerUtilisateurReference();
+        RegimeAlimentaire activeRegime = determinerRegimeReference(refUser);
+        int target = activeRegime != null && activeRegime.getCaloriesCibles() != null ? activeRegime.getCaloriesCibles() : 2000;
+        
+        Label impactLabel = new Label("📈 Impact sur la journée");
+        impactLabel.setStyle("-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #1e293b;");
+        
+        ProgressBar pb = new ProgressBar(ratio(repas.getCalories() != null ? repas.getCalories() : 0, target));
+        pb.setMaxWidth(Double.MAX_VALUE);
+        pb.setPrefHeight(6);
+        pb.getStyleClass().add("impact-pb");
+        pb.setStyle("-fx-accent: #0c3f44;");
+
+        Label impactInfo = new Label(toText(repas.getCalories()) + " / " + target + " kcal");
+        impactInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b;");
+
+        Button addBtn = new Button("Ajouter ce repas");
+        addBtn.setMaxWidth(Double.MAX_VALUE);
+        addBtn.getStyleClass().add("primary-button");
+        addBtn.setStyle("-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8;");
+        addBtn.setOnAction(e -> clonerRepasPourAujourdhui(repas));
+
+        VBox card = new VBox(12, header, kcal, macros, new VBox(4, impactLabel, pb, impactInfo), addBtn);
+        card.getStyleClass().add("selection-repas-card");
+        card.setStyle("-fx-background-color: white; -fx-padding: 16; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 2);");
+        card.setPrefWidth(210);
+        return card;
+    }
+
+    private Label creerPill(String text, String bg, String fg) {
+        Label l = new Label(text);
+        l.setStyle("-fx-background-color: " + bg + "; -fx-text-fill: " + fg + "; -fx-padding: 2 6; -fx-background-radius: 6; -fx-font-size: 10px; -fx-font-weight: bold;");
+        return l;
     }
 
     private void actualiserModificationRepas() {
@@ -1299,9 +2013,25 @@ public class MainController {
         return Integer.parseInt(value.trim());
     }
 
+    private Integer parseIntegerSafe(String value) {
+        try {
+            return parseInteger(value);
+        } catch (NumberFormatException exception) {
+            return null;
+        }
+    }
+
     private Double parseDouble(String value) {
         if (value == null || value.isBlank()) return null;
         return Double.parseDouble(value.trim().replace(",", "."));
+    }
+
+    private Double parseDoubleSafe(String value) {
+        try {
+            return parseDouble(value);
+        } catch (NumberFormatException exception) {
+            return null;
+        }
     }
 
     private String toText(Object value) {
@@ -1319,6 +2049,10 @@ public class MainController {
     }
 
     private void afficherVue(VBox vueActive, VBox... vues) {
+        if (vueActive != null) {
+            vueActive.setVisible(true);
+            vueActive.setManaged(true);
+        }
         for (VBox vue : vues) {
             boolean active = vue == vueActive;
             vue.setVisible(active);
@@ -1328,11 +2062,16 @@ public class MainController {
 
     private void activerBoutonModule(Button boutonActif, Button... autres) {
         setStyleFlag(boutonActif, "sidebar-nav-button-active", true);
+        setStyleFlag(boutonActif, "planner-nav-button-active", true);
         for (Button button : autres) setStyleFlag(button, "sidebar-nav-button-active", false);
+        for (Button button : autres) setStyleFlag(button, "planner-nav-button-active", false);
     }
 
     private void activerBoutonAction(Button boutonActif, Button... boutons) {
-        // Keep option cards visually identical; switching only changes the visible panel.
+        for (Button button : boutons) {
+            setStyleFlag(button, "action-card-active", button == boutonActif);
+            setStyleFlag(button, "planner-switch-button-active", button == boutonActif);
+        }
     }
 
     private void setStyleFlag(Button button, String styleClass, boolean active) {

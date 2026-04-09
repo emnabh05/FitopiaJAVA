@@ -15,7 +15,7 @@
 
 /* SIDEBAR */
 .back-sidebar {
-    -fx-background-color: linear-gradient(to bottom, #0b4b4a, #0e6158);
+    -fx-background-color: #0F4C45;
     -fx-background-radius: 0 28 28 0;
     -fx-pref-width: 326;
     -fx-padding: 28 22 30 22;
@@ -57,8 +57,8 @@
 }
 
 .back-user-card {
-    -fx-background-color: rgba(255,255,255,0.16);
-    -fx-background-radius: 18;
+    -fx-background-color: #37655E;
+    -fx-background-radius: 14;
     -fx-padding: 14 16 14 16;
     -fx-alignment: center-left;
 }
@@ -115,25 +115,28 @@
 }
 
 .back-sidebar-section-button {
-    -fx-background-color: rgba(255,255,255,0.20);
-    -fx-padding: 18 18 18 18;
+    -fx-background-color: #37655E;
+    -fx-background-radius: 14;
+    -fx-padding: 14 16 14 16;
     -fx-font-size: 16px;
-    -fx-min-height: 62;
+    -fx-font-weight: 800;
+    -fx-min-height: 54;
 }
 
 .back-menu-link {
-    -fx-padding: 8 12 8 12;
-    -fx-font-size: 14px;
+    -fx-padding: 12 16 12 16;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
 }
 
 .back-menu-featured {
-    -fx-padding: 16 16 16 16;
-    -fx-min-height: 74;
+    -fx-padding: 12 16 12 16;
+    -fx-min-height: 50;
 }
 
 .sidebar-nav-button-active {
-    -fx-background-color: rgba(142, 191, 184, 0.36);
-    -fx-effect: dropshadow(gaussian, rgba(5, 30, 31, 0.18), 12, 0.12, 0, 2);
+    -fx-background-color: #37655E;
+    -fx-background-radius: 14;
 }
 
 .back-sidebar-footer {
@@ -144,7 +147,7 @@
 .back-logout-button {
     -fx-background-color: white;
     -fx-background-radius: 14;
-    -fx-text-fill: #133642;
+    -fx-text-fill: #0F4C45;
     -fx-font-size: 15px;
     -fx-font-weight: 900;
     -fx-padding: 14 20;
@@ -159,7 +162,7 @@
 }
 
 .back-logout-icon {
-    -fx-text-fill: #133642;
+    -fx-text-fill: #0F4C45;
     -fx-font-size: 15px;
     -fx-font-weight: 900;
 }
@@ -244,7 +247,7 @@
 
 .back-panel-title {
     -fx-text-fill: #172033;
-    -fx-font-size: 22px;
+    -fx-font-size: 24px;
     -fx-font-weight: 900;
 }
 
@@ -325,7 +328,7 @@
 .back-field-label {
     -fx-text-fill: #182033;
     -fx-font-size: 14px;
-    -fx-font-weight: 800;
+    -fx-font-weight: 900;
 }
 
 .back-field-label-red {
@@ -348,7 +351,7 @@
     -fx-border-width: 1;
     -fx-min-height: 50;
     -fx-font-size: 14px;
-    -fx-font-weight: 600;
+    -fx-font-weight: 900;
     -fx-text-fill: #1f2937;
     -fx-prompt-text-fill: #a0acb8;
     -fx-padding: 0 14;
@@ -370,7 +373,7 @@
     -fx-border-radius: 14;
     -fx-border-width: 1;
     -fx-font-size: 14px;
-    -fx-font-weight: 600;
+    -fx-font-weight: 900;
     -fx-text-fill: #1f2937;
     -fx-prompt-text-fill: #a0acb8;
     -fx-padding: 10 14;
@@ -453,7 +456,7 @@
 .field-label {
     -fx-text-fill: #182033;
     -fx-font-size: 14px;
-    -fx-font-weight: 800;
+    -fx-font-weight: 900;
 }
 
 .hint-label {
