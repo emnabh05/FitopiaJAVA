@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/22"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            style="-fx-background: #E9FBF3; -fx-background-color: #E9FBF3;">
+    <content>
+        <VBox prefWidth="1280.0"
+              spacing="26.0"
+              style="-fx-background-color: linear-gradient(to bottom right, #F7FFFB, #E5FBF3);">
+            <padding>
+                <Insets top="34.0" right="34.0" bottom="40.0" left="34.0"/>
+            </padding>
+            <children>
+                <VBox spacing="20.0"
+                      style="-fx-background-color: linear-gradient(to right, #0D3141, #1B7A61); -fx-background-radius: 34; -fx-effect: dropshadow(gaussian, rgba(5, 40, 34, 0.22), 26, 0.24, 0, 14);">
+                    <padding>
+                        <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
+                    </padding>
+
+                    <children>
+                        <HBox spacing="12.0" alignment="CENTER_RIGHT">
+                            <children>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="My Progress"
+                                        prefHeight="42.0"
+                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                <Button text="Ranking"
+                                        prefHeight="42.0"
+                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                <Button text="Cart"
+                                        prefHeight="42.0"
+                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                <Button text="Checkout"
+                                        prefHeight="42.0"
+                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="26.0" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="16.0" prefWidth="760.0">
+                                    <children>
+                                        <Label text="SUPPLEMENTS STORE"
+                                               style="-fx-text-fill: rgba(255,255,255,0.74); -fx-font-size: 14px; -fx-font-weight: 800; -fx-letter-spacing: 2px;"/>
+                                        <Label text="FUEL YOUR NEXT LEVEL"
+                                               wrapText="true"
+                                               style="-fx-text-fill: white; -fx-font-size: 52px; -fx-font-weight: 900;"/>
+                                        <Label text="Science-backed formulas curated for energy, recovery, strength, and everyday performance."
+                                               wrapText="true"
+                                               maxWidth="650.0"
+                                               style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 19px; -fx-line-spacing: 4px;"/>
+                                        <HBox spacing="14.0" alignment="CENTER_LEFT">
+                                            <children>
+                                                <Button text="Explore Supplements"
+                                                        prefWidth="240.0"
+                                                        prefHeight="48.0"
+                                                        style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 16; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 800;"/>
+                                                <Label text="86 curated products ready to display"
+                                                       style="-fx-text-fill: rgba(255,255,255,0.78); -fx-font-size: 15px; -fx-font-weight: 600;"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <StackPane prefWidth="360.0" prefHeight="220.0"
+                                           style="-fx-background-color: rgba(255,255,255,0.10); -fx-background-radius: 26; -fx-border-color: rgba(255,255,255,0.16); -fx-border-radius: 26;">
+                                    <children>
+                                        <VBox spacing="14.0" maxWidth="260.0" alignment="CENTER">
+                                            <children>
+                                                <StackPane prefWidth="116.0" prefHeight="116.0"
+                                                           style="-fx-background-color: linear-gradient(to bottom, #ECF9F3, #D0F3E3); -fx-background-radius: 24;">
+                                                    <children>
+                                                        <Label text="WHEY"
+                                                               style="-fx-text-fill: #0E5B4B; -fx-font-size: 24px; -fx-font-weight: 900;"/>
+                                                    </children>
+                                                </StackPane>
+                                                <Label text="Clean visual placeholder for a featured product packshot."
+                                                       wrapText="true"
+                                                       alignment="CENTER"
+                                                       style="-fx-text-fill: rgba(255,255,255,0.82); -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </StackPane>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="14.0">
+                            <children>
+                                <VBox HBox.hgrow="ALWAYS"
+                                      spacing="8.0"
+                                      prefHeight="88.0"
+                                      style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                    <padding>
+                                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="AVAILABLE PRODUCTS"
+                                               style="-fx-text-fill: rgba(255,255,255,0.70); -fx-font-size: 12px; -fx-font-weight: 800; -fx-letter-spacing: 1px;"/>
+                                        <Label text="86"
+                                               style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox HBox.hgrow="ALWAYS"
+                                      spacing="8.0"
+                                      prefHeight="88.0"
+                                      style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                    <padding>
+                                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="FAST DELIVERY"
+                                               style="-fx-text-fill: rgba(255,255,255,0.70); -fx-font-size: 12px; -fx-font-weight: 800; -fx-letter-spacing: 1px;"/>
+                                        <Label text="From 100 DT"
+                                               style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox HBox.hgrow="ALWAYS"
+                                      spacing="8.0"
+                                      prefHeight="88.0"
+                                      style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                    <padding>
+                                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="CHECKOUT EXPERIENCE"
+                                               style="-fx-text-fill: rgba(255,255,255,0.70); -fx-font-size: 12px; -fx-font-weight: 800; -fx-letter-spacing: 1px;"/>
+                                        <Label text="Secure and fast"
+                                               style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <HBox alignment="CENTER_LEFT"
+                      spacing="18.0"
+                      style="-fx-background-color: rgba(255,255,255,0.88); -fx-background-radius: 22; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-radius: 22;">
+                    <padding>
+                        <Insets top="16.0" right="18.0" bottom="16.0" left="24.0"/>
+                    </padding>
+
+                    <children>
+                        <VBox spacing="4.0">
+                            <children>
+                                <Label text="Showing 86 of 86 products"
+                                       style="-fx-text-fill: #5E7380; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                <Label text="Main catalog area only. Search and left filters intentionally skipped for now."
+                                       style="-fx-text-fill: #8DA0AA; -fx-font-size: 13px;"/>
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <ComboBox prefWidth="220.0"
+                                  promptText="Sort by Name (A-Z)"
+                                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #D4E5DE; -fx-border-radius: 14; -fx-font-size: 14px;"/>
+                    </children>
+                </HBox>
+
+                <FlowPane prefWrapLength="1210.0"
+                          hgap="22.0"
+                          vgap="22.0">
+                    <children>
+                        <VBox prefWidth="272.0"
+                              spacing="16.0"
+                              style="-fx-background-color: white; -fx-background-radius: 26; -fx-border-color: rgba(8, 67, 58, 0.08); -fx-border-radius: 26; -fx-effect: dropshadow(gaussian, rgba(7, 35, 29, 0.12), 22, 0.22, 0, 10);">
+                            <children>
+                                <StackPane prefHeight="214.0"
+                                           style="-fx-background-color: linear-gradient(to bottom right, #A9D7FF, #EAF5FF); -fx-background-radius: 26 26 0 0;">
+                                    <children>
+                                        <Label text="CREATINE VISUAL"
+                                               style="-fx-text-fill: rgba(9, 41, 53, 0.48); -fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                        <Label text="BEST SELLER"
+                                               StackPane.alignment="TOP_RIGHT"
+                                               style="-fx-background-color: #10B981; -fx-background-radius: 999; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 8 12 8 12;">
+                                            <StackPane.margin>
+                                                <Insets top="14.0" right="14.0" bottom="0.0" left="0.0"/>
+                                            </StackPane.margin>
+                                        </Label>
+                                    </children>
+                                </StackPane>
+                                <VBox spacing="10.0">
+                                    <padding>
+                                        <Insets top="0.0" right="18.0" bottom="18.0" left="18.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="MUSCLETECH"
+                                               style="-fx-text-fill: #4E877A; -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                        <Label text="CREATINE"
+                                               style="-fx-text-fill: #123748; -fx-font-size: 31px; -fx-font-weight: 900;"/>
+                                        <Label text="Pure strength support"
+                                               style="-fx-text-fill: #80929C; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                        <Label text="20.00 DT"
+                                               style="-fx-text-fill: #166E5B; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+                                        <HBox spacing="8.0">
+                                            <children>
+                                                <Label text="Trusted formula"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                                <Label text="Fast checkout"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                            </children>
+                                        </HBox>
+                                        <Label text="IN STOCK"
+                                               maxWidth="82.0"
+                                               style="-fx-background-color: #EEF9F1; -fx-background-radius: 999; -fx-text-fill: #1D7E56; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 7 12 7 12;"/>
+                                        <Button text="Quick View"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: transparent; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="View Details"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="ADD TO CART"
+                                                prefHeight="42.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: linear-gradient(to right, #124A4D, #0F6A58); -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 900;"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <VBox prefWidth="272.0"
+                              spacing="16.0"
+                              style="-fx-background-color: white; -fx-background-radius: 26; -fx-border-color: rgba(8, 67, 58, 0.08); -fx-border-radius: 26; -fx-effect: dropshadow(gaussian, rgba(7, 35, 29, 0.12), 22, 0.22, 0, 10);">
+                            <children>
+                                <StackPane prefHeight="214.0"
+                                           style="-fx-background-color: linear-gradient(to bottom right, #D7F3FF, #F4FEFF); -fx-background-radius: 26 26 0 0;">
+                                    <children>
+                                        <Label text="PROTEIN VISUAL"
+                                               style="-fx-text-fill: rgba(9, 41, 53, 0.48); -fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                        <Label text="POPULAR"
+                                               StackPane.alignment="TOP_RIGHT"
+                                               style="-fx-background-color: #0EA5E9; -fx-background-radius: 999; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 8 12 8 12;">
+                                            <StackPane.margin>
+                                                <Insets top="14.0" right="14.0" bottom="0.0" left="0.0"/>
+                                            </StackPane.margin>
+                                        </Label>
+                                    </children>
+                                </StackPane>
+                                <VBox spacing="10.0">
+                                    <padding>
+                                        <Insets top="0.0" right="18.0" bottom="18.0" left="18.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="GSN"
+                                               style="-fx-text-fill: #4E877A; -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                        <Label text="PROTEINE"
+                                               style="-fx-text-fill: #123748; -fx-font-size: 31px; -fx-font-weight: 900;"/>
+                                        <Label text="Lean recovery blend"
+                                               style="-fx-text-fill: #80929C; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                        <Label text="125.00 DT"
+                                               style="-fx-text-fill: #166E5B; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+                                        <HBox spacing="8.0">
+                                            <children>
+                                                <Label text="Daily support"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                                <Label text="High protein"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                            </children>
+                                        </HBox>
+                                        <Label text="IN STOCK"
+                                               maxWidth="82.0"
+                                               style="-fx-background-color: #EEF9F1; -fx-background-radius: 999; -fx-text-fill: #1D7E56; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 7 12 7 12;"/>
+                                        <Button text="Quick View"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: transparent; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="View Details"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="ADD TO CART"
+                                                prefHeight="42.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: linear-gradient(to right, #124A4D, #0F6A58); -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 900;"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <VBox prefWidth="272.0"
+                              spacing="16.0"
+                              style="-fx-background-color: white; -fx-background-radius: 26; -fx-border-color: rgba(8, 67, 58, 0.08); -fx-border-radius: 26; -fx-effect: dropshadow(gaussian, rgba(7, 35, 29, 0.12), 22, 0.22, 0, 10);">
+                            <children>
+                                <StackPane prefHeight="214.0"
+                                           style="-fx-background-color: linear-gradient(to bottom right, #BCE9FF, #E8F6FF); -fx-background-radius: 26 26 0 0;">
+                                    <children>
+                                        <Label text="AMINO VISUAL"
+                                               style="-fx-text-fill: rgba(9, 41, 53, 0.48); -fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                        <Label text="BEST VALUE"
+                                               StackPane.alignment="TOP_RIGHT"
+                                               style="-fx-background-color: #14B8A6; -fx-background-radius: 999; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 8 12 8 12;">
+                                            <StackPane.margin>
+                                                <Insets top="14.0" right="14.0" bottom="0.0" left="0.0"/>
+                                            </StackPane.margin>
+                                        </Label>
+                                    </children>
+                                </StackPane>
+                                <VBox spacing="10.0">
+                                    <padding>
+                                        <Insets top="0.0" right="18.0" bottom="18.0" left="18.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="UNIVERSAL"
+                                               style="-fx-text-fill: #4E877A; -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                        <Label text="100% BEEF AMINOS"
+                                               wrapText="true"
+                                               style="-fx-text-fill: #123748; -fx-font-size: 26px; -fx-font-weight: 900;"/>
+                                        <Label text="Acides amines essential line"
+                                               style="-fx-text-fill: #80929C; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                        <Label text="120.00 DT"
+                                               style="-fx-text-fill: #166E5B; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+                                        <HBox spacing="8.0">
+                                            <children>
+                                                <Label text="Trusted formula"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                                <Label text="Fast checkout"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                            </children>
+                                        </HBox>
+                                        <Label text="IN STOCK"
+                                               maxWidth="82.0"
+                                               style="-fx-background-color: #EEF9F1; -fx-background-radius: 999; -fx-text-fill: #1D7E56; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 7 12 7 12;"/>
+                                        <Button text="Quick View"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: transparent; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="View Details"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="ADD TO CART"
+                                                prefHeight="42.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: linear-gradient(to right, #124A4D, #0F6A58); -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 900;"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+
+                        <VBox prefWidth="272.0"
+                              spacing="16.0"
+                              style="-fx-background-color: white; -fx-background-radius: 26; -fx-border-color: rgba(8, 67, 58, 0.08); -fx-border-radius: 26; -fx-effect: dropshadow(gaussian, rgba(7, 35, 29, 0.12), 22, 0.22, 0, 10);">
+                            <children>
+                                <StackPane prefHeight="214.0"
+                                           style="-fx-background-color: linear-gradient(to bottom right, #C9E6FF, #EEF8FF); -fx-background-radius: 26 26 0 0;">
+                                    <children>
+                                        <Label text="RECOVERY VISUAL"
+                                               style="-fx-text-fill: rgba(9, 41, 53, 0.48); -fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                        <Label text="NEW DROP"
+                                               StackPane.alignment="TOP_RIGHT"
+                                               style="-fx-background-color: #F59E0B; -fx-background-radius: 999; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 8 12 8 12;">
+                                            <StackPane.margin>
+                                                <Insets top="14.0" right="14.0" bottom="0.0" left="0.0"/>
+                                            </StackPane.margin>
+                                        </Label>
+                                    </children>
+                                </StackPane>
+                                <VBox spacing="10.0">
+                                    <padding>
+                                        <Insets top="0.0" right="18.0" bottom="18.0" left="18.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="FITOPIA LABS"
+                                               style="-fx-text-fill: #4E877A; -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                        <Label text="POST WORKOUT RECOVERY"
+                                               wrapText="true"
+                                               style="-fx-text-fill: #123748; -fx-font-size: 24px; -fx-font-weight: 900;"/>
+                                        <Label text="Balanced recovery stack"
+                                               style="-fx-text-fill: #80929C; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                        <Label text="89.00 DT"
+                                               style="-fx-text-fill: #166E5B; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+                                        <HBox spacing="8.0">
+                                            <children>
+                                                <Label text="Hydration"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                                <Label text="Recovery"
+                                                       style="-fx-background-color: #EFF8F4; -fx-background-radius: 999; -fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;"/>
+                                            </children>
+                                        </HBox>
+                                        <Label text="LIMITED STOCK"
+                                               maxWidth="110.0"
+                                               style="-fx-background-color: #FFF7E6; -fx-background-radius: 999; -fx-text-fill: #B66905; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 7 12 7 12;"/>
+                                        <Button text="Quick View"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: transparent; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="View Details"
+                                                prefHeight="34.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D4E2EA; -fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Button text="ADD TO CART"
+                                                prefHeight="42.0"
+                                                maxWidth="1.7976931348623157E308"
+                                                style="-fx-background-color: linear-gradient(to right, #124A4D, #0F6A58); -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 900;"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </FlowPane>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>
