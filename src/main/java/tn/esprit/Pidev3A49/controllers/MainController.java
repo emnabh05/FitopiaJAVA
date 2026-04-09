@@ -217,6 +217,7 @@ public class MainController {
     private final AppSession appSession = AppSession.getInstance();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceRepas serviceRepas = new ServiceRepas();
+    // Exercise service powers CRUD actions and explorer data.
     private final ServiceFitnessExercise serviceFitnessExercise = new ServiceFitnessExercise();
 
     private List<FitnessExercise> filteredExercises = new ArrayList<>();
