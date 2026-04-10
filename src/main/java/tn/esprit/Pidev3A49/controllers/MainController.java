@@ -140,6 +140,14 @@ public class MainController {
     @FXML private Button btnActionSupprimerRegime;
     @FXML private Button btnActionExplorerRegime;
 
+    @FXML private Label lblRegimeUser;
+    @FXML private Label lblRegimeTaille;
+    @FXML private Label lblRegimePoids;
+    @FXML private Label lblRegimeAge;
+    @FXML private Label lblRegimeUserEdit;
+    @FXML private Label lblRegimeTailleEdit;
+    @FXML private Label lblRegimePoidsEdit;
+    @FXML private Label lblRegimeAgeEdit;
     @FXML private Label lblPlannerTaille;
     @FXML private Label lblPlannerPoids;
     @FXML private Label lblPlannerAge;
@@ -292,6 +300,7 @@ public class MainController {
         initialiserSelectionRepasJointure();
         rafraichirDonnees();
         masquerTousLesFormulaires();
+        setupRealTimeValidation();
     }
 
     public void ouvrirBackRepas() {
@@ -644,6 +653,34 @@ public class MainController {
         if (colRegimeTaille != null) colRegimeTaille.setCellValueFactory(new PropertyValueFactory<>("taille"));
         if (colRegimePoids != null) colRegimePoids.setCellValueFactory(new PropertyValueFactory<>("poids"));
         if (colRegimeAge != null) colRegimeAge.setCellValueFactory(new PropertyValueFactory<>("age"));
+    }
+
+    private void setupRealTimeValidation() {
+        if (tfRegimeTaille != null) tfRegimeTaille.textProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimeTaille, n, 1, 300));
+        if (tfRegimePoids != null) tfRegimePoids.textProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimePoids, n, 1, 300));
+        if (tfRegimeAge != null) tfRegimeAge.textProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimeAge, n, 1, 100));
+        if (cbRegimeUser != null) cbRegimeUser.valueProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimeUser, n != null));
+
+        if (tfRegimeTailleEdit != null) tfRegimeTailleEdit.textProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimeTailleEdit, n, 1, 300));
+        if (tfRegimePoidsEdit != null) tfRegimePoidsEdit.textProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimePoidsEdit, n, 1, 300));
+        if (tfRegimeAgeEdit != null) tfRegimeAgeEdit.textProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimeAgeEdit, n, 1, 100));
+        if (cbRegimeUserEdit != null) cbRegimeUserEdit.valueProperty().addListener((o, v, n) -> mettreAJourStyleValidation(lblRegimeUserEdit, n != null));
+    }
+
+    private void mettreAJourStyleValidation(Label label, String value, double min, double max) {
+        if (label == null) return;
+        try {
+            double val = Double.parseDouble(value);
+            boolean valid = val >= min && val <= max;
+            label.setStyle("-fx-text-fill: " + (valid ? "#10b981" : "#ef4444") + "; -fx-font-weight: 800;");
+        } catch (Exception e) {
+            label.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: 800;");
+        }
+    }
+
+    private void mettreAJourStyleValidation(Label label, boolean valid) {
+        if (label == null) return;
+        label.setStyle("-fx-text-fill: " + (valid ? "#10b981" : "#ef4444") + "; -fx-font-weight: 800;");
     }
 
     private void initialiserColonnesRepas(TableColumn<Repas, Integer> id,

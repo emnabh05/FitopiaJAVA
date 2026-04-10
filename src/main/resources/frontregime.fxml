@@ -320,19 +320,19 @@
                                         <ColumnConstraints hgrow="ALWAYS" percentWidth="34.0"/>
                                     </columnConstraints>
                                     <VBox spacing="8.0" styleClass="field-card" GridPane.columnSpan="3">
-                                        <Label styleClass="field-label" text="Utilisateur"/>
+                                        <Label fx:id="lblRegimeUser" styleClass="field-label" text="Utilisateur"/>
                                         <ComboBox fx:id="cbRegimeUser" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.rowIndex="1">
-                                        <Label styleClass="field-label" text="Taille (cm)"/>
+                                        <Label fx:id="lblRegimeTaille" styleClass="field-label" text="Taille (cm)"/>
                                         <TextField fx:id="tfRegimeTaille" promptText="175" styleClass="text-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                        <Label styleClass="field-label" text="Poids (kg)"/>
+                                        <Label fx:id="lblRegimePoids" styleClass="field-label" text="Poids (kg)"/>
                                         <TextField fx:id="tfRegimePoids" promptText="72" styleClass="text-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                        <Label styleClass="field-label" text="Age"/>
+                                        <Label fx:id="lblRegimeAge" styleClass="field-label" text="Age"/>
                                         <TextField fx:id="tfRegimeAge" promptText="29" styleClass="text-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.rowIndex="2">
@@ -386,7 +386,7 @@
                                         <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
                                     </columnConstraints>
                                     <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
-                                        <Label styleClass="field-label" text="Utilisateur"/>
+                                        <Label fx:id="lblRegimeUserEdit" styleClass="field-label" text="Utilisateur"/>
                                         <ComboBox fx:id="cbRegimeUserEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
@@ -394,15 +394,15 @@
                                         <ComboBox fx:id="cbRegimeTypeSanteEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="1">
-                                        <Label styleClass="field-label" text="Taille (cm)"/>
+                                        <Label fx:id="lblRegimeTailleEdit" styleClass="field-label" text="Taille (cm)"/>
                                         <TextField fx:id="tfRegimeTailleEdit" styleClass="text-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                        <Label styleClass="field-label" text="Poids (kg)"/>
+                                        <Label fx:id="lblRegimePoidsEdit" styleClass="field-label" text="Poids (kg)"/>
                                         <TextField fx:id="tfRegimePoidsEdit" styleClass="text-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="0" GridPane.rowIndex="2">
-                                        <Label styleClass="field-label" text="Age"/>
+                                        <Label fx:id="lblRegimeAgeEdit" styleClass="field-label" text="Age"/>
                                         <TextField fx:id="tfRegimeAgeEdit" styleClass="text-input"/>
                                     </VBox>
                                     <VBox spacing="8.0" styleClass="metric-card" GridPane.columnIndex="1" GridPane.rowIndex="2">
