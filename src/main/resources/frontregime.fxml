@@ -78,13 +78,13 @@
                                      </HBox>
                                      <HBox spacing="40" style="-fx-padding: 20 0 0 0;">
                                          <VBox spacing="2">
-                                              <Label text="1500+" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900;" />
-                                              <Label text="members coached" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                              <Label text="5000+" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900;" />
+                                              <Label text="repas analysés" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
                                          </VBox>
                                          <Separator orientation="VERTICAL" prefHeight="40" style="-fx-opacity: 0.2;" />
                                          <VBox spacing="2">
                                               <Label text="24/7" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900;" />
-                                              <Label text="support access" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                              <Label text="aide nutritionnelle" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
                                          </VBox>
                                      </HBox>
                                  </VBox>
@@ -92,12 +92,12 @@
                                  <!-- Right Side: Secondary Info & Guides -->
                                  <VBox spacing="15" minWidth="300" alignment="TOP_RIGHT">
                                      <VBox styleClass="hero-stat-card" spacing="5">
-                                         <Label text="95%" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800;" />
-                                         <Label text="Goal completion rate" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                         <Label text="98%" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800;" />
+                                         <Label text="Précision des calories" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
                                      </VBox>
                                      <VBox styleClass="hero-stat-card" spacing="5">
-                                         <Label text="12 weeks" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800;" />
-                                         <Label text="Structured transformation cycle" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                         <Label text="12 sem." style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800;" />
+                                         <Label text="Planification de régime" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
                                      </VBox>
                                      <VBox styleClass="hero-white-card" spacing="10">
                                          <Label text="Coach Focus" style="-fx-text-fill: #178a6e; -fx-font-weight: 800; -fx-font-size: 12px;" />
