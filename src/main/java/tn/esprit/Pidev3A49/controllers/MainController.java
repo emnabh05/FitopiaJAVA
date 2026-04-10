@@ -279,6 +279,22 @@ public class MainController {
     @FXML private Label lblRepasSelectionInfo;
     @FXML private TilePane tileRepasSelectionCards;
 
+    @FXML private VBox paneBadgeWinStreak;
+    @FXML private Label lblBadgeWinStreakIcon;
+    @FXML private Label lblBadgeWinStreakTitle;
+    @FXML private Label lblBadgeWinStreakDesc;
+    
+    @FXML private VBox paneBadgeHydration;
+    @FXML private Label lblBadgeHydrationIcon;
+    @FXML private Label lblBadgeHydrationTitle;
+    @FXML private Label lblBadgeHydrationDesc;
+    
+    @FXML private VBox paneBadgeCalories;
+    @FXML private Label lblBadgeCaloriesIcon;
+    @FXML private Label lblBadgeCaloriesTitle;
+    @FXML private Label lblBadgeCaloriesDesc;
+
+
     private final ServiceRepas serviceRepas = new ServiceRepas();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceUser serviceUser = new ServiceUser();
@@ -453,7 +469,7 @@ public class MainController {
     private void clonerRepasPourAujourdhui(Repas source) {
         try {
             User refUser = determinerUtilisateurReference();
-            RegimeAlimentaire activeRegime = determinerRegimeReference(refUser);
+            RegimeAlimentaire activeRegime = getActualActiveRegime();
             
             if (activeRegime == null) throw new IllegalStateException("Aucun regime actif trouve. Creez-en un d'abord.");
             
@@ -951,21 +967,7 @@ public class MainController {
 
     private void actualiserDashboardPlanner() {
         User referenceUser = determinerUtilisateurReference();
-        
-        RegimeAlimentaire activeRegime = null;
-        if (tfRegimeId != null && !tfRegimeId.getText().isBlank()) {
-            try {
-                int selectedId = Integer.parseInt(tfRegimeId.getText());
-                activeRegime = allRegimes.stream()
-                        .filter(r -> r.getId() == selectedId)
-                        .findFirst()
-                        .orElse(null);
-            } catch (Exception ignored) {}
-        }
-        
-        if (activeRegime == null) {
-            activeRegime = determinerRegimeReference(referenceUser);
-        }
+        RegimeAlimentaire activeRegime = getActualActiveRegime();
         List<Repas> repasDuJour = filtrerRepasDuJour(referenceUser);
         if (activeRegime != null) {
             final Integer selectedRid = activeRegime.getId();
@@ -999,6 +1001,10 @@ public class MainController {
             setTextIfPresent(lblSummaryC, "C 0 g");
             setTextIfPresent(lblSummaryF, "F 0 g");
             mettreAJourProgression("0 / 0 kcal", 0, pbPlannerCalories, lblPlannerCaloriesProgress);
+            
+            styleBadge(paneBadgeWinStreak, lblBadgeWinStreakIcon, lblBadgeWinStreakTitle, lblBadgeWinStreakDesc, false);
+            styleBadge(paneBadgeHydration, lblBadgeHydrationIcon, lblBadgeHydrationTitle, lblBadgeHydrationDesc, false);
+            styleBadge(paneBadgeCalories, lblBadgeCaloriesIcon, lblBadgeCaloriesTitle, lblBadgeCaloriesDesc, false);
         } else {
             int target = activeRegime.getCaloriesCibles() == null ? 2000 : activeRegime.getCaloriesCibles();
             int curKcal = sommeRepas(repasDuJour, Repas::getCalories);
@@ -1022,6 +1028,14 @@ public class MainController {
             setTextIfPresent(lblSummaryF, "F " + curF + " g");
 
             mettreAJourProgression(curKcal + " / " + target + " kcal (" + rem + " restantes)", ratio(curKcal, target), pbPlannerCalories, lblPlannerCaloriesProgress);
+            
+            boolean caloriesRespectees = curKcal > 0 && curKcal <= target;
+            boolean hydratationOk = repasDuJour.size() >= 3;
+            boolean semaineParfaite = curKcal > 0 && Math.abs(curKcal - target) <= (target * 0.05); // within 5%
+            
+            styleBadge(paneBadgeWinStreak, lblBadgeWinStreakIcon, lblBadgeWinStreakTitle, lblBadgeWinStreakDesc, semaineParfaite);
+            styleBadge(paneBadgeHydration, lblBadgeHydrationIcon, lblBadgeHydrationTitle, lblBadgeHydrationDesc, hydratationOk);
+            styleBadge(paneBadgeCalories, lblBadgeCaloriesIcon, lblBadgeCaloriesTitle, lblBadgeCaloriesDesc, caloriesRespectees);
         }
 
         if (lblPlannerMealsSubtitle != null) {
@@ -1230,11 +1244,25 @@ public class MainController {
                 .orElse(allUsers.isEmpty() ? null : allUsers.get(0));
     }
 
+    private RegimeAlimentaire getActualActiveRegime() {
+        User referenceUser = determinerUtilisateurReference();
+        if (tfRegimeId != null && !tfRegimeId.getText().isBlank()) {
+            try {
+                int selectedId = Integer.parseInt(tfRegimeId.getText());
+                return allRegimes.stream()
+                        .filter(r -> r.getId() == selectedId)
+                        .findFirst()
+                        .orElse(determinerRegimeReference(referenceUser));
+            } catch (Exception ignored) {}
+        }
+        return determinerRegimeReference(referenceUser);
+    }
+
     private RegimeAlimentaire determinerRegimeReference(User user) {
         return allRegimes.stream()
                 .filter(regime -> user == null || (regime.getUserId() != null && regime.getUserId() == user.getId()))
-                .findFirst()
-                .orElse(allRegimes.isEmpty() ? null : allRegimes.get(0));
+                .max(Comparator.comparingInt(RegimeAlimentaire::getId))
+                .orElse(allRegimes.isEmpty() ? null : allRegimes.get(Math.max(0, allRegimes.size() - 1)));
     }
 
     private List<Repas> filtrerRepasDuJour(User user) {
@@ -1331,6 +1359,28 @@ public class MainController {
             bar.setProgress(progress);
         }
         setTextIfPresent(label, text);
+    }
+
+    private void styleBadge(VBox pane, Label icon, Label title, Label desc, boolean active) {
+        if (pane == null) return;
+        pane.getStyleClass().removeAll("badge-locked", "badge-unlocked");
+        pane.getStyleClass().add(active ? "badge-unlocked" : "badge-locked");
+        
+        if (icon != null) {
+            icon.getStyleClass().removeAll("badge-icon-locked", "badge-icon-unlocked");
+            icon.getStyleClass().add(active ? "badge-icon-unlocked" : "badge-icon-locked");
+            icon.setText(active ? "\u2714" : "\uD83D\uDD12"); 
+        }
+        
+        if (title != null) {
+            title.getStyleClass().removeAll("badge-title-locked", "badge-title-unlocked");
+            title.getStyleClass().add(active ? "badge-title-unlocked" : "badge-title-locked");
+        }
+        
+        if (desc != null) {
+            desc.getStyleClass().removeAll("badge-desc-locked", "badge-desc-unlocked");
+            desc.getStyleClass().add(active ? "badge-desc-unlocked" : "badge-desc-locked");
+        }
     }
 
     private void setTextIfPresent(Label label, String value) {
@@ -1538,7 +1588,7 @@ public class MainController {
         );
 
         User refUser = determinerUtilisateurReference();
-        RegimeAlimentaire activeRegime = determinerRegimeReference(refUser);
+        RegimeAlimentaire activeRegime = getActualActiveRegime();
         int target = activeRegime != null && activeRegime.getCaloriesCibles() != null ? activeRegime.getCaloriesCibles() : 2000;
         
         Label impactLabel = new Label("📈 Impact sur la journée");

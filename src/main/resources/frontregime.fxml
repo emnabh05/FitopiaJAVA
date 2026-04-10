@@ -274,30 +274,30 @@
                                                  </HBox>
                                                  
                                                  <VBox spacing="10">
-                                                 <VBox styleClass="badge-row, badge-unlocked">
+                                                 <VBox fx:id="paneBadgeWinStreak" styleClass="badge-row, badge-locked">
                                                      <HBox spacing="12" alignment="CENTER_LEFT">
-                                                         <Label text="&#10004;" styleClass="badge-icon-unlocked" style="-fx-font-size: 16px;"/>
+                                                         <Label fx:id="lblBadgeWinStreakIcon" text="&#128274;" styleClass="badge-icon-locked" style="-fx-font-size: 16px;"/>
                                                          <VBox>
-                                                             <Label text="Semaine parfaite" styleClass="badge-title-unlocked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
-                                                             <Label text="Calories dans la cible aujourd'hui." styleClass="badge-desc-unlocked" style="-fx-font-size: 11px;"/>
+                                                             <Label fx:id="lblBadgeWinStreakTitle" text="Semaine parfaite" styleClass="badge-title-locked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
+                                                             <Label fx:id="lblBadgeWinStreakDesc" text="Calories dans la cible aujourd'hui." styleClass="badge-desc-locked" style="-fx-font-size: 11px;"/>
                                                          </VBox>
                                                      </HBox>
                                                  </VBox>
-                                                 <VBox styleClass="badge-row, badge-unlocked">
+                                                 <VBox fx:id="paneBadgeHydration" styleClass="badge-row, badge-locked">
                                                      <HBox spacing="12" alignment="CENTER_LEFT">
-                                                         <Label text="&#10004;" styleClass="badge-icon-unlocked" style="-fx-font-size: 16px;"/>
+                                                         <Label fx:id="lblBadgeHydrationIcon" text="&#128274;" styleClass="badge-icon-locked" style="-fx-font-size: 16px;"/>
                                                          <VBox>
-                                                             <Label text="Hydratation OK" styleClass="badge-title-unlocked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
-                                                             <Label text="Au moins 3 repas / collations enregistrés aujourd'hui." styleClass="badge-desc-unlocked" style="-fx-font-size: 11px;"/>
+                                                             <Label fx:id="lblBadgeHydrationTitle" text="Hydratation OK" styleClass="badge-title-locked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
+                                                             <Label fx:id="lblBadgeHydrationDesc" text="Au moins 3 repas / collations enregistrés aujourd'hui." styleClass="badge-desc-locked" style="-fx-font-size: 11px;"/>
                                                          </VBox>
                                                      </HBox>
                                                  </VBox>
-                                                 <VBox styleClass="badge-row, badge-unlocked">
+                                                 <VBox fx:id="paneBadgeCalories" styleClass="badge-row, badge-locked">
                                                      <HBox spacing="12" alignment="CENTER_LEFT">
-                                                         <Label text="&#10004;" styleClass="badge-icon-unlocked" style="-fx-font-size: 16px;"/>
+                                                         <Label fx:id="lblBadgeCaloriesIcon" text="&#128274;" styleClass="badge-icon-locked" style="-fx-font-size: 16px;"/>
                                                          <VBox>
-                                                             <Label text="Calories respectées" styleClass="badge-title-unlocked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
-                                                             <Label text="Journée avec calories proches de l'objectif." styleClass="badge-desc-unlocked" style="-fx-font-size: 11px;"/>
+                                                             <Label fx:id="lblBadgeCaloriesTitle" text="Calories respectées" styleClass="badge-title-locked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
+                                                             <Label fx:id="lblBadgeCaloriesDesc" text="Journée avec calories proches de l'objectif." styleClass="badge-desc-locked" style="-fx-font-size: 11px;"/>
                                                          </VBox>
                                                      </HBox>
                                                  </VBox>
