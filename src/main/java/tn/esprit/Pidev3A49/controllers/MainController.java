@@ -951,8 +951,29 @@ public class MainController {
 
     private void actualiserDashboardPlanner() {
         User referenceUser = determinerUtilisateurReference();
-        RegimeAlimentaire activeRegime = determinerRegimeReference(referenceUser);
+        
+        RegimeAlimentaire activeRegime = null;
+        if (tfRegimeId != null && !tfRegimeId.getText().isBlank()) {
+            try {
+                int selectedId = Integer.parseInt(tfRegimeId.getText());
+                activeRegime = allRegimes.stream()
+                        .filter(r -> r.getId() == selectedId)
+                        .findFirst()
+                        .orElse(null);
+            } catch (Exception ignored) {}
+        }
+        
+        if (activeRegime == null) {
+            activeRegime = determinerRegimeReference(referenceUser);
+        }
         List<Repas> repasDuJour = filtrerRepasDuJour(referenceUser);
+        if (activeRegime != null) {
+            final Integer selectedRid = activeRegime.getId();
+            repasDuJour = repasDuJour.stream()
+                    .filter(r -> r.getRegimeId() != null && r.getRegimeId().equals(selectedRid))
+                    .toList();
+        }
+        
         List<Repas> repasAffiches = repasDuJour.isEmpty() ? derniersRepas(referenceUser, 3) : repasDuJour.stream().limit(3).toList();
 
         if (lblHeaderUser != null) {
@@ -1363,6 +1384,9 @@ public class MainController {
         voirBtn.setOnAction(e -> {
             tfRegimeId.setText(String.valueOf(regime.getId()));
             actualiserDashboardPlanner();
+            if (appScrollPane != null) {
+                appScrollPane.setVvalue(0);
+            }
         });
         
         Button modBtn = new Button("Modifier");
