@@ -11,31 +11,42 @@
             fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
     <top>
         <VBox styleClass="navbar-container">
-            <!-- Main Navbar matching the image -->
-            <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="navbar-shell">
+            <!-- Top Strip with Contact & Socials -->
+            <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10">
+                    <Label text="" styleClass="social-icon" />
+                    <Label text="" styleClass="social-icon" />
+                    <Label text="" styleClass="social-icon" />
+                </HBox>
+            </HBox>
+
+            <!-- Main Navbar -->
+            <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
                 <!-- Logo -->
-                <VBox alignment="CENTER" spacing="2.0">
+                <VBox alignment="CENTER" spacing="0">
                     <Label text="&#127811;" styleClass="navbar-logo-icon" />
                     <Label text="FITOPIA" styleClass="navbar-logo-text" />
                 </VBox>
-                <Region prefWidth="30" />
+                
+                <Region prefWidth="20" />
+                
                 <!-- Links -->
-                <VBox alignment="CENTER" spacing="2.0">
-                    <Label text="Home" styleClass="navbar-link navbar-link-active" />
-                </VBox>
-                <Region prefWidth="5" />
-                <VBox alignment="CENTER" spacing="2.0">
-                    <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
-                </VBox>
-                <Region prefWidth="30" />
+                <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+                
+                <Region prefWidth="10" />
+                
                 <!-- Action Buttons -->
                 <Button fx:id="btnModuleRegimes" onAction="#afficherModuleRegimes" text="EXPLORE&#10;OUR&#10;DIET&amp;EATING&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
-                <Button fx:id="btnModuleRepas" onAction="#afficherModuleRepas" text="EXPLORE&#10;OUR&#10;DAILY&#10;MEALS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button fx:id="btnModuleRepas" onAction="#afficherModuleRepas" text="EXPLORE&#10;OUR&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
                 <Button text="EXPLORE&#10;OUR&#10;FITNESS&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
                 <Button text="EXPLORE&#10;OUR&#10;EVENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
                 <Button text="EXPLORE&#10;FORUMS&amp;BLOGS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
                 
                 <Region HBox.hgrow="ALWAYS" />
+                
                 <!-- Right Actions -->
                 <Button onAction="#rafraichirDonnees" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
                 <Button text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
@@ -52,22 +63,54 @@
                          
                          <VBox fx:id="viewRegimes" fillWidth="true" spacing="20.0" style="-fx-background-color: #f3f6fb; -fx-padding: 40;" visible="true" managed="true">
                              
-                             <!-- Hero & Intro -->
-                             <VBox spacing="8">
-                                 <Label text="Diet &amp; Eating Planner" style="-fx-font-weight: 800; -fx-font-size: 38px; -fx-text-fill: #1f2937;" />
-                                 <Label text="Welcome. This page is personalized for you." style="-fx-text-fill: #6b7280; -fx-font-size: 14px;" />
-                                 
-                                 <!-- Info banner -->
-                                 <VBox style="-fx-background-color: linear-gradient(to bottom right, #f4fbf9, #eef4ff); -fx-border-color: #dbe7f4; -fx-border-radius: 14; -fx-background-radius: 14; -fx-padding: 15; -fx-spacing: 12;" translateY="12">
-                                     <Label text="Comment utiliser cette page :" style="-fx-font-weight: 800; -fx-text-fill: #0c3f44; -fx-font-size: 14px;"/>
-                                     <Label text="Cette interface vous guide pas à pas pour définir votre régime, suivre vos repas du jour et vérifier votre progression nutritionnelle." style="-fx-text-fill: #334155;"/>
-                                     <HBox spacing="10">
-                                         <Label text=" 1. Ajoutez/sélectionnez régime" style="-fx-background-color: white; -fx-border-color: #d7e2ef; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 4 12; -fx-font-size: 11px; -fx-font-weight: 600;" />
-                                         <Label text=" 2. Ajoutez vos repas" style="-fx-background-color: white; -fx-border-color: #d7e2ef; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 4 12; -fx-font-size: 11px; -fx-font-weight: 600;" />
-                                         <Label text=" 3. Suivez macros et calories" style="-fx-background-color: white; -fx-border-color: #d7e2ef; -fx-border-radius: 999; -fx-background-radius: 999; -fx-padding: 4 12; -fx-font-size: 11px; -fx-font-weight: 600;" />
+                             <!-- Hero & Intro Section (Green Design Style) -->
+                             <HBox styleClass="hero-green-card" spacing="40" alignment="CENTER_LEFT">
+                                 <!-- Left Side: Main Info -->
+                                 <VBox spacing="20" HBox.hgrow="ALWAYS">
+                                     <Label text="FITOPIA PERFORMANCE PLATFORM" styleClass="hero-tag" />
+                                     <VBox spacing="8">
+                                         <Label text="Diet &amp; Eating Planner" styleClass="hero-title-white" wrapText="true" maxWidth="600" />
+                                         <Label text="Welcome. This page is personalized for you." styleClass="hero-desc-white" wrapText="true" maxWidth="550" />
+                                     </VBox>
+                                     <HBox spacing="15">
+                                         <Button text="Learn more" styleClass="hero-btn-filled" />
+                                         <Button text="Contact us" styleClass="hero-btn-outline" />
+                                     </HBox>
+                                     <HBox spacing="40" style="-fx-padding: 20 0 0 0;">
+                                         <VBox spacing="2">
+                                              <Label text="1500+" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900;" />
+                                              <Label text="members coached" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                         </VBox>
+                                         <Separator orientation="VERTICAL" prefHeight="40" style="-fx-opacity: 0.2;" />
+                                         <VBox spacing="2">
+                                              <Label text="24/7" style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900;" />
+                                              <Label text="support access" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                         </VBox>
                                      </HBox>
                                  </VBox>
-                             </VBox>
+                                 
+                                 <!-- Right Side: Secondary Info & Guides -->
+                                 <VBox spacing="15" minWidth="300" alignment="TOP_RIGHT">
+                                     <VBox styleClass="hero-stat-card" spacing="5">
+                                         <Label text="95%" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800;" />
+                                         <Label text="Goal completion rate" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                     </VBox>
+                                     <VBox styleClass="hero-stat-card" spacing="5">
+                                         <Label text="12 weeks" style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: 800;" />
+                                         <Label text="Structured transformation cycle" style="-fx-text-fill: rgba(255,255,255,0.6); -fx-font-size: 11px;" />
+                                     </VBox>
+                                     <VBox styleClass="hero-white-card" spacing="10">
+                                         <Label text="Coach Focus" style="-fx-text-fill: #178a6e; -fx-font-weight: 800; -fx-font-size: 12px;" />
+                                         <Label text="Comment utiliser cette page :" style="-fx-font-weight: 800; -fx-text-fill: #1f2937; -fx-font-size: 14px;" />
+                                         <Label text="Cette interface vous guide pas à pas pour définir votre régime, suivre vos repas du jour et vérifier votre progression nutritionnelle." wrapText="true" style="-fx-text-fill: #4b5563; -fx-font-size: 12px; -fx-line-spacing: 1.3;" />
+                                         <VBox spacing="6" style="-fx-padding: 5 0 0 0;">
+                                             <Label text="• Ajoutez/sélectionnez régime" style="-fx-text-fill: #374151; -fx-font-size: 11px; -fx-font-weight: 600;" />
+                                             <Label text="• Ajoutez vos repas" style="-fx-text-fill: #374151; -fx-font-size: 11px; -fx-font-weight: 600;" />
+                                             <Label text="• Suivez macros et calories" style="-fx-text-fill: #374151; -fx-font-size: 11px; -fx-font-weight: 600;" />
+                                         </VBox>
+                                     </VBox>
+                                 </VBox>
+                             </HBox>
 
                              <!-- 2 Column Grid -->
                              <GridPane hgap="24" vgap="24" style="-fx-padding: 24 0 0 0;">
