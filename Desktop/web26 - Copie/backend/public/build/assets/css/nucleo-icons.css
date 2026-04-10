@@ -1,0 +1,36 @@
+/*
+ * Nucleo Icons - Minimal version for Fitopia
+ */
+
+@font-face {
+    font-family: 'nucleo';
+    src: url('https://demos.creative-tim.com/argon-dashboard-pro/assets/fonts/nucleo-icons.eot');
+    src: url('https://demos.creative-tim.com/argon-dashboard-pro/assets/fonts/nucleo-icons.eot') format('embedded-opentype'),
+         url('https://demos.creative-tim.com/argon-dashboard-pro/assets/fonts/nucleo-icons.woff2') format('woff2'),
+         url('https://demos.creative-tim.com/argon-dashboard-pro/assets/fonts/nucleo-icons.woff') format('woff'),
+         url('https://demos.creative-tim.com/argon-dashboard-pro/assets/fonts/nucleo-icons.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.ni {
+    display: inline-block;
+    font: normal normal normal 14px/1 'nucleo';
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.ni-box-2:before {
+    content: "\ea47";
+}
+
+.ni-settings:before {
+    content: "\ea5a";
+}
+
+.ni-user-run:before {
+    content: "\ea5b";
+}
+

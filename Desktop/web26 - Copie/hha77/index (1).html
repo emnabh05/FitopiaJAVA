@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #0f1b3c 0%, #1a2e5f 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .header-title span {
+            color: #7aa878;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .time-filter {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .time-filter:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #7aa878;
+        }
+
+        .time-filter.active {
+            background: #7aa878;
+            border-color: #7aa878;
+            color: #0f1b3c;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #7aa878;
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(122, 168, 120, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(122, 168, 120, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .stat-card:hover::before {
+            left: 100%;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #7aa878 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-change {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stat-change.positive {
+            color: #7aa878;
+        }
+
+        .stat-change.negative {
+            color: #ff6b6b;
+        }
+
+        .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover .arrow.up {
+            transform: translateY(-3px);
+        }
+
+        /* Charts Section */
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 32px;
+            position: relative;
+            animation: fadeInUp 0.8s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        .chart-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #7aa878;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            color: #ffffff;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 250px;
+            margin-bottom: 16px;
+        }
+
+        /* Bar Chart */
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 100%;
+            gap: 12px;
+        }
+
+        .bar {
+            flex: 1;
+            background: linear-gradient(180deg, #7aa878 0%, #5a7d58 100%);
+            border-radius: 6px 6px 0 0;
+            position: relative;
+            min-height: 20px;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .bar:hover {
+            opacity: 0.8;
+            transform: scaleY(1.05);
+            box-shadow: 0 10px 30px rgba(122, 168, 120, 0.3);
+        }
+
+        .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #7aa878;
+        }
+
+        /* Pie Chart */
+        .pie-chart {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+
+        .pie-segment {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Activity Feed */
+        .activity-section {
+            animation: fadeInUp 1s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+
+        .activity-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 32px;
+        }
+
+        .activity-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #7aa878;
+        }
+
+        .activity-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-left-color: #7aa878;
+        }
+
+        .activity-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #7aa878;
+            flex-shrink: 0;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .activity-item:nth-child(2) .activity-dot { animation-delay: 0.3s; }
+        .activity-item:nth-child(3) .activity-dot { animation-delay: 0.6s; }
+        .activity-item:nth-child(4) .activity-dot { animation-delay: 0.9s; }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes fillBar {
+            from {
+                height: 0;
+            }
+            to {
+                height: var(--height);
+            }
+        }
+
+        .bar {
+            animation: fillBar 0.8s ease-out forwards;
+        }
+
+        .bar:nth-child(1) { animation-delay: 0.6s; }
+        .bar:nth-child(2) { animation-delay: 0.7s; }
+        .bar:nth-child(3) { animation-delay: 0.8s; }
+        .bar:nth-child(4) { animation-delay: 0.9s; }
+        .bar:nth-child(5) { animation-delay: 1s; }
+        .bar:nth-child(6) { animation-delay: 1.1s; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <div class="header-title">Analytics <span>Dashboard</span></div>
+            </div>
+            <div class="header-controls">
+                <button class="time-filter active" data-filter="week">This Week</button>
+                <button class="time-filter" data-filter="month">This Month</button>
+                <button class="time-filter" data-filter="year">This Year</button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value">$48,250</div>
+                <div class="stat-change positive">
+                    <span class="arrow up">↑</span>
+                    <span>12.5% from last week</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-value">2,847</div>
+                <div class="stat-change positive">
+                    <span class="arrow up">↑</span>
+                    <span>8.2% increase</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Conversion Rate</div>
+                <div class="stat-value">3.24%</div>
+                <div class="stat-change negative">
+                    <span class="arrow up">↓</span>
+                    <span>2.1% from target</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">Avg Order Value</div>
+                <div class="stat-value">$156</div>
+                <div class="stat-change positive">
+                    <span class="arrow up">↑</span>
+                    <span>4.8% higher</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-section">
+            <!-- Bar Chart -->
+            <div class="chart-card">
+                <div class="chart-title">Sales by Day</div>
+                <div class="chart-container">
+                    <div class="bar-chart" id="barChart">
+                        <div class="bar" style="--height: 65%">
+                            <div class="bar-value">$8.2k</div>
+                            <div class="bar-label">Mon</div>
+                        </div>
+                        <div class="bar" style="--height: 82%">
+                            <div class="bar-value">$10.5k</div>
+                            <div class="bar-label">Tue</div>
+                        </div>
+                        <div class="bar" style="--height: 55%">
+                            <div class="bar-value">$7.1k</div>
+                            <div class="bar-label">Wed</div>
+                        </div>
+                        <div class="bar" style="--height: 90%">
+                            <div class="bar-value">$11.8k</div>
+                            <div class="bar-label">Thu</div>
+                        </div>
+                        <div class="bar" style="--height: 78%">
+                            <div class="bar-value">$10.2k</div>
+                            <div class="bar-label">Fri</div>
+                        </div>
+                        <div class="bar" style="--height: 95%">
+                            <div class="bar-value">$12.4k</div>
+                            <div class="bar-label">Sat</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 13px; margin-top: 30px;">
+                    Total: $60,200
+                </div>
+            </div>
+
+            <!-- Pie Chart -->
+            <div class="chart-card">
+                <div class="chart-title">Traffic Source</div>
+                <div class="chart-container">
+                    <canvas id="pieChart" width="200" height="200"></canvas>
+                </div>
+                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: rgba(255, 255, 255, 0.8);">
+                        <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; background: #7aa878; border-radius: 50%;"></span> Organic</span>
+                        <span>45%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: rgba(255, 255, 255, 0.8);">
+                        <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; background: #5a7d58; border-radius: 50%;"></span> Direct</span>
+                        <span>30%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 13px; color: rgba(255, 255, 255, 0.8);">
+                        <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 8px; height: 8px; background: #4a6d48; border-radius: 50%;"></span> Referral</span>
+                        <span>25%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed -->
+        <div class="activity-section">
+            <div class="activity-card">
+                <div class="activity-title">Recent Activity</div>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-dot"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">New user registered from Canada</div>
+                            <div class="activity-time">2 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">Order #12847 completed successfully</div>
+                            <div class="activity-time">5 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">System backup completed - 2.4 GB saved</div>
+                            <div class="activity-time">12 minutes ago</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-dot"></div>
+                        <div class="activity-content">
+                            <div class="activity-text">Payment gateway synchronized with 3 new methods</div>
+                            <div class="activity-time">25 minutes ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bar Chart Interactivity
+        const bars = document.querySelectorAll('.bar');
+        bars.forEach(bar => {
+            bar.addEventListener('mouseenter', function() {
+                bars.forEach(b => b.style.opacity = '0.5');
+                this.style.opacity = '1';
+            });
+            bar.addEventListener('mouseleave', function() {
+                bars.forEach(b => b.style.opacity = '1');
+            });
+        });
+
+        // Pie Chart Canvas
+        function drawPieChart() {
+            const canvas = document.getElementById('pieChart');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 80;
+
+            const data = [
+                { label: 'Organic', value: 45, color: '#7aa878' },
+                { label: 'Direct', value: 30, color: '#5a7d58' },
+                { label: 'Referral', value: 25, color: '#4a6d48' }
+            ];
+
+            let currentAngle = -Math.PI / 2;
+
+            data.forEach(segment => {
+                const sliceAngle = (segment.value / 100) * 2 * Math.PI;
+
+                // Draw segment
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+                ctx.closePath();
+                ctx.fillStyle = segment.color;
+                ctx.fill();
+
+                // Draw border
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                currentAngle += sliceAngle;
+            });
+        }
+
+        // Draw pie chart on load
+        window.addEventListener('load', drawPieChart);
+
+        // Time filter buttons
+        const filterButtons = document.querySelectorAll('.time-filter');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+
+                // Animate bars
+                bars.forEach(bar => {
+                    const randomHeight = Math.random() * (95 - 30) + 30;
+                    bar.style.setProperty('--height', randomHeight + '%');
+                });
+            });
+        });
+
+        // Smooth number animation for stats
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                element.textContent = value.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Prevent animation on page reload
+        if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
+            // Only animate on first load
+        }
+    </script>
+</body>
+</html>

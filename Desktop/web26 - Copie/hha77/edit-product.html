@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product - CRUD Dashboard</title>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --dark-blue: #0B2C3D;
+            --vert-sapin: #1B5E4B;
+            --white: #FFFFFF;
+            --light-gray: #F5F7FA;
+            --border-color: #E4E7EB;
+            --text-dark: #2C3E50;
+            --text-light: #8892A0;
+            --shadow: 0 2px 14px rgba(11, 44, 61, 0.1);
+            --shadow-lg: 0 8px 24px rgba(11, 44, 61, 0.15);
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #0B2C3D 0%, #1B5E4B 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: var(--white);
+            padding: 30px 0;
+            box-shadow: var(--shadow-lg);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0B2C3D, #1B5E4B);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 24px;
+            margin: 0 auto 10px;
+        }
+        
+        .sidebar-logo-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background: linear-gradient(90deg, #f0f7ff, transparent);
+            color: var(--vert-sapin);
+            border-left: 4px solid var(--vert-sapin);
+            padding-left: 16px;
+        }
+        
+        .sidebar-nav i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            background: var(--white);
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            gap: 15px;
+        }
+        
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .back-btn:hover {
+            background: var(--light-gray);
+            border-color: var(--vert-sapin);
+            color: var(--vert-sapin);
+        }
+        
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        
+        .form-container {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 700px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-blue);
+            font-size: 14px;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Open Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--vert-sapin);
+            box-shadow: 0 0 0 3px rgba(27, 94, 75, 0.1);
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 35px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #0B2C3D, #1B5E4B);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(27, 94, 75, 0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--light-gray);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--white);
+            border-color: var(--vert-sapin);
+        }
+        
+        .btn-danger {
+            background: #FF6B6B;
+            color: var(--white);
+        }
+        
+        .btn-danger:hover {
+            background: #EE5A52;
+        }
+        
+        .success-message {
+            display: none;
+            padding: 16px;
+            background: #D4EDDA;
+            border: 1px solid #C3E6CB;
+            border-radius: 8px;
+            color: #155724;
+            margin-bottom: 25px;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .success-message.show {
+            display: block;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+        }
+        
+        .modal-body {
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        
+        .btn-cancel {
+            background: var(--light-gray);
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-cancel:hover {
+            background: #EEEEEE;
+        }
+        
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="sidebar-logo-text">Fitopia</div>
+        </div>
+        <ul class="sidebar-nav">
+            <li><a href="/dashboard.html"><i class="fas fa-th-large"></i> Dashboard</a></li>
+            <li><a href="/products.html" class="active"><i class="fas fa-list"></i> Products</a></li>
+            <li><a href="/users.html"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="/settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="page-header">
+            <a href="/products.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <h1 class="page-title">Edit Product</h1>
+        </div>
+
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Product updated successfully!
+            </div>
+
+            <form id="productForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productName">Product Name *</label>
+                        <input type="text" id="productName" name="productName" placeholder="Enter product name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sku">SKU *</label>
+                        <input type="text" id="sku" name="sku" placeholder="e.g., P001" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">Category *</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select a category</option>
+                            <option value="fitness">Fitness Equipment</option>
+                            <option value="wearables">Wearables</option>
+                            <option value="strength">Strength Training</option>
+                            <option value="supplements">Supplements</option>
+                            <option value="nutrition">Nutrition</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <select id="status" name="status" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="price">Price ($) *</label>
+                        <input type="number" id="price" name="price" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stock">Stock Quantity *</label>
+                        <input type="number" id="stock" name="stock" placeholder="0" min="0" required>
+                    </div>
+                </div>
+
+                <div class="form-row full">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" placeholder="Enter product description..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="manufacturer">Manufacturer</label>
+                        <input type="text" id="manufacturer" name="manufacturer" placeholder="Enter manufacturer name">
+                    </div>
+                    <div class="form-group">
+                        <label for="weight">Weight (kg)</label>
+                        <input type="number" id="weight" name="weight" placeholder="0.0" step="0.1" min="0">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <a href="/products.html" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="button" onclick="openDeleteModal()" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <i class="fas fa-exclamation-circle" style="color: #FF6B6B; margin-right: 10px;"></i>Delete Product
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this product? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeDeleteModal()" class="btn btn-cancel">Cancel</button>
+                <button onclick="confirmDelete()" class="btn btn-danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample product data (in a real app, this would come from a database)
+        const productData = {
+            1: {
+                productName: 'Premium Yoga Mat',
+                sku: 'P001',
+                category: 'fitness',
+                status: 'active',
+                price: '49.99',
+                stock: '120',
+                description: 'Premium quality non-slip yoga mat with carrying strap',
+                manufacturer: 'YogaPro Inc',
+                weight: '0.6'
+            },
+            2: {
+                productName: 'Resistance Bands Set',
+                sku: 'P002',
+                category: 'fitness',
+                status: 'active',
+                price: '29.99',
+                stock: '85',
+                description: 'Complete set of 5 resistance bands for all fitness levels',
+                manufacturer: 'FitBands Co',
+                weight: '0.3'
+            },
+            3: {
+                productName: 'Wireless Fitness Tracker',
+                sku: 'P003',
+                category: 'wearables',
+                status: 'active',
+                price: '89.99',
+                stock: '45',
+                description: 'Advanced fitness tracker with heart rate monitor',
+                manufacturer: 'TechFit',
+                weight: '0.05'
+            },
+            4: {
+                productName: 'Dumbbells Set (Adjustable)',
+                sku: 'P004',
+                category: 'strength',
+                status: 'inactive',
+                price: '199.99',
+                stock: '30',
+                description: 'Adjustable dumbbells set (5-40 lbs)',
+                manufacturer: 'PowerLift',
+                weight: '2.5'
+            },
+            5: {
+                productName: 'Protein Shaker Bottle',
+                sku: 'P005',
+                category: 'supplements',
+                status: 'active',
+                price: '14.99',
+                stock: '200',
+                description: 'Stainless steel protein shaker with mixing ball',
+                manufacturer: 'ShakeGear',
+                weight: '0.2'
+            }
+        };
+
+        // Get product ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = urlParams.get('id');
+
+        // Navigation active state
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            if (link.href.includes('products.html')) {
+                link.classList.add('active');
+            }
+        });
+
+        // Load product data
+        if (productId && productData[productId]) {
+            const product = productData[productId];
+            document.getElementById('productName').value = product.productName;
+            document.getElementById('sku').value = product.sku;
+            document.getElementById('category').value = product.category;
+            document.getElementById('status').value = product.status;
+            document.getElementById('price').value = product.price;
+            document.getElementById('stock').value = product.stock;
+            document.getElementById('description').value = product.description;
+            document.getElementById('manufacturer').value = product.manufacturer;
+            document.getElementById('weight').value = product.weight;
+        }
+
+        // Form submission
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.add('show');
+
+            setTimeout(() => {
+                window.location.href = '/products.html';
+            }, 2000);
+        });
+
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+
+        function confirmDelete() {
+            window.location.href = '/products.html';
+        }
+
+        // Close modal on outside click
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+    </script>
+</body>
+</html>

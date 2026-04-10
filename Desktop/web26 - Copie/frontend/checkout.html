@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement - Fitopia Supplements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Maven+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/shop.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-logo">
+                    <a href="index.html">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>FITOPIA</span>
+                    </a>
+                </div>
+                <div class="checkout-steps">
+                    <div class="step active">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>Panier</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step active">
+                        <i class="fas fa-user"></i>
+                        <span>Informations</span>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step">
+                        <i class="fas fa-credit-card"></i>
+                        <span>Paiement</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Checkout Section -->
+    <section class="checkout-section">
+        <div class="container">
+            <div class="checkout-layout">
+                <!-- Checkout Form -->
+                <div class="checkout-main">
+                    <h2>Informations de livraison</h2>
+                    
+                    <form id="checkoutForm" class="checkout-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="firstName">Prénom *</label>
+                                <input type="text" id="firstName" name="firstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Nom *</label>
+                                <input type="text" id="lastName" name="lastName" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone">Téléphone *</label>
+                            <input type="tel" id="phone" name="phone" required placeholder="+216 XX XXX XXX">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="address">Adresse complète *</label>
+                            <input type="text" id="address" name="address" required placeholder="Rue, numéro, bâtiment...">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="city">Ville *</label>
+                                <input type="text" id="city" name="city" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="postalCode">Code postal *</label>
+                                <input type="text" id="postalCode" name="postalCode" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Notes de commande (optionnel)</label>
+                            <textarea id="notes" name="notes" rows="3" placeholder="Instructions spéciales pour la livraison..."></textarea>
+                        </div>
+
+                        <h2 style="margin-top: 40px;">Méthode de paiement</h2>
+
+                        <div class="payment-methods-selection">
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="visa" required>
+                                <div class="payment-method-card">
+                                    <i class="fab fa-cc-visa"></i>
+                                    <span>Carte Visa</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="mastercard" required>
+                                <div class="payment-method-card">
+                                    <i class="fab fa-cc-mastercard"></i>
+                                    <span>Mastercard</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="paypal" required>
+                                <div class="payment-method-card">
+                                    <i class="fab fa-cc-paypal"></i>
+                                    <span>PayPal</span>
+                                </div>
+                            </label>
+
+                            <label class="payment-method-option">
+                                <input type="radio" name="paymentMethod" value="cod" required checked>
+                                <div class="payment-method-card">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                    <span>Paiement à la livraison</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="shop.html?cart=open" class="back-btn">
+                                <i class="fas fa-arrow-left"></i> Retour au panier
+                            </a>
+                            <button type="submit" class="submit-order-btn">
+                                <i class="fas fa-lock"></i> Confirmer la commande
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary -->
+                <aside class="order-summary">
+                    <h3>Résumé de la commande</h3>
+                    
+                    <div id="orderItems" class="order-items">
+                        <!-- Items will be loaded here -->
+                    </div>
+
+                    <div class="summary-totals">
+                        <div class="summary-row">
+                            <span>Sous-total</span>
+                            <span id="summarySubtotal">0.00 DT</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Livraison</span>
+                            <span id="summaryShipping">0.00 DT</span>
+                        </div>
+                        <div class="summary-row discount-row" id="summaryDiscountRow" style="display: none;">
+                            <span>Réduction</span>
+                            <span id="summaryDiscount">-0.00 DT</span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span>Total</span>
+                            <span id="summaryTotal" class="total-price">0.00 DT</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/checkout.js"></script>
+</body>
+</html>

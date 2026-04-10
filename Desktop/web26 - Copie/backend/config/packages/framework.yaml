@@ -1,0 +1,23 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    http_method_override: false
+    handle_all_throwables: true
+    php_errors:
+        log: true
+    csrf_protection: ~
+    session:
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        cookie_secure: auto
+        cookie_samesite: lax
+        storage_factory_id: session.storage.factory.native
+
+when@dev:
+    framework:
+        router:
+            strict_requirements: true
+
+when@prod:
+    framework:
+        router:
+            strict_requirements: null
+

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commande Confirmée - Fitopia Supplements</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Maven+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/shop.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <link rel="stylesheet" href="css/checkout.css">
+    <link rel="stylesheet" href="css/payment.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-logo">
+                    <a href="index.html">
+                        <i class="fas fa-dumbbell"></i>
+                        <span>FITOPIA</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Success Section -->
+    <section class="success-section">
+        <div class="container">
+            <div class="success-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                
+                <h1>Commande confirmée!</h1>
+                <p class="success-message">Merci pour votre commande. Nous avons bien reçu votre demande.</p>
+                
+                <div class="order-number">
+                    <span>Numéro de commande:</span>
+                    <strong id="orderNumber">FIT-123456789</strong>
+                </div>
+
+                <div class="order-details-card">
+                    <h3>Détails de la commande</h3>
+                    
+                    <div class="detail-row">
+                        <span>Date de commande:</span>
+                        <strong id="orderDate">-</strong>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span>Méthode de paiement:</span>
+                        <strong id="paymentMethod">-</strong>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span>Montant total:</span>
+                        <strong id="orderTotal" class="total-amount">0.00 DT</strong>
+                    </div>
+                    
+                    <div class="detail-row">
+                        <span>Livraison estimée:</span>
+                        <strong id="deliveryDate">-</strong>
+                    </div>
+                </div>
+
+                <div class="customer-info-card">
+                    <h3>Informations de livraison</h3>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-user"></i>
+                        <span id="customerName">-</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-envelope"></i>
+                        <span id="customerEmail">-</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-phone"></i>
+                        <span id="customerPhone">-</span>
+                    </div>
+                    
+                    <div class="info-row">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span id="customerAddress">-</span>
+                    </div>
+                </div>
+
+                <div class="order-items-card">
+                    <h3>Articles commandés</h3>
+                    <div id="orderItemsList" class="success-order-items">
+                        <!-- Items will be loaded here -->
+                    </div>
+                </div>
+
+                <div class="success-actions">
+                    <a href="shop.html" class="continue-shopping-btn">
+                        <i class="fas fa-shopping-bag"></i> Continuer vos achats
+                    </a>
+                    <button onclick="window.print()" class="print-btn">
+                        <i class="fas fa-print"></i> Imprimer
+                    </button>
+                </div>
+
+                <div class="success-info">
+                    <i class="fas fa-info-circle"></i>
+                    <p>Un email de confirmation a été envoyé à votre adresse email. Vous pouvez suivre votre commande dans votre espace client.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="js/order-success.js"></script>
+</body>
+</html>
+

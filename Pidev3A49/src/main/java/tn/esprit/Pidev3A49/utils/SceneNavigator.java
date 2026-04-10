@@ -24,6 +24,7 @@ public final class SceneNavigator {
     public static final ViewState START_VIEW = new ViewState("/Start.fxml", "Fitopia");
     public static final ViewState FRONT_END_VIEW = new ViewState("/SupplementCatalogShowcase.fxml", "Supplement Front End");
     public static final ViewState BACK_END_VIEW = new ViewState("/Main.fxml", "Supplement Back End");
+    public static final ViewState ORDERD_VIEW = new ViewState("/OrderedCustomers.fxml", "Orderd Customers");
     public static final ViewState PROGRESS_VIEW = new ViewState("/SupplementProgress.fxml", "My Supplement Progress");
     public static final ViewState RANKING_VIEW = new ViewState("/MonthlyRanking.fxml", "Monthly Ranking");
     public static final ViewState CHECKOUT_VIEW = new ViewState("/Checkout.fxml", "Secure Checkout");

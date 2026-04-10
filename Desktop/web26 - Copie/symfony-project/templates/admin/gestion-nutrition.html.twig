@@ -1,0 +1,340 @@
+{% extends 'admin/layout.html.twig' %}
+
+{% block title %}Gestion alimentation | Fitopia{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .agenda-hero {
+    background: linear-gradient(135deg, #0b3a3d 0%, #0d5b50 55%, #0f7a5f 100%);
+    color: #fff;
+    border-radius: 16px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 18px 50px rgba(14, 30, 37, 0.18);
+    position: relative;
+    overflow: hidden;
+  }
+  .agenda-hero::after {
+    content: "";
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 180px;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+  }
+  .option-grid {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .option-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 1.5rem;
+    box-shadow: 0 12px 30px rgba(14, 30, 37, 0.08);
+    border: 1px solid #eef2f6;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+  }
+  .option-card.selected {
+    border-color: #0f7a5f;
+    box-shadow: 0 0 0 3px rgba(15, 122, 95, 0.15);
+  }
+  .panel {
+    margin-top: 2rem;
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.75rem;
+    border: 1px solid #eef2f6;
+    box-shadow: 0 12px 30px rgba(14, 30, 37, 0.08);
+    display: none;
+    transform: translateY(12px);
+    opacity: 0;
+    transition: all 0.25s ease;
+  }
+  .panel.active {
+    display: block;
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .panel h3 {
+    margin-top: 0;
+    font-weight: 800;
+  }
+  .panel .muted { color: #6b7280; }
+  .form-wrap {
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #eef2f6;
+    padding: 1.5rem;
+  }
+  .icon-input {
+    position: relative;
+  }
+  .icon-input i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #0f7a5f;
+  }
+  .icon-input input,
+  .icon-input textarea,
+  .icon-input select {
+    padding-left: 38px;
+  }
+  .success-toast {
+    background: #e6fffa;
+    color: #0b3a3d;
+    border: 1px solid #b7f3ea;
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    animation: popIn 0.5s ease;
+  }
+  @keyframes popIn {
+    from { transform: translateY(-8px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    border: 1px solid #eef2f6;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+  }
+  .action-btn {
+    background: #0b3a3d;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.45rem 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .feed-card {
+    border: 1px solid #eef2f6;
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.8rem;
+  }
+  .option-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 18px 40px rgba(14, 30, 37, 0.15);
+  }
+  .option-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #e6f0ee;
+    color: #0b3a3d;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 0.75rem;
+  }
+  @media (max-width: 991px) {
+    .option-grid { grid-template-columns: 1fr; }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+  <div class="agenda-hero">
+    <h2 style="font-weight:800;margin:0 0 0.4rem;">Hello Mr Nutrition Manager</h2>
+    <p style="opacity:0.9;margin:0;">Be creative — what is your agenda for today?</p>
+  </div>
+
+  <div class="option-grid">
+    <div class="option-card" data-action="create">
+      <div class="option-icon"><i class="fa fa-plus"></i></div>
+      <h4>Ajouter restriction alimentaire</h4>
+      <p class="text-muted">Creer une nouvelle restriction ou preference.</p>
+    </div>
+    <div class="option-card" data-action="delete">
+      <div class="option-icon"><i class="fa fa-trash"></i></div>
+      <h4>Supprimer restriction alimentaire</h4>
+      <p class="text-muted">Retirer une restriction existante.</p>
+    </div>
+    <div class="option-card" data-action="update">
+      <div class="option-icon"><i class="fa fa-edit"></i></div>
+      <h4>Update restriction alimentaire</h4>
+      <p class="text-muted">Mettre a jour une restriction.</p>
+    </div>
+    <div class="option-card" data-action="explore">
+      <div class="option-icon"><i class="fa fa-eye"></i></div>
+      <h4>Explore restriction alimentaire</h4>
+      <p class="text-muted">Consulter les restrictions disponibles.</p>
+    </div>
+  </div>
+
+  {% set restrictions = restrictions|default([]) %}
+
+  <div id="panel-create" class="panel">
+    <h3>Ajouter restriction alimentaire</h3>
+    <p class="muted">Creer une nouvelle restriction alimentaire.</p>
+    <div class="form-wrap">
+      {% for message in app.flashes('success') %}
+        <div class="success-toast">{{ message }}</div>
+      {% endfor %}
+      {{ form_start(restrictionForm) }}
+        <div class="mb-3 icon-input">
+          <i class="fa fa-leaf"></i>
+          {{ form_widget(restrictionForm.restrictionName, {'attr': {'class': 'form-control', 'placeholder': 'Allergie aux noix'}}) }}
+          {{ form_errors(restrictionForm.restrictionName) }}
+        </div>
+        <div class="mb-3 icon-input">
+          <i class="fa fa-tags"></i>
+          {{ form_widget(restrictionForm.restrictionType, {'attr': {'class': 'form-control'}}) }}
+          {{ form_errors(restrictionForm.restrictionType) }}
+        </div>
+        <div class="mb-3 icon-input">
+          <i class="fa fa-exclamation-triangle"></i>
+          {{ form_widget(restrictionForm.severity, {'attr': {'class': 'form-control'}}) }}
+          {{ form_errors(restrictionForm.severity) }}
+        </div>
+        <div class="mb-3 icon-input">
+          <i class="fa fa-calendar"></i>
+          {{ form_widget(restrictionForm.startDate, {'attr': {'class': 'form-control'}}) }}
+          {{ form_errors(restrictionForm.startDate) }}
+        </div>
+        <div class="mb-3">
+          {{ form_widget(restrictionForm.isTemporary) }}
+          {{ form_label(restrictionForm.isTemporary) }}
+          {{ form_errors(restrictionForm.isTemporary) }}
+        </div>
+        <div class="mb-3 icon-input">
+          <i class="fa fa-calendar-check-o"></i>
+          {{ form_widget(restrictionForm.endDate, {'attr': {'class': 'form-control'}}) }}
+          {{ form_errors(restrictionForm.endDate) }}
+        </div>
+        <button class="action-btn" type="submit">Ajouter</button>
+      {{ form_end(restrictionForm) }}
+    </div>
+  </div>
+
+  <div id="panel-update" class="panel">
+    <h3>Update restriction alimentaire</h3>
+    {% if restrictions is empty %}
+      <p class="muted">Aucune restriction alimentaire disponible.</p>
+    {% else %}
+      {% for r in restrictions %}
+        <div class="list-item">
+          <div>
+            <strong>{{ r.restrictionName }}</strong><br>
+            <small class="muted">{{ r.restrictionType }} · {{ r.severity }}</small>
+          </div>
+          <button class="action-btn js-restriction-toggle" type="button" data-restriction-id="{{ r.id }}">Update</button>
+        </div>
+        <div class="form-wrap" id="restriction-form-{{ r.id }}" style="display:none;margin-bottom:1rem;">
+          {{ form_start(editForms[r.id]) }}
+            <div class="mb-3 icon-input">
+              <i class="fa fa-leaf"></i>
+              {{ form_widget(editForms[r.id].restrictionName, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3 icon-input">
+              <i class="fa fa-tags"></i>
+              {{ form_widget(editForms[r.id].restrictionType, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3 icon-input">
+              <i class="fa fa-exclamation-triangle"></i>
+              {{ form_widget(editForms[r.id].severity, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3 icon-input">
+              <i class="fa fa-calendar"></i>
+              {{ form_widget(editForms[r.id].startDate, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <div class="mb-3">
+              {{ form_widget(editForms[r.id].isTemporary) }}
+              {{ form_label(editForms[r.id].isTemporary) }}
+            </div>
+            <div class="mb-3 icon-input">
+              <i class="fa fa-calendar-check-o"></i>
+              {{ form_widget(editForms[r.id].endDate, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            <button class="action-btn" type="submit">Save changes</button>
+          {{ form_end(editForms[r.id]) }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div id="panel-delete" class="panel">
+    <h3>Supprimer restriction alimentaire</h3>
+    {% if restrictions is empty %}
+      <p class="muted">Aucune restriction alimentaire disponible.</p>
+    {% else %}
+      {% for r in restrictions %}
+        <div class="list-item">
+          <div>
+            <strong>{{ r.restrictionName }}</strong><br>
+            <small class="muted">{{ r.restrictionType }} · {{ r.severity }}</small>
+          </div>
+          <form method="post" action="{{ path('admin_nutrition_delete', {'id': r.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete_restriction_' ~ r.id) }}">
+            <button class="action-btn" type="submit">Delete</button>
+          </form>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <div id="panel-explore" class="panel">
+    <h3>Explore restriction alimentaire</h3>
+    {% if restrictions is empty %}
+      <p class="muted">Aucune restriction alimentaire disponible.</p>
+    {% else %}
+      {% for r in restrictions %}
+        <div class="feed-card">
+          <strong>{{ r.restrictionName }}</strong>
+          <p class="muted">{{ r.restrictionType }} · {{ r.severity }}</p>
+          <small class="muted">
+            Start: {{ r.startDate ? r.startDate|date('Y-m-d') : '—' }}
+            {% if r.isTemporary and r.endDate %}
+              · End: {{ r.endDate|date('Y-m-d') }}
+            {% endif %}
+          </small>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.option-card');
+    const panels = {
+      create: document.getElementById('panel-create'),
+      update: document.getElementById('panel-update'),
+      delete: document.getElementById('panel-delete'),
+      explore: document.getElementById('panel-explore'),
+    };
+    const editToggles = document.querySelectorAll('.js-restriction-toggle');
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        Object.values(panels).forEach(p => p.classList.remove('active'));
+        const key = card.getAttribute('data-action');
+        if (panels[key]) {
+          panels[key].classList.add('active');
+        }
+      });
+    });
+    editToggles.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-restriction-id');
+        const form = document.getElementById('restriction-form-' + id);
+        if (!form) return;
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+  });
+</script>
+{% endblock %}
