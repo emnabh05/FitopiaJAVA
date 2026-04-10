@@ -303,6 +303,8 @@ public class MainController {
     private List<RegimeAlimentaire> allRegimes = List.of();
     private List<Repas> repasExplorerView = List.of();
     private Integer repasEditSelectionId;
+    private int verresEau = 0;
+
 
     @FXML
     public void initialize() {
@@ -490,9 +492,9 @@ public class MainController {
                 activeRegime.getId()
             );
             
-            serviceRepas.add(nouveau);
+            fusionnerRepasSiExiste(nouveau);
             rafraichirDonnees();
-            showInfo("Repas '" + source.getNomRepas() + "' ajoute a votre journee !");
+            showInfo("Calories ajoutées à votre suivi !");
             masquerTousLesFormulaires();
         } catch (Exception exception) {
             showError("Erreur ajout", exception.getMessage());
@@ -502,10 +504,10 @@ public class MainController {
     @FXML
     private void ajouterRepas() {
         try {
-            serviceRepas.add(construireRepas(false));
+            fusionnerRepasSiExiste(construireRepas(false));
             rafraichirDonnees();
             viderFormulaireRepas();
-            showInfo("Repas ajoute avec succes.");
+            showInfo("Données nutritionnelles mises à jour.");
             masquerTousLesFormulaires();
         } catch (Exception exception) {
             showError("Erreur repas", exception.getMessage());
@@ -580,6 +582,41 @@ public class MainController {
         } catch (Exception exception) {
             showError("Erreur regime", exception.getMessage());
         }
+    }
+
+    @FXML
+    private void ajouterVerreEau() {
+        verresEau++;
+        actualiserDashboardPlanner();
+    }
+
+
+    private void fusionnerRepasSiExiste(Repas nouveau) {
+        if (nouveau == null) return;
+        User refUser = determinerUtilisateurReference();
+        List<Repas> duJour = filtrerRepasDuJour(refUser);
+        
+        Repas existing = duJour.stream()
+                .filter(r -> r.getRegimeId() != null && r.getRegimeId().equals(nouveau.getRegimeId()))
+                .findFirst()
+                .orElse(null);
+
+        if (existing != null) {
+            existing.setCalories(safeAdd(existing.getCalories(), nouveau.getCalories()));
+            existing.setProteines(safeAdd(existing.getProteines(), nouveau.getProteines()));
+            existing.setGlucides(safeAdd(existing.getGlucides(), nouveau.getGlucides()));
+            existing.setLipides(safeAdd(existing.getLipides(), nouveau.getLipides()));
+            existing.setNomRepas("Suivi nutritionnel du jour");
+            existing.setTypeRepas("Mixte");
+            serviceRepas.update(existing);
+        } else {
+            nouveau.setNomRepas("Suivi nutritionnel du jour");
+            serviceRepas.add(nouveau);
+        }
+    }
+
+    private Integer safeAdd(Integer a, Integer b) {
+        return ((a == null) ? 0 : a) + ((b == null) ? 0 : b);
     }
 
     @FXML
@@ -1034,7 +1071,11 @@ public class MainController {
             mettreAJourProgression(curKcal + " / " + target + " kcal (" + rem + " restantes)", ratio(curKcal, target), pbPlannerCalories, lblPlannerCaloriesProgress);
             
             boolean caloriesRespectees = curKcal > 0 && curKcal <= target;
-            boolean hydratationOk = repasDuJour.size() >= 3;
+            boolean hydratationOk = verresEau >= 5;
+            if (lblBadgeHydrationDesc != null) {
+                lblBadgeHydrationDesc.setText("Objectif : 1L par jour (" + verresEau + "/5 verres)");
+            }
+
             boolean semaineParfaite = curKcal > 0 && Math.abs(curKcal - target) <= (target * 0.05); // within 5%
             
             styleBadge(paneBadgeWinStreak, lblBadgeWinStreakIcon, lblBadgeWinStreakTitle, lblBadgeWinStreakDesc, semaineParfaite);

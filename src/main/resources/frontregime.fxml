@@ -283,15 +283,16 @@
                                                          </VBox>
                                                      </HBox>
                                                  </VBox>
-                                                 <VBox fx:id="paneBadgeHydration" styleClass="badge-row, badge-locked">
-                                                     <HBox spacing="12" alignment="CENTER_LEFT">
-                                                         <Label fx:id="lblBadgeHydrationIcon" text="&#128274;" styleClass="badge-icon-locked" style="-fx-font-size: 16px;"/>
-                                                         <VBox>
-                                                             <Label fx:id="lblBadgeHydrationTitle" text="Hydratation OK" styleClass="badge-title-locked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
-                                                             <Label fx:id="lblBadgeHydrationDesc" text="Au moins 3 repas / collations enregistrés aujourd'hui." styleClass="badge-desc-locked" style="-fx-font-size: 11px;"/>
-                                                         </VBox>
-                                                     </HBox>
-                                                 </VBox>
+                                                  <VBox fx:id="paneBadgeHydration" styleClass="badge-row, badge-locked">
+                                                      <HBox spacing="12" alignment="CENTER_LEFT">
+                                                          <Label fx:id="lblBadgeHydrationIcon" text="&#128274;" styleClass="badge-icon-locked" style="-fx-font-size: 16px;"/>
+                                                          <VBox HBox.hgrow="ALWAYS">
+                                                              <Label fx:id="lblBadgeHydrationTitle" text="Hydratation OK" styleClass="badge-title-locked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
+                                                              <Label fx:id="lblBadgeHydrationDesc" text="Au moins un litre d'eau par jour." styleClass="badge-desc-locked" style="-fx-font-size: 11px;"/>
+                                                          </VBox>
+                                                          <Button onAction="#ajouterVerreEau" text="+" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: 900; -fx-background-radius: 999; -fx-min-width: 26; -fx-min-height: 26; -fx-padding: 0; -fx-cursor: hand;"/>
+                                                      </HBox>
+                                                  </VBox>
                                                  <VBox fx:id="paneBadgeCalories" styleClass="badge-row, badge-locked">
                                                      <HBox spacing="12" alignment="CENTER_LEFT">
                                                          <Label fx:id="lblBadgeCaloriesIcon" text="&#128274;" styleClass="badge-icon-locked" style="-fx-font-size: 16px;"/>
