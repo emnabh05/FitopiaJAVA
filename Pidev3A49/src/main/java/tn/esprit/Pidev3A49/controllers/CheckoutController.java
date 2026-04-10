@@ -18,6 +18,7 @@ import tn.esprit.Pidev3A49.Models.SupplementOrder;
 import tn.esprit.Pidev3A49.Models.SupplementOrderItem;
 import tn.esprit.Pidev3A49.services.ServiceSupplementOrder;
 import tn.esprit.Pidev3A49.utils.CartStore;
+import tn.esprit.Pidev3A49.utils.PendingOrderStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
 
 import javafx.event.ActionEvent;
@@ -130,6 +131,7 @@ public class CheckoutController {
     private Button placeOrderButton;
 
     private final CartStore cartStore = CartStore.getInstance();
+    private final PendingOrderStore pendingOrderStore = PendingOrderStore.getInstance();
     private ServiceSupplementOrder serviceSupplementOrder;
     private BigDecimal appliedDiscountAmount = BigDecimal.ZERO;
 
@@ -207,6 +209,17 @@ public class CheckoutController {
 
         try {
             SupplementOrder order = buildOrder(cartItems);
+
+            if ("Visa".equalsIgnoreCase(order.getPaymentMethod()) || "Mastercard".equalsIgnoreCase(order.getPaymentMethod())) {
+                pendingOrderStore.setPendingOrder(order);
+                try {
+                    SceneNavigator.navigate(event, SceneNavigator.CHECKOUT_VIEW, SceneNavigator.CARD_PAYMENT_VIEW);
+                } catch (IOException exception) {
+                    throw new IllegalStateException("Impossible d'ouvrir la page de paiement carte.");
+                }
+                return;
+            }
+
             int orderId = serviceSupplementOrder.placeOrder(order);
             cartStore.setLastCheckoutEmail(order.getEmail());
 

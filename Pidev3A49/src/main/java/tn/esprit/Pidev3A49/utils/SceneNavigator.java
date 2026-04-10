@@ -29,6 +29,7 @@ public final class SceneNavigator {
     public static final ViewState PROGRESS_VIEW = new ViewState("/SupplementProgress.fxml", "My Supplement Progress");
     public static final ViewState RANKING_VIEW = new ViewState("/MonthlyRanking.fxml", "Monthly Ranking");
     public static final ViewState CHECKOUT_VIEW = new ViewState("/Checkout.fxml", "Secure Checkout");
+    public static final ViewState CARD_PAYMENT_VIEW = new ViewState("/CardPayment.fxml", "Card Payment");
 
     private static final Deque<ViewState> HISTORY = new ArrayDeque<>();
 
