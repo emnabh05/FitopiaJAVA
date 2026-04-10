@@ -444,10 +444,14 @@ public class MainController {
     private void actualiserSelectionRepasJointure() {
         if (tileRepasSelectionCards == null) return;
         
+        RegimeAlimentaire activeRegime = getActualActiveRegime();
+        final Integer activeRid = activeRegime != null ? activeRegime.getId() : null;
+        
         String search = tfRepasSelectionSearch == null ? "" : tfRepasSelectionSearch.getText();
         List<Repas> selectionList = allRepas.stream()
+                .filter(repas -> activeRid == null || (repas.getRegimeId() != null && repas.getRegimeId().equals(activeRid)))
                 .filter(repas -> correspondRechercheRepas(repas, search))
-                .limit(20) // limiter pour perf
+                .limit(40) 
                 .toList();
 
         tileRepasSelectionCards.getChildren().setAll(selectionList.stream()
@@ -1050,6 +1054,7 @@ public class MainController {
 
         // Logic for refreshing current view lists
         rafraichirListesDashboard();
+        actualiserSelectionRepasJointure();
     }
 
     private void rafraichirListesDashboard() {
