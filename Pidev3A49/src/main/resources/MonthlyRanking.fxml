@@ -38,10 +38,6 @@
                             </children>
                         </StackPane>
 
-                        <Button text="Home"
-                                style="-fx-background-color: transparent; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 700;"/>
-                        <Button text="About Fitopia"
-                                style="-fx-background-color: transparent; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 700;"/>
                         <Button text="Explore Supplements"
                                 onAction="#openSupplementShowcase"
                                 style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
@@ -56,13 +52,6 @@
                         <Button text="Back End"
                                 onAction="#openBackEnd"
                                 style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #123B49; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                        <Button text="Return"
-                                onAction="#goBackOrExit"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #94A3B8; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                        <Button text="My Profile"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #22C55E; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                        <Button text="Logout"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #EF4444; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
                     </children>
                 </HBox>
 
@@ -105,9 +94,19 @@
                             <padding>
                                 <Insets top="18.0" right="18.0" bottom="18.0" left="18.0"/>
                             </padding>
+                                    <children>
+                                        <Label text="No intake logs were found for this month yet."
+                                               style="-fx-text-fill: #8A9BA7; -fx-font-size: 16px; -fx-font-weight: 600;"/>
+                                    </children>
+                                </HBox>
+
+                        <HBox alignment="CENTER_LEFT">
                             <children>
-                                <Label text="No intake logs were found for this month yet."
-                                       style="-fx-text-fill: #8A9BA7; -fx-font-size: 16px; -fx-font-weight: 600;"/>
+                                <Button text="Return"
+                                        onAction="#goBackOrExit"
+                                        prefWidth="130.0"
+                                        prefHeight="44.0"
+                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #CBD8E0; -fx-border-radius: 14; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 800;"/>
                             </children>
                         </HBox>
                     </children>

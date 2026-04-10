@@ -16,11 +16,14 @@ public final class SceneNavigator {
 
     public static final double WINDOW_WIDTH = 1440.0;
     public static final double WINDOW_HEIGHT = 1024.0;
+    public static final boolean OPEN_MAXIMIZED = true;
 
+    public static final ViewState START_VIEW = new ViewState("/Start.fxml", "Fitopia");
     public static final ViewState FRONT_END_VIEW = new ViewState("/SupplementCatalogShowcase.fxml", "Supplement Front End");
     public static final ViewState BACK_END_VIEW = new ViewState("/Main.fxml", "Supplement Back End");
     public static final ViewState PROGRESS_VIEW = new ViewState("/SupplementProgress.fxml", "My Supplement Progress");
     public static final ViewState RANKING_VIEW = new ViewState("/MonthlyRanking.fxml", "Monthly Ranking");
+    public static final ViewState CHECKOUT_VIEW = new ViewState("/Checkout.fxml", "Secure Checkout");
 
     private static final Deque<ViewState> HISTORY = new ArrayDeque<>();
 
@@ -50,7 +53,14 @@ public final class SceneNavigator {
         Stage stage = extractStage(event);
         stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
         stage.setTitle(targetView.title());
+        applyWindowMode(stage);
         stage.show();
+    }
+
+    public static void applyWindowMode(Stage stage) {
+        if (OPEN_MAXIMIZED) {
+            stage.setMaximized(true);
+        }
     }
 
     private static Stage extractStage(ActionEvent event) {

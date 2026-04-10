@@ -37,32 +37,33 @@
                     </padding>
 
                     <children>
-                        <HBox spacing="12.0" alignment="CENTER_RIGHT">
+                        <HBox alignment="CENTER_RIGHT">
                             <children>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Button text="Back End"
-                                        onAction="#openBackEnd"
-                                        prefHeight="42.0"
-                                        style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                <Button text="Return"
-                                        onAction="#goBackOrExit"
-                                        prefHeight="42.0"
-                                        style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                <Button text="My Progress"
-                                        onAction="#openProgressTracker"
-                                        prefHeight="42.0"
-                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                <Button text="Ranking"
-                                        onAction="#openMonthlyRanking"
-                                        prefHeight="42.0"
-                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                <Button text="Cart"
-                                        onAction="#showCartPanel"
-                                        prefHeight="42.0"
-                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                <Button text="Checkout"
-                                        prefHeight="42.0"
-                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                <FlowPane hgap="12.0" vgap="12.0" alignment="CENTER_RIGHT" prefWrapLength="720.0">
+                                    <children>
+                                        <Button text="Back End"
+                                                onAction="#openBackEnd"
+                                                prefHeight="42.0"
+                                                style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                        <Button text="My Progress"
+                                                onAction="#openProgressTracker"
+                                                prefHeight="42.0"
+                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                        <Button text="Ranking"
+                                                onAction="#openMonthlyRanking"
+                                                prefHeight="42.0"
+                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                        <Button text="Cart"
+                                                onAction="#showCartPanel"
+                                                prefHeight="42.0"
+                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                        <Button text="Checkout"
+                                                onAction="#openCheckout"
+                                                prefHeight="42.0"
+                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                    </children>
+                                </FlowPane>
                             </children>
                         </HBox>
 
@@ -281,6 +282,7 @@
                                 <HBox alignment="CENTER_RIGHT">
                                     <children>
                                         <Button text="PROCEED TO CHECKOUT"
+                                                onAction="#openCheckout"
                                                 prefWidth="214.0"
                                                 prefHeight="40.0"
                                                 style="-fx-background-color: linear-gradient(to right, #082C3C, #103D52); -fx-background-radius: 8; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
@@ -633,6 +635,16 @@
                                 </FlowPane>
                             </children>
                         </VBox>
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT">
+                    <children>
+                        <Button text="Return"
+                                onAction="#goBackOrExit"
+                                prefWidth="130.0"
+                                prefHeight="46.0"
+                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #CBD8E0; -fx-border-radius: 14; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 800;"/>
                     </children>
                 </HBox>
 

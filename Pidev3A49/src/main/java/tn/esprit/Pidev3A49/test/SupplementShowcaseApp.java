@@ -11,12 +11,13 @@ public class SupplementShowcaseApp extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(
-                SupplementShowcaseApp.class.getResource(SceneNavigator.FRONT_END_VIEW.fxmlPath())
+                SupplementShowcaseApp.class.getResource(SceneNavigator.START_VIEW.fxmlPath())
         );
 
         Scene scene = new Scene(loader.load(), SceneNavigator.WINDOW_WIDTH, SceneNavigator.WINDOW_HEIGHT);
-        stage.setTitle(SceneNavigator.FRONT_END_VIEW.title());
+        stage.setTitle(SceneNavigator.START_VIEW.title());
         stage.setScene(scene);
+        SceneNavigator.applyWindowMode(stage);
         stage.show();
     }
 
