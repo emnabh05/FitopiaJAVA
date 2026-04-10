@@ -3,6 +3,7 @@ package tn.esprit.Pidev3A49.models;
 import java.time.LocalDateTime;
 
 public class Participation {
+
     private int idParticipation;
     private int idEvent;
     private String nomParticipant;
@@ -12,6 +13,13 @@ public class Participation {
     public Participation() {
     }
 
+    public Participation(int idEvent, String nomParticipant, String emailParticipant, LocalDateTime dateInscription) {
+        this.idEvent = idEvent;
+        this.nomParticipant = nomParticipant;
+        this.emailParticipant = emailParticipant;
+        this.dateInscription = dateInscription;
+    }
+
     public Participation(int idParticipation, int idEvent, String nomParticipant, String emailParticipant,
                          LocalDateTime dateInscription) {
         this.idParticipation = idParticipation;
@@ -19,10 +27,6 @@ public class Participation {
         this.nomParticipant = nomParticipant;
         this.emailParticipant = emailParticipant;
         this.dateInscription = dateInscription;
-    }
-
-    public Participation(int idEvent, String nomParticipant, String emailParticipant, LocalDateTime dateInscription) {
-        this(0, idEvent, nomParticipant, emailParticipant, dateInscription);
     }
 
     public int getIdParticipation() {
@@ -63,5 +67,16 @@ public class Participation {
 
     public void setDateInscription(LocalDateTime dateInscription) {
         this.dateInscription = dateInscription;
+    }
+
+    @Override
+    public String toString() {
+        return "Participation{" +
+                "idParticipation=" + idParticipation +
+                ", idEvent=" + idEvent +
+                ", nomParticipant='" + nomParticipant + '\'' +
+                ", emailParticipant='" + emailParticipant + '\'' +
+                ", dateInscription=" + dateInscription +
+                '}';
     }
 }

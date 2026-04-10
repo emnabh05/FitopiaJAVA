@@ -1,10 +1,10 @@
 package tn.esprit.Pidev3A49.models;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Event {
+
     private int idEvent;
     private String titre;
     private String description;
@@ -13,16 +13,29 @@ public class Event {
     private int capacite;
     private String typeEvent;
     private String imageEvent;
-    private BigDecimal prixEvent;
+    private double prixEvent;
     private LocalDateTime createdAt;
     private boolean premium;
 
     public Event() {
     }
 
-    public Event(int idEvent, String titre, String description, LocalDate dateEvent, String lieu, int capacite,
-                 String typeEvent, String imageEvent, BigDecimal prixEvent, LocalDateTime createdAt, boolean premium) {
-        this.idEvent = idEvent;
+    public Event(String titre, String description, LocalDate dateEvent, String lieu, int capacite,
+                 String typeEvent, String imageEvent, double prixEvent, boolean premium) {
+        this.titre = titre;
+        this.description = description;
+        this.dateEvent = dateEvent;
+        this.lieu = lieu;
+        this.capacite = capacite;
+        this.typeEvent = typeEvent;
+        this.imageEvent = imageEvent;
+        this.prixEvent = prixEvent;
+        this.createdAt = LocalDateTime.now();
+        this.premium = premium;
+    }
+
+    public Event(String titre, String description, LocalDate dateEvent, String lieu, int capacite,
+                 String typeEvent, String imageEvent, double prixEvent, LocalDateTime createdAt, boolean premium) {
         this.titre = titre;
         this.description = description;
         this.dateEvent = dateEvent;
@@ -35,9 +48,19 @@ public class Event {
         this.premium = premium;
     }
 
-    public Event(String titre, String description, LocalDate dateEvent, String lieu, int capacite,
-                 String typeEvent, String imageEvent, BigDecimal prixEvent, LocalDateTime createdAt, boolean premium) {
-        this(0, titre, description, dateEvent, lieu, capacite, typeEvent, imageEvent, prixEvent, createdAt, premium);
+    public Event(int idEvent, String titre, String description, LocalDate dateEvent, String lieu, int capacite,
+                 String typeEvent, String imageEvent, double prixEvent, LocalDateTime createdAt, boolean premium) {
+        this.idEvent = idEvent;
+        this.titre = titre;
+        this.description = description;
+        this.dateEvent = dateEvent;
+        this.lieu = lieu;
+        this.capacite = capacite;
+        this.typeEvent = typeEvent;
+        this.imageEvent = imageEvent;
+        this.prixEvent = prixEvent;
+        this.createdAt = createdAt;
+        this.premium = premium;
     }
 
     public int getIdEvent() {
@@ -104,11 +127,11 @@ public class Event {
         this.imageEvent = imageEvent;
     }
 
-    public BigDecimal getPrixEvent() {
+    public double getPrixEvent() {
         return prixEvent;
     }
 
-    public void setPrixEvent(BigDecimal prixEvent) {
+    public void setPrixEvent(double prixEvent) {
         this.prixEvent = prixEvent;
     }
 
@@ -138,6 +161,7 @@ public class Event {
                 ", capacite=" + capacite +
                 ", typeEvent='" + typeEvent + '\'' +
                 ", prixEvent=" + prixEvent +
+                ", createdAt=" + createdAt +
                 ", premium=" + premium +
                 '}';
     }

@@ -1,6 +1,5 @@
 package tn.esprit.Pidev3A49.dao;
 
-import tn.esprit.Pidev3A49.interfaces.CrudRepository;
 import tn.esprit.Pidev3A49.models.Participation;
 import tn.esprit.Pidev3A49.utils.MyDataBase;
 
@@ -8,102 +7,57 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class ParticipationDAO implements CrudRepository<Participation, Integer> {
-    private static final String INSERT_SQL = """
-            INSERT INTO participation (id_event, nom_participant, email_participant, date_inscription)
-            VALUES (?, ?, ?, ?)
-            """;
-    private static final String UPDATE_SQL = """
-            UPDATE participation
-            SET id_event = ?, nom_participant = ?, email_participant = ?, date_inscription = ?
-            WHERE id_participation = ?
-            """;
-    private static final String DELETE_SQL = "DELETE FROM participation WHERE id_participation = ?";
-    private static final String FIND_BY_ID_SQL = "SELECT * FROM participation WHERE id_participation = ?";
-    private static final String FIND_ALL_SQL = "SELECT * FROM participation ORDER BY id_participation DESC";
+public class ParticipationDAO {
 
     private final Connection connection;
 
     public ParticipationDAO() {
-        this.connection = MyDataBase.getInstance().getCnx();
+        this.connection = MyDataBase.getInstance().getConnection();
     }
 
-    @Override
-    public void add(Participation participation) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            bindCommonFields(statement, participation);
-            statement.executeUpdate();
-
-            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
-                if (generatedKeys.next()) {
-                    participation.setIdParticipation(generatedKeys.getInt(1));
-                }
-            }
-        }
-    }
-
-    @Override
-    public void update(Participation participation) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
-            bindCommonFields(statement, participation);
-            statement.setInt(5, participation.getIdParticipation());
-            statement.executeUpdate();
-        }
-    }
-
-    @Override
-    public void deleteById(Integer id) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(DELETE_SQL)) {
-            statement.setInt(1, id);
-            statement.executeUpdate();
-        }
-    }
-
-    @Override
-    public Optional<Participation> findById(Integer id) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(FIND_BY_ID_SQL)) {
-            statement.setInt(1, id);
-            try (ResultSet resultSet = statement.executeQuery()) {
-                if (resultSet.next()) {
-                    return Optional.of(mapRow(resultSet));
-                }
-                return Optional.empty();
-            }
-        }
-    }
-
-    @Override
-    public List<Participation> findAll() throws SQLException {
+    public List<Participation> getAll() {
+        String sql = "SELECT id_participation, id_event, nom_participant, email_participant, date_inscription "
+                + "FROM participation ORDER BY id_participation DESC";
         List<Participation> participations = new ArrayList<>();
-        try (Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(FIND_ALL_SQL)) {
+
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
             while (resultSet.next()) {
-                participations.add(mapRow(resultSet));
+                participations.add(mapParticipation(resultSet));
             }
+        } catch (SQLException e) {
+            logSqlError(sql, e);
+            throw new RuntimeException("Echec SQL lors du chargement des participations.", e);
         }
+
         return participations;
     }
 
-    private void bindCommonFields(PreparedStatement statement, Participation participation) throws SQLException {
-        statement.setInt(1, participation.getIdEvent());
-        statement.setString(2, participation.getNomParticipant());
-        statement.setString(3, participation.getEmailParticipant());
-        statement.setTimestamp(4, Timestamp.valueOf(participation.getDateInscription()));
+    private Participation mapParticipation(ResultSet resultSet) throws SQLException {
+        Timestamp inscriptionTimestamp = resultSet.getTimestamp("date_inscription");
+        LocalDateTime dateInscription = inscriptionTimestamp != null ? inscriptionTimestamp.toLocalDateTime() : null;
+
+        return new Participation(
+                resultSet.getInt("id_participation"),
+                resultSet.getInt("id_event"),
+                resultSet.getString("nom_participant"),
+                resultSet.getString("email_participant"),
+                dateInscription
+        );
     }
 
-    private Participation mapRow(ResultSet resultSet) throws SQLException {
-        Participation participation = new Participation();
-        participation.setIdParticipation(resultSet.getInt("id_participation"));
-        participation.setIdEvent(resultSet.getInt("id_event"));
-        participation.setNomParticipant(resultSet.getString("nom_participant"));
-        participation.setEmailParticipant(resultSet.getString("email_participant"));
-        participation.setDateInscription(resultSet.getTimestamp("date_inscription").toLocalDateTime());
-        return participation;
+    private void logSqlError(String sql, SQLException e) {
+        System.err.println("Erreur SQL lors du chargement des participations.");
+        System.err.println("SQL : " + sql);
+        System.err.println("Message : " + e.getMessage());
+        System.err.println("SQLState : " + e.getSQLState());
+        System.err.println("Code erreur : " + e.getErrorCode());
+        e.printStackTrace();
     }
 }

@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:controller="tn.esprit.Pidev3A49.controllers.MainController"
+            minHeight="820.0"
+            minWidth="1320.0"
+            prefHeight="900.0"
+            prefWidth="1520.0"
+            styleClass="app-root"
+            xmlns="http://javafx.com/javafx/22.0.1"
+            xmlns:fx="http://javafx.com/fxml/1">
+
+    <left>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="sidebar-scroll">
+            <content>
+                <VBox minWidth="238.0" prefWidth="250.0" spacing="14.0" styleClass="sidebar">
+                    <padding>
+                        <Insets top="18.0" right="16.0" bottom="18.0" left="16.0"/>
+                    </padding>
+
+                    <children>
+                        <VBox spacing="12.0" styleClass="sidebar-block sidebar-brand-block">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <StackPane minHeight="44.0" minWidth="44.0" prefHeight="44.0" prefWidth="44.0" styleClass="brand-avatar">
+                                            <children>
+                                                <Label text="F" styleClass="brand-avatar-text"/>
+                                            </children>
+                                        </StackPane>
+                                        <VBox spacing="4.0">
+                                            <children>
+                                                <Label maxWidth="1.7976931348623157E308" text="Fitopia Admin" styleClass="brand-title"/>
+                                                <Label text="Administration Events" styleClass="brand-subtitle"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <Label text="event-admin@fitopia.tn" styleClass="brand-subtitle brand-pill"/>
+                            </children>
+                        </VBox>
+
+                        <Separator/>
+
+                        <VBox spacing="8.0" styleClass="sidebar-block">
+                            <children>
+                                <Label text="Navigation" styleClass="section-label"/>
+
+                                <Button fx:id="tablesButton"
+                                        maxWidth="1.7976931348623157E308"
+                                        mnemonicParsing="false"
+                                        onAction="#toggleTablesMenu"
+                                        prefWidth="214.0"
+                                        styleClass="nav-button active-nav nav-parent-button"
+                                        text="Tables"/>
+
+                                <VBox fx:id="tablesSubmenu"
+                                      managed="true"
+                                      spacing="6.0"
+                                      styleClass="submenu-container"
+                                      visible="true">
+                                    <children>
+                                        <Button disable="true"
+                                                focusTraversable="false"
+                                                maxWidth="1.7976931348623157E308"
+                                                mnemonicParsing="false"
+                                                prefWidth="214.0"
+                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                text="Gestion Utilisateurs"/>
+
+                                        <Button disable="true"
+                                                focusTraversable="false"
+                                                maxWidth="1.7976931348623157E308"
+                                                mnemonicParsing="false"
+                                                prefWidth="214.0"
+                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                text="Gestion Forum et Blog"/>
+
+                                        <Button disable="true"
+                                                focusTraversable="false"
+                                                maxWidth="1.7976931348623157E308"
+                                                mnemonicParsing="false"
+                                                prefWidth="214.0"
+                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                text="Gestion des stock"/>
+
+                                        <Button fx:id="eventsManagementButton"
+                                                maxWidth="1.7976931348623157E308"
+                                                mnemonicParsing="false"
+                                                onAction="#toggleEventsManagementMenu"
+                                                prefWidth="214.0"
+                                                styleClass="nav-button submenu-button nav-parent-button active-nav"
+                                                text="Gestion des evenements"/>
+
+                                        <VBox fx:id="eventsSubmenu"
+                                              managed="true"
+                                              spacing="6.0"
+                                              styleClass="submenu-container submenu-container-nested"
+                                              visible="true">
+                                            <children>
+                                                <Button disable="true"
+                                                        focusTraversable="false"
+                                                        maxWidth="1.7976931348623157E308"
+                                                        mnemonicParsing="false"
+                                                        prefWidth="214.0"
+                                                        styleClass="nav-button submenu-button submenu-button-nested nav-button-muted"
+                                                        text="Fidelite clients"/>
+
+                                                <Button disable="true"
+                                                        focusTraversable="false"
+                                                        maxWidth="1.7976931348623157E308"
+                                                        mnemonicParsing="false"
+                                                        prefWidth="214.0"
+                                                        styleClass="nav-button submenu-button submenu-button-nested nav-button-muted"
+                                                        text="Check in QR"/>
+                                            </children>
+                                        </VBox>
+
+                                        <Button disable="true"
+                                                focusTraversable="false"
+                                                maxWidth="1.7976931348623157E308"
+                                                mnemonicParsing="false"
+                                                prefWidth="214.0"
+                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                text="Gestion des entrainements"/>
+
+                                        <Button disable="true"
+                                                focusTraversable="false"
+                                                maxWidth="1.7976931348623157E308"
+                                                mnemonicParsing="false"
+                                                prefWidth="214.0"
+                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                text="Gestion alimentation"/>
+                                    </children>
+                                </VBox>
+
+                                <Button fx:id="participantsNavButton"
+                                        maxWidth="1.7976931348623157E308"
+                                        mnemonicParsing="false"
+                                        onAction="#showParticipantsSection"
+                                        prefWidth="214.0"
+                                        styleClass="nav-button"
+                                        text="Participation"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="8.0" styleClass="sidebar-block">
+                            <children>
+                                <Label text="Quick Access" styleClass="section-label"/>
+
+                                <Button fx:id="dashboardNavButton"
+                                        maxWidth="1.7976931348623157E308"
+                                        mnemonicParsing="false"
+                                        onAction="#showDashboardSection"
+                                        prefWidth="214.0"
+                                        styleClass="nav-button quick-nav-button"
+                                        text="Events Dashboard"/>
+
+                                <Button fx:id="createNavButton"
+                                        maxWidth="1.7976931348623157E308"
+                                        mnemonicParsing="false"
+                                        onAction="#showCreateSection"
+                                        prefWidth="214.0"
+                                        styleClass="nav-button quick-nav-button"
+                                        text="Create Event"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0" styleClass="sidebar-block sidebar-footer-card">
+                            <children>
+                                <Label text="Admin session active" styleClass="sidebar-footer-title"/>
+                                <Label text="Gestion harmonisee des events et participations depuis une seule interface."
+                                       styleClass="sidebar-footer-text"
+                                       wrapText="true"/>
+
+                                <Button maxWidth="1.7976931348623157E308"
+                                        mnemonicParsing="false"
+                                        onAction="#openFrontEventsWindow"
+                                        prefWidth="214.0"
+                                        styleClass="logout-button"
+                                        text="Logout"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </left>
+
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll">
+            <content>
+                <VBox fillWidth="true" spacing="18.0" styleClass="content-shell">
+                    <padding>
+                        <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
+                    </padding>
+
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="18.0" styleClass="hero-banner">
+                            <children>
+                                <VBox spacing="6.0">
+                                    <children>
+                                        <Label text="Events Management" styleClass="page-title"/>
+                                        <Label text="Dashboard admin JavaFX pour piloter les tables events et participation avec une interface moderne et centralisee."
+                                               styleClass="page-subtitle"/>
+                                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                            <children>
+                                                <Label text="Central Hub" styleClass="hero-chip hero-chip-soft"/>
+                                                <Label text="Admin Ready" styleClass="hero-chip hero-chip-soft"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <Region HBox.hgrow="ALWAYS"/>
+
+                                <VBox alignment="CENTER_RIGHT" spacing="10.0" styleClass="hero-side-panel">
+                                    <children>
+                                        <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                                            <children>
+                                                <Label text="Events" styleClass="hero-chip"/>
+                                                <Label text="Participation" styleClass="hero-chip"/>
+                                            </children>
+                                        </HBox>
+                                        <HBox alignment="CENTER_RIGHT" spacing="8.0">
+                                            <children>
+                                                <Label text="Live Workspace" styleClass="hero-chip hero-chip-muted"/>
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#openFrontEventsWindow"
+                                                        styleClass="primary-button header-button"
+                                                        text="Front Events"/>
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#refreshAllData"
+                                                        styleClass="primary-button header-button"
+                                                        text="Refresh Data"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <FlowPane hgap="14.0" vgap="14.0">
+                            <children>
+                                <VBox minWidth="185.0" prefWidth="190.0" spacing="6.0" styleClass="stat-card">
+                                    <children>
+                                        <Label text="01" styleClass="stat-kicker"/>
+                                        <Label text="Total Events" styleClass="stat-title"/>
+                                        <Label fx:id="totalEventsLabel" text="0" styleClass="stat-value"/>
+                                        <Label text="Evenements charges depuis la table events." styleClass="stat-caption"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox minWidth="185.0" prefWidth="190.0" spacing="6.0" styleClass="stat-card accent-card">
+                                    <children>
+                                        <Label text="02" styleClass="stat-kicker"/>
+                                        <Label text="Total Participants" styleClass="stat-title"/>
+                                        <Label fx:id="totalParticipantsLabel" text="0" styleClass="stat-value"/>
+                                        <Label text="Participations chargees depuis la table participation." styleClass="stat-caption"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox minWidth="185.0" prefWidth="190.0" spacing="6.0" styleClass="stat-card">
+                                    <children>
+                                        <Label text="03" styleClass="stat-kicker"/>
+                                        <Label text="Complete Events" styleClass="stat-title"/>
+                                        <Label fx:id="completeEventsLabel" text="0" styleClass="stat-value"/>
+                                        <Label text="Evenements consideres complets lorsque places restantes &lt;= 0." styleClass="stat-caption"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox minWidth="185.0" prefWidth="190.0" spacing="6.0" styleClass="stat-card">
+                                    <children>
+                                        <Label text="04" styleClass="stat-kicker"/>
+                                        <Label text="Premium Events" styleClass="stat-title"/>
+                                        <Label fx:id="premiumEventsLabel" text="0" styleClass="stat-value"/>
+                                        <Label text="Evenements premium actuellement disponibles." styleClass="stat-caption"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </FlowPane>
+
+                        <HBox spacing="10.0" styleClass="workspace-switcher">
+                            <children>
+                                <Button fx:id="eventsWorkspaceButton"
+                                        mnemonicParsing="false"
+                                        onAction="#showEventsWorkspace"
+                                        styleClass="workspace-button active-workspace"
+                                        text="Events Workspace"/>
+
+                                <Button fx:id="participantsWorkspaceButton"
+                                        mnemonicParsing="false"
+                                        onAction="#showParticipantsSection"
+                                        styleClass="workspace-button"
+                                        text="Liste des Participants"/>
+                            </children>
+                        </HBox>
+
+                        <StackPane VBox.vgrow="ALWAYS">
+                            <children>
+                                <VBox fx:id="tablesLandingSection" spacing="18.0" styleClass="panel-card" visible="true" managed="true">
+                                    <children>
+                                        <VBox spacing="3.0">
+                                            <children>
+                                                <Label text="Tables" styleClass="panel-title panel-title-icon"/>
+                                                <Label text="Vue d'accueil du back-office Fitopia." styleClass="panel-subtitle"/>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox spacing="12.0" styleClass="panel-card">
+                                            <padding>
+                                                <Insets top="22.0" right="22.0" bottom="22.0" left="22.0"/>
+                                            </padding>
+                                            <children>
+                                                <Label text="Select a management section from the Tables menu."
+                                                       styleClass="panel-title"
+                                                       wrapText="true"/>
+                                                <Label text="Utilise la sidebar a gauche pour acceder a Gestion des evenements, Participation et aux autres espaces du back-office."
+                                                       styleClass="panel-subtitle"
+                                                       wrapText="true"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox fx:id="eventsWorkspaceSection" spacing="18.0" visible="false" managed="false">
+                                    <children>
+                                        <FlowPane fx:id="crudCardsRow" hgap="16.0" prefWrapLength="980.0" vgap="16.0" styleClass="crud-cards-row">
+                                            <children>
+                                                <Button fx:id="createCardButton"
+                                                        contentDisplay="GRAPHIC_ONLY"
+                                                        mnemonicParsing="false"
+                                                        onAction="#showCreateSection"
+                                                        prefHeight="150.0"
+                                                        prefWidth="228.0"
+                                                        styleClass="action-card-button">
+                                                    <graphic>
+                                                        <VBox spacing="14.0">
+                                                            <children>
+                                                                <StackPane minHeight="42.0" minWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="action-card-icon-box">
+                                                                    <children>
+                                                                        <Label text="+" styleClass="action-card-icon"/>
+                                                                    </children>
+                                                                </StackPane>
+                                                                <VBox spacing="6.0">
+                                                                    <children>
+                                                                        <Label text="Create Event" styleClass="action-card-title"/>
+                                                                        <Label text="Bloc creation moderne et rapide." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </VBox>
+                                                    </graphic>
+                                                </Button>
+
+                                                <Button fx:id="updateCardButton"
+                                                        contentDisplay="GRAPHIC_ONLY"
+                                                        mnemonicParsing="false"
+                                                        onAction="#showUpdateSection"
+                                                        prefHeight="150.0"
+                                                        prefWidth="228.0"
+                                                        styleClass="action-card-button">
+                                                    <graphic>
+                                                        <VBox spacing="14.0">
+                                                            <children>
+                                                                <StackPane minHeight="42.0" minWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="action-card-icon-box">
+                                                                    <children>
+                                                                        <Label text="U" styleClass="action-card-icon"/>
+                                                                    </children>
+                                                                </StackPane>
+                                                                <VBox spacing="6.0">
+                                                                    <children>
+                                                                        <Label text="Update Event" styleClass="action-card-title"/>
+                                                                        <Label text="Edition fluide des evenements existants." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </VBox>
+                                                    </graphic>
+                                                </Button>
+
+                                                <Button fx:id="deleteCardButton"
+                                                        contentDisplay="GRAPHIC_ONLY"
+                                                        mnemonicParsing="false"
+                                                        onAction="#showDeleteSection"
+                                                        prefHeight="150.0"
+                                                        prefWidth="228.0"
+                                                        styleClass="action-card-button">
+                                                    <graphic>
+                                                        <VBox spacing="14.0">
+                                                            <children>
+                                                                <StackPane minHeight="42.0" minWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="action-card-icon-box">
+                                                                    <children>
+                                                                        <Label text="D" styleClass="action-card-icon"/>
+                                                                    </children>
+                                                                </StackPane>
+                                                                <VBox spacing="6.0">
+                                                                    <children>
+                                                                        <Label text="Delete Event" styleClass="action-card-title"/>
+                                                                        <Label text="Suppression propre avec acces rapide." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </VBox>
+                                                    </graphic>
+                                                </Button>
+
+                                                <Button fx:id="dashboardCardButton"
+                                                        contentDisplay="GRAPHIC_ONLY"
+                                                        mnemonicParsing="false"
+                                                        onAction="#showDashboardSection"
+                                                        prefHeight="150.0"
+                                                        prefWidth="228.0"
+                                                        styleClass="action-card-button">
+                                                    <graphic>
+                                                        <VBox spacing="14.0">
+                                                            <children>
+                                                                <StackPane minHeight="42.0" minWidth="42.0" prefHeight="42.0" prefWidth="42.0" styleClass="action-card-icon-box">
+                                                                    <children>
+                                                                        <Label text="E" styleClass="action-card-icon"/>
+                                                                    </children>
+                                                                </StackPane>
+                                                                <VBox spacing="6.0">
+                                                                    <children>
+                                                                        <Label text="Dashboard &amp; Explore" styleClass="action-card-title"/>
+                                                                        <Label text="Vue globale, filtres et tableau de suivi." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </VBox>
+                                                    </graphic>
+                                                </Button>
+                                            </children>
+                                        </FlowPane>
+
+                                        <StackPane VBox.vgrow="ALWAYS">
+                                            <children>
+                                                <VBox fx:id="addEventSection" managed="false" spacing="14.0" styleClass="panel-card" visible="false">
+                                                    <children>
+                                                        <VBox spacing="3.0">
+                                                            <children>
+                                                                <Label text="Add Event" styleClass="panel-title panel-title-icon"/>
+                                                                <Label text="Formulaire modernise branche sur le CRUD Event existant." styleClass="panel-subtitle"/>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <GridPane hgap="16.0" vgap="12.0">
+                                                            <columnConstraints>
+                                                                <ColumnConstraints percentWidth="50.0"/>
+                                                                <ColumnConstraints percentWidth="50.0"/>
+                                                            </columnConstraints>
+
+                                                            <children>
+                                                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                                                    <children>
+                                                                        <Label text="Titre" styleClass="form-label"/>
+                                                                        <TextField fx:id="titreField" promptText="Nom de l'evenement" styleClass="form-field"/>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                                    <children>
+                                                                        <Label text="Date" styleClass="form-label"/>
+                                                                        <DatePicker fx:id="dateEventPicker" styleClass="form-field"/>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                                                    <children>
+                                                                        <Label text="Capacite" styleClass="form-label"/>
+                                                                        <TextField fx:id="capaciteField" promptText="Nombre de places" styleClass="form-field"/>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                                                    <children>
+                                                                        <Label text="Type" styleClass="form-label"/>
+                                                                        <TextField fx:id="typeEventField" promptText="Workshop, fitness, marathon..." styleClass="form-field"/>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                                                    <children>
+                                                                        <Label text="Location" styleClass="form-label"/>
+                                                                        <TextField fx:id="lieuField" promptText="Lieu de l'evenement" styleClass="form-field"/>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                                                    <children>
+                                                                        <Label text="Prix" styleClass="form-label"/>
+                                                                        <TextField fx:id="prixEventField" promptText="Prix d'entree" styleClass="form-field"/>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                                                    <children>
+                                                                        <Label text="Image" styleClass="form-label"/>
+                                                                        <TextField fx:id="imageEventField" promptText="Nom ou chemin de l'image" styleClass="form-field"/>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                                                    <children>
+                                                                        <Label text="Premium" styleClass="form-label"/>
+                                                                        <HBox alignment="CENTER_LEFT" prefHeight="40.0" styleClass="premium-box">
+                                                                            <children>
+                                                                                <CheckBox fx:id="premiumCheckBox" text="Evenement premium"/>
+                                                                            </children>
+                                                                        </HBox>
+                                                                    </children>
+                                                                </VBox>
+
+                                                                <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="4">
+                                                                    <children>
+                                                                        <Label text="Description" styleClass="form-label"/>
+                                                                        <TextArea fx:id="descriptionArea"
+                                                                                  prefRowCount="4"
+                                                                                  promptText="Description detaillee de l'evenement"
+                                                                                  styleClass="form-area"/>
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </GridPane>
+
+                                                        <HBox spacing="8.0">
+                                                            <children>
+                                                                <Button fx:id="ajouterButton"
+                                                                        mnemonicParsing="false"
+                                                                        onAction="#ajouterEvent"
+                                                                        styleClass="primary-button large-primary"
+                                                                        text="Create Event"/>
+
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#modifierEvent"
+                                                                        styleClass="toolbar-button"
+                                                                        text="Update"/>
+
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#viderFormulaire"
+                                                                        styleClass="toolbar-button"
+                                                                        text="Reset Form"/>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <Label fx:id="statusLabel"
+                                                               text="Section Add Event active."
+                                                               styleClass="status-label"
+                                                               wrapText="true"/>
+                                                    </children>
+                                                </VBox>
+
+                                                <VBox fx:id="updateEventsSection" managed="false" spacing="14.0" styleClass="panel-card" visible="false">
+                                                    <children>
+                                                        <VBox spacing="3.0">
+                                                            <children>
+                                                                <Label text="Update Events" styleClass="panel-title panel-title-icon"/>
+                                                                <Label text="Liste stylisee des evenements existants. Le bouton Edit charge l'evenement dans le formulaire de mise a jour."
+                                                                       styleClass="panel-subtitle"/>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <ScrollPane fitToWidth="true" prefHeight="540.0" styleClass="inner-scroll">
+                                                            <content>
+                                                                <VBox fx:id="updateEventsContainer" spacing="10.0" styleClass="list-container">
+                                                                    <padding>
+                                                                        <Insets top="4.0" right="4.0" bottom="4.0" left="4.0"/>
+                                                                    </padding>
+                                                                </VBox>
+                                                            </content>
+                                                        </ScrollPane>
+                                                    </children>
+                                                </VBox>
+
+                                                <VBox fx:id="deleteEventsSection" managed="false" spacing="14.0" styleClass="panel-card" visible="false">
+                                                    <children>
+                                                        <VBox spacing="3.0">
+                                                            <children>
+                                                                <Label text="Delete Events" styleClass="panel-title panel-title-icon"/>
+                                                                <Label text="Liste simplifiee et moderne des evenements avec suppression rapide."
+                                                                       styleClass="panel-subtitle"/>
+                                                            </children>
+                                                        </VBox>
+
+                                                        <ScrollPane fitToWidth="true" prefHeight="540.0" styleClass="inner-scroll">
+                                                            <content>
+                                                                <VBox fx:id="deleteEventsContainer" spacing="10.0" styleClass="list-container">
+                                                                    <padding>
+                                                                        <Insets top="4.0" right="4.0" bottom="4.0" left="4.0"/>
+                                                                    </padding>
+                                                                </VBox>
+                                                            </content>
+                                                        </ScrollPane>
+                                                    </children>
+                                                </VBox>
+
+                                                <VBox fx:id="dashboardSection" spacing="14.0" styleClass="panel-card" visible="true">
+                                                    <children>
+                                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                            <children>
+                                                                <VBox spacing="3.0">
+                                                                    <children>
+                                                                        <Label text="Events Dashboard &amp; List" styleClass="panel-title panel-title-icon"/>
+                                                                        <Label text="Vue dashboard complete avec recherche, filtre, tri et tableau de suivi des evenements."
+                                                                               styleClass="panel-subtitle"/>
+                                                                    </children>
+                                                                </VBox>
+                                                                <Region HBox.hgrow="ALWAYS"/>
+                                                                <Label text="Sort: ID DESC" styleClass="toolbar-chip"/>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar-row dashboard-toolbar-row">
+                                                            <children>
+                                                                <TextField fx:id="searchField"
+                                                                           promptText="Search events by title, type, location or description..."
+                                                                           styleClass="search-field"
+                                                                           HBox.hgrow="ALWAYS"/>
+
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#applyEventFilter"
+                                                                        styleClass="toolbar-button toolbar-button-strong"
+                                                                        text="Filter"/>
+
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#resetEventFilter"
+                                                                        styleClass="toolbar-button"
+                                                                        text="Reset"/>
+
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#refreshEvents"
+                                                                        styleClass="toolbar-button"
+                                                                        text="Refresh"/>
+
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#exportPdfPlaceholder"
+                                                                        styleClass="toolbar-button toolbar-button-export"
+                                                                        text="Export PDF"/>
+                                                            </children>
+                                                        </HBox>
+
+                                                        <TableView fx:id="eventTable" prefHeight="500.0" styleClass="event-table" VBox.vgrow="ALWAYS">
+                                                            <columns>
+                                                                <TableColumn fx:id="idColumn" prefWidth="65.0" text="ID"/>
+                                                                <TableColumn fx:id="titreColumn" prefWidth="150.0" text="Title"/>
+                                                                <TableColumn fx:id="typeEventColumn" prefWidth="120.0" text="Type"/>
+                                                                <TableColumn fx:id="dateColumn" prefWidth="105.0" text="Date"/>
+                                                                <TableColumn fx:id="lieuColumn" prefWidth="130.0" text="Location"/>
+                                                                <TableColumn fx:id="resActivesColumn" prefWidth="95.0" text="Res. actives"/>
+                                                                <TableColumn fx:id="capaciteColumn" prefWidth="90.0" text="Capacity"/>
+                                                                <TableColumn fx:id="restantesColumn" prefWidth="90.0" text="Restantes"/>
+                                                                <TableColumn fx:id="waitlistColumn" prefWidth="90.0" text="Waitlist"/>
+                                                                <TableColumn fx:id="premiumColumn" prefWidth="80.0" text="Premium"/>
+                                                                <TableColumn fx:id="etatColumn" prefWidth="90.0" text="Etat"/>
+                                                                <TableColumn fx:id="prixColumn" prefWidth="85.0" text="Price"/>
+                                                                <TableColumn fx:id="descriptionColumn" prefWidth="180.0" text="Description"/>
+                                                                <TableColumn fx:id="imageEventColumn" prefWidth="140.0" text="Image"/>
+                                                                <TableColumn fx:id="createdAtColumn" prefWidth="150.0" text="Created At"/>
+                                                            </columns>
+                                                        </TableView>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </StackPane>
+                                    </children>
+                                </VBox>
+
+                                <VBox fx:id="participantsSection" managed="false" spacing="14.0" styleClass="panel-card participation-panel" visible="false">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="panel-header-row">
+                                            <children>
+                                                <VBox spacing="3.0">
+                                                    <children>
+                                                        <Label text="Liste des Participants" styleClass="panel-title panel-title-icon"/>
+                                                        <Label text="Section de consultation des participations liees aux evenements avec recherche et tri simples."
+                                                               styleClass="panel-subtitle"/>
+                                                    </children>
+                                                </VBox>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label text="Sort: ID DESC" styleClass="toolbar-chip"/>
+                                            </children>
+                                        </HBox>
+
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar-row">
+                                            <children>
+                                                <TextField fx:id="participantSearchField"
+                                                           promptText="Search by name, email or event..."
+                                                           styleClass="search-field"
+                                                           HBox.hgrow="ALWAYS"/>
+
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#applyParticipantFilter"
+                                                        styleClass="toolbar-button"
+                                                        text="Filter"/>
+
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#resetParticipantFilter"
+                                                        styleClass="toolbar-button"
+                                                        text="Reset"/>
+
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#refreshParticipations"
+                                                        styleClass="toolbar-button"
+                                                        text="Refresh"/>
+
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#exportParticipantsPdf"
+                                                        styleClass="toolbar-button toolbar-button-export"
+                                                        text="Export PDF"/>
+                                            </children>
+                                        </HBox>
+
+                                        <TableView fx:id="participationTable" prefHeight="540.0" styleClass="event-table" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="participationIdColumn" prefWidth="110.0" text="ID Participation"/>
+                                                <TableColumn fx:id="nomParticipantColumn" prefWidth="180.0" text="Nom"/>
+                                                <TableColumn fx:id="emailParticipantColumn" prefWidth="220.0" text="Email"/>
+                                                <TableColumn fx:id="dateInscriptionColumn" prefWidth="180.0" text="Date d'inscription"/>
+                                                <TableColumn fx:id="evenementParticipationColumn" prefWidth="220.0" text="Evenement"/>
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </StackPane>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox spacing="28.0"
+      styleClass="reservation-root"
+      xmlns="http://javafx.com/javafx/22.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.Pidev3A49.controllers.ReservationController">
+
+    <padding>
+        <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
+    </padding>
+
+    <children>
+        <!-- LEFT SIDE : EVENT -->
+        <VBox prefWidth="700.0"
+              spacing="18.0"
+              styleClass="reservation-event-pane"
+              HBox.hgrow="ALWAYS">
+            <children>
+                <StackPane fx:id="eventVisualPane"
+                           minHeight="430.0"
+                           prefHeight="430.0"
+                           styleClass="reservation-media">
+                    <children>
+                        <VBox alignment="BOTTOM_LEFT"
+                              spacing="8.0"
+                              styleClass="reservation-media-overlay">
+                            <padding>
+                                <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+                            </padding>
+                            <children>
+                                <Label fx:id="eventTypeLabel"
+                                       text="Wellness Event"
+                                       styleClass="reservation-eyebrow"/>
+                                <Label fx:id="eventTitleLabel"
+                                       text="Event title"
+                                       wrapText="true"
+                                       styleClass="reservation-title"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+
+                <VBox spacing="16.0" styleClass="reservation-summary-card">
+                    <padding>
+                        <Insets top="20.0" right="22.0" bottom="22.0" left="22.0"/>
+                    </padding>
+                    <children>
+                        <Label fx:id="eventDisplayTitleLabel"
+                               text="yoga premium"
+                               styleClass="reservation-display-title"/>
+
+                        <GridPane hgap="24.0" vgap="12.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="50.0"/>
+                                <ColumnConstraints percentWidth="50.0"/>
+                            </columnConstraints>
+
+                            <children>
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label text="Date :" styleClass="reservation-meta-label"/>
+                                        <Label fx:id="eventDateLabel" text="2026-02-28" styleClass="reservation-meta-value"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label text="Lieu :" styleClass="reservation-meta-label"/>
+                                        <Label fx:id="eventLocationLabel" text="marsa" styleClass="reservation-meta-value"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Prix :" styleClass="reservation-meta-label"/>
+                                        <Label fx:id="eventPriceLabel" text="50.00 DT" styleClass="reservation-meta-value"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Capacite restante :" styleClass="reservation-meta-label"/>
+                                        <Label fx:id="eventSeatsLabel" text="15" styleClass="reservation-meta-value"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </GridPane>
+
+                        <TextArea fx:id="eventDescriptionArea"
+                                  editable="false"
+                                  focusTraversable="false"
+                                  prefRowCount="5"
+                                  wrapText="true"
+                                  styleClass="reservation-description"/>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+
+        <!-- RIGHT SIDE : FORM -->
+        <VBox prefWidth="500.0"
+              spacing="18.0"
+              styleClass="reservation-form-card">
+            <padding>
+                <Insets top="26.0" right="24.0" bottom="24.0" left="24.0"/>
+            </padding>
+            <children>
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Confirmer votre reservation"
+                               styleClass="reservation-form-title"/>
+                        <Label fx:id="formSubtitleLabel"
+                               text="Complete your details to confirm this booking."
+                               wrapText="true"
+                               styleClass="reservation-form-subtitle"/>
+                    </children>
+                </VBox>
+
+                <VBox spacing="8.0">
+                    <children>
+                        <Label text="Nom"
+                               styleClass="reservation-label"/>
+                        <TextField fx:id="fullNameField"
+                                   promptText="Votre nom"
+                                   styleClass="reservation-field"/>
+                    </children>
+                </VBox>
+
+                <VBox spacing="8.0">
+                    <children>
+                        <Label text="Prenom"
+                               styleClass="reservation-label"/>
+                        <TextField fx:id="firstNameField"
+                                   promptText="Votre prenom"
+                                   styleClass="reservation-field"/>
+                    </children>
+                </VBox>
+
+                <VBox spacing="8.0">
+                    <children>
+                        <Label text="Email"
+                               styleClass="reservation-label"/>
+                        <TextField fx:id="emailField"
+                                   promptText="votre.email@exemple.com"
+                                   styleClass="reservation-field"/>
+                    </children>
+                </VBox>
+
+                <VBox spacing="10.0" styleClass="reservation-price-panel">
+                    <padding>
+                        <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Montant"
+                                       styleClass="reservation-price-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="bookingAmountLabel"
+                                       text="0.00 DT"
+                                       styleClass="reservation-price-value"/>
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Statut initial"
+                                       styleClass="reservation-price-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="bookingStatusLabel"
+                                       text="confirmee"
+                                       styleClass="reservation-status-chip"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <Button fx:id="confirmButton"
+                        mnemonicParsing="false"
+                        onAction="#confirmReservation"
+                        styleClass="reservation-confirm-button"
+                        text="CONFIRMER MA RESERVATION"/>
+
+                <Label fx:id="feedbackLabel"
+                       text=""
+                       wrapText="true"
+                       styleClass="reservation-feedback"/>
+            </children>
+        </VBox>
+    </children>
+</HBox>

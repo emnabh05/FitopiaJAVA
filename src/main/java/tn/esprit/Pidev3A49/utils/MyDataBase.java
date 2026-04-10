@@ -1,56 +1,40 @@
 package tn.esprit.Pidev3A49.utils;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 public class MyDataBase {
 
+    private static final String URL = "jdbc:mysql://127.0.0.1:3306/fitopiabd?useSSL=false&serverTimezone=UTC";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
+
     private static MyDataBase instance;
-    private final String url;
-    private final String username;
-    private final String password;
-    private Connection cnx;
+    private Connection connection;
 
     private MyDataBase() {
-        Properties properties = loadProperties();
-        url = properties.getProperty("db.url", "jdbc:mysql://127.0.0.1:3306/fitopiabd?serverTimezone=UTC");
-        username = properties.getProperty("db.username", "root");
-        password = properties.getProperty("db.password", "");
-
-        try {
-            cnx = DriverManager.getConnection(url, username, password);
-            System.out.println("Connected to fitopiabd");
-        } catch (SQLException e) {
-            throw new IllegalStateException("Erreur de connexion a la base de donnees: " + e.getMessage(), e);
-        }
     }
 
-
-    public static MyDataBase getInstance() {
+    public static synchronized MyDataBase getInstance() {
         if (instance == null) {
             instance = new MyDataBase();
         }
-
         return instance;
     }
 
-    public Connection getCnx() {
-        return cnx;
-    }
-
-    private Properties loadProperties() {
-        Properties properties = new Properties();
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("db.properties")) {
-            if (inputStream != null) {
-                properties.load(inputStream);
+    public Connection getConnection() {
+        try {
+            if (connection == null || connection.isClosed()) {
+                System.out.println("Connexion a MySQL : " + URL);
+                connection = DriverManager.getConnection(URL, USER, PASSWORD);
+                System.out.println("Connexion MySQL reussie.");
             }
-        } catch (IOException e) {
-            throw new IllegalStateException("Impossible de lire le fichier db.properties", e);
+            return connection;
+        } catch (SQLException e) {
+            System.err.println("Impossible de se connecter a la base fitopiabd.");
+            e.printStackTrace();
+            throw new RuntimeException("Impossible de se connecter a la base fitopiabd : " + e.getMessage(), e);
         }
-        return properties;
     }
 }
