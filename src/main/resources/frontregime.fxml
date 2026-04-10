@@ -201,8 +201,8 @@
                                                     </HBox>
                                                     
                                                     <VBox spacing="6">
-                                                        <ProgressBar fx:id="pbPlannerCalories" progress="0.2" maxWidth="Infinity" prefHeight="6" style="-fx-accent: #0c3f44;"/>
-                                                        <Label fx:id="lblPlannerCaloriesProgress" text="0 / 2079 kcal (2079 restantes)" style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                                                        <ProgressBar fx:id="pbPlannerCalories" progress="0.65" maxWidth="Infinity" prefHeight="12" styleClass="calorie-progress-bar"/>
+                                                        <Label fx:id="lblPlannerCaloriesProgress" text="1139 / 1800 kcal (661 restantes)" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
                                                     </VBox>
                                                     
                                                     <HBox>

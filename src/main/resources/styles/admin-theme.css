@@ -1806,4 +1806,23 @@
 .badge-desc-locked { -fx-text-fill: #94a3b8; }
 .badge-desc-unlocked { -fx-text-fill: #059669; }
 
+/* --- CALORIE PROGRESS BAR --- */
+.calorie-progress-bar {
+    -fx-indeterminate-bar-animation-speed: 1;
+}
+
+.calorie-progress-bar > .bar {
+    -fx-background-color: linear-gradient(to right, #34d399, #10b981, #059669);
+    -fx-background-radius: 12;
+    -fx-background-insets: 0;
+}
+
+.calorie-progress-bar > .track {
+    -fx-background-color: #f1f5f9;
+    -fx-background-radius: 12;
+    -fx-border-color: #e2e8f0;
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
 
