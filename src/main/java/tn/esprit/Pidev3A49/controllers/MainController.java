@@ -591,28 +591,29 @@ public class MainController {
 
     @FXML
     private void viderFormulaireRegime() {
-        cbRegimeUser.getSelectionModel().clearSelection();
-        cbRegimeTypeSante.getSelectionModel().clearSelection();
-        tfRegimeTaille.clear();
-        tfRegimePoids.clear();
-        tfRegimeAge.clear();
-        tfRegimeBmi.clear();
-        tfRegimeCaloriesCibles.clear();
-        taRegimeRepasAdequats.clear();
+        if (cbRegimeUser != null) cbRegimeUser.getSelectionModel().clearSelection();
+        if (tfRegimeTaille != null) tfRegimeTaille.clear();
+        if (tfRegimePoids != null) tfRegimePoids.clear();
+        if (tfRegimeAge != null) tfRegimeAge.clear();
+        if (tfRegimeBmi != null) tfRegimeBmi.clear();
+        if (cbRegimeTypeSante != null) cbRegimeTypeSante.getSelectionModel().clearSelection();
+        if (tfRegimeCaloriesCibles != null) tfRegimeCaloriesCibles.clear();
+        if (taRegimeRepasAdequats != null) taRegimeRepasAdequats.clear();
+        masquerTousLesFormulaires();
     }
 
     @FXML
     private void viderFormulaireRegimeModification() {
-        tfRegimeId.clear();
-        cbRegimeUserEdit.getSelectionModel().clearSelection();
-        cbRegimeTypeSanteEdit.getSelectionModel().clearSelection();
-        tfRegimeTailleEdit.clear();
-        tfRegimePoidsEdit.clear();
-        tfRegimeAgeEdit.clear();
-        tfRegimeBmiEdit.clear();
-        tfRegimeCaloriesCiblesEdit.clear();
-        taRegimeRepasAdequatsEdit.clear();
-        tableRegimesEdit.getSelectionModel().clearSelection();
+        if (tfRegimeId != null) tfRegimeId.clear();
+        if (cbRegimeUserEdit != null) cbRegimeUserEdit.getSelectionModel().clearSelection();
+        if (tfRegimeTailleEdit != null) tfRegimeTailleEdit.clear();
+        if (tfRegimePoidsEdit != null) tfRegimePoidsEdit.clear();
+        if (tfRegimeAgeEdit != null) tfRegimeAgeEdit.clear();
+        if (tfRegimeBmiEdit != null) tfRegimeBmiEdit.clear();
+        if (cbRegimeTypeSanteEdit != null) cbRegimeTypeSanteEdit.getSelectionModel().clearSelection();
+        if (tfRegimeCaloriesCiblesEdit != null) tfRegimeCaloriesCiblesEdit.clear();
+        if (taRegimeRepasAdequatsEdit != null) taRegimeRepasAdequatsEdit.clear();
+        masquerTousLesFormulaires();
     }
 
     private void initialiserColonnes() {
@@ -1107,13 +1108,30 @@ public class MainController {
         TextField caloriesField = editMode ? tfRegimeCaloriesCiblesEdit : tfRegimeCaloriesCibles;
         TextArea repasField = editMode ? taRegimeRepasAdequatsEdit : taRegimeRepasAdequats;
 
-        if (user == null) throw new IllegalArgumentException("Selectionnez un utilisateur pour le regime.");
+        if (user == null) {
+            throw new IllegalArgumentException("La selection d'un utilisateur est obligatoire.");
+        }
+
+        double taille = parseDouble(tailleField.getText());
+        if (taille <= 0 || taille > 300) {
+            throw new IllegalArgumentException("La taille doit etre comprise entre 1 et 300 cm.");
+        }
+
+        double poids = parseDouble(poidsField.getText());
+        if (poids <= 0 || poids > 300) {
+            throw new IllegalArgumentException("Le poids doit etre compris entre 1 et 300 kg.");
+        }
+
+        int age = parseInteger(ageField.getText());
+        if (age <= 0 || age > 100) {
+            throw new IllegalArgumentException("L'age doit etre compris entre 1 et 100 ans.");
+        }
 
         return new RegimeAlimentaire(
                 user.getId(),
-                parseDouble(tailleField.getText()),
-                parseDouble(poidsField.getText()),
-                parseInteger(ageField.getText()),
+                taille,
+                poids,
+                age,
                 parseDouble(bmiField.getText()),
                 typeCombo.getValue(),
                 parseInteger(caloriesField.getText()),
