@@ -1070,7 +1070,7 @@ public class MainController {
 
             mettreAJourProgression(curKcal + " / " + target + " kcal (" + rem + " restantes)", ratio(curKcal, target), pbPlannerCalories, lblPlannerCaloriesProgress);
             
-            boolean caloriesRespectees = curKcal > 0 && curKcal <= target;
+            boolean caloriesRespectees = target > 0 && curKcal >= (target * 0.8);
             boolean hydratationOk = verresEau >= 5;
             if (lblBadgeHydrationDesc != null) {
                 lblBadgeHydrationDesc.setText("Objectif : 1L par jour (" + verresEau + "/5 verres)");
