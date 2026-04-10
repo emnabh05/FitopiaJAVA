@@ -1,27 +1,28 @@
 package tn.esprit.Pidev3A49.controllers;
 
 import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.fxml.FXML;
+import tn.esprit.Pidev3A49.utils.SceneNavigator;
 
 import java.io.IOException;
 
 public class MonthlyRankingController {
 
-    public void openSupplementShowcase(ActionEvent event) throws IOException {
-        switchScene(event, "/SupplementCatalogShowcase.fxml", "Supplement Front End");
+    public void openProgressTracker(ActionEvent event) throws IOException {
+        SceneNavigator.navigate(event, SceneNavigator.RANKING_VIEW, SceneNavigator.PROGRESS_VIEW);
     }
 
-    private void switchScene(ActionEvent event, String resourcePath, String title) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
-        Parent root = loader.load();
+    public void openSupplementShowcase(ActionEvent event) throws IOException {
+        SceneNavigator.navigate(event, SceneNavigator.RANKING_VIEW, SceneNavigator.FRONT_END_VIEW);
+    }
 
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root, 1440, 1024));
-        stage.setTitle(title);
-        stage.show();
+    @FXML
+    public void openBackEnd(ActionEvent event) throws IOException {
+        SceneNavigator.navigate(event, SceneNavigator.RANKING_VIEW, SceneNavigator.BACK_END_VIEW);
+    }
+
+    @FXML
+    public void goBackOrExit(ActionEvent event) throws IOException {
+        SceneNavigator.goBackOrClose(event);
     }
 }

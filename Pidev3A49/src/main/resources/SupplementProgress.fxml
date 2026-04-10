@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/22"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.SupplementProgressController"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            style="-fx-background: #EAF9F3; -fx-background-color: #EAF9F3;">
+    <content>
+        <VBox prefWidth="1440.0"
+              spacing="30.0"
+              style="-fx-background-color: linear-gradient(to bottom right, #F7FFFC, #E7F7F1);">
+            <children>
+                <HBox alignment="CENTER_LEFT"
+                      spacing="18.0"
+                      prefHeight="78.0"
+                      style="-fx-background-color: white; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-width: 0 0 1 0;">
+                    <padding>
+                        <Insets top="14.0" right="26.0" bottom="14.0" left="26.0"/>
+                    </padding>
+                    <children>
+                        <StackPane prefWidth="62.0" prefHeight="42.0"
+                                   style="-fx-background-color: #F5FAF7; -fx-background-radius: 14; -fx-border-color: #DDECE4; -fx-border-radius: 14;">
+                            <children>
+                                <Label text="FITOPIA"
+                                       style="-fx-text-fill: #274051; -fx-font-size: 11px; -fx-font-weight: 900;"/>
+                            </children>
+                        </StackPane>
+
+                        <Button text="Home"
+                                style="-fx-background-color: transparent; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                        <Button text="About Fitopia"
+                                style="-fx-background-color: transparent; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                        <Button text="Explore Supplements"
+                                onAction="#openSupplementShowcase"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                        <Button text="Monthly Ranking"
+                                onAction="#openMonthlyRanking"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                        <Button text="My Progress"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #10B981; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 800; -fx-padding: 10 18 10 18;"/>
+
+                        <Region HBox.hgrow="ALWAYS"/>
+
+                        <Button text="Back End"
+                                onAction="#openBackEnd"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #123B49; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                        <Button text="Return"
+                                onAction="#goBackOrExit"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #94A3B8; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                        <Button text="Profile"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #22C55E; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                        <Button text="Logout"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #EF4444; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                    </children>
+                </HBox>
+
+                <VBox spacing="20.0">
+                    <padding>
+                        <Insets top="0.0" right="36.0" bottom="36.0" left="36.0"/>
+                    </padding>
+                    <children>
+                        <VBox spacing="16.0"
+                              style="-fx-background-color: linear-gradient(to right, #123B49, #1B8B76); -fx-background-radius: 28; -fx-effect: dropshadow(gaussian, rgba(6, 39, 34, 0.18), 24, 0.22, 0, 10);">
+                            <padding>
+                                <Insets top="26.0" right="26.0" bottom="20.0" left="26.0"/>
+                            </padding>
+                            <children>
+                                <Label text="FITOPIA SMART CONSUMPTION TRACKER"
+                                       style="-fx-text-fill: rgba(255,255,255,0.74); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                <Label text="MY SUPPLEMENT PROGRESS"
+                                       wrapText="true"
+                                       style="-fx-text-fill: #07161F; -fx-font-size: 52px; -fx-font-weight: 900;"/>
+                                <Label text="See discipline score, consistency streak, risk level, and estimated timeline for each purchased supplement."
+                                       wrapText="true"
+                                       maxWidth="840.0"
+                                       style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 17px; -fx-font-weight: 600;"/>
+
+                                <Label text="Synced automatically with your account orders"
+                                       maxWidth="320.0"
+                                       style="-fx-background-color: rgba(255,255,255,0.12); -fx-background-radius: 999; -fx-border-color: rgba(255,255,255,0.22); -fx-border-radius: 999; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 16 10 16;"/>
+
+                                <HBox spacing="12.0">
+                                    <children>
+                                        <VBox HBox.hgrow="ALWAYS"
+                                              spacing="8.0"
+                                              style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                            <padding>
+                                                <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
+                                            </padding>
+                                            <children>
+                                                <Label text="TRACKED SUPPLEMENTS"
+                                                       style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                <Label text="1"
+                                                       style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox HBox.hgrow="ALWAYS"
+                                              spacing="8.0"
+                                              style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                            <padding>
+                                                <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
+                                            </padding>
+                                            <children>
+                                                <Label text="AVERAGE COMPLIANCE"
+                                                       style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                <Label text="0%"
+                                                       style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox HBox.hgrow="ALWAYS"
+                                              spacing="8.0"
+                                              style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                            <padding>
+                                                <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
+                                            </padding>
+                                            <children>
+                                                <Label text="CURRENT MAX STREAK"
+                                                       style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                <Label text="0d"
+                                                       style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox HBox.hgrow="ALWAYS"
+                                              spacing="8.0"
+                                              style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                            <padding>
+                                                <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
+                                            </padding>
+                                            <children>
+                                                <Label text="AT-RISK SUPPLEMENTS"
+                                                       style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                <Label text="1"
+                                                       style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox HBox.hgrow="ALWAYS"
+                                              spacing="8.0"
+                                              style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 18; -fx-border-color: rgba(255,255,255,0.18); -fx-border-radius: 18;">
+                                            <padding>
+                                                <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
+                                            </padding>
+                                            <children>
+                                                <Label text="TOTAL XP"
+                                                       style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                <Label text="0"
+                                                       style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="16.0"
+                              style="-fx-background-color: white; -fx-background-radius: 24; -fx-border-color: rgba(13, 63, 57, 0.10); -fx-border-radius: 24; -fx-effect: dropshadow(gaussian, rgba(6, 39, 34, 0.14), 24, 0.22, 0, 10);">
+                            <padding>
+                                <Insets top="18.0" right="18.0" bottom="14.0" left="18.0"/>
+                            </padding>
+                            <children>
+                                <HBox alignment="TOP_LEFT">
+                                    <children>
+                                        <VBox spacing="6.0">
+                                            <children>
+                                                <Label text="GSN"
+                                                       style="-fx-text-fill: #2E8C7E; -fx-font-size: 13px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                <Label text="PROTEINE"
+                                                       style="-fx-text-fill: #113649; -fx-font-size: 32px; -fx-font-weight: 900;"/>
+                                                <Label text="Bought since 2026-04-09 | Ordered qty: 1 | Base plan: 56 days"
+                                                       style="-fx-text-fill: #8A9BA7; -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                                            </children>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Label text="AT RISK"
+                                               style="-fx-background-color: #FFF2E9; -fx-background-radius: 999; -fx-border-color: #FFD7C4; -fx-border-radius: 999; -fx-text-fill: #C86A3B; -fx-font-size: 12px; -fx-font-weight: 900; -fx-padding: 10 16 10 16;"/>
+                                    </children>
+                                </HBox>
+
+                                <HBox spacing="18.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <VBox spacing="10.0" alignment="CENTER">
+                                            <children>
+                                                <StackPane prefWidth="118.0" prefHeight="118.0">
+                                                    <children>
+                                                        <Circle radius="54.0" fill="#F4FAFD" stroke="#D7E8F3" strokeWidth="9.0"/>
+                                                        <Circle radius="40.0" fill="white"/>
+                                                        <VBox alignment="CENTER" spacing="2.0">
+                                                            <children>
+                                                                <Label text="0%"
+                                                                       style="-fx-text-fill: #113649; -fx-font-size: 24px; -fx-font-weight: 900;"/>
+                                                                <Label text="COMPLIANCE"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 10px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </StackPane>
+                                                <Label text="0 taken / 1 days"
+                                                       style="-fx-text-fill: #93A3AE; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <HBox spacing="10.0">
+                                                    <children>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="CURRENT STREAK"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label text="0 days"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="BEST STREAK"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label text="0 days"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="ESTIMATED PROGRESS"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label text="0%"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+
+                                                <HBox spacing="10.0">
+                                                    <children>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="ESTIMATED RESULT DATE"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label text="N/A"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="ESTIMATED DURATION"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label text="N/A"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="LAST INTAKE GAP"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label text="1 days"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="XP POINTS"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label text="0"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT"
+                                      style="-fx-background-color: #FFF3EA; -fx-background-radius: 14; -fx-border-color: #FFD6C3; -fx-border-radius: 14;">
+                                    <padding>
+                                        <Insets top="12.0" right="14.0" bottom="12.0" left="14.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label text="Your discipline is dropping. Turn on reminders and lock a fixed intake time."
+                                               style="-fx-text-fill: #D07145; -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                                    </children>
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label text="Not logged yet for today."
+                                               style="-fx-text-fill: #93A3AE; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+                                        <Region HBox.hgrow="ALWAYS"/>
+                                        <Button text="Mark as taken today"
+                                                prefWidth="170.0"
+                                                prefHeight="38.0"
+                                                style="-fx-background-color: linear-gradient(to right, #0F6A58, #14795B); -fx-background-radius: 12; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 800;"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

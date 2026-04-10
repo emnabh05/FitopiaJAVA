@@ -47,9 +47,18 @@
                                 style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
                         <Button text="Monthly Ranking"
                                 style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 800; -fx-padding: 10 18 10 18;"/>
+                        <Button text="My Progress"
+                                onAction="#openProgressTracker"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #10B981; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
 
                         <Region HBox.hgrow="ALWAYS"/>
 
+                        <Button text="Back End"
+                                onAction="#openBackEnd"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #123B49; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                        <Button text="Return"
+                                onAction="#goBackOrExit"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #94A3B8; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
                         <Button text="My Profile"
                                 style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #22C55E; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
                         <Button text="Logout"

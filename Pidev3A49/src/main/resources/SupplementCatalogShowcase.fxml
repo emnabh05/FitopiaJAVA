@@ -40,7 +40,16 @@
                         <HBox spacing="12.0" alignment="CENTER_RIGHT">
                             <children>
                                 <Region HBox.hgrow="ALWAYS"/>
+                                <Button text="Back End"
+                                        onAction="#openBackEnd"
+                                        prefHeight="42.0"
+                                        style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                <Button text="Return"
+                                        onAction="#goBackOrExit"
+                                        prefHeight="42.0"
+                                        style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
                                 <Button text="My Progress"
+                                        onAction="#openProgressTracker"
                                         prefHeight="42.0"
                                         style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
                                 <Button text="Ranking"
