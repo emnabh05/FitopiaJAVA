@@ -16,8 +16,17 @@ import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ServiceSupplementOrder {
+
+    private static final Set<String> ALLOWED_STATUSES = Set.of(
+            "DELIVERED",
+            "ON_THE_WAY",
+            "CANCELED",
+            "ON_PROGRESS",
+            "PLACED"
+    );
 
     private final Connection cnx;
 
@@ -136,6 +145,79 @@ public class ServiceSupplementOrder {
             return customers;
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de recuperer la liste des clients ayant commande.", exception);
+        }
+    }
+
+    public List<SupplementOrder> getAllOrdersForAdmin() {
+        String query = """
+                SELECT
+                    id,
+                    first_name,
+                    last_name,
+                    email,
+                    phone,
+                    city,
+                    total_amount,
+                    status,
+                    created_at
+                FROM %s
+                ORDER BY created_at DESC, id DESC
+                """.formatted(SchemaInitializer.SUPPLEMENT_ORDER_TABLE);
+
+        List<SupplementOrder> orders = new ArrayList<>();
+        try (PreparedStatement statement = cnx.prepareStatement(query);
+             ResultSet resultSet = statement.executeQuery()) {
+            while (resultSet.next()) {
+                SupplementOrder order = new SupplementOrder();
+                order.setId(resultSet.getInt("id"));
+                order.setFirstName(resultSet.getString("first_name"));
+                order.setLastName(resultSet.getString("last_name"));
+                order.setEmail(resultSet.getString("email"));
+                order.setPhone(resultSet.getString("phone"));
+                order.setCity(resultSet.getString("city"));
+                order.setTotalAmount(resultSet.getBigDecimal("total_amount"));
+
+                String status = resultSet.getString("status");
+                order.setStatus(status == null || status.isBlank() ? "ON_PROGRESS" : status.toUpperCase());
+
+                Timestamp createdAtTimestamp = resultSet.getTimestamp("created_at");
+                order.setCreatedAt(createdAtTimestamp == null ? null : createdAtTimestamp.toLocalDateTime());
+                orders.add(order);
+            }
+            return orders;
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossible de recuperer les commandes.", exception);
+        }
+    }
+
+    public void updateOrderStatus(int orderId, String status) {
+        if (orderId <= 0) {
+            throw new IllegalArgumentException("Identifiant de commande invalide.");
+        }
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Le statut de commande est obligatoire.");
+        }
+
+        String normalizedStatus = status.trim().toUpperCase();
+        if (!ALLOWED_STATUSES.contains(normalizedStatus)) {
+            throw new IllegalArgumentException("Statut invalide: " + status);
+        }
+
+        String query = """
+                UPDATE %s
+                SET status = ?
+                WHERE id = ?
+                """.formatted(SchemaInitializer.SUPPLEMENT_ORDER_TABLE);
+
+        try (PreparedStatement statement = cnx.prepareStatement(query)) {
+            statement.setString(1, normalizedStatus);
+            statement.setInt(2, orderId);
+            int updatedRows = statement.executeUpdate();
+            if (updatedRows != 1) {
+                throw new IllegalStateException("Commande introuvable pour l'id " + orderId + ".");
+            }
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossible de mettre a jour le statut de la commande.", exception);
         }
     }
 

@@ -108,9 +108,9 @@
                               AnchorPane.leftAnchor="34.0"
                               AnchorPane.topAnchor="36.0">
                             <children>
-                                <Label text="Clients Who Ordered"
+                                <Label text="Orders Management"
                                        style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 800;"/>
-                                <Label text="This page shows every customer in the database that placed at least one order."
+                                <Label text="Change order status directly from the table: DELIVERED, ON_THE_WAY, CANCELED, ON_PROGRESS."
                                        wrapText="true"
                                        style="-fx-text-fill: rgba(255,255,255,0.92); -fx-font-size: 16px;"/>
                             </children>
@@ -137,13 +137,14 @@
                                    prefHeight="620.0"
                                    style="-fx-background-radius: 16; -fx-border-color: #E5EAF0; -fx-border-radius: 16;">
                             <columns>
-                                <TableColumn fx:id="fullNameColumn" text="Full Name"/>
+                                <TableColumn fx:id="orderIdColumn" text="Order ID"/>
+                                <TableColumn fx:id="fullNameColumn" text="Customer"/>
                                 <TableColumn fx:id="emailColumn" text="Email"/>
                                 <TableColumn fx:id="phoneColumn" text="Phone"/>
                                 <TableColumn fx:id="cityColumn" text="City"/>
-                                <TableColumn fx:id="orderCountColumn" text="Orders"/>
-                                <TableColumn fx:id="totalSpentColumn" text="Total Spent"/>
-                                <TableColumn fx:id="lastOrderColumn" text="Last Order"/>
+                                <TableColumn fx:id="totalAmountColumn" text="Total"/>
+                                <TableColumn fx:id="statusColumn" text="Status"/>
+                                <TableColumn fx:id="createdAtColumn" text="Created At"/>
                             </columns>
                         </TableView>
                     </children>
