@@ -1257,10 +1257,10 @@ public class MainController {
                 return allRegimes.stream()
                         .filter(r -> r.getId() == selectedId)
                         .findFirst()
-                        .orElse(determinerRegimeReference(referenceUser));
+                        .orElse(null);
             } catch (Exception ignored) {}
         }
-        return determinerRegimeReference(referenceUser);
+        return null;
     }
 
     private RegimeAlimentaire determinerRegimeReference(User user) {
