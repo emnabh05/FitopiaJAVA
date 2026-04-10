@@ -221,6 +221,53 @@ public class ServiceSupplementOrder {
         }
     }
 
+    public List<SupplementOrder> getOrdersByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return List.of();
+        }
+
+        String query = """
+                SELECT
+                    id,
+                    first_name,
+                    last_name,
+                    email,
+                    phone,
+                    city,
+                    total_amount,
+                    status,
+                    created_at
+                FROM %s
+                WHERE LOWER(email) = LOWER(?)
+                ORDER BY created_at DESC, id DESC
+                """.formatted(SchemaInitializer.SUPPLEMENT_ORDER_TABLE);
+
+        List<SupplementOrder> orders = new ArrayList<>();
+        try (PreparedStatement statement = cnx.prepareStatement(query)) {
+            statement.setString(1, email.trim());
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    SupplementOrder order = new SupplementOrder();
+                    order.setId(resultSet.getInt("id"));
+                    order.setFirstName(resultSet.getString("first_name"));
+                    order.setLastName(resultSet.getString("last_name"));
+                    order.setEmail(resultSet.getString("email"));
+                    order.setPhone(resultSet.getString("phone"));
+                    order.setCity(resultSet.getString("city"));
+                    order.setTotalAmount(resultSet.getBigDecimal("total_amount"));
+                    order.setStatus(resultSet.getString("status"));
+
+                    Timestamp createdAtTimestamp = resultSet.getTimestamp("created_at");
+                    order.setCreatedAt(createdAtTimestamp == null ? null : createdAtTimestamp.toLocalDateTime());
+                    orders.add(order);
+                }
+            }
+            return orders;
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossible de recuperer les commandes pour cet email.", exception);
+        }
+    }
+
     private void fillOrderStatement(PreparedStatement statement, SupplementOrder order) throws SQLException {
         statement.setString(1, order.getFirstName());
         statement.setString(2, order.getLastName());

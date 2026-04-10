@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -62,6 +63,10 @@
                                                 onAction="#openCheckout"
                                                 prefHeight="42.0"
                                                 style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                                        <Button text="My Orders"
+                                                onAction="#openMyOrders"
+                                                prefHeight="42.0"
+                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
                                     </children>
                                 </FlowPane>
                             </children>
@@ -106,7 +111,7 @@
                                                                style="-fx-text-fill: #0E5B4B; -fx-font-size: 24px; -fx-font-weight: 900;"/>
                                                     </children>
                                                 </StackPane>
-                                                <Label text="Clean visual placeholder for a featured product packshot."
+                                                <Label text="Build your cart, then send a real order into the database."
                                                        wrapText="true"
                                                        alignment="CENTER"
                                                        style="-fx-text-fill: rgba(255,255,255,0.82); -fx-font-size: 14px; -fx-font-weight: 600;"/>
@@ -182,7 +187,7 @@
                             </padding>
                             <children>
                                 <Label text="YOUR CART"
-                                       style="-fx-text-fill: #07161F; -fx-font-size: 18px; -fx-font-weight: 900;"/>
+                                       style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 900;"/>
                                 <Region HBox.hgrow="ALWAYS"/>
                                 <Button text="X"
                                         onAction="#hideCartPanel"
@@ -197,61 +202,7 @@
                                 <Insets top="18.0" right="18.0" bottom="16.0" left="18.0"/>
                             </padding>
                             <children>
-                                <HBox alignment="CENTER_LEFT" spacing="16.0">
-                                    <children>
-                                        <StackPane prefWidth="60.0" prefHeight="60.0"
-                                                   style="-fx-background-color: linear-gradient(to bottom right, #D8F0FF, #F1FAFF); -fx-background-radius: 14;">
-                                            <children>
-                                                <Label text="IMG"
-                                                       style="-fx-text-fill: #557181; -fx-font-size: 13px; -fx-font-weight: 900;"/>
-                                            </children>
-                                        </StackPane>
-
-                                        <VBox spacing="4.0" prefWidth="280.0">
-                                            <children>
-                                                <Label text="proteine"
-                                                       style="-fx-text-fill: #0D1B25; -fx-font-size: 18px; -fx-font-weight: 800;"/>
-                                                <Label text="gsn | prot"
-                                                       style="-fx-text-fill: #6F8290; -fx-font-size: 14px;"/>
-                                            </children>
-                                        </VBox>
-
-                                        <Region HBox.hgrow="ALWAYS"/>
-
-                                        <Label text="125.00 DT"
-                                               style="-fx-text-fill: #0F3444; -fx-font-size: 16px; -fx-font-weight: 700;"/>
-
-                                        <HBox spacing="8.0" alignment="CENTER">
-                                            <children>
-                                                <Button text="-"
-                                                        prefWidth="28.0"
-                                                        prefHeight="28.0"
-                                                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #D4E2EA; -fx-border-radius: 10; -fx-text-fill: #183948; -fx-font-size: 14px; -fx-font-weight: 800;"/>
-                                                <Label text="1"
-                                                       style="-fx-text-fill: #0D1B25; -fx-font-size: 16px; -fx-font-weight: 700;"/>
-                                                <Button text="+"
-                                                        prefWidth="28.0"
-                                                        prefHeight="28.0"
-                                                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #D4E2EA; -fx-border-radius: 10; -fx-text-fill: #183948; -fx-font-size: 14px; -fx-font-weight: 800;"/>
-                                            </children>
-                                        </HBox>
-
-                                        <Label text="125.00 DT"
-                                               style="-fx-text-fill: #0F3444; -fx-font-size: 16px; -fx-font-weight: 800;"/>
-
-                                        <Button text="DEL"
-                                                onAction="#hideCartPanel"
-                                                prefWidth="44.0"
-                                                prefHeight="32.0"
-                                                style="-fx-background-color: #FFE9E7; -fx-background-radius: 11; -fx-text-fill: #F25752; -fx-font-size: 12px; -fx-font-weight: 900;"/>
-                                    </children>
-                                </HBox>
-
-                                <Region prefHeight="1.0"
-                                        style="-fx-background-color: #E4EDF1;"/>
-
-                                <Region prefHeight="1.0"
-                                        style="-fx-background-color: #F4F7F9;"/>
+                                <VBox fx:id="cartItemsContainer" spacing="12.0"/>
 
                                 <HBox alignment="TOP_LEFT" spacing="18.0">
                                     <children>
@@ -270,20 +221,28 @@
 
                                         <VBox spacing="10.0" alignment="CENTER_RIGHT">
                                             <children>
-                                                <Label text="125.00 DT"
+                                                <Label fx:id="cartSubtotalLabel"
+                                                       text="0.00 DT"
                                                        style="-fx-text-fill: #0F3444; -fx-font-size: 14px; -fx-font-weight: 700;"/>
-                                                <Label text="0.00 DT"
+                                                <Label fx:id="cartShippingLabel"
+                                                       text="0.00 DT"
                                                        style="-fx-text-fill: #0F3444; -fx-font-size: 14px; -fx-font-weight: 700;"/>
-                                                <Label text="125.00 DT"
+                                                <Label fx:id="cartTotalLabel"
+                                                       text="0.00 DT"
                                                        style="-fx-text-fill: #082B3E; -fx-font-size: 20px; -fx-font-weight: 900;"/>
                                             </children>
                                         </VBox>
                                     </children>
                                 </HBox>
 
+                                <Label fx:id="cartStatusLabel"
+                                       wrapText="true"
+                                       style="-fx-text-fill: #0F6A58; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+
                                 <HBox alignment="CENTER_RIGHT">
                                     <children>
-                                        <Button text="PROCEED TO CHECKOUT"
+                                        <Button fx:id="proceedToCheckoutButton"
+                                                text="PROCEED TO CHECKOUT"
                                                 onAction="#openCheckout"
                                                 prefWidth="214.0"
                                                 prefHeight="40.0"
@@ -323,38 +282,22 @@
                                                 <Label text="Categories"
                                                        style="-fx-text-fill: #163848; -fx-font-size: 16px; -fx-font-weight: 800;"/>
                                                 <Region HBox.hgrow="ALWAYS"/>
-                                                <Label text="âŒ„"
-                                                       style="-fx-text-fill: #425C6A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                <Label text="FILTER"
+                                                       style="-fx-text-fill: #425C6A; -fx-font-size: 12px; -fx-font-weight: 900;"/>
                                             </children>
                                         </HBox>
 
                                         <VBox spacing="10.0">
                                             <children>
-                                                <CheckBox text="Accessoires"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Acides Amines"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Amino Acids"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Boosteur de Testo"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Bruleurs de graisses"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Carbs"
+                                                <CheckBox text="Protein"
                                                           style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
                                                 <CheckBox text="Creatine"
                                                           style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Creatine monohydrate"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Joint flex"
+                                                <CheckBox text="Pre-workout"
                                                           style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
                                                 <CheckBox text="Mass gainer"
                                                           style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Protein"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Pre-workout"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Ramadhan Deal"
+                                                <CheckBox text="Vitamins"
                                                           style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
                                             </children>
                                         </VBox>
@@ -390,7 +333,7 @@
                                     </children>
                                 </HBox>
 
-                                                                <FlowPane fx:id="productGrid"
+                                <FlowPane fx:id="productGrid"
                                           prefWrapLength="958.0"
                                           hgap="22.0"
                                           vgap="22.0"/>
@@ -413,4 +356,3 @@
         </VBox>
     </content>
 </ScrollPane>
-

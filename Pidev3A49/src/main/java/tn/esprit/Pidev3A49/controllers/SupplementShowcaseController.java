@@ -4,24 +4,35 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import tn.esprit.Pidev3A49.Models.CartItem;
 import tn.esprit.Pidev3A49.Models.Supplement;
 import tn.esprit.Pidev3A49.services.ServiceSupplement;
+import tn.esprit.Pidev3A49.utils.CartStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Locale;
 
 public class SupplementShowcaseController {
+
+    private static final String CART_INFO_STYLE =
+            "-fx-text-fill: #0F6A58; -fx-font-size: 13px; -fx-font-weight: 700;";
+
+    private static final String CART_ERROR_STYLE =
+            "-fx-text-fill: #D92D20; -fx-font-size: 13px; -fx-font-weight: 700;";
 
     @FXML
     private ScrollPane rootScrollPane;
@@ -47,11 +58,31 @@ public class SupplementShowcaseController {
     @FXML
     private Label availableProductsCountLabel;
 
+    @FXML
+    private VBox cartItemsContainer;
+
+    @FXML
+    private Label cartSubtotalLabel;
+
+    @FXML
+    private Label cartShippingLabel;
+
+    @FXML
+    private Label cartTotalLabel;
+
+    @FXML
+    private Label cartStatusLabel;
+
+    @FXML
+    private Button proceedToCheckoutButton;
+
+    private final CartStore cartStore = CartStore.getInstance();
     private ServiceSupplement serviceSupplement;
 
     @FXML
     private void initialize() {
         loadProducts();
+        renderCart();
     }
 
     public void openProgressTracker(ActionEvent event) throws IOException {
@@ -70,12 +101,17 @@ public class SupplementShowcaseController {
         SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.CHECKOUT_VIEW);
     }
 
+    public void openMyOrders(ActionEvent event) throws IOException {
+        SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.FRONT_ORDERS_VIEW);
+    }
+
     public void goBackOrExit(ActionEvent event) throws IOException {
         SceneNavigator.goBackOrClose(event);
     }
 
     @FXML
     private void showCartPanel() {
+        renderCart();
         cartPanel.setManaged(true);
         cartPanel.setVisible(true);
 
@@ -155,7 +191,7 @@ public class SupplementShowcaseController {
 
         Label topBadge = createChip(stockLabel(supplement), stockChipStyle(supplement));
         StackPane.setMargin(topBadge, new Insets(14.0, 14.0, 0.0, 0.0));
-        StackPane.setAlignment(topBadge, javafx.geometry.Pos.TOP_RIGHT);
+        StackPane.setAlignment(topBadge, Pos.TOP_RIGHT);
         visualPane.getChildren().addAll(visualLabel, topBadge);
 
         VBox detailsBox = new VBox(10.0);
@@ -199,7 +235,7 @@ public class SupplementShowcaseController {
         addToCartButton.setDisable(supplement.getStock() <= 0);
         addToCartButton.setStyle("-fx-background-color: linear-gradient(to right, #124A4D, #0F6A58); -fx-background-radius: 14; "
                 + "-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 900;");
-        addToCartButton.setOnAction(event -> showCartPanel());
+        addToCartButton.setOnAction(event -> addToCart(supplement));
 
         detailsBox.getChildren().addAll(
                 brandLabel,
@@ -214,6 +250,143 @@ public class SupplementShowcaseController {
 
         card.getChildren().addAll(visualPane, detailsBox);
         return card;
+    }
+
+    private void addToCart(Supplement supplement) {
+        try {
+            cartStore.addSupplement(supplement);
+            setCartMessage(valueOrDefault(supplement.getName()) + " added to cart.", false);
+            showCartPanel();
+        } catch (RuntimeException exception) {
+            setCartMessage(exception.getMessage(), true);
+            showCartPanel();
+        }
+    }
+
+    private void renderCart() {
+        cartItemsContainer.getChildren().clear();
+
+        List<CartItem> items = cartStore.getItems();
+        if (items.isEmpty()) {
+            cartItemsContainer.getChildren().add(buildEmptyCartState());
+            cartSubtotalLabel.setText("0.00 DT");
+            cartShippingLabel.setText("0.00 DT");
+            cartTotalLabel.setText("0.00 DT");
+            proceedToCheckoutButton.setDisable(true);
+            if (cartStatusLabel.getText() == null || cartStatusLabel.getText().isBlank()) {
+                setCartMessage("Your cart is empty.", false);
+            }
+            return;
+        }
+
+        for (CartItem item : items) {
+            cartItemsContainer.getChildren().add(buildCartItemRow(item));
+        }
+
+        cartSubtotalLabel.setText(formatPrice(cartStore.getSubtotal()));
+        cartShippingLabel.setText(formatPrice(cartStore.getShippingCost()));
+        cartTotalLabel.setText(formatPrice(cartStore.getTotal(BigDecimal.ZERO)));
+        proceedToCheckoutButton.setDisable(false);
+    }
+
+    private VBox buildEmptyCartState() {
+        VBox emptyState = new VBox(8.0);
+        emptyState.setStyle("-fx-background-color: #F6FAFC; -fx-background-radius: 18; -fx-border-color: #D9E6ED; "
+                + "-fx-border-radius: 18; -fx-padding: 18 18 18 18;");
+
+        Label titleLabel = new Label("Your cart is empty");
+        titleLabel.setStyle("-fx-text-fill: #113748; -fx-font-size: 18px; -fx-font-weight: 900;");
+
+        Label hintLabel = new Label("Add one or more supplements from the product grid, then proceed to checkout.");
+        hintLabel.setWrapText(true);
+        hintLabel.setStyle("-fx-text-fill: #768995; -fx-font-size: 13px; -fx-font-weight: 600;");
+
+        emptyState.getChildren().addAll(titleLabel, hintLabel);
+        return emptyState;
+    }
+
+    private VBox buildCartItemRow(CartItem item) {
+        Supplement supplement = item.getSupplement();
+
+        VBox wrapper = new VBox(12.0);
+
+        HBox row = new HBox(16.0);
+        row.setAlignment(Pos.CENTER_LEFT);
+
+        StackPane visual = new StackPane();
+        visual.setPrefSize(60.0, 60.0);
+        visual.setStyle("-fx-background-color: linear-gradient(to bottom right, #D8F0FF, #F1FAFF); -fx-background-radius: 14;");
+        Label visualLabel = new Label(valueOrDefault(supplement.getBrand()).substring(0, Math.min(3, valueOrDefault(supplement.getBrand()).length())).toUpperCase(Locale.ROOT));
+        visualLabel.setStyle("-fx-text-fill: #557181; -fx-font-size: 13px; -fx-font-weight: 900;");
+        visual.getChildren().add(visualLabel);
+
+        VBox details = new VBox(4.0);
+        details.setPrefWidth(250.0);
+        Label nameLabel = new Label(valueOrDefault(supplement.getName()));
+        nameLabel.setStyle("-fx-text-fill: #0D1B25; -fx-font-size: 18px; -fx-font-weight: 800;");
+        Label metaLabel = new Label(valueOrDefault(supplement.getBrand()) + " | " + valueOrDefault(supplement.getCategory()));
+        metaLabel.setStyle("-fx-text-fill: #6F8290; -fx-font-size: 13px;");
+        details.getChildren().addAll(nameLabel, metaLabel);
+
+        Label unitPriceLabel = new Label(formatPrice(supplement.getPrice()));
+        unitPriceLabel.setStyle("-fx-text-fill: #0F3444; -fx-font-size: 16px; -fx-font-weight: 700;");
+
+        HBox quantityBox = new HBox(8.0);
+        quantityBox.setAlignment(Pos.CENTER);
+        Button decreaseButton = buildCartControlButton("-");
+        decreaseButton.setOnAction(event -> {
+            cartStore.decreaseQuantity(supplement.getId());
+            setCartMessage("Cart updated.", false);
+            renderCart();
+        });
+
+        Label quantityLabel = new Label(Integer.toString(item.getQuantity()));
+        quantityLabel.setStyle("-fx-text-fill: #0D1B25; -fx-font-size: 16px; -fx-font-weight: 700;");
+
+        Button increaseButton = buildCartControlButton("+");
+        increaseButton.setOnAction(event -> {
+            try {
+                cartStore.increaseQuantity(supplement.getId());
+                setCartMessage("Cart updated.", false);
+            } catch (RuntimeException exception) {
+                setCartMessage(exception.getMessage(), true);
+            }
+            renderCart();
+        });
+        quantityBox.getChildren().addAll(decreaseButton, quantityLabel, increaseButton);
+
+        Label lineTotalLabel = new Label(formatPrice(item.getLineTotal()));
+        lineTotalLabel.setStyle("-fx-text-fill: #0F3444; -fx-font-size: 16px; -fx-font-weight: 800;");
+
+        Button removeButton = new Button("DEL");
+        removeButton.setPrefWidth(44.0);
+        removeButton.setPrefHeight(32.0);
+        removeButton.setStyle("-fx-background-color: #FFE9E7; -fx-background-radius: 11; -fx-text-fill: #F25752; -fx-font-size: 12px; -fx-font-weight: 900;");
+        removeButton.setOnAction(event -> {
+            cartStore.removeSupplement(supplement.getId());
+            setCartMessage(valueOrDefault(supplement.getName()) + " removed from cart.", false);
+            renderCart();
+        });
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        row.getChildren().addAll(visual, details, spacer, unitPriceLabel, quantityBox, lineTotalLabel, removeButton);
+
+        Region separator = new Region();
+        separator.setPrefHeight(1.0);
+        separator.setStyle("-fx-background-color: #E4EDF1;");
+
+        wrapper.getChildren().addAll(row, separator);
+        return wrapper;
+    }
+
+    private Button buildCartControlButton(String text) {
+        Button button = new Button(text);
+        button.setPrefSize(28.0, 28.0);
+        button.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #D4E2EA; "
+                + "-fx-border-radius: 10; -fx-text-fill: #183948; -fx-font-size: 14px; -fx-font-weight: 800;");
+        return button;
     }
 
     private VBox buildEmptyCard(String title, String message) {
@@ -274,6 +447,11 @@ public class SupplementShowcaseController {
         if (price == null) {
             return "-";
         }
-        return price.stripTrailingZeros().toPlainString() + " DT";
+        return price.setScale(2, RoundingMode.HALF_UP).toPlainString() + " DT";
+    }
+
+    private void setCartMessage(String message, boolean error) {
+        cartStatusLabel.setText(message);
+        cartStatusLabel.setStyle(error ? CART_ERROR_STYLE : CART_INFO_STYLE);
     }
 }

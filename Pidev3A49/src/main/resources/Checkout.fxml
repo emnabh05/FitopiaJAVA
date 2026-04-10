@@ -54,7 +54,7 @@
                             <children>
                                 <Label text="SECURE CHECKOUT"
                                        style="-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: 900;"/>
-                                <Label text="Encrypted payment, delivery details, and a final order review."
+                                <Label text="Customer details, order review, and a real checkout save to MySQL."
                                        style="-fx-text-fill: rgba(255,255,255,0.80); -fx-font-size: 14px; -fx-font-weight: 600;"/>
                             </children>
                         </VBox>
@@ -67,6 +67,10 @@
                                 style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
                         <Button text="Back End"
                                 onAction="#openBackEnd"
+                                prefHeight="40.0"
+                                style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                        <Button text="My Orders"
+                                onAction="#openMyOrders"
                                 prefHeight="40.0"
                                 style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
                     </children>
@@ -94,43 +98,51 @@
 
                                         <HBox spacing="12.0">
                                             <children>
-                                                <TextField promptText="First name"
+                                                <TextField fx:id="firstNameField"
+                                                           promptText="First name"
                                                            prefHeight="48.0"
                                                            HBox.hgrow="ALWAYS"
                                                            style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
-                                                <TextField promptText="Last name"
+                                                <TextField fx:id="lastNameField"
+                                                           promptText="Last name"
                                                            prefHeight="48.0"
                                                            HBox.hgrow="ALWAYS"
                                                            style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
                                             </children>
                                         </HBox>
 
-                                        <TextField promptText="Email"
+                                        <TextField fx:id="emailField"
+                                                   promptText="Email"
                                                    prefHeight="48.0"
                                                    style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
 
-                                        <TextField promptText="Phone"
+                                        <TextField fx:id="phoneField"
+                                                   promptText="Phone"
                                                    prefHeight="48.0"
                                                    style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
 
-                                        <TextField promptText="Address"
+                                        <TextField fx:id="addressField"
+                                                   promptText="Address"
                                                    prefHeight="48.0"
                                                    style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
 
                                         <HBox spacing="12.0">
                                             <children>
-                                                <TextField promptText="City"
+                                                <TextField fx:id="cityField"
+                                                           promptText="City"
                                                            prefHeight="48.0"
                                                            HBox.hgrow="ALWAYS"
                                                            style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
-                                                <TextField promptText="Postal code"
+                                                <TextField fx:id="postalCodeField"
+                                                           promptText="Postal code"
                                                            prefHeight="48.0"
                                                            HBox.hgrow="ALWAYS"
                                                            style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
                                             </children>
                                         </HBox>
 
-                                        <TextArea promptText="Notes (optional)"
+                                        <TextArea fx:id="notesArea"
+                                                  promptText="Notes (optional)"
                                                   prefHeight="112.0"
                                                   wrapText="true"
                                                   style="-fx-background-color: #FBFDFE; -fx-background-radius: 16; -fx-border-color: #D6E2EA; -fx-border-radius: 16; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
@@ -227,16 +239,22 @@
 
                                         <HBox spacing="12.0">
                                             <children>
-                                                <TextField promptText="Discount code"
+                                                <TextField fx:id="discountCodeField"
+                                                           promptText="Discount code"
                                                            prefHeight="46.0"
                                                            HBox.hgrow="ALWAYS"
                                                            style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
                                                 <Button text="Apply"
+                                                        onAction="#applyDiscountCode"
                                                         prefWidth="110.0"
                                                         prefHeight="46.0"
                                                         style="-fx-background-color: #123C47; -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 800;"/>
                                             </children>
                                         </HBox>
+
+                                        <Label fx:id="checkoutStatusLabel"
+                                               wrapText="true"
+                                               style="-fx-text-fill: #255D71; -fx-font-size: 14px; -fx-font-weight: 700;"/>
                                     </children>
                                 </VBox>
                             </children>
@@ -254,43 +272,14 @@
                                     <children>
                                         <Label text="ORDER SUMMARY"
                                                style="-fx-text-fill: #0B2E3E; -fx-font-size: 26px; -fx-font-weight: 900;"/>
-                                        <Label text="One quick review before the payment step."
+                                        <Label fx:id="orderSummaryHintLabel"
+                                               text="One quick review before the payment step."
                                                wrapText="true"
                                                style="-fx-text-fill: #6D808C; -fx-font-size: 13px; -fx-font-weight: 600;"/>
                                     </children>
                                 </VBox>
 
-                                <VBox spacing="12.0"
-                                      style="-fx-background-color: #F6FAFC; -fx-background-radius: 18; -fx-border-color: #D9E6ED; -fx-border-radius: 18;">
-                                    <padding>
-                                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
-                                    </padding>
-                                    <children>
-                                        <HBox alignment="CENTER_LEFT" spacing="12.0">
-                                            <children>
-                                                <StackPane prefWidth="62.0" prefHeight="62.0"
-                                                           style="-fx-background-color: linear-gradient(to bottom right, #D9F5EA, #F2FCF7); -fx-background-radius: 18;">
-                                                    <children>
-                                                        <Label text="GSN"
-                                                               style="-fx-text-fill: #0F6A58; -fx-font-size: 16px; -fx-font-weight: 900;"/>
-                                                    </children>
-                                                </StackPane>
-
-                                                <VBox spacing="4.0" HBox.hgrow="ALWAYS">
-                                                    <children>
-                                                        <Label text="PROTEINE"
-                                                               style="-fx-text-fill: #113748; -fx-font-size: 17px; -fx-font-weight: 900;"/>
-                                                        <Label text="Lean recovery blend | Qty 1"
-                                                               style="-fx-text-fill: #768995; -fx-font-size: 12px; -fx-font-weight: 600;"/>
-                                                    </children>
-                                                </VBox>
-
-                                                <Label text="125.00 DT"
-                                                       style="-fx-text-fill: #123748; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                            </children>
-                                        </HBox>
-                                    </children>
-                                </VBox>
+                                <VBox fx:id="orderItemsContainer" spacing="12.0"/>
 
                                 <Region prefHeight="1.0"
                                         style="-fx-background-color: #E1EBF1;"/>
@@ -300,7 +289,8 @@
                                         <Label text="Subtotal"
                                                style="-fx-text-fill: #345061; -fx-font-size: 15px; -fx-font-weight: 600;"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label text="125.00 DT"
+                                        <Label fx:id="subtotalLabel"
+                                               text="0.00 DT"
                                                style="-fx-text-fill: #123748; -fx-font-size: 15px; -fx-font-weight: 800;"/>
                                     </children>
                                 </HBox>
@@ -310,7 +300,8 @@
                                         <Label text="Shipping"
                                                style="-fx-text-fill: #345061; -fx-font-size: 15px; -fx-font-weight: 600;"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label text="7.00 DT"
+                                        <Label fx:id="shippingLabel"
+                                               text="0.00 DT"
                                                style="-fx-text-fill: #123748; -fx-font-size: 15px; -fx-font-weight: 800;"/>
                                     </children>
                                 </HBox>
@@ -320,7 +311,8 @@
                                         <Label text="Discount"
                                                style="-fx-text-fill: #345061; -fx-font-size: 15px; -fx-font-weight: 600;"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label text="0.00 DT"
+                                        <Label fx:id="discountLabel"
+                                               text="0.00 DT"
                                                style="-fx-text-fill: #123748; -fx-font-size: 15px; -fx-font-weight: 800;"/>
                                     </children>
                                 </HBox>
@@ -335,7 +327,8 @@
                                             <children>
                                                 <Label text="TOTAL"
                                                        style="-fx-text-fill: rgba(255,255,255,0.78); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                <Label text="132.00 DT"
+                                                <Label fx:id="totalLabel"
+                                                       text="0.00 DT"
                                                        style="-fx-text-fill: white; -fx-font-size: 30px; -fx-font-weight: 900;"/>
                                             </children>
                                         </VBox>
@@ -345,12 +338,14 @@
                                     </children>
                                 </HBox>
 
-                                <Button text="PLACE ORDER"
+                                <Button fx:id="placeOrderButton"
+                                        text="PLACE ORDER"
+                                        onAction="#placeOrder"
                                         prefHeight="48.0"
                                         maxWidth="1.7976931348623157E308"
                                         style="-fx-background-color: linear-gradient(to right, #0E5D4E, #13846A); -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 900;"/>
 
-                                <Label text="Your payment details stay inside the secure checkout flow."
+                                <Label text="Use FIT10 or WELCOME5 for a discount before confirming the order."
                                        wrapText="true"
                                        style="-fx-text-fill: #8395A0; -fx-font-size: 12px; -fx-font-weight: 600;"/>
                             </children>

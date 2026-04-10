@@ -15,6 +15,7 @@ public final class CartStore {
     private static final CartStore INSTANCE = new CartStore();
 
     private final Map<Integer, CartItem> itemsBySupplementId = new LinkedHashMap<>();
+    private String lastCheckoutEmail;
 
     private CartStore() {
     }
@@ -98,6 +99,14 @@ public final class CartStore {
 
     public synchronized void clear() {
         itemsBySupplementId.clear();
+    }
+
+    public synchronized String getLastCheckoutEmail() {
+        return lastCheckoutEmail;
+    }
+
+    public synchronized void setLastCheckoutEmail(String lastCheckoutEmail) {
+        this.lastCheckoutEmail = lastCheckoutEmail;
     }
 
     private CartItem requireItem(int supplementId) {
