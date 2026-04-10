@@ -274,33 +274,33 @@
                                                  </HBox>
                                                  
                                                  <VBox spacing="10">
-                                                     <VBox style="-fx-background-color: #f8fafc; -fx-border-color: #f1f5f9; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 12;">
-                                                         <HBox spacing="12" alignment="CENTER_LEFT">
-                                                             <Label text="&#128274;" style="-fx-text-fill: #94a3b8;"/>
-                                                             <VBox>
-                                                                 <Label text="Semaine parfaite" style="-fx-font-weight: 800; -fx-text-fill: #475569; -fx-font-size: 13px;"/>
-                                                                 <Label text="Calories dans la cible aujourd'hui." style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
-                                                             </VBox>
-                                                         </HBox>
-                                                     </VBox>
-                                                     <VBox style="-fx-background-color: #f8fafc; -fx-border-color: #f1f5f9; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 12;">
-                                                         <HBox spacing="12" alignment="CENTER_LEFT">
-                                                             <Label text="&#128274;" style="-fx-text-fill: #94a3b8;"/>
-                                                             <VBox>
-                                                                 <Label text="Hydratation OK" style="-fx-font-weight: 800; -fx-text-fill: #475569; -fx-font-size: 13px;"/>
-                                                                 <Label text="Au moins 3 repas / collations enregistrés aujourd'hui." style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
-                                                             </VBox>
-                                                         </HBox>
-                                                     </VBox>
-                                                     <VBox style="-fx-background-color: #f8fafc; -fx-border-color: #f1f5f9; -fx-background-radius: 10; -fx-border-radius: 10; -fx-padding: 12;">
-                                                         <HBox spacing="12" alignment="CENTER_LEFT">
-                                                             <Label text="&#128274;" style="-fx-text-fill: #94a3b8;"/>
-                                                             <VBox>
-                                                                 <Label text="Calories respectées" style="-fx-font-weight: 800; -fx-text-fill: #475569; -fx-font-size: 13px;"/>
-                                                                 <Label text="Journée avec calories proches de l'objectif." style="-fx-font-size: 11px; -fx-text-fill: #94a3b8;"/>
-                                                             </VBox>
-                                                         </HBox>
-                                                     </VBox>
+                                                 <VBox styleClass="badge-row, badge-unlocked">
+                                                     <HBox spacing="12" alignment="CENTER_LEFT">
+                                                         <Label text="&#10004;" styleClass="badge-icon-unlocked" style="-fx-font-size: 16px;"/>
+                                                         <VBox>
+                                                             <Label text="Semaine parfaite" styleClass="badge-title-unlocked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
+                                                             <Label text="Calories dans la cible aujourd'hui." styleClass="badge-desc-unlocked" style="-fx-font-size: 11px;"/>
+                                                         </VBox>
+                                                     </HBox>
+                                                 </VBox>
+                                                 <VBox styleClass="badge-row, badge-unlocked">
+                                                     <HBox spacing="12" alignment="CENTER_LEFT">
+                                                         <Label text="&#10004;" styleClass="badge-icon-unlocked" style="-fx-font-size: 16px;"/>
+                                                         <VBox>
+                                                             <Label text="Hydratation OK" styleClass="badge-title-unlocked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
+                                                             <Label text="Au moins 3 repas / collations enregistrés aujourd'hui." styleClass="badge-desc-unlocked" style="-fx-font-size: 11px;"/>
+                                                         </VBox>
+                                                     </HBox>
+                                                 </VBox>
+                                                 <VBox styleClass="badge-row, badge-unlocked">
+                                                     <HBox spacing="12" alignment="CENTER_LEFT">
+                                                         <Label text="&#10004;" styleClass="badge-icon-unlocked" style="-fx-font-size: 16px;"/>
+                                                         <VBox>
+                                                             <Label text="Calories respectées" styleClass="badge-title-unlocked" style="-fx-font-weight: 800; -fx-font-size: 13px;"/>
+                                                             <Label text="Journée avec calories proches de l'objectif." styleClass="badge-desc-unlocked" style="-fx-font-size: 11px;"/>
+                                                         </VBox>
+                                                     </HBox>
+                                                 </VBox>
                                                  </VBox>
                                            </VBox>
                                      </VBox>

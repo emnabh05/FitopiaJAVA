@@ -1779,3 +1779,31 @@
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 15, 0, 0, 5);
 }
 
+/* --- BADGE STYLES --- */
+.badge-row {
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-padding: 12;
+}
+
+.badge-locked {
+    -fx-background-color: #f8fafc;
+    -fx-border-color: #f1f5f9;
+}
+
+.badge-unlocked {
+    -fx-background-color: #ecfdf5;
+    -fx-border-color: #10b981;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.1), 10, 0, 0, 2);
+}
+
+.badge-icon-locked { -fx-text-fill: #94a3b8; }
+.badge-icon-unlocked { -fx-text-fill: #10b981; }
+
+.badge-title-locked { -fx-text-fill: #475569; }
+.badge-title-unlocked { -fx-text-fill: #065f46; }
+
+.badge-desc-locked { -fx-text-fill: #94a3b8; }
+.badge-desc-unlocked { -fx-text-fill: #059669; }
+
+
