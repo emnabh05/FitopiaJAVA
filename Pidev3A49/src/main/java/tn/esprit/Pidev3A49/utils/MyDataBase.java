@@ -7,7 +7,7 @@ import java.sql.SQLException;
 public class MyDataBase {
 
     private static MyDataBase instance ;
-    private final String URL ="jdbc:mysql://127.0.0.1:3306/esprit";
+    private final String URL ="jdbc:mysql://127.0.0.1:3306/esprit?createDatabaseIfNotExist=true&serverTimezone=UTC";
     private final String USERNAME ="root";
     private final String PASSWORD ="";
     private Connection cnx ;
@@ -15,6 +15,7 @@ public class MyDataBase {
    private MyDataBase(){
        try {
            cnx = DriverManager.getConnection(URL,USERNAME,PASSWORD);
+           SchemaInitializer.initialize(cnx);
 
            System.out.println("Connected ...");
        } catch (SQLException e) {

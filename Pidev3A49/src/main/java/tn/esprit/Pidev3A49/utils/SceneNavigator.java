@@ -1,10 +1,13 @@
 package tn.esprit.Pidev3A49.utils;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -37,6 +40,13 @@ public final class SceneNavigator {
         load(event, targetView);
     }
 
+    public static void navigate(Node source, ViewState currentView, ViewState targetView) throws IOException {
+        if (!currentView.fxmlPath().equals(targetView.fxmlPath())) {
+            HISTORY.push(currentView);
+        }
+        load(source, targetView);
+    }
+
     public static void goBackOrClose(ActionEvent event) throws IOException {
         if (HISTORY.isEmpty()) {
             extractStage(event).close();
@@ -46,25 +56,77 @@ public final class SceneNavigator {
         load(event, HISTORY.pop());
     }
 
+    public static void goBackOrClose(Node source) throws IOException {
+        if (HISTORY.isEmpty()) {
+            extractStage(source).close();
+            return;
+        }
+
+        load(source, HISTORY.pop());
+    }
+
     public static void load(ActionEvent event, ViewState targetView) throws IOException {
         FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(targetView.fxmlPath()));
         Parent root = loader.load();
 
         Stage stage = extractStage(event);
-        stage.setScene(new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT));
+        stage.setScene(createScene(root));
         stage.setTitle(targetView.title());
-        applyWindowMode(stage);
         stage.show();
+        applyWindowMode(stage);
+    }
+
+    public static void load(Node source, ViewState targetView) throws IOException {
+        FXMLLoader loader = new FXMLLoader(SceneNavigator.class.getResource(targetView.fxmlPath()));
+        Parent root = loader.load();
+
+        Stage stage = extractStage(source);
+        stage.setScene(createScene(root));
+        stage.setTitle(targetView.title());
+        stage.show();
+        applyWindowMode(stage);
     }
 
     public static void applyWindowMode(Stage stage) {
+        Rectangle2D visualBounds = getVisualBounds();
+        stage.setResizable(true);
+        stage.setX(visualBounds.getMinX());
+        stage.setY(visualBounds.getMinY());
+        stage.setWidth(visualBounds.getWidth());
+        stage.setHeight(visualBounds.getHeight());
+
         if (OPEN_MAXIMIZED) {
+            stage.setMaximized(false);
             stage.setMaximized(true);
         }
+
+        Platform.runLater(() -> {
+            stage.setX(visualBounds.getMinX());
+            stage.setY(visualBounds.getMinY());
+            stage.setWidth(visualBounds.getWidth());
+            stage.setHeight(visualBounds.getHeight());
+
+            if (OPEN_MAXIMIZED) {
+                stage.setMaximized(true);
+            }
+        });
+    }
+
+    public static Scene createScene(Parent root) {
+        Rectangle2D visualBounds = getVisualBounds();
+        return new Scene(root, visualBounds.getWidth(), visualBounds.getHeight());
     }
 
     private static Stage extractStage(ActionEvent event) {
-        return (Stage) ((Node) event.getSource()).getScene().getWindow();
+        return extractStage((Node) event.getSource());
+    }
+
+    private static Stage extractStage(Node source) {
+        return (Stage) source.getScene().getWindow();
+    }
+
+    private static Rectangle2D getVisualBounds() {
+        return Screen.getPrimary().getVisualBounds();
     }
 
     public record ViewState(String fxmlPath, String title) {

@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -12,7 +11,6 @@
             prefHeight="950.0"
             style="-fx-background-color: #F4F7F6;">
 
-    <!-- LEFT SIDEBAR -->
     <left>
         <VBox prefWidth="310.0"
               spacing="24.0"
@@ -36,7 +34,8 @@
                     </children>
                 </HBox>
 
-                <HBox spacing="14.0" alignment="CENTER_LEFT"
+                <HBox spacing="14.0"
+                      alignment="CENTER_LEFT"
                       style="-fx-background-color: rgba(255,255,255,0.12); -fx-background-radius: 18;">
                     <padding>
                         <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>
@@ -81,19 +80,19 @@
         </VBox>
     </left>
 
-    <!-- MAIN CONTENT -->
     <center>
-        <ScrollPane fitToWidth="true"
+        <ScrollPane fx:id="adminScrollPane"
+                    fitToWidth="true"
                     hbarPolicy="NEVER"
                     style="-fx-background-color: transparent; -fx-background: transparent;">
             <content>
-                <VBox spacing="26.0">
+                <VBox fx:id="adminContentRoot"
+                      spacing="26.0">
                     <padding>
                         <Insets top="30.0" right="36.0" bottom="30.0" left="36.0"/>
                     </padding>
 
                     <children>
-                        <!-- HERO -->
                         <AnchorPane prefHeight="155.0"
                                     style="-fx-background-color: linear-gradient(to right, #07505B, #118465); -fx-background-radius: 26;">
                             <children>
@@ -103,7 +102,7 @@
                                     <children>
                                         <Label text="Gestion des supplements"
                                                style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 800;"/>
-                                        <Label text="Créez, modifiez, supprimez ou consultez les supplements enregistrés dans le système."
+                                        <Label text="Creez de nouveaux supplements et verifiez qu ils sont bien synchronises avec le front."
                                                wrapText="true"
                                                style="-fx-text-fill: rgba(255,255,255,0.92); -fx-font-size: 16px;"/>
                                     </children>
@@ -115,7 +114,6 @@
                             </children>
                         </AnchorPane>
 
-                        <!-- ACTION CARDS -->
                         <GridPane hgap="24.0" vgap="24.0">
                             <columnConstraints>
                                 <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
@@ -123,10 +121,12 @@
                             </columnConstraints>
 
                             <children>
-                                <VBox GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                <VBox GridPane.columnIndex="0"
+                                      GridPane.rowIndex="0"
+                                      onMouseClicked="#focusCreateSupplement"
                                       spacing="18.0"
                                       prefHeight="220.0"
-                                      style="-fx-background-color: white; -fx-background-radius: 22; -fx-border-color: #4BA98A; -fx-border-width: 1.5; -fx-border-radius: 22;">
+                                      style="-fx-background-color: white; -fx-background-radius: 22; -fx-border-color: #4BA98A; -fx-border-width: 1.5; -fx-border-radius: 22; -fx-cursor: hand;">
                                     <padding>
                                         <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
                                     </padding>
@@ -139,7 +139,7 @@
                                                        style="-fx-text-fill: #0A4450; -fx-font-size: 28px; -fx-font-weight: 800;"/>
                                             </children>
                                         </StackPane>
-                                        <Label text="Créer un supplement"
+                                        <Label text="Creer un supplement"
                                                style="-fx-text-fill: #111827; -fx-font-size: 18px; -fx-font-weight: 800;"/>
                                         <Label text="Ajoutez un nouveau supplement pour votre stock."
                                                wrapText="true"
@@ -147,10 +147,12 @@
                                     </children>
                                 </VBox>
 
-                                <VBox GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                <VBox GridPane.columnIndex="1"
+                                      GridPane.rowIndex="0"
+                                      onMouseClicked="#focusUpdateSupplement"
                                       spacing="18.0"
                                       prefHeight="220.0"
-                                      style="-fx-background-color: white; -fx-background-radius: 22;">
+                                      style="-fx-background-color: white; -fx-background-radius: 22; -fx-cursor: hand;">
                                     <padding>
                                         <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
                                     </padding>
@@ -159,22 +161,24 @@
                                                    maxWidth="50.0" maxHeight="50.0"
                                                    style="-fx-background-color: #EAF2EF; -fx-background-radius: 14;">
                                             <children>
-                                                <Label text="↻"
-                                                       style="-fx-text-fill: #0A4450; -fx-font-size: 24px; -fx-font-weight: 800;"/>
+                                                <Label text="UP"
+                                                       style="-fx-text-fill: #0A4450; -fx-font-size: 18px; -fx-font-weight: 800;"/>
                                             </children>
                                         </StackPane>
                                         <Label text="Modifier un supplement"
                                                style="-fx-text-fill: #111827; -fx-font-size: 18px; -fx-font-weight: 800;"/>
-                                        <Label text="Mettez à jour les informations d'un supplement existant."
+                                        <Label text="La modification peut etre ajoutee ensuite sans changer le schema actuel."
                                                wrapText="true"
                                                style="-fx-text-fill: #6B7280; -fx-font-size: 16px;"/>
                                     </children>
                                 </VBox>
 
-                                <VBox GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                <VBox GridPane.columnIndex="0"
+                                      GridPane.rowIndex="1"
+                                      onMouseClicked="#focusDeleteSupplement"
                                       spacing="18.0"
                                       prefHeight="220.0"
-                                      style="-fx-background-color: white; -fx-background-radius: 22;">
+                                      style="-fx-background-color: white; -fx-background-radius: 22; -fx-cursor: hand;">
                                     <padding>
                                         <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
                                     </padding>
@@ -183,22 +187,24 @@
                                                    maxWidth="50.0" maxHeight="50.0"
                                                    style="-fx-background-color: #EAF2EF; -fx-background-radius: 14;">
                                             <children>
-                                                <Label text="🗑"
-                                                       style="-fx-font-size: 20px;"/>
+                                                <Label text="DEL"
+                                                       style="-fx-font-size: 16px; -fx-font-weight: 800;"/>
                                             </children>
                                         </StackPane>
                                         <Label text="Supprimer un supplement"
                                                style="-fx-text-fill: #111827; -fx-font-size: 18px; -fx-font-weight: 800;"/>
-                                        <Label text="Supprimez un supplement de la base de données."
+                                        <Label text="La suppression peut etre ajoutee ensuite en reutilisant la meme table."
                                                wrapText="true"
                                                style="-fx-text-fill: #6B7280; -fx-font-size: 16px;"/>
                                     </children>
                                 </VBox>
 
-                                <VBox GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                <VBox GridPane.columnIndex="1"
+                                      GridPane.rowIndex="1"
+                                      onMouseClicked="#openFrontEndFromCard"
                                       spacing="18.0"
                                       prefHeight="220.0"
-                                      style="-fx-background-color: white; -fx-background-radius: 22;">
+                                      style="-fx-background-color: white; -fx-background-radius: 22; -fx-cursor: hand;">
                                     <padding>
                                         <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
                                     </padding>
@@ -207,13 +213,13 @@
                                                    maxWidth="50.0" maxHeight="50.0"
                                                    style="-fx-background-color: #EAF2EF; -fx-background-radius: 14;">
                                             <children>
-                                                <Label text="⌕"
-                                                       style="-fx-text-fill: #0A4450; -fx-font-size: 24px; -fx-font-weight: 800;"/>
+                                                <Label text="SEE"
+                                                       style="-fx-text-fill: #0A4450; -fx-font-size: 17px; -fx-font-weight: 800;"/>
                                             </children>
                                         </StackPane>
                                         <Label text="Explorer les supplements"
                                                style="-fx-text-fill: #111827; -fx-font-size: 18px; -fx-font-weight: 800;"/>
-                                        <Label text="Consultez la liste de tous les supplements enregistrés."
+                                        <Label text="Les produits ci dessous viennent de la meme base que la boutique front."
                                                wrapText="true"
                                                style="-fx-text-fill: #6B7280; -fx-font-size: 16px;"/>
                                     </children>
@@ -221,16 +227,17 @@
                             </children>
                         </GridPane>
 
-                        <!-- DYNAMIC FORM AREA: show Create / Update form here depending on clicked card -->
-                        <VBox spacing="22.0"
+                        <VBox fx:id="supplementFormSection"
+                              spacing="22.0"
                               style="-fx-background-color: white; -fx-background-radius: 24;">
                             <padding>
                                 <Insets top="28.0" right="28.0" bottom="28.0" left="28.0"/>
                             </padding>
+
                             <children>
-                                <Label text="Créer un supplement"
+                                <Label text="Creer un supplement"
                                        style="-fx-text-fill: #111827; -fx-font-size: 22px; -fx-font-weight: 800;"/>
-                                <Label text="Ajoutez un nouveau supplement pour votre stock."
+                                <Label text="Ajoutez un produit et il apparaitra dans le shop front end apres rechargement de la page."
                                        style="-fx-text-fill: #6B7280; -fx-font-size: 16px;"/>
 
                                 <VBox spacing="18.0"
@@ -238,6 +245,7 @@
                                     <padding>
                                         <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
                                     </padding>
+
                                     <children>
                                         <HBox alignment="CENTER_LEFT"
                                               prefHeight="64.0"
@@ -246,10 +254,11 @@
                                                 <Insets top="0.0" right="24.0" bottom="0.0" left="24.0"/>
                                             </padding>
                                             <children>
-                                                <Label text="Vous êtes connecté en tant que ahmed@gmail.com"
+                                                <Label text="Vous etes connecte en tant que ahmed@gmail.com"
                                                        style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 700;"/>
                                                 <Region HBox.hgrow="ALWAYS"/>
-                                                <Label text="💊" style="-fx-font-size: 20px;"/>
+                                                <Label text="DB"
+                                                       style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 800;"/>
                                             </children>
                                         </HBox>
 
@@ -258,6 +267,7 @@
                                             <padding>
                                                 <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
                                             </padding>
+
                                             <children>
                                                 <Label text="Informations principales"
                                                        style="-fx-text-fill: #153F46; -fx-font-size: 18px; -fx-font-weight: 800;"/>
@@ -267,8 +277,10 @@
                                                         <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
                                                         <ColumnConstraints percentWidth="50.0" hgrow="ALWAYS"/>
                                                     </columnConstraints>
+
                                                     <children>
-                                                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                                        <VBox GridPane.columnIndex="0"
+                                                              GridPane.rowIndex="0"
                                                               spacing="8.0"
                                                               style="-fx-background-color: #FCFCFC; -fx-background-radius: 16; -fx-border-color: #E6EAEE; -fx-border-radius: 16;">
                                                             <padding>
@@ -277,29 +289,33 @@
                                                             <children>
                                                                 <Label text="Nom du supplement"
                                                                        style="-fx-text-fill: #B42318; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                                <TextField promptText="Enter supplement name"
+                                                                <TextField fx:id="nameField"
+                                                                           promptText="Enter supplement name"
                                                                            prefHeight="52.0"
                                                                            style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12; -fx-font-size: 15px;"/>
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                                        <VBox GridPane.columnIndex="1"
+                                                              GridPane.rowIndex="0"
                                                               spacing="8.0"
                                                               style="-fx-background-color: #FCFCFC; -fx-background-radius: 16; -fx-border-color: #E6EAEE; -fx-border-radius: 16;">
                                                             <padding>
                                                                 <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
                                                             </padding>
                                                             <children>
-                                                                <Label text="Catégorie"
+                                                                <Label text="Categorie"
                                                                        style="-fx-text-fill: #B42318; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                                <ComboBox promptText="Select a category"
+                                                                <ComboBox fx:id="categoryComboBox"
+                                                                          promptText="Select a category"
                                                                           prefHeight="52.0"
                                                                           maxWidth="1.7976931348623157E308"
                                                                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12; -fx-font-size: 15px;"/>
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                                        <VBox GridPane.columnIndex="0"
+                                                              GridPane.rowIndex="1"
                                                               spacing="8.0"
                                                               style="-fx-background-color: #FCFCFC; -fx-background-radius: 16; -fx-border-color: #E6EAEE; -fx-border-radius: 16;">
                                                             <padding>
@@ -308,44 +324,50 @@
                                                             <children>
                                                                 <Label text="Marque"
                                                                        style="-fx-text-fill: #167E64; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                                <ComboBox promptText="Select a brand"
+                                                                <ComboBox fx:id="brandComboBox"
+                                                                          promptText="Select a brand"
                                                                           prefHeight="52.0"
                                                                           maxWidth="1.7976931348623157E308"
                                                                           style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12; -fx-font-size: 15px;"/>
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                                        <VBox GridPane.columnIndex="1"
+                                                              GridPane.rowIndex="1"
                                                               spacing="8.0"
                                                               style="-fx-background-color: #FCFCFC; -fx-background-radius: 16; -fx-border-color: #E6EAEE; -fx-border-radius: 16;">
                                                             <padding>
                                                                 <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
                                                             </padding>
                                                             <children>
-                                                                <Label text="Prix ($)"
+                                                                <Label text="Prix (DT)"
                                                                        style="-fx-text-fill: #111827; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                                <TextField promptText="0.00"
+                                                                <TextField fx:id="priceField"
+                                                                           promptText="0.00"
                                                                            prefHeight="52.0"
                                                                            style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12; -fx-font-size: 15px;"/>
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox GridPane.columnIndex="0" GridPane.rowIndex="2"
+                                                        <VBox GridPane.columnIndex="0"
+                                                              GridPane.rowIndex="2"
                                                               spacing="8.0"
                                                               style="-fx-background-color: #FCFCFC; -fx-background-radius: 16; -fx-border-color: #E6EAEE; -fx-border-radius: 16;">
                                                             <padding>
                                                                 <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
                                                             </padding>
                                                             <children>
-                                                                <Label text="Stock Quantity"
+                                                                <Label text="Stock quantity"
                                                                        style="-fx-text-fill: #111827; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                                <TextField promptText="0"
+                                                                <TextField fx:id="stockField"
+                                                                           promptText="0"
                                                                            prefHeight="52.0"
                                                                            style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12; -fx-font-size: 15px;"/>
                                                             </children>
                                                         </VBox>
 
-                                                        <VBox GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                                        <VBox GridPane.columnIndex="1"
+                                                              GridPane.rowIndex="2"
                                                               spacing="8.0"
                                                               style="-fx-background-color: #FCFCFC; -fx-background-radius: 16; -fx-border-color: #E6EAEE; -fx-border-radius: 16;">
                                                             <padding>
@@ -354,7 +376,8 @@
                                                             <children>
                                                                 <Label text="Calories"
                                                                        style="-fx-text-fill: #111827; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                                <TextField promptText="Optional"
+                                                                <TextField fx:id="caloriesField"
+                                                                           promptText="Optional"
                                                                            prefHeight="52.0"
                                                                            style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12; -fx-font-size: 15px;"/>
                                                             </children>
@@ -370,7 +393,8 @@
                                                     <children>
                                                         <Label text="Description"
                                                                style="-fx-text-fill: #111827; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                        <TextArea promptText="Enter supplement description..."
+                                                        <TextArea fx:id="descriptionArea"
+                                                                  promptText="Enter supplement description..."
                                                                   prefHeight="120.0"
                                                                   wrapText="true"
                                                                   style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12; -fx-font-size: 15px;"/>
@@ -383,9 +407,10 @@
                                                         <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
                                                     </padding>
                                                     <children>
-                                                        <Label text="Product Image"
+                                                        <Label text="Product image"
                                                                style="-fx-text-fill: #111827; -fx-font-size: 15px; -fx-font-weight: 800;"/>
-                                                        <HBox spacing="12.0" alignment="CENTER_LEFT"
+                                                        <HBox spacing="12.0"
+                                                              alignment="CENTER_LEFT"
                                                               prefHeight="56.0"
                                                               style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D9DEE7; -fx-border-radius: 12;">
                                                             <padding>
@@ -393,9 +418,11 @@
                                                             </padding>
                                                             <children>
                                                                 <Button text="Choisir un fichier"
+                                                                        onAction="#chooseImage"
                                                                         prefHeight="34.0"
                                                                         style="-fx-background-color: #F3F4F6; -fx-background-radius: 8; -fx-border-color: #BFC7D4; -fx-border-radius: 8; -fx-font-size: 14px;"/>
-                                                                <Label text="Aucun fichier choisi"
+                                                                <Label fx:id="imageNameLabel"
+                                                                       text="Aucun fichier choisi"
                                                                        style="-fx-text-fill: #475467; -fx-font-size: 14px;"/>
                                                             </children>
                                                         </HBox>
@@ -406,14 +433,44 @@
                                             </children>
                                         </VBox>
 
-                                        <HBox alignment="CENTER_RIGHT">
+                                        <Label fx:id="formStatusLabel"
+                                               wrapText="true"
+                                               style="-fx-text-fill: #255D71; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+
+                                        <HBox alignment="CENTER_RIGHT"
+                                              spacing="12.0">
                                             <children>
-                                                <Button text="Créer le supplement"
-                                                        prefWidth="170.0"
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Button text="Reset"
+                                                        onAction="#resetAddForm"
+                                                        prefWidth="110.0"
+                                                        prefHeight="46.0"
+                                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #D4E2EA; -fx-border-radius: 14; -fx-text-fill: #496170; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                                                <Button text="Creer le supplement"
+                                                        onAction="#handleCreateSupplement"
+                                                        prefWidth="190.0"
                                                         prefHeight="46.0"
                                                         style="-fx-background-color: linear-gradient(to right, #0B4A56, #13866A); -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 800;"/>
                                             </children>
                                         </HBox>
+
+                                        <VBox fx:id="syncedSupplementsSection"
+                                              spacing="16.0"
+                                              style="-fx-background-color: #FFFFFF; -fx-background-radius: 18; -fx-border-color: #E6EAEE; -fx-border-radius: 18;">
+                                            <padding>
+                                                <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+                                            </padding>
+                                            <children>
+                                                <Label text="Supplements synchronises"
+                                                       style="-fx-text-fill: #153F46; -fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                                <Label fx:id="supplementCountLabel"
+                                                       style="-fx-text-fill: #6B7280; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                                <FlowPane fx:id="adminSupplementGrid"
+                                                          prefWrapLength="980.0"
+                                                          hgap="16.0"
+                                                          vgap="16.0"/>
+                                            </children>
+                                        </VBox>
                                     </children>
                                 </VBox>
                             </children>

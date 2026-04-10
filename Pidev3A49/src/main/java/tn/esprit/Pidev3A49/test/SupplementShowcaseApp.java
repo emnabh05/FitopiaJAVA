@@ -14,11 +14,11 @@ public class SupplementShowcaseApp extends Application {
                 SupplementShowcaseApp.class.getResource(SceneNavigator.START_VIEW.fxmlPath())
         );
 
-        Scene scene = new Scene(loader.load(), SceneNavigator.WINDOW_WIDTH, SceneNavigator.WINDOW_HEIGHT);
+        Scene scene = SceneNavigator.createScene(loader.load());
         stage.setTitle(SceneNavigator.START_VIEW.title());
         stage.setScene(scene);
-        SceneNavigator.applyWindowMode(stage);
         stage.show();
+        SceneNavigator.applyWindowMode(stage);
     }
 
     public static void main(String[] args) {
