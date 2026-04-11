@@ -17,81 +17,63 @@
             fx:controller="tn.esprit.Pidev3A49.controllers.OrderedCustomersController"
             prefWidth="1500.0"
             prefHeight="950.0"
+            styleClass="back-root"
+            stylesheets="@styles/back-theme.css"
             style="-fx-background-color: #F4F7F6;">
 
     <left>
-        <VBox prefWidth="310.0"
-              spacing="24.0"
-              style="-fx-background-color: linear-gradient(to bottom, #063C43, #0B6B5C);">
-            <padding>
-                <Insets top="28.0" right="20.0" bottom="28.0" left="20.0"/>
-            </padding>
-
-            <children>
-                <HBox spacing="14.0" alignment="CENTER_LEFT">
-                    <children>
-                        <StackPane prefWidth="52.0" prefHeight="52.0"
-                                   style="-fx-background-color: white; -fx-background-radius: 14;">
-                            <children>
-                                <Label text="S"
-                                       style="-fx-text-fill: #0B4D57; -fx-font-size: 24px; -fx-font-weight: bold;"/>
-                            </children>
-                        </StackPane>
-                        <Label text="Fitopia Admin"
-                               style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 700;"/>
-                    </children>
+        <StackPane alignment="TOP_LEFT" styleClass="back-sidebar-shell">
+            <VBox maxWidth="326.0" prefWidth="326.0" spacing="28.0" styleClass="back-sidebar" style="-fx-background-color: #0F4C45; -fx-background-radius: 0 28 28 0;">
+                <padding><Insets bottom="30.0" left="22.0" right="22.0" top="28.0" /></padding>
+                <HBox alignment="CENTER_LEFT" spacing="14.0">
+                    <StackPane minHeight="46.0" minWidth="46.0" prefHeight="46.0" prefWidth="46.0" styleClass="back-sidebar-logo-box" style="-fx-background-color: white; -fx-background-radius: 12;">
+                        <VBox alignment="CENTER" spacing="0.0">
+                            <Label styleClass="back-sidebar-logo-mark" text="F" style="-fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 16px;" />
+                            <Label styleClass="back-sidebar-logo-caption" text="FITOPIA" style="-fx-text-fill: #7e8a8f; -fx-font-weight: 800; -fx-font-size: 6.5px;" />
+                        </VBox>
+                    </StackPane>
+                    <Label styleClass="back-sidebar-title" text="Fitopia Admin" style="-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 19px;" />
                 </HBox>
-
-                <HBox spacing="14.0"
-                      alignment="CENTER_LEFT"
-                      style="-fx-background-color: rgba(255,255,255,0.12); -fx-background-radius: 18;">
-                    <padding>
-                        <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>
-                    </padding>
-                    <children>
-                        <StackPane prefWidth="46.0" prefHeight="46.0"
-                                   style="-fx-background-color: #D9E7E4; -fx-background-radius: 23;">
-                            <children>
-                                <Label text="A"
-                                       style="-fx-text-fill: #0A4A53; -fx-font-size: 18px; -fx-font-weight: bold;"/>
-                            </children>
-                        </StackPane>
-                        <Label text="ahmed@gmail.com"
-                               style="-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 700;"/>
-                    </children>
+                <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="back-user-card" style="-fx-background-color: #31655B; -fx-background-radius: 14; -fx-padding: 14 16 14 16;">
+                    <StackPane minHeight="44.0" minWidth="44.0" prefHeight="44.0" prefWidth="44.0" styleClass="back-user-avatar" style="-fx-background-color: #7caeb2; -fx-background-radius: 999;">
+                        <Label styleClass="back-user-avatar-text" text="A" style="-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 16px;" />
+                    </StackPane>
+                    <Label styleClass="back-user-mail" text="ahmed@gmail.com" style="-fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px;" />
                 </HBox>
-
-                <Button text="Tables"
-                        onAction="#openBackEnd"
-                        prefHeight="54.0"
-                        maxWidth="1.7976931348623157E308"
-                        style="-fx-background-color: rgba(255,255,255,0.10); -fx-background-radius: 16; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 700;"/>
-
-                <Button text="Orderd"
-                        prefHeight="60.0"
-                        maxWidth="1.7976931348623157E308"
-                        style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 16; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 700; -fx-alignment: CENTER_LEFT; -fx-padding: 0 0 0 20;"/>
-
-                <Button text="Front End"
-                        onAction="#openFrontEnd"
-                        prefHeight="54.0"
-                        maxWidth="1.7976931348623157E308"
-                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-text-fill: #0A4450; -fx-font-size: 16px; -fx-font-weight: 700;"/>
-
-                <Region VBox.vgrow="ALWAYS"/>
-
-                <Button text="Return"
-                        onAction="#goBackOrExit"
-                        prefHeight="54.0"
-                        maxWidth="1.7976931348623157E308"
-                        style="-fx-background-color: rgba(255,255,255,0.10); -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.25); -fx-border-radius: 16; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 700;"/>
-
-                <Button text="Logout"
-                        prefWidth="130.0"
-                        prefHeight="54.0"
-                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-text-fill: #0A4450; -fx-font-size: 16px; -fx-font-weight: 700;"/>
-            </children>
-        </VBox>
+                <VBox spacing="10.0">
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="back-nav-button back-sidebar-section-button" text="Tables" style="-fx-background-color: #31655B; -fx-background-radius: 14; -fx-font-weight: 800; -fx-padding: 16 18; -fx-text-fill: white; -fx-font-size: 16px; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#9638;" style="-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
+                </VBox>
+                <VBox spacing="6.0">
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openBackEnd" styleClass="back-nav-button back-menu-link" text="Gestion alimentation" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#127807;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openFrontEnd" styleClass="back-nav-button back-menu-link" text="Gestion supplements" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#128722;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="back-nav-button back-menu-link back-menu-featured sidebar-nav-button-active" text="Commandes supplements" wrapText="true" style="-fx-background-color: #387163; -fx-background-radius: 14; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 18 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#128179;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
+                </VBox>
+                <Region VBox.vgrow="ALWAYS" />
+                <VBox spacing="12.0" styleClass="back-sidebar-footer">
+                    <Button maxWidth="180.0" mnemonicParsing="false" onAction="#goBackOrExit" styleClass="back-logout-button" text="Return" style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 15px; -fx-padding: 14 20; -fx-alignment: center-left; -fx-graphic-text-gap: 10;" textFill="#0f4c45">
+                        <graphic>
+                            <Label styleClass="back-logout-icon" text="&#8618;" style="-fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 16px;" />
+                        </graphic>
+                    </Button>
+                </VBox>
+            </VBox>
+        </StackPane>
     </left>
 
     <center>
