@@ -23,7 +23,7 @@
 <!--suppress XMLErrors -->
 <!--suppress XMLWarnings -->
 
-<BorderPane prefHeight="700.0" prefWidth="1200.0" styleClass="back-root" stylesheets="@styles/back-theme.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
+<BorderPane prefHeight="700.0" prefWidth="1200.0" styleClass="back-root" stylesheets="@styles/back-theme.css" xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
     <left>
         <StackPane alignment="TOP_LEFT" styleClass="back-sidebar-shell">
             <VBox maxWidth="326.0" prefWidth="326.0" spacing="28.0" styleClass="back-sidebar" style="-fx-background-color: #0F4C45; -fx-background-radius: 0 28 28 0;">
