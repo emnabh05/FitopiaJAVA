@@ -121,6 +121,15 @@ public class AdminDashboardController {
     }
 
     @FXML
+    public void openSupplementBackEnd(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.BACK_END_VIEW, SceneNavigator.BACK_END_VIEW);
+        } catch (IOException exception) {
+            setErrorMessage("Impossible d'ouvrir l'administration supplements: " + exception.getMessage());
+        }
+    }
+
+    @FXML
     public void openOrderdPage(ActionEvent event) {
         try {
             SceneNavigator.navigate(event, SceneNavigator.BACK_END_VIEW, SceneNavigator.ORDERD_VIEW);

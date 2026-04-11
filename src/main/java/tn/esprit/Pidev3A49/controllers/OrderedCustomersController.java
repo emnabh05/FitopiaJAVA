@@ -94,6 +94,15 @@ public class OrderedCustomersController {
     }
 
     @FXML
+    public void openSupplementBackEnd(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.ORDERD_VIEW, SceneNavigator.BACK_END_VIEW);
+        } catch (IOException exception) {
+            setErrorMessage("Impossible d'ouvrir l'administration supplements: " + exception.getMessage());
+        }
+    }
+
+    @FXML
     public void goBackOrExit(ActionEvent event) {
         try {
             SceneNavigator.goBackOrClose(event);
