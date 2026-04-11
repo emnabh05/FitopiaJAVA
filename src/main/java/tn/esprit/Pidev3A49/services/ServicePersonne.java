@@ -15,8 +15,19 @@ public class ServicePersonne implements IServices<Personne> {
     public ServicePersonne(){
         cnx = MyDataBase.getInstance().getCnx();
     }
+
+    public boolean isAvailable() {
+        return cnx != null;
+    }
+
+    private void ensureConnection() {
+        if (cnx == null) {
+            throw new IllegalStateException("Connexion a la base de donnees indisponible.");
+        }
+    }
     @Override
     public void add(Personne personne) {
+        ensureConnection();
         String qry ="INSERT INTO `" + TABLE_NAME + "`(`nom`, `prenom`, `age`) VALUES (?,?,?)";
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
@@ -33,6 +44,7 @@ public class ServicePersonne implements IServices<Personne> {
 
     @Override
     public List<Personne> getAll() {
+        ensureConnection();
         List<Personne> personnes = new ArrayList<>();
         String qry ="SELECT `id`, `nom`, `prenom`, `age` FROM `" + TABLE_NAME + "`";
         try (Statement stm  = cnx.createStatement();
@@ -44,6 +56,7 @@ public class ServicePersonne implements IServices<Personne> {
                 p.setNom(rs.getString("nom"));
                 p.setPrenom(rs.getString("prenom"));
                 p.setAge(rs.getInt("age"));
+                p.setRole("Patient");
                 personnes.add(p);
             }
 
@@ -55,6 +68,7 @@ public class ServicePersonne implements IServices<Personne> {
 
     @Override
     public void update(Personne personne) {
+        ensureConnection();
         String qry = "UPDATE `" + TABLE_NAME + "` SET `nom` = ?, `prenom` = ?, `age` = ? WHERE `id` = ?";
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setString(1, personne.getNom());
@@ -73,6 +87,7 @@ public class ServicePersonne implements IServices<Personne> {
 
     @Override
     public void delete(Personne personne) {
+        ensureConnection();
         String qry = "DELETE FROM `" + TABLE_NAME + "` WHERE `id` = ?";
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setInt(1, personne.getId());
@@ -87,6 +102,7 @@ public class ServicePersonne implements IServices<Personne> {
     }
 
     public Personne getById(int id) {
+        ensureConnection();
         String qry = "SELECT `id`, `nom`, `prenom`, `age` FROM `" + TABLE_NAME + "` WHERE `id` = ?";
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setInt(1, id);
