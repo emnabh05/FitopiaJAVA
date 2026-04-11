@@ -34,22 +34,22 @@
     <left>
         <ScrollPane fx:id="sidebarScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="sidebar-scroll">
             <content>
-                <VBox minWidth="266.0" prefWidth="266.0" spacing="18.0" styleClass="sidebar">
+                <VBox minWidth="326.0" prefWidth="326.0" spacing="28.0" styleClass="sidebar">
                     <padding>
-                        <Insets top="14.0" right="12.0" bottom="14.0" left="12.0"/>
+                        <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
                     </padding>
 
                     <children>
-                        <VBox spacing="12.0" styleClass="sidebar-brand-shell">
+                        <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="sidebar-brand-shell">
                             <children>
-                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                <HBox alignment="CENTER_LEFT" spacing="14.0">
                                     <children>
-                                        <StackPane minHeight="44.0" minWidth="44.0" prefHeight="44.0" prefWidth="44.0" styleClass="brand-avatar">
+                                        <StackPane minHeight="54.0" minWidth="54.0" prefHeight="54.0" prefWidth="54.0" styleClass="brand-avatar">
                                             <children>
                                                 <Label text="F" styleClass="brand-avatar-text"/>
                                             </children>
                                         </StackPane>
-                                        <VBox spacing="4.0">
+                                        <VBox spacing="5.0">
                                             <children>
                                                 <Label maxWidth="1.7976931348623157E308" text="Fitopia Admin" styleClass="brand-title"/>
                                                 <Label text="Administration Dashboard" styleClass="brand-subtitle"/>
@@ -58,11 +58,11 @@
                                     </children>
                                 </HBox>
                             </children>
-                        </VBox>
+                        </HBox>
 
-                        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="sidebar-profile-card">
+                        <HBox alignment="CENTER_LEFT" spacing="14.0" styleClass="sidebar-profile-card">
                             <children>
-                                <StackPane minHeight="44.0" minWidth="44.0" prefHeight="44.0" prefWidth="44.0" styleClass="profile-avatar">
+                                <StackPane minHeight="48.0" minWidth="48.0" prefHeight="48.0" prefWidth="48.0" styleClass="profile-avatar">
                                     <children>
                                         <Label text="A" styleClass="profile-avatar-text"/>
                                     </children>
@@ -71,13 +71,12 @@
                             </children>
                         </HBox>
 
-                        <VBox spacing="8.0" styleClass="sidebar-nav-shell">
+                        <VBox spacing="14.0" styleClass="sidebar-nav-shell">
                             <children>
                                 <Button fx:id="tablesButton"
                                         maxWidth="1.7976931348623157E308"
                                         mnemonicParsing="false"
                                         disable="true"
-                                        prefWidth="214.0"
                                         styleClass="nav-button tables-main-button active-nav nav-parent-button"
                                         text="▦  Tables"/>
 
@@ -91,7 +90,6 @@
                                                 focusTraversable="false"
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
-                                                prefWidth="214.0"
                                                 styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="👥 Gestion utilisateur"/>
 
@@ -99,7 +97,6 @@
                                                 focusTraversable="false"
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
-                                                prefWidth="214.0"
                                                 styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="💬 Gestion forum et blog"/>
 
@@ -107,7 +104,6 @@
                                                 focusTraversable="false"
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
-                                                prefWidth="214.0"
                                                 styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="📦 Gestion des stock"/>
 
@@ -115,7 +111,6 @@
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
                                                 onAction="#showEventsWorkspace"
-                                                prefWidth="214.0"
                                                 styleClass="nav-button submenu-button sidebar-link-button nav-parent-button active-nav"
                                                 text="🗓 Gestion des evenements"/>
 
@@ -129,7 +124,6 @@
                                                         focusTraversable="false"
                                                         maxWidth="1.7976931348623157E308"
                                                         mnemonicParsing="false"
-                                                        prefWidth="214.0"
                                                         styleClass="nav-button submenu-button sidebar-link-button submenu-button-nested nav-button-muted"
                                                         text="🏆 Fidelite clients"/>
 
@@ -137,7 +131,6 @@
                                                         focusTraversable="false"
                                                         maxWidth="1.7976931348623157E308"
                                                         mnemonicParsing="false"
-                                                        prefWidth="214.0"
                                                         styleClass="nav-button submenu-button sidebar-link-button submenu-button-nested nav-button-muted"
                                                         text="⌁ Check-in QR"/>
                                             </children>
@@ -147,7 +140,6 @@
                                                 focusTraversable="false"
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
-                                                prefWidth="214.0"
                                                 styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="🏋 Gestion des entrainement"/>
 
@@ -155,7 +147,6 @@
                                                 focusTraversable="false"
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
-                                                prefWidth="214.0"
                                                 styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="🍃 Gestion alimentation"/>
                                     </children>
@@ -165,7 +156,6 @@
                                         maxWidth="1.7976931348623157E308"
                                         mnemonicParsing="false"
                                         onAction="#showParticipantsSection"
-                                        prefWidth="214.0"
                                         styleClass="nav-button sidebar-link-button"
                                         text="🧾 Participation"/>
                             </children>
@@ -173,12 +163,11 @@
 
                         <Region VBox.vgrow="ALWAYS"/>
 
-                        <VBox spacing="10.0">
+                        <VBox spacing="12.0" styleClass="sidebar-footer">
                             <children>
-                                <Button maxWidth="1.7976931348623157E308"
+                                <Button maxWidth="150.0"
                                         mnemonicParsing="false"
                                         onAction="#openFrontEventsWindow"
-                                        prefWidth="214.0"
                                         styleClass="logout-button"
                                         text="⎋ Logout"/>
                             </children>

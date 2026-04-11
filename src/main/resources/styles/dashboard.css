@@ -24,48 +24,51 @@
 
 .sidebar-scroll,
 .sidebar-scroll > .viewport {
-    -fx-background-color: linear-gradient(to bottom, #0f4d4d 0%, #0f5350 54%, #176a59 100%);
+    -fx-background-color: #0f4c45;
 }
 
 .sidebar {
-    -fx-background-color: linear-gradient(to bottom, #0f4d4d 0%, #0f5350 54%, #176a59 100%);
+    -fx-background-color: #0f4c45;
+    -fx-background-radius: 0 28 28 0;
     -fx-border-color: transparent;
     -fx-border-width: 0;
+    -fx-effect: dropshadow(gaussian, rgba(5, 43, 44, 0.22), 28, 0.18, 0, 10);
 }
 
 .sidebar-brand-shell {
-    -fx-padding: 6 8 0 8;
+    -fx-padding: 0 0 8 0;
 }
 
 .sidebar-profile-card {
-    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-color: #37655e;
     -fx-background-radius: 16px;
-    -fx-padding: 10 12;
+    -fx-padding: 16 16 16 16;
     -fx-border-color: transparent;
     -fx-border-radius: 16px;
 }
 
 .profile-avatar {
-    -fx-background-color: linear-gradient(to bottom right, #b9d4e8 0%, #d9edf9 100%);
+    -fx-background-color: linear-gradient(to bottom, #7caeb2, #3f6a72);
     -fx-background-radius: 999px;
-    -fx-border-color: rgba(255, 255, 255, 0.18);
+    -fx-border-color: rgba(255,255,255,0.55);
+    -fx-border-width: 2px;
     -fx-border-radius: 999px;
 }
 
 .profile-avatar-text {
-    -fx-text-fill: #18453d;
-    -fx-font-size: 18px;
-    -fx-font-weight: 800;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
 }
 
 .profile-email {
     -fx-text-fill: white;
     -fx-font-size: 14px;
-    -fx-font-weight: 800;
+    -fx-font-weight: 900;
 }
 
 .sidebar-nav-shell {
-    -fx-padding: 6 0 0 0;
+    -fx-padding: 0;
 }
 
 .brand-avatar {
@@ -78,7 +81,7 @@
 
 .brand-avatar-text {
     -fx-text-fill: #0f4d4d;
-    -fx-font-size: 18px;
+    -fx-font-size: 16px;
     -fx-font-weight: 900;
 }
 
@@ -89,8 +92,8 @@
 }
 
 .brand-subtitle {
-    -fx-text-fill: #d5e7df;
-    -fx-font-size: 9px;
+    -fx-text-fill: rgba(255,255,255,0.72);
+    -fx-font-size: 11px;
 }
 
 .nav-button,
@@ -112,10 +115,10 @@
     -fx-border-color: transparent;
     -fx-border-width: 0;
     -fx-text-fill: #f3fbf7;
-    -fx-padding: 10 12;
+    -fx-padding: 12 16;
     -fx-alignment: CENTER_LEFT;
     -fx-background-insets: 0;
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
     -fx-font-weight: 800;
 }
 
@@ -125,7 +128,7 @@
 
 .nav-button:hover,
 .active-nav {
-    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-color: rgba(255, 255, 255, 0.10);
     -fx-background-radius: 14px;
     -fx-border-color: transparent;
     -fx-effect: none;
@@ -137,22 +140,23 @@
 }
 
 .submenu-container {
-    -fx-padding: 8 0 0 0;
+    -fx-padding: 2 0 0 0;
 }
 
 .submenu-container-nested {
-    -fx-padding: 0 0 0 0;
+    -fx-padding: 0;
 }
 
 .submenu-button {
     -fx-background-radius: 14px;
     -fx-border-radius: 14px;
-    -fx-padding: 8 12 8 12;
-    -fx-font-size: 12px;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 15px;
 }
 
 .submenu-button-nested {
-    -fx-padding: 8 12 8 18;
+    -fx-padding: 8 14 8 20;
+    -fx-font-size: 14px;
 }
 
 .nav-button-muted {
@@ -161,7 +165,7 @@
 
 .nav-button-muted:disabled {
     -fx-opacity: 1;
-    -fx-text-fill: #eef8f4;
+    -fx-text-fill: white;
 }
 
 .nav-parent-button {
@@ -169,27 +173,35 @@
 }
 
 .tables-main-button {
-    -fx-background-color: rgba(255, 255, 255, 0.16);
-    -fx-background-radius: 14px;
-    -fx-padding: 13 16;
-    -fx-font-size: 14px;
+    -fx-background-color: #37655e;
+    -fx-background-radius: 16px;
+    -fx-padding: 18 20;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+    -fx-min-height: 64px;
 }
 
 .sidebar-link-button {
-    -fx-padding: 8 12 8 12;
+    -fx-padding: 12 16 12 16;
     -fx-background-radius: 14px;
+}
+
+.sidebar-footer {
+    -fx-padding: 6 0 0 0;
 }
 
 .logout-button {
     -fx-background-color: white;
     -fx-border-color: rgba(15, 51, 43, 0.08);
     -fx-border-width: 1;
-    -fx-text-fill: #163b31;
+    -fx-text-fill: #0f4c45;
     -fx-padding: 14 22;
-    -fx-font-size: 14px;
+    -fx-font-size: 15px;
     -fx-font-weight: 900;
-    -fx-background-radius: 18px;
-    -fx-border-radius: 18px;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(7, 63, 66, 0.12), 12, 0.12, 0, 4);
+    -fx-alignment: CENTER_LEFT;
 }
 
 .logout-button:hover {
