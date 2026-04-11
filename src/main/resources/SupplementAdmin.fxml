@@ -53,9 +53,29 @@
                     </Button>
                 </VBox>
                 <VBox spacing="6.0">
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="back-nav-button back-menu-link" text="Gestion utilisateur" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#128101;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="back-nav-button back-menu-link" text="Gestion forum et blog" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#128172;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="back-nav-button back-menu-link" text="Gestion des stock" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#128230;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
+                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" styleClass="back-nav-button back-menu-link" text="Gestion des evenements" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#128197;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
                     <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openFitnessBackEnd" styleClass="back-nav-button back-menu-link" text="Gestion alimentation" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
                         <graphic>
-                            <Label styleClass="back-nav-icon" text="&#127807;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                            <Label styleClass="back-nav-icon" text="&#127807;" style="-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
                         </graphic>
                     </Button>
                     <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openOrderdPage" styleClass="back-nav-button back-menu-link" text="Commandes supplements" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
@@ -68,15 +88,10 @@
                             <Label styleClass="back-nav-icon" text="&#128722;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
                         </graphic>
                     </Button>
-                    <Button focusTraversable="false" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openFitnessBackEnd" styleClass="back-nav-button back-menu-link" text="Gestion entrainement" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
-                        <graphic>
-                            <Label styleClass="back-nav-icon" text="&#9881;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
-                        </graphic>
-                    </Button>
                 </VBox>
                 <Region VBox.vgrow="ALWAYS" />
                 <VBox spacing="12.0" styleClass="back-sidebar-footer">
-                    <Button maxWidth="180.0" mnemonicParsing="false" onAction="#goBackOrExit" styleClass="back-logout-button" text="Return" style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 15px; -fx-padding: 14 20; -fx-alignment: center-left; -fx-graphic-text-gap: 10;" textFill="#0f4c45">
+                    <Button maxWidth="180.0" mnemonicParsing="false" onAction="#goBackOrExit" styleClass="back-logout-button" text="Change sessions" style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 15px; -fx-padding: 14 20; -fx-alignment: center-left; -fx-graphic-text-gap: 10;" textFill="#0f4c45">
                         <graphic>
                             <Label styleClass="back-logout-icon" text="&#8618;" style="-fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 16px;" />
                         </graphic>
