@@ -585,17 +585,11 @@ public class MainController implements Initializable {
 
     @FXML
     private void toggleTablesMenu() {
-        boolean shouldShow = !tablesSubmenu.isVisible();
-        setSubmenuVisible(tablesSubmenu, shouldShow);
-        toggleStyleClass(tablesButton, "expanded-nav", shouldShow);
         showTablesLanding();
     }
 
     @FXML
     private void toggleEventsManagementMenu() {
-        boolean shouldShow = !eventsSubmenu.isVisible();
-        setSubmenuVisible(eventsSubmenu, shouldShow);
-        toggleStyleClass(eventsManagementButton, "expanded-nav", shouldShow);
         showEventsWorkspace();
     }
 
@@ -769,8 +763,6 @@ public class MainController implements Initializable {
     private void syncSidebarMenus() {
         setSubmenuVisible(tablesSubmenu, true);
         setSubmenuVisible(eventsSubmenu, true);
-        toggleStyleClass(tablesButton, "expanded-nav", true);
-        toggleStyleClass(eventsManagementButton, "expanded-nav", true);
     }
 
     private void setSubmenuVisible(VBox submenu, boolean visible) {

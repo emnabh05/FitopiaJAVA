@@ -76,9 +76,9 @@
                                 <Button fx:id="tablesButton"
                                         maxWidth="1.7976931348623157E308"
                                         mnemonicParsing="false"
-                                        onAction="#toggleTablesMenu"
+                                        disable="true"
                                         prefWidth="214.0"
-                                        styleClass="nav-button active-nav nav-parent-button"
+                                        styleClass="nav-button tables-main-button active-nav nav-parent-button"
                                         text="▦  Tables"/>
 
                                 <VBox fx:id="tablesSubmenu"
@@ -92,7 +92,7 @@
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
                                                 prefWidth="214.0"
-                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="👥 Gestion utilisateur"/>
 
                                         <Button disable="true"
@@ -100,7 +100,7 @@
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
                                                 prefWidth="214.0"
-                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="💬 Gestion forum et blog"/>
 
                                         <Button disable="true"
@@ -108,15 +108,15 @@
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
                                                 prefWidth="214.0"
-                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="📦 Gestion des stock"/>
 
                                         <Button fx:id="eventsManagementButton"
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
-                                                onAction="#toggleEventsManagementMenu"
+                                                onAction="#showEventsWorkspace"
                                                 prefWidth="214.0"
-                                                styleClass="nav-button submenu-button nav-parent-button active-nav"
+                                                styleClass="nav-button submenu-button sidebar-link-button nav-parent-button active-nav"
                                                 text="🗓 Gestion des evenements"/>
 
                                         <VBox fx:id="eventsSubmenu"
@@ -130,7 +130,7 @@
                                                         maxWidth="1.7976931348623157E308"
                                                         mnemonicParsing="false"
                                                         prefWidth="214.0"
-                                                        styleClass="nav-button submenu-button submenu-button-nested nav-button-muted"
+                                                        styleClass="nav-button submenu-button sidebar-link-button submenu-button-nested nav-button-muted"
                                                         text="🏆 Fidelite clients"/>
 
                                                 <Button disable="true"
@@ -138,7 +138,7 @@
                                                         maxWidth="1.7976931348623157E308"
                                                         mnemonicParsing="false"
                                                         prefWidth="214.0"
-                                                        styleClass="nav-button submenu-button submenu-button-nested nav-button-muted"
+                                                        styleClass="nav-button submenu-button sidebar-link-button submenu-button-nested nav-button-muted"
                                                         text="⌁ Check-in QR"/>
                                             </children>
                                         </VBox>
@@ -148,7 +148,7 @@
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
                                                 prefWidth="214.0"
-                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="🏋 Gestion des entrainement"/>
 
                                         <Button disable="true"
@@ -156,7 +156,7 @@
                                                 maxWidth="1.7976931348623157E308"
                                                 mnemonicParsing="false"
                                                 prefWidth="214.0"
-                                                styleClass="nav-button submenu-button nav-button-muted"
+                                                styleClass="nav-button submenu-button sidebar-link-button nav-button-muted"
                                                 text="🍃 Gestion alimentation"/>
                                     </children>
                                 </VBox>
@@ -166,7 +166,7 @@
                                         mnemonicParsing="false"
                                         onAction="#showParticipantsSection"
                                         prefWidth="214.0"
-                                        styleClass="nav-button"
+                                        styleClass="nav-button sidebar-link-button"
                                         text="🧾 Participation"/>
                             </children>
                         </VBox>
