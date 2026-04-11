@@ -298,45 +298,69 @@
 }
 
 .data-table {
-    -fx-background-color: #f9fcfb;
-    -fx-background-radius: 22;
-    -fx-border-color: #dbe8e2;
-    -fx-border-radius: 22;
-    -fx-padding: 8;
+    -fx-background-color: white;
+    -fx-background-radius: 18;
+    -fx-border-color: #e6efeb;
+    -fx-border-radius: 18;
+    -fx-border-width: 1.5;
+    -fx-padding: 0;
 }
 
 .data-table .column-header-background {
-    -fx-background-color: #edf5f2;
-    -fx-background-radius: 16 16 0 0;
+    -fx-background-color: #f1f8f6;
+    -fx-background-radius: 18 18 0 0;
+    -fx-padding: 0 0 1 0;
 }
 
 .data-table .column-header,
 .data-table .filler {
     -fx-background-color: transparent;
-    -fx-size: 44;
+    -fx-size: 54;
+    -fx-border-color: transparent transparent #e6efeb transparent;
+    -fx-border-width: 0 0 1 0;
 }
 
 .data-table .column-header .label {
-    -fx-font-size: 14px;
+    -fx-font-size: 15px;
     -fx-font-weight: 800;
-    -fx-text-fill: #203047;
+    -fx-text-fill: #1a4d45;
+    -fx-alignment: center-left;
 }
 
 .data-table .table-row-cell {
     -fx-background-color: white;
-    -fx-border-color: transparent transparent #edf3f1 transparent;
+    -fx-border-color: transparent transparent #f1f8f6 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+/*noinspection CssInvalidPseudoSelector*/
+.data-table .table-row-cell:odd {
+    -fx-background-color: #fafdfc;
+}
+
+/*noinspection CssInvalidPseudoSelector*/
+.data-table .table-row-cell:hover {
+    -fx-background-color: #f6fbf9;
 }
 
 /*noinspection CssInvalidPseudoSelector*/
 .data-table .table-row-cell:selected {
-    -fx-background-color: #dff2eb;
+    -fx-background-color: #e7f5f1;
+    -fx-text-fill: #166b5b;
 }
 
 .data-table .table-cell {
-    -fx-padding: 12 10 12 10;
+    -fx-padding: 16 12 16 12;
     -fx-font-size: 14px;
-    -fx-text-fill: #253242;
+    -fx-text-fill: #2c3e44;
+    -fx-border-color: transparent;
 }
+
+.data-table .scroll-bar:horizontal,
+.data-table .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
 
 .back-root {
     -fx-background-color: linear-gradient(to bottom right, #f5fbf8, #edf6f3);

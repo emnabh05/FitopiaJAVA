@@ -371,15 +371,14 @@ public class MainController {
         if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
 
         allRepas.setAll(repas);
-        tableRepas.setItems(FXCollections.observableArrayList(repas));
-        tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
-        tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
+        if (tableRepas != null) tableRepas.setItems(FXCollections.observableArrayList(repas));
+        if (tableRepasEdit != null) tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
+        if (tableRepasDelete != null) tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
         restaurerSelectionRepasEdit(repas);
 
-        tableRegimes.setItems(FXCollections.observableArrayList(regimes));
-        tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
-        tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
-        tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
+        if (tableRegimes != null) tableRegimes.setItems(FXCollections.observableArrayList(regimes));
+        if (tableRegimesEdit != null) tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
+        if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
 
         if (cbRegimeSort != null && cbRegimeSort.getItems().isEmpty()) {
             cbRegimeSort.setItems(FXCollections.observableArrayList("Calories \u2193", "Calories \u2191", "Recent"));
@@ -987,23 +986,29 @@ public class MainController {
     }
 
     private void initialiserSelections() {
-        tableRepasEdit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            repasEditSelectionId = newValue == null ? null : newValue.getId();
-            if (newValue != null) {
-                remplirFormulaireRepas(newValue);
-            }
-            if (boxRepasEditForm != null) {
-                boolean hasSelection = newValue != null;
-                boxRepasEditForm.setManaged(hasSelection);
-                boxRepasEditForm.setVisible(hasSelection);
-            }
-            actualiserModificationRepas();
-        });
-        tableRegimesEdit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) remplirFormulaireRegime(newValue);
-        });
-        tableRegimesDelete.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                lblRegimeSelectionDelete.setText(newValue == null ? "Aucun regime selectionne" : "Regime selectionne: #" + newValue.getId()));
+        if (tableRepasEdit != null) {
+            tableRepasEdit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                repasEditSelectionId = newValue == null ? null : newValue.getId();
+                if (newValue != null) {
+                    remplirFormulaireRepas(newValue);
+                }
+                if (boxRepasEditForm != null) {
+                    boolean hasSelection = newValue != null;
+                    boxRepasEditForm.setManaged(hasSelection);
+                    boxRepasEditForm.setVisible(hasSelection);
+                }
+                actualiserModificationRepas();
+            });
+        }
+        if (tableRegimesEdit != null) {
+            tableRegimesEdit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) remplirFormulaireRegime(newValue);
+            });
+        }
+        if (tableRegimesDelete != null) {
+            tableRegimesDelete.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
+                    lblRegimeSelectionDelete.setText(newValue == null ? "Aucun regime selectionne" : "Regime selectionne: #" + newValue.getId()));
+        }
     }
 
     private void actualiserDashboardPlanner() {

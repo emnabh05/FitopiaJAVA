@@ -414,16 +414,7 @@
                                 <Label styleClass="section-title" text="Modifier un regime"/>
                                 <Label styleClass="section-subtitle" text="Selectionnez un regime puis mettez a jour ses donnees."/>
                                 <TextField fx:id="tfRegimeId" editable="false" managed="false" visible="false"/>
-                                <TableView fx:id="tableRegimesEdit" prefHeight="290.0" styleClass="data-table">
-                                    <columns>
-                                        <TableColumn fx:id="colRegimeIdEdit" prefWidth="60.0" text="ID"/>
-                                        <TableColumn fx:id="colRegimeUserEdit" prefWidth="210.0" text="Utilisateur"/>
-                                        <TableColumn fx:id="colRegimeTypeEdit" prefWidth="150.0" text="Type sante"/>
-                                        <TableColumn fx:id="colRegimeCaloriesEdit" prefWidth="130.0" text="Calories"/>
-                                        <TableColumn fx:id="colRegimeBmiEdit" prefWidth="100.0" text="BMI"/>
-                                        <TableColumn fx:id="colRegimeRepasEdit" prefWidth="260.0" text="Repas adequats"/>
-                                    </columns>
-                                </TableView>
+
                                 <GridPane hgap="16.0" vgap="16.0">
                                     <columnConstraints>
                                         <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
