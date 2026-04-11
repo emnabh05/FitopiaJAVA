@@ -139,6 +139,12 @@ public class MainController implements Initializable {
     private final Map<Integer, Long> participationCountByEvent = new HashMap<>();
     private final Map<Integer, String> eventTitleById = new HashMap<>();
     private final PdfExportService pdfExportService = new PdfExportService();
+    private enum EventWindowMode {
+        CREATE,
+        UPDATE,
+        DELETE,
+        DASHBOARD
+    }
 
     @FXML
     private void exportPdfPlaceholder() {
@@ -665,6 +671,26 @@ public class MainController implements Initializable {
         statusLabel.setText("Section Events Dashboard & List active.");
     }
 
+    @FXML
+    private void openCreateWindow() {
+        openEventWindow(EventWindowMode.CREATE);
+    }
+
+    @FXML
+    private void openUpdateWindow() {
+        openEventWindow(EventWindowMode.UPDATE);
+    }
+
+    @FXML
+    private void openDeleteWindow() {
+        openEventWindow(EventWindowMode.DELETE);
+    }
+
+    @FXML
+    private void openDashboardWindow() {
+        openEventWindow(EventWindowMode.DASHBOARD);
+    }
+
     private void activateEventsWorkspace() {
         setMainView(false, true, false);
         setWorkspaceActive(true);
@@ -1028,5 +1054,42 @@ public class MainController implements Initializable {
         if (pageSubtitleLabel != null) {
             pageSubtitleLabel.setText(subtitle);
         }
+    }
+
+    private void openEventWindow(EventWindowMode mode) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main.fxml"));
+            Parent root = loader.load();
+
+            MainController controller = loader.getController();
+
+            switch (mode) {
+                case CREATE -> controller.showCreateSection();
+                case UPDATE -> controller.showUpdateSection();
+                case DELETE -> controller.showDeleteSection();
+                case DASHBOARD -> controller.showDashboardSection();
+            }
+
+            Scene scene = new Scene(root, 1520, 900);
+            scene.getStylesheets().add(getClass().getResource("/styles/dashboard.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - " + getWindowTitle(mode));
+            stage.setScene(scene);
+            stage.setMinWidth(1320);
+            stage.setMinHeight(820);
+            stage.show();
+        } catch (Exception e) {
+            showError("Ouverture impossible", "La fenetre demandee n'a pas pu etre chargee.", e);
+        }
+    }
+
+    private String getWindowTitle(EventWindowMode mode) {
+        return switch (mode) {
+            case CREATE -> "Creer un evenement";
+            case UPDATE -> "Modifier un evenement";
+            case DELETE -> "Supprimer un evenement";
+            case DASHBOARD -> "Dashboard des evenements";
+        };
     }
 }

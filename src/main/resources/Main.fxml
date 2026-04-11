@@ -369,7 +369,7 @@
                                                 <Button fx:id="createCardButton"
                                                         contentDisplay="GRAPHIC_ONLY"
                                                         mnemonicParsing="false"
-                                                        onAction="#showCreateSection"
+                                                        onAction="#openCreateWindow"
                                                         prefHeight="230.0"
                                                         prefWidth="430.0"
                                                         styleClass="action-card-button">
@@ -395,7 +395,7 @@
                                                 <Button fx:id="updateCardButton"
                                                         contentDisplay="GRAPHIC_ONLY"
                                                         mnemonicParsing="false"
-                                                        onAction="#showUpdateSection"
+                                                        onAction="#openUpdateWindow"
                                                         prefHeight="230.0"
                                                         prefWidth="430.0"
                                                         styleClass="action-card-button">
@@ -421,7 +421,7 @@
                                                 <Button fx:id="deleteCardButton"
                                                         contentDisplay="GRAPHIC_ONLY"
                                                         mnemonicParsing="false"
-                                                        onAction="#showDeleteSection"
+                                                        onAction="#openDeleteWindow"
                                                         prefHeight="230.0"
                                                         prefWidth="430.0"
                                                         styleClass="action-card-button">
@@ -447,7 +447,7 @@
                                                 <Button fx:id="dashboardCardButton"
                                                         contentDisplay="GRAPHIC_ONLY"
                                                         mnemonicParsing="false"
-                                                        onAction="#showDashboardSection"
+                                                        onAction="#openDashboardWindow"
                                                         prefHeight="230.0"
                                                         prefWidth="430.0"
                                                         styleClass="action-card-button">
