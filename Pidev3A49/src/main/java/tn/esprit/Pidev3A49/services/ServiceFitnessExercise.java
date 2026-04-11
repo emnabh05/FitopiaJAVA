@@ -67,6 +67,7 @@ public class ServiceFitnessExercise implements IServices<FitnessExercise> {
         return exercises;
     }
 
+    @Override
     public FitnessExercise getById(int id) {
         String qry = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
 

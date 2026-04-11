@@ -101,6 +101,7 @@ public class AdminDashboardController {
 
     private ServiceSupplement serviceSupplement;
     private File selectedImageFile;
+    private Supplement selectedSupplement;
 
     @FXML
     private void initialize() {
@@ -155,13 +156,13 @@ public class AdminDashboardController {
     @FXML
     private void focusUpdateSupplement(MouseEvent event) {
         scrollTo(supplementFormSection);
-        setInfoMessage("La modification n'est pas encore disponible. Utilise le formulaire de creation pour l'instant.");
+        setInfoMessage("Selectionne un supplement dans la liste, modifie le formulaire puis clique sur Modifier.");
     }
 
     @FXML
     private void focusDeleteSupplement(MouseEvent event) {
         scrollTo(syncedSupplementsSection);
-        setInfoMessage("La suppression n'est pas encore disponible. Les produits synchronises sont affiches plus bas.");
+        setInfoMessage("Selectionne un supplement dans la liste puis clique sur Supprimer.");
     }
 
     @FXML
@@ -208,6 +209,7 @@ public class AdminDashboardController {
             }
 
             serviceSupplement.add(buildSupplement(storedImageName));
+            selectedSupplement = null;
             resetAddForm();
             loadSupplements();
             setSuccessMessage("Supplement ajoute avec succes.");
@@ -220,8 +222,71 @@ public class AdminDashboardController {
     }
 
     @FXML
+    private void handleUpdateSupplement(ActionEvent event) {
+        ensureServiceAvailable();
+        if (selectedSupplement == null) {
+            setErrorMessage("Selectionne d'abord un supplement a modifier.");
+            return;
+        }
+
+        String previousImageName = selectedSupplement.getImage();
+        String newStoredImageName = null;
+        try {
+            String imageToPersist = previousImageName;
+            if (selectedImageFile != null) {
+                newStoredImageName = SupplementImageStorage.store(selectedImageFile);
+                imageToPersist = newStoredImageName;
+            }
+
+            Supplement updatedSupplement = buildSupplement(imageToPersist);
+            updatedSupplement.setId(selectedSupplement.getId());
+            serviceSupplement.update(updatedSupplement);
+
+            if (newStoredImageName != null && previousImageName != null && !previousImageName.isBlank()
+                    && !previousImageName.equals(newStoredImageName)) {
+                SupplementImageStorage.deleteImage(previousImageName);
+            }
+
+            selectedSupplement = null;
+            resetAddForm();
+            loadSupplements();
+            setSuccessMessage("Supplement modifie avec succes.");
+        } catch (RuntimeException exception) {
+            if (newStoredImageName != null) {
+                SupplementImageStorage.deleteImage(newStoredImageName);
+            }
+            setErrorMessage(exception.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleDeleteSupplement(ActionEvent event) {
+        ensureServiceAvailable();
+        if (selectedSupplement == null) {
+            setErrorMessage("Selectionne d'abord un supplement a supprimer.");
+            return;
+        }
+
+        try {
+            String imageName = selectedSupplement.getImage();
+            serviceSupplement.delete(selectedSupplement);
+            if (imageName != null && !imageName.isBlank()) {
+                SupplementImageStorage.deleteImage(imageName);
+            }
+
+            selectedSupplement = null;
+            resetAddForm();
+            loadSupplements();
+            setSuccessMessage("Supplement supprime avec succes.");
+        } catch (RuntimeException exception) {
+            setErrorMessage(exception.getMessage());
+        }
+    }
+
+    @FXML
     private void resetAddForm() {
         selectedImageFile = null;
+        selectedSupplement = null;
         if (nameField != null) {
             nameField.clear();
         }
@@ -303,8 +368,11 @@ public class AdminDashboardController {
     private VBox buildSupplementCard(Supplement supplement) {
         VBox card = new VBox(10.0);
         card.setPrefWidth(245.0);
-        card.setStyle("-fx-background-color: #FCFFFE; -fx-background-radius: 18; -fx-border-color: #D9E8E1; " +
-                "-fx-border-radius: 18; -fx-padding: 16 16 16 16;");
+        boolean isSelected = selectedSupplement != null && selectedSupplement.getId() == supplement.getId();
+        card.setStyle(isSelected
+                ? "-fx-background-color: #ECFDF3; -fx-background-radius: 18; -fx-border-color: #118265; -fx-border-width: 1.6; -fx-border-radius: 18; -fx-padding: 16 16 16 16;"
+                : "-fx-background-color: #FCFFFE; -fx-background-radius: 18; -fx-border-color: #D9E8E1; -fx-border-radius: 18; -fx-padding: 16 16 16 16;");
+        card.setOnMouseClicked(event -> selectSupplement(supplement));
 
         Label brandLabel = new Label(valueOrDefault(supplement.getBrand()).toUpperCase(Locale.ROOT));
         brandLabel.setStyle("-fx-text-fill: #4E877A; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;");
@@ -332,6 +400,26 @@ public class AdminDashboardController {
 
         card.getChildren().addAll(brandLabel, nameLabel, descriptionLabel, metaRow, priceLabel);
         return card;
+    }
+
+    private void selectSupplement(Supplement supplement) {
+        selectedSupplement = supplement;
+        selectedImageFile = null;
+
+        nameField.setText(supplement.getName() == null ? "" : supplement.getName());
+        categoryComboBox.setValue(supplement.getCategory());
+        brandComboBox.setValue(supplement.getBrand());
+        priceField.setText(supplement.getPrice() == null ? "" : supplement.getPrice().toPlainString());
+        stockField.setText(Integer.toString(supplement.getStock()));
+        caloriesField.setText(supplement.getCalories() == null ? "" : supplement.getCalories().toString());
+        descriptionArea.setText(supplement.getDescription() == null ? "" : supplement.getDescription());
+        imageNameLabel.setText((supplement.getImage() == null || supplement.getImage().isBlank())
+                ? "Aucun fichier choisi"
+                : supplement.getImage());
+
+        scrollTo(supplementFormSection);
+        loadSupplements();
+        setInfoMessage("Supplement selectionne: " + supplement.getName() + ". Tu peux maintenant modifier ou supprimer.");
     }
 
     private VBox buildEmptyCard(String title, String message) {

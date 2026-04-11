@@ -65,6 +65,7 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
         return regimes;
     }
 
+    @Override
     public RegimeAlimentaire getById(int id) {
         String qry = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
 

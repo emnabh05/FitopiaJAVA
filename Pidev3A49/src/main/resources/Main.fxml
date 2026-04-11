@@ -458,6 +458,16 @@
                                                         prefWidth="110.0"
                                                         prefHeight="46.0"
                                                         style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #D4E2EA; -fx-border-radius: 14; -fx-text-fill: #496170; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                                                <Button text="Modifier"
+                                                        onAction="#handleUpdateSupplement"
+                                                        prefWidth="130.0"
+                                                        prefHeight="46.0"
+                                                        style="-fx-background-color: #E8F3FF; -fx-background-radius: 14; -fx-text-fill: #0B4A56; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                                                <Button text="Supprimer"
+                                                        onAction="#handleDeleteSupplement"
+                                                        prefWidth="130.0"
+                                                        prefHeight="46.0"
+                                                        style="-fx-background-color: #FFE8E8; -fx-background-radius: 14; -fx-text-fill: #9D1C1C; -fx-font-size: 15px; -fx-font-weight: 800;"/>
                                                 <Button text="Creer le supplement"
                                                         onAction="#handleCreateSupplement"
                                                         prefWidth="190.0"

@@ -239,10 +239,8 @@ public class MainController {
         chargerRegimes();
         chargerRepas();
         chargerExercises();
-        afficherModuleRepas();
-        afficherCreationRepas();
-        afficherCreationRegime();
-        afficherCreationExercise();
+        afficherModuleExercises();
+        afficherExplorationExercise();
     }
 
     @FXML
@@ -260,6 +258,24 @@ public class MainController {
             SceneNavigator.navigate(event, SceneNavigator.FITNESS_BACK_VIEW, SceneNavigator.FRONT_END_VIEW);
         } catch (IOException exception) {
             showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir le front supplement.");
+        }
+    }
+
+    @FXML
+    private void openOrderdPage(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.FITNESS_BACK_VIEW, SceneNavigator.ORDERD_VIEW);
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir la page des commandes.");
+        }
+    }
+
+    @FXML
+    private void goBackOrExit(ActionEvent event) {
+        try {
+            SceneNavigator.goBackOrClose(event);
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible de revenir a la page precedente.");
         }
     }
 
@@ -984,9 +1000,13 @@ public class MainController {
     }
 
     private void activerBoutonModule(Button boutonActif, Button... autres) {
-        boutonActif.getStyleClass().setAll("sidebar-nav-button", "sidebar-nav-button-active");
+        if (boutonActif != null) {
+            boutonActif.getStyleClass().setAll("sidebar-nav-button", "sidebar-nav-button-active");
+        }
         for (Button button : autres) {
-            button.getStyleClass().setAll("sidebar-nav-button");
+            if (button != null) {
+                button.getStyleClass().setAll("sidebar-nav-button");
+            }
         }
     }
 

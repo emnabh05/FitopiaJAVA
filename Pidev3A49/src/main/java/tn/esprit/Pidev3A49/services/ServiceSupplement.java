@@ -68,13 +68,48 @@ public class ServiceSupplement implements IServices<Supplement> {
     }
 
     @Override
+    public Supplement getById(int id) {
+        String query = "SELECT * FROM " + SchemaInitializer.SUPPLEMENT_TABLE + " WHERE id = ?";
+        try (PreparedStatement preparedStatement = cnx.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapResultSet(resultSet);
+                }
+            }
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossible de recuperer le supplement " + id + ".", exception);
+        }
+        return null;
+    }
+
+    @Override
     public void update(Supplement supplement) {
-        throw new UnsupportedOperationException("La modification n'est pas encore implemente.");
+        validate(supplement);
+        String query = """
+                UPDATE %s
+                SET name = ?, category = ?, brand = ?, price = ?, stock = ?, calories = ?, description = ?, image = ?
+                WHERE id = ?
+                """.formatted(SchemaInitializer.SUPPLEMENT_TABLE);
+
+        try (PreparedStatement preparedStatement = cnx.prepareStatement(query)) {
+            fillStatement(preparedStatement, supplement);
+            preparedStatement.setInt(9, supplement.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossible de modifier le supplement.", exception);
+        }
     }
 
     @Override
     public void delete(Supplement supplement) {
-        throw new UnsupportedOperationException("La suppression n'est pas encore implemente.");
+        String query = "DELETE FROM " + SchemaInitializer.SUPPLEMENT_TABLE + " WHERE id = ?";
+        try (PreparedStatement preparedStatement = cnx.prepareStatement(query)) {
+            preparedStatement.setInt(1, supplement.getId());
+            preparedStatement.executeUpdate();
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossible de supprimer le supplement.", exception);
+        }
     }
 
     private void fillStatement(PreparedStatement preparedStatement, Supplement supplement) throws SQLException {

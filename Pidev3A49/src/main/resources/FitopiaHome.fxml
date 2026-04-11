@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
@@ -37,14 +37,11 @@
             <Region HBox.hgrow="ALWAYS"/>
             <VBox alignment="CENTER_RIGHT" spacing="8.0">
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
-                    <Label styleClass="nav-link-active" text="Home"/>
-                    <Label styleClass="nav-link" text="Services"/>
-                    <Label styleClass="nav-link" text="Plans"/>
-                    <Button mnemonicParsing="false" onAction="#openSupplementFront" styleClass="nav-link-button" text="SUPPLEMENT FRONT"/>
-                    <Button mnemonicParsing="false" onAction="#openFitnessBack" styleClass="nav-link-button" text="FITNESS BACK"/>
-                    <Button mnemonicParsing="false" onAction="#scrollToPlanner" styleClass="nav-link-button" text="EXPLORE OUR FITNESS PLANNER"/>
-                    <Label styleClass="nav-link" text="Contact"/>
-                    <Button mnemonicParsing="false" styleClass="ghost-button" text="Login"/>
+                    <Button mnemonicParsing="false" onAction="#openProgressTracker" styleClass="nav-link-button" text="My Progress"/>
+                    <Button mnemonicParsing="false" onAction="#openCart" styleClass="nav-link-button" text="Cart"/>
+                    <Button mnemonicParsing="false" onAction="#openMonthlyRanking" styleClass="nav-link-button" text="Monthly Ranking"/>
+                    <Button mnemonicParsing="false" onAction="#openCheckout" styleClass="nav-link-button" text="Checkout"/>
+                    <Button mnemonicParsing="false" onAction="#openMyOrders" styleClass="nav-link-button" text="My Orders"/>
                 </HBox>
             </VBox>
         </HBox>

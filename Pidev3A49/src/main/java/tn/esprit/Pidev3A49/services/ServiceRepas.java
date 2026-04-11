@@ -70,6 +70,7 @@ public class ServiceRepas implements IServices<Repas> {
         return repasList;
     }
 
+    @Override
     public Repas getById(int id) {
         String qry = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
 

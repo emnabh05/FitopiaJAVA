@@ -103,6 +103,51 @@ public class FitopiaHomeController {
     }
 
     @FXML
+    private void openProgressTracker(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.FITNESS_FRONT_VIEW, SceneNavigator.PROGRESS_VIEW);
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir la progression.");
+        }
+    }
+
+    @FXML
+    private void openCart(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.FITNESS_FRONT_VIEW, SceneNavigator.FRONT_END_VIEW);
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir le panier.");
+        }
+    }
+
+    @FXML
+    private void openMonthlyRanking(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.FITNESS_FRONT_VIEW, SceneNavigator.RANKING_VIEW);
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir le classement mensuel.");
+        }
+    }
+
+    @FXML
+    private void openCheckout(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.FITNESS_FRONT_VIEW, SceneNavigator.CHECKOUT_VIEW);
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir le checkout.");
+        }
+    }
+
+    @FXML
+    private void openMyOrders(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.FITNESS_FRONT_VIEW, SceneNavigator.FRONT_ORDERS_VIEW);
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir mes commandes.");
+        }
+    }
+
+    @FXML
     private void ajouterExercise() {
         try {
             serviceFitnessExercise.add(construireExercise());
