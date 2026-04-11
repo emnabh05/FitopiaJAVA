@@ -207,7 +207,7 @@
                                             <children>
                                                 <RadioButton fx:id="paypalRadio"
                                                              toggleGroup="$paymentMethodGroup"
-                                                             onAction="#updatePaymentStyles"
+                                                             onAction="#handlePaypalSelection"
                                                              style="-fx-mark-color: #118465;"/>
                                                 <VBox spacing="4.0">
                                                     <children>

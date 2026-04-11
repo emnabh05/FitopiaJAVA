@@ -1,5 +1,6 @@
 package tn.esprit.Pidev3A49.controllers;
 
+import java.awt.Desktop;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -25,6 +26,7 @@ import javafx.event.ActionEvent;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 
@@ -51,6 +53,7 @@ public class CheckoutController {
 
     private static final BigDecimal FIT10_DISCOUNT = new BigDecimal("10.00");
     private static final BigDecimal WELCOME5_DISCOUNT = new BigDecimal("5.00");
+    private static final String PAYPAL_LOGIN_URL = "https://www.paypal.com/signin";
 
     @FXML
     private HBox visaOption;
@@ -164,6 +167,12 @@ public class CheckoutController {
         applyPaymentStyle(mastercardOption, mastercardRadio);
         applyPaymentStyle(paypalOption, paypalRadio);
         applyPaymentStyle(cashOnDeliveryOption, cashOnDeliveryRadio);
+    }
+
+    @FXML
+    private void handlePaypalSelection() {
+        updatePaymentStyles();
+        openPaypalLoginPage();
     }
 
     @FXML
@@ -417,6 +426,24 @@ public class CheckoutController {
 
     private void applyPaymentStyle(HBox option, RadioButton radioButton) {
         option.setStyle(radioButton.isSelected() ? PAYMENT_OPTION_SELECTED_STYLE : PAYMENT_OPTION_DEFAULT_STYLE);
+    }
+
+    private void openPaypalLoginPage() {
+        if (!paypalRadio.isSelected()) {
+            return;
+        }
+
+        try {
+            URI paypalUri = URI.create(PAYPAL_LOGIN_URL);
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(paypalUri);
+                setInfoMessage("PayPal login opened in your browser.");
+            } else {
+                setInfoMessage("Open this link to login to PayPal: " + PAYPAL_LOGIN_URL);
+            }
+        } catch (Exception exception) {
+            setErrorMessage("Impossible d'ouvrir PayPal automatiquement. Utilise ce lien: " + PAYPAL_LOGIN_URL);
+        }
     }
 
     private void ensureServiceAvailable() {
