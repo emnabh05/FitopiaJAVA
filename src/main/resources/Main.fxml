@@ -37,10 +37,8 @@
                 <Label styleClass="user-mail" text="admin@forum.local"/>
             </VBox>
             <VBox spacing="10.0">
-                <Button fx:id="btnModuleForums" maxWidth="1.7976931348623157E308" onAction="#afficherModuleForums"
-                        styleClass="sidebar-nav-button sidebar-nav-button-active" text="Gestion des forums"/>
-                <Button fx:id="btnModuleComments" maxWidth="1.7976931348623157E308" onAction="#afficherModuleComments"
-                        styleClass="sidebar-nav-button" text="Gestion des commentaires"/>
+                <Button fx:id="btnModuleForumComment" maxWidth="1.7976931348623157E308" onAction="#afficherTableauDeBord"
+                        styleClass="sidebar-nav-button sidebar-nav-button-active" text="Forum et Comment"/>
             </VBox>
             <Region VBox.vgrow="ALWAYS"/>
             <Button maxWidth="1.7976931348623157E308" onAction="#rafraichirDonnees" styleClass="logout-button"
@@ -50,11 +48,11 @@
     <center>
         <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="app-scroll" vbarPolicy="AS_NEEDED">
             <content>
-                <StackPane>
-                    <VBox fx:id="viewForums" fillWidth="true" spacing="22.0" styleClass="content-root">
-                        <padding>
-                            <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
-                        </padding>
+                <VBox fillWidth="true" spacing="32.0" styleClass="content-root">
+                    <padding>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
+                    </padding>
+                    <VBox fx:id="viewForums" fillWidth="true" spacing="22.0">
                         <VBox spacing="8.0" styleClass="hero-banner">
                             <Label styleClass="hero-title" text="Gestion des forums"/>
                             <Label styleClass="hero-subtitle" text="Ajoutez, modifiez, supprimez ou explorez les discussions du forum."/>
@@ -150,10 +148,7 @@
                             </VBox>
                         </StackPane>
                     </VBox>
-                    <VBox fx:id="viewComments" fillWidth="true" managed="false" spacing="22.0" styleClass="content-root" visible="false">
-                        <padding>
-                            <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
-                        </padding>
+                    <VBox fx:id="viewComments" fillWidth="true" spacing="22.0">
                         <VBox spacing="8.0" styleClass="hero-banner">
                             <Label styleClass="hero-title" text="Gestion des commentaires"/>
                             <Label styleClass="hero-subtitle" text="Ajoutez des commentaires lies a un forum existant."/>
@@ -259,7 +254,7 @@
                             </VBox>
                         </StackPane>
                     </VBox>
-                </StackPane>
+                </VBox>
             </content>
         </ScrollPane>
     </center>

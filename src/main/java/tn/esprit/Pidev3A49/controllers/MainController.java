@@ -33,8 +33,7 @@ public class MainController {
     @FXML private VBox paneCommentDelete;
     @FXML private VBox paneCommentExplore;
 
-    @FXML private Button btnModuleForums;
-    @FXML private Button btnModuleComments;
+    @FXML private Button btnModuleForumComment;
     @FXML private Button btnActionCreerForum;
     @FXML private Button btnActionModifierForum;
     @FXML private Button btnActionSupprimerForum;
@@ -99,22 +98,18 @@ public class MainController {
         initialiserSelections();
         chargerForums();
         chargerComments();
-        afficherModuleForums();
+        afficherTableauDeBord();
         afficherCreationForum();
         afficherCreationComment();
     }
 
     @FXML
-    private void afficherModuleForums() {
-        afficherVue(viewForums, viewForums, viewComments);
-        activerBoutonModule(btnModuleForums, btnModuleComments);
-    }
-
-    @FXML
-    private void afficherModuleComments() {
-        afficherVue(viewComments, viewForums, viewComments);
-        activerBoutonModule(btnModuleComments, btnModuleForums);
-        afficherCreationComment();
+    private void afficherTableauDeBord() {
+        viewForums.setVisible(true);
+        viewForums.setManaged(true);
+        viewComments.setVisible(true);
+        viewComments.setManaged(true);
+        btnModuleForumComment.getStyleClass().setAll("sidebar-nav-button", "sidebar-nav-button-active");
     }
 
     @FXML private void afficherCreationForum() { afficherPaneForum(paneForumCreate, btnActionCreerForum); }
@@ -411,13 +406,6 @@ public class MainController {
             boolean active = vue == vueActive;
             vue.setVisible(active);
             vue.setManaged(active);
-        }
-    }
-
-    private void activerBoutonModule(Button boutonActif, Button... autres) {
-        boutonActif.getStyleClass().setAll("sidebar-nav-button", "sidebar-nav-button-active");
-        for (Button button : autres) {
-            button.getStyleClass().setAll("sidebar-nav-button");
         }
     }
 
