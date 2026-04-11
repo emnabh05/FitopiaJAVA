@@ -69,16 +69,18 @@ public class ReservationController {
             return;
         }
 
+        Connection connection = null;
+        boolean previousAutoCommit = true;
         try {
-            Connection connection = MyDataBase.getInstance().getConnection();
-            boolean previousAutoCommit = connection.getAutoCommit();
-            connection.setAutoCommit(false);
-
             String lastName = requireText(fullNameField.getText(), "Le nom est obligatoire.");
             String firstName = requireText(firstNameField.getText(), "Le prenom est obligatoire.");
             String fullParticipantName = (lastName + " " + firstName).trim();
             String email = requireEmail(emailField.getText());
             String initialStatus = remainingPlaces > 0 ? "confirmee" : "en_attente";
+
+            connection = MyDataBase.getInstance().getConnection();
+            previousAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
 
             Reservation reservation = new Reservation(
                     event.getIdEvent(),
@@ -91,19 +93,9 @@ public class ReservationController {
 
             reservationService.add(reservation);
             boolean confirmedReservation = "confirmee".equalsIgnoreCase(reservation.getStatut());
-            boolean alreadyParticipant = participationService.existsForEventAndEmail(event.getIdEvent(), email);
-
-            if (confirmedReservation && !alreadyParticipant) {
-                participationService.add(new Participation(
-                        event.getIdEvent(),
-                        fullParticipantName,
-                        email,
-                        LocalDateTime.now()
-                ));
-            }
+            addParticipationIfConfirmed(confirmedReservation, fullParticipantName, email);
 
             connection.commit();
-            connection.setAutoCommit(previousAutoCommit);
 
             feedbackLabel.setText(
                     (confirmedReservation ? "Reservation confirmee" : "Demande ajoutee en attente")
@@ -116,25 +108,59 @@ public class ReservationController {
         } catch (IllegalArgumentException e) {
             feedbackLabel.setText(e.getMessage());
         } catch (SQLException e) {
-            rollbackReservationTransaction();
+            rollbackReservationTransaction(connection);
             showError("Reservation impossible", "Erreur lors de l'enregistrement dans la base fitopiabd.");
             e.printStackTrace();
         } catch (Exception e) {
-            rollbackReservationTransaction();
+            rollbackReservationTransaction(connection);
             showError("Reservation impossible", "Erreur lors de l'enregistrement de la reservation.");
             e.printStackTrace();
+        } finally {
+            restoreAutoCommit(connection, previousAutoCommit);
         }
     }
 
-    private void rollbackReservationTransaction() {
+    private void addParticipationIfConfirmed(boolean confirmedReservation, String fullParticipantName, String email) {
+        if (!confirmedReservation) {
+            return;
+        }
+
+        boolean alreadyParticipant = participationService.existsForEventAndEmail(event.getIdEvent(), email);
+        if (alreadyParticipant) {
+            return;
+        }
+
+        participationService.add(new Participation(
+                event.getIdEvent(),
+                fullParticipantName,
+                email,
+                LocalDateTime.now()
+        ));
+    }
+
+    private void rollbackReservationTransaction(Connection connection) {
+        if (connection == null) {
+            return;
+        }
+
         try {
-            Connection connection = MyDataBase.getInstance().getConnection();
             if (!connection.getAutoCommit()) {
                 connection.rollback();
-                connection.setAutoCommit(true);
             }
         } catch (SQLException rollbackException) {
             rollbackException.printStackTrace();
+        }
+    }
+
+    private void restoreAutoCommit(Connection connection, boolean previousAutoCommit) {
+        if (connection == null) {
+            return;
+        }
+
+        try {
+            connection.setAutoCommit(previousAutoCommit);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
