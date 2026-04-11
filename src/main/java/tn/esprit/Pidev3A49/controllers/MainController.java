@@ -607,8 +607,8 @@ public class MainController implements Initializable {
         setSidebarContext(false, true, false);
         setQuickAccessMode(null);
         updatePageHero(
-                "Events Management",
-                "Centralize event dashboard, create/update forms, and CRUD in one admin page."
+                "Gestion des evenements",
+                "Creez, modifiez ou supprimez les evenements enregistres dans le systeme."
         );
         statusLabel.setText("Gestion des evenements ouverte. Choisis Create, Update, Delete ou Dashboard.");
     }

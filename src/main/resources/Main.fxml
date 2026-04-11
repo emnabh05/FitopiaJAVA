@@ -351,8 +351,8 @@
                                     <children>
                                         <VBox spacing="12.0" styleClass="events-intro-banner">
                                             <children>
-                                                <Label text="Events Management" styleClass="events-intro-title"/>
-                                                <Label text="Centralize event dashboard, create/update forms, and CRUD in one admin page." styleClass="events-intro-subtitle"/>
+                                                <Label text="Gestion des evenements" styleClass="events-intro-title"/>
+                                                <Label text="Creez, modifiez ou supprimez les evenements enregistres dans le systeme." styleClass="events-intro-subtitle"/>
                                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
                                                     <children>
                                                         <Label text="🗓 8 events" styleClass="events-intro-chip"/>
@@ -383,8 +383,8 @@
                                                                 </StackPane>
                                                                 <VBox spacing="6.0">
                                                                     <children>
-                                                                        <Label text="Create Event" styleClass="action-card-title"/>
-                                                                        <Label text="Equivalent of old event_form create flow." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                        <Label text="Creer un evenement" styleClass="action-card-title"/>
+                                                                        <Label text="Ajoutez un nouvel evenement avec tous ses details." styleClass="action-card-subtitle" wrapText="true"/>
                                                                     </children>
                                                                 </VBox>
                                                             </children>
@@ -409,8 +409,8 @@
                                                                 </StackPane>
                                                                 <VBox spacing="6.0">
                                                                     <children>
-                                                                        <Label text="Update Event" styleClass="action-card-title"/>
-                                                                        <Label text="Inline edit forms for all existing events." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                        <Label text="Modifier un evenement" styleClass="action-card-title"/>
+                                                                        <Label text="Mettez a jour les informations d'un evenement existant." styleClass="action-card-subtitle" wrapText="true"/>
                                                                     </children>
                                                                 </VBox>
                                                             </children>
@@ -435,8 +435,8 @@
                                                                 </StackPane>
                                                                 <VBox spacing="6.0">
                                                                     <children>
-                                                                        <Label text="Delete Event" styleClass="action-card-title"/>
-                                                                        <Label text="Remove events and linked participations." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                        <Label text="Supprimer un evenement" styleClass="action-card-title"/>
+                                                                        <Label text="Supprimez un evenement de la base de donnees." styleClass="action-card-subtitle" wrapText="true"/>
                                                                     </children>
                                                                 </VBox>
                                                             </children>
@@ -461,8 +461,8 @@
                                                                 </StackPane>
                                                                 <VBox spacing="6.0">
                                                                     <children>
-                                                                        <Label text="Dashboard &amp; Explore" styleClass="action-card-title"/>
-                                                                        <Label text="events_crud/dashboard in one searchable table." styleClass="action-card-subtitle" wrapText="true"/>
+                                                                        <Label text="Explorer les evenements" styleClass="action-card-title"/>
+                                                                        <Label text="Consultez la liste de tous les evenements enregistres." styleClass="action-card-subtitle" wrapText="true"/>
                                                                     </children>
                                                                 </VBox>
                                                             </children>
@@ -568,7 +568,7 @@
                                                                         mnemonicParsing="false"
                                                                         onAction="#ajouterEvent"
                                                                         styleClass="primary-button large-primary"
-                                                                        text="Create Event"/>
+                                                                        text="Creer l'evenement"/>
 
                                                                 <Button mnemonicParsing="false"
                                                                         onAction="#modifierEvent"
