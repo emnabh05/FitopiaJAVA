@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -129,6 +130,10 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Participation, LocalDateTime> dateInscriptionColumn;
     @FXML private TableColumn<Participation, String> evenementParticipationColumn;
     @FXML private TextField participantSearchField;
+    @FXML private TextField participantNameField;
+    @FXML private TextField participantEmailField;
+    @FXML private ComboBox<Event> participantEventCombo;
+    @FXML private Label participantFormStatusLabel;
 
     @FXML private Label totalEventsLabel;
     @FXML private Label totalParticipantsLabel;
@@ -152,6 +157,7 @@ public class MainController implements Initializable {
     private final Map<Integer, String> eventTitleById = new HashMap<>();
     private final PdfExportService pdfExportService = new PdfExportService();
     private final Timeline liveSyncTimeline = new Timeline();
+    private Participation selectedParticipation;
     private enum EventWindowMode {
         CREATE,
         UPDATE,
@@ -229,10 +235,39 @@ public class MainController implements Initializable {
         configureParticipationTable();
         configureSearches();
         configureEventSelection();
+        configureParticipantCrud();
         configureLiveSync();
         syncSidebarMenus();
         refreshAllData();
         showTablesLanding();
+    }
+
+    private void configureParticipantCrud() {
+        participantEventCombo.setItems(eventList);
+        participantEventCombo.setConverter(new StringConverter<>() {
+            @Override
+            public String toString(Event event) {
+                return event == null ? "" : event.getTitre();
+            }
+
+            @Override
+            public Event fromString(String string) {
+                if (string == null || string.isBlank()) {
+                    return null;
+                }
+                return eventList.stream()
+                        .filter(event -> string.equalsIgnoreCase(event.getTitre()))
+                        .findFirst()
+                        .orElse(null);
+            }
+        });
+
+        participationTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            selectedParticipation = newValue;
+            if (newValue != null) {
+                populateParticipantForm(newValue);
+            }
+        });
     }
 
     private void configureLiveSync() {
@@ -386,6 +421,7 @@ public class MainController implements Initializable {
             renderUpdateSection(events);
             renderDeleteSection(events);
             eventTable.refresh();
+            restoreSelectedParticipantEvent();
             System.out.println("Evenements charges : " + events.size());
         } catch (Exception e) {
             showError("Chargement impossible", "Erreur lors du chargement des evenements.", e);
@@ -400,10 +436,87 @@ public class MainController implements Initializable {
             sortParticipationTableByIdDesc();
             participationTable.refresh();
             eventTable.refresh();
+            if (selectedParticipation != null) {
+                selectedParticipation = participationList.stream()
+                        .filter(participation -> participation.getIdParticipation() == selectedParticipation.getIdParticipation())
+                        .findFirst()
+                        .orElse(null);
+                if (selectedParticipation != null) {
+                    populateParticipantForm(selectedParticipation);
+                } else {
+                    clearParticipantForm();
+                }
+            }
             System.out.println("Participations chargees : " + participations.size());
         } catch (Exception e) {
             showError("Chargement impossible", "Erreur lors du chargement des participations.", e);
         }
+    }
+
+    @FXML
+    private void addParticipant() {
+        try {
+            Participation participation = buildParticipationFromForm();
+            participationService.add(participation);
+            refreshParticipations();
+            clearParticipantForm();
+            statusLabel.setText("Participant ajoute avec succes : " + participation.getNomParticipant());
+        } catch (IllegalArgumentException e) {
+            participantFormStatusLabel.setText(e.getMessage());
+        } catch (Exception e) {
+            showError("Ajout impossible", "Erreur lors de l'ajout du participant.", e);
+        }
+    }
+
+    @FXML
+    private void updateParticipant() {
+        if (selectedParticipation == null) {
+            participantFormStatusLabel.setText("Selectionne un participant a modifier.");
+            return;
+        }
+
+        try {
+            Participation updatedParticipation = buildParticipationFromForm();
+            updatedParticipation.setIdParticipation(selectedParticipation.getIdParticipation());
+            updatedParticipation.setDateInscription(selectedParticipation.getDateInscription());
+            participationService.update(updatedParticipation);
+            refreshParticipations();
+            clearParticipantForm();
+            statusLabel.setText("Participant modifie avec succes : ID " + updatedParticipation.getIdParticipation());
+        } catch (IllegalArgumentException e) {
+            participantFormStatusLabel.setText(e.getMessage());
+        } catch (Exception e) {
+            showError("Modification impossible", "Erreur lors de la modification du participant.", e);
+        }
+    }
+
+    @FXML
+    private void deleteParticipant() {
+        if (selectedParticipation == null) {
+            participantFormStatusLabel.setText("Selectionne un participant a supprimer.");
+            return;
+        }
+
+        try {
+            int idParticipation = selectedParticipation.getIdParticipation();
+            String participantName = selectedParticipation.getNomParticipant();
+            participationService.delete(idParticipation);
+            refreshParticipations();
+            clearParticipantForm();
+            statusLabel.setText("Participant supprime avec succes : ID " + idParticipation + " - " + participantName);
+        } catch (Exception e) {
+            showError("Suppression impossible", "Erreur lors de la suppression du participant.", e);
+        }
+    }
+
+    @FXML
+    private void clearParticipantForm() {
+        selectedParticipation = null;
+        participantNameField.clear();
+        participantEmailField.clear();
+        participantEventCombo.getSelectionModel().clearSelection();
+        participationTable.getSelectionModel().clearSelection();
+        participantFormStatusLabel.setText("Selectionne un participant pour modifier ou supprimer.");
     }
 
     private void rebuildEventTitleMap(List<Event> events) {
@@ -515,6 +628,56 @@ public class MainController implements Initializable {
 
     private boolean contains(String source, String value) {
         return source != null && source.toLowerCase(Locale.ROOT).contains(value);
+    }
+
+    private Participation buildParticipationFromForm() {
+        String participantName = requireNonBlank(participantNameField.getText(), "Le nom du participant est obligatoire.");
+        String participantEmail = requireNonBlank(participantEmailField.getText(), "L'email du participant est obligatoire.");
+        if (!participantEmail.contains("@")) {
+            throw new IllegalArgumentException("L'email du participant est invalide.");
+        }
+
+        Event selectedEventForParticipant = participantEventCombo.getValue();
+        if (selectedEventForParticipant == null) {
+            throw new IllegalArgumentException("Choisis un evenement pour ce participant.");
+        }
+
+        Participation participation = new Participation(
+                selectedEventForParticipant.getIdEvent(),
+                participantName,
+                participantEmail,
+                selectedParticipation != null ? selectedParticipation.getDateInscription() : LocalDateTime.now()
+        );
+        participation.setEvenement(selectedEventForParticipant.getTitre());
+        return participation;
+    }
+
+    private void populateParticipantForm(Participation participation) {
+        participantNameField.setText(participation.getNomParticipant());
+        participantEmailField.setText(participation.getEmailParticipant());
+        participantEventCombo.setValue(findEventById(participation.getIdEvent()));
+        participantFormStatusLabel.setText("Participant selectionne : ID " + participation.getIdParticipation());
+    }
+
+    private void restoreSelectedParticipantEvent() {
+        if (selectedParticipation == null) {
+            return;
+        }
+        participantEventCombo.setValue(findEventById(selectedParticipation.getIdEvent()));
+    }
+
+    private Event findEventById(int idEvent) {
+        return eventList.stream()
+                .filter(event -> event.getIdEvent() == idEvent)
+                .findFirst()
+                .orElse(null);
+    }
+
+    private String requireNonBlank(String value, String message) {
+        if (value == null || value.trim().isEmpty()) {
+            throw new IllegalArgumentException(message);
+        }
+        return value.trim();
     }
 
     private void renderUpdateSection(List<Event> events) {
