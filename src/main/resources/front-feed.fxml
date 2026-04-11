@@ -28,6 +28,7 @@
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
             <TextField fx:id="tfSearch" onKeyReleased="#refreshData" promptText="Search forums..." styleClass="search-input"/>
+            <Button onAction="#ouvrirAdminInterface" styleClass="ghost-pill" text="Change sessions"/>
             <Button onAction="#refreshData" styleClass="ghost-pill" text="Refresh"/>
         </HBox>
     </top>

@@ -373,6 +373,27 @@ public class MainController {
         }
     }
 
+    @FXML
+    private void ouvrirAdminInterface() {
+        if (viewRepas == null || viewRepas.getScene() == null) {
+            showError("Navigation", "Impossible d'ouvrir l'interface admin.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/backrepas.fxml"));
+            Scene scene = new Scene(loader.load());
+            MainController controller = loader.getController();
+            controller.ouvrirBackRepas();
+
+            Stage stage = (Stage) viewRepas.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException exception) {
+            showError("Navigation", "Impossible d'ouvrir l'interface admin : " + exception.getMessage());
+        }
+    }
+
     @FXML private void afficherModuleRepas() { afficherVue(viewRepas, viewRegimes, viewForumComment); activerBoutonModule(btnModuleRepas, btnModuleRegimes, btnModuleForumComment); }
     @FXML private void afficherModuleRegimes() { afficherVue(viewRegimes, viewRepas, viewForumComment); activerBoutonModule(btnModuleRegimes, btnModuleRepas, btnModuleForumComment); }
     @FXML private void afficherModuleForumComment() { afficherVue(viewForumComment, viewRepas, viewRegimes); activerBoutonModule(btnModuleForumComment, btnModuleRepas, btnModuleRegimes); }

@@ -1,7 +1,9 @@
 package tn.esprit.Pidev3A49.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -13,12 +15,15 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import tn.esprit.Pidev3A49.Models.Comment;
 import tn.esprit.Pidev3A49.Models.Forum;
+import tn.esprit.Pidev3A49.controllers.MainController;
 import tn.esprit.Pidev3A49.services.ServiceComment;
 import tn.esprit.Pidev3A49.services.ServiceForum;
 
+import java.io.IOException;
 import java.util.List;
 
 public class FrontFeedController {
@@ -359,6 +364,27 @@ public class FrontFeedController {
         cbCommentForum.getItems().setAll(forums);
         if (selectedCommentId == null && !forums.isEmpty() && cbCommentForum.getValue() == null) {
             cbCommentForum.setValue(forums.get(0));
+        }
+    }
+
+    @FXML
+    private void ouvrirAdminInterface() {
+        if (feedContainer == null || feedContainer.getScene() == null) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir l'interface admin.");
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/backrepas.fxml"));
+            Scene scene = new Scene(loader.load());
+            MainController controller = loader.getController();
+            controller.ouvrirBackRepas();
+
+            Stage stage = (Stage) feedContainer.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException exception) {
+            showAlert(Alert.AlertType.ERROR, "Navigation", "Impossible d'ouvrir l'interface admin : " + exception.getMessage());
         }
     }
 
