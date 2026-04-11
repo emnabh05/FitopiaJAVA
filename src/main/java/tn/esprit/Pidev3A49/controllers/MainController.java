@@ -266,6 +266,11 @@ public class MainController implements Initializable {
             selectedParticipation = newValue;
             if (newValue != null) {
                 populateParticipantForm(newValue);
+            } else {
+                participantNameField.clear();
+                participantEmailField.clear();
+                participantEventCombo.getSelectionModel().clearSelection();
+                participantFormStatusLabel.setText("Selectionne un participant pour modifier ou supprimer.");
             }
         });
     }
@@ -460,6 +465,7 @@ public class MainController implements Initializable {
             participationService.add(participation);
             refreshParticipations();
             clearParticipantForm();
+            participantFormStatusLabel.setText("Participant ajoute avec succes.");
             statusLabel.setText("Participant ajoute avec succes : " + participation.getNomParticipant());
         } catch (IllegalArgumentException e) {
             participantFormStatusLabel.setText(e.getMessage());
@@ -482,6 +488,7 @@ public class MainController implements Initializable {
             participationService.update(updatedParticipation);
             refreshParticipations();
             clearParticipantForm();
+            participantFormStatusLabel.setText("Participant modifie avec succes.");
             statusLabel.setText("Participant modifie avec succes : ID " + updatedParticipation.getIdParticipation());
         } catch (IllegalArgumentException e) {
             participantFormStatusLabel.setText(e.getMessage());
@@ -503,6 +510,7 @@ public class MainController implements Initializable {
             participationService.delete(idParticipation);
             refreshParticipations();
             clearParticipantForm();
+            participantFormStatusLabel.setText("Participant supprime avec succes.");
             statusLabel.setText("Participant supprime avec succes : ID " + idParticipation + " - " + participantName);
         } catch (Exception e) {
             showError("Suppression impossible", "Erreur lors de la suppression du participant.", e);
