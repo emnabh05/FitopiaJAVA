@@ -28,6 +28,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import tn.esprit.Pidev3A49.models.Event;
@@ -81,6 +83,13 @@ public class MainController implements Initializable {
     @FXML private VBox tablesLandingSection;
     @FXML private VBox eventsWorkspaceSection;
     @FXML private VBox participantsSection;
+    @FXML private BorderPane rootPane;
+    @FXML private ScrollPane sidebarScrollPane;
+    @FXML private VBox contentShell;
+    @FXML private HBox heroBanner;
+    @FXML private FlowPane statsPane;
+    @FXML private HBox workspaceSwitcher;
+    @FXML private VBox eventsIntroBanner;
 
     @FXML private VBox addEventSection;
     @FXML private VBox updateEventsSection;
@@ -1070,14 +1079,16 @@ public class MainController implements Initializable {
                 case DASHBOARD -> controller.showDashboardSection();
             }
 
-            Scene scene = new Scene(root, 1520, 900);
+            controller.enableStandaloneMode(mode);
+
+            Scene scene = new Scene(root, 1180, 820);
             scene.getStylesheets().add(getClass().getResource("/styles/dashboard.css").toExternalForm());
 
             Stage stage = new Stage();
             stage.setTitle("Fitopia - " + getWindowTitle(mode));
             stage.setScene(scene);
-            stage.setMinWidth(1320);
-            stage.setMinHeight(820);
+            stage.setMinWidth(980);
+            stage.setMinHeight(720);
             stage.show();
         } catch (Exception e) {
             showError("Ouverture impossible", "La fenetre demandee n'a pas pu etre chargee.", e);
@@ -1091,5 +1102,40 @@ public class MainController implements Initializable {
             case DELETE -> "Supprimer un evenement";
             case DASHBOARD -> "Dashboard des evenements";
         };
+    }
+
+    private void enableStandaloneMode(EventWindowMode mode) {
+        if (rootPane != null) {
+            rootPane.setLeft(null);
+        }
+        hideNode(sidebarScrollPane);
+        hideNode(heroBanner);
+        hideNode(statsPane);
+        hideNode(workspaceSwitcher);
+        hideNode(eventsIntroBanner);
+        hideCrudCards();
+
+        if (contentShell != null) {
+            contentShell.setPadding(new Insets(22, 22, 22, 22));
+        }
+
+        setMainView(false, true, false);
+
+        switch (mode) {
+            case CREATE -> {
+                showEventSection(addEventSection, createCardButton);
+                titreField.requestFocus();
+            }
+            case UPDATE -> showEventSection(updateEventsSection, updateCardButton);
+            case DELETE -> showEventSection(deleteEventsSection, deleteCardButton);
+            case DASHBOARD -> showEventSection(dashboardSection, dashboardCardButton);
+        }
+    }
+
+    private void hideNode(Node node) {
+        if (node != null) {
+            node.setVisible(false);
+            node.setManaged(false);
+        }
     }
 }

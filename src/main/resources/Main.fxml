@@ -21,7 +21,8 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane fx:controller="tn.esprit.Pidev3A49.controllers.MainController"
+<BorderPane fx:id="rootPane"
+            fx:controller="tn.esprit.Pidev3A49.controllers.MainController"
             minHeight="820.0"
             minWidth="1320.0"
             prefHeight="900.0"
@@ -31,7 +32,7 @@
             xmlns:fx="http://javafx.com/fxml/1">
 
     <left>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="sidebar-scroll">
+        <ScrollPane fx:id="sidebarScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="sidebar-scroll">
             <content>
                 <VBox minWidth="266.0" prefWidth="266.0" spacing="18.0" styleClass="sidebar">
                     <padding>
@@ -191,13 +192,13 @@
     <center>
         <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="content-scroll">
             <content>
-                <VBox fillWidth="true" spacing="18.0" styleClass="content-shell">
+                <VBox fx:id="contentShell" fillWidth="true" spacing="18.0" styleClass="content-shell">
                     <padding>
                         <Insets top="22.0" right="24.0" bottom="22.0" left="24.0"/>
                     </padding>
 
                     <children>
-                        <HBox alignment="CENTER_LEFT" spacing="18.0" styleClass="hero-banner">
+                        <HBox fx:id="heroBanner" alignment="CENTER_LEFT" spacing="18.0" styleClass="hero-banner">
                             <children>
                                 <VBox spacing="6.0">
                                     <children>
@@ -241,7 +242,7 @@
                             </children>
                         </HBox>
 
-                        <FlowPane hgap="14.0" vgap="14.0">
+                        <FlowPane fx:id="statsPane" hgap="14.0" vgap="14.0">
                             <children>
                                 <VBox minWidth="185.0" prefWidth="190.0" spacing="6.0" styleClass="stat-card">
                                     <children>
@@ -281,7 +282,7 @@
                             </children>
                         </FlowPane>
 
-                        <HBox spacing="10.0" styleClass="workspace-switcher">
+                        <HBox fx:id="workspaceSwitcher" spacing="10.0" styleClass="workspace-switcher">
                             <children>
                                 <Button fx:id="eventsWorkspaceButton"
                                         mnemonicParsing="false"
@@ -349,7 +350,7 @@
 
                                 <VBox fx:id="eventsWorkspaceSection" spacing="18.0" visible="false" managed="false">
                                     <children>
-                                        <VBox spacing="12.0" styleClass="events-intro-banner">
+                                        <VBox fx:id="eventsIntroBanner" spacing="12.0" styleClass="events-intro-banner">
                                             <children>
                                                 <Label text="Gestion des evenements" styleClass="events-intro-title"/>
                                                 <Label text="Creez, modifiez ou supprimez les evenements enregistres dans le systeme." styleClass="events-intro-subtitle"/>
