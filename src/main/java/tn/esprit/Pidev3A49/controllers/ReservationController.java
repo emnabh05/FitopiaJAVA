@@ -125,11 +125,6 @@ public class ReservationController {
             return;
         }
 
-        boolean alreadyParticipant = participationService.existsForEventAndEmail(event.getIdEvent(), email);
-        if (alreadyParticipant) {
-            return;
-        }
-
         participationService.add(new Participation(
                 event.getIdEvent(),
                 fullParticipantName,
