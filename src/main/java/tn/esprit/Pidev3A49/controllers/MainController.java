@@ -1491,6 +1491,7 @@ public class MainController {
         Button voirBtn = new Button("Voir");
         voirBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-cursor: hand;");
         voirBtn.setOnAction(e -> {
+            verresEau = 0;
             tfRegimeId.setText(String.valueOf(regime.getId()));
             actualiserDashboardPlanner();
             if (appScrollPane != null) {
