@@ -86,7 +86,7 @@
                 </VBox>
                 <Region VBox.vgrow="ALWAYS" />
                 <VBox spacing="12.0" styleClass="back-sidebar-footer">
-                    <Button maxWidth="180.0" mnemonicParsing="false" onAction="#goBackOrExit" styleClass="back-logout-button" text="Change sessions" style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 15px; -fx-padding: 14 20; -fx-alignment: center-left; -fx-graphic-text-gap: 10;" textFill="#0f4c45">
+                    <Button maxWidth="180.0" mnemonicParsing="false" onAction="#openChangeSessions" styleClass="back-logout-button" text="Change sessions" style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 15px; -fx-padding: 14 20; -fx-alignment: center-left; -fx-graphic-text-gap: 10;" textFill="#0f4c45">
                         <graphic>
                             <Label styleClass="back-logout-icon" text="&#8618;" style="-fx-text-fill: #0F4C45; -fx-font-weight: 900; -fx-font-size: 16px;" />
                         </graphic>

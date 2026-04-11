@@ -148,6 +148,15 @@ public class AdminDashboardController {
     }
 
     @FXML
+    public void openChangeSessions(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.BACK_END_VIEW, SceneNavigator.FITNESS_FRONT_VIEW);
+        } catch (IOException exception) {
+            setErrorMessage("Impossible d'ouvrir frontregime.fxml.");
+        }
+    }
+
+    @FXML
     private void focusCreateSupplement(MouseEvent event) {
         scrollTo(supplementFormSection);
         setInfoMessage("Remplis le formulaire ci-dessous pour creer un supplement.");

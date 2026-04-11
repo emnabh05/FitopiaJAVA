@@ -102,6 +102,15 @@ public class OrderedCustomersController {
         }
     }
 
+    @FXML
+    public void openChangeSessions(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.ORDERD_VIEW, SceneNavigator.FITNESS_FRONT_VIEW);
+        } catch (IOException exception) {
+            setErrorMessage("Impossible d'ouvrir frontregime.fxml.");
+        }
+    }
+
     private void configureColumns() {
         orderIdColumn.setCellValueFactory(cell -> new SimpleIntegerProperty(cell.getValue().getId()));
         fullNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(
