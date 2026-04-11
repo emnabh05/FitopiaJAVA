@@ -294,12 +294,7 @@ public class MainController implements Initializable {
         nomParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("nomParticipant"));
         emailParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("emailParticipant"));
         dateInscriptionColumn.setCellValueFactory(new PropertyValueFactory<>("dateInscription"));
-        evenementParticipationColumn.setCellValueFactory(cellData ->
-                new ReadOnlyStringWrapper(eventTitleById.getOrDefault(
-                        cellData.getValue().getIdEvent(),
-                        "Event #" + cellData.getValue().getIdEvent()
-                ))
-        );
+        evenementParticipationColumn.setCellValueFactory(new PropertyValueFactory<>("evenement"));
         dateInscriptionColumn.setCellFactory(column -> new FormattedTableCell<>(DATE_TIME_FORMATTER));
 
         SortedList<Participation> sortedParticipations = new SortedList<>(filteredParticipations);
@@ -504,7 +499,7 @@ public class MainController implements Initializable {
             }
 
             String value = rawValue.toLowerCase(Locale.ROOT).trim();
-            String eventTitle = eventTitleById.getOrDefault(participation.getIdEvent(), "");
+            String eventTitle = participation.getEvenement() == null ? "" : participation.getEvenement();
 
             return contains(participation.getNomParticipant(), value)
                     || contains(participation.getEmailParticipant(), value)

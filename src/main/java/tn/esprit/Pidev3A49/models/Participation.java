@@ -6,6 +6,7 @@ public class Participation {
 
     private int idParticipation;
     private int idEvent;
+    private String evenement;
     private String nomParticipant;
     private String emailParticipant;
     private LocalDateTime dateInscription;
@@ -29,6 +30,16 @@ public class Participation {
         this.dateInscription = dateInscription;
     }
 
+    public Participation(int idParticipation, int idEvent, String evenement, String nomParticipant, String emailParticipant,
+                         LocalDateTime dateInscription) {
+        this.idParticipation = idParticipation;
+        this.idEvent = idEvent;
+        this.evenement = evenement;
+        this.nomParticipant = nomParticipant;
+        this.emailParticipant = emailParticipant;
+        this.dateInscription = dateInscription;
+    }
+
     public int getIdParticipation() {
         return idParticipation;
     }
@@ -43,6 +54,14 @@ public class Participation {
 
     public void setIdEvent(int idEvent) {
         this.idEvent = idEvent;
+    }
+
+    public String getEvenement() {
+        return evenement;
+    }
+
+    public void setEvenement(String evenement) {
+        this.evenement = evenement;
     }
 
     public String getNomParticipant() {
@@ -74,6 +93,7 @@ public class Participation {
         return "Participation{" +
                 "idParticipation=" + idParticipation +
                 ", idEvent=" + idEvent +
+                ", evenement='" + evenement + '\'' +
                 ", nomParticipant='" + nomParticipant + '\'' +
                 ", emailParticipant='" + emailParticipant + '\'' +
                 ", dateInscription=" + dateInscription +

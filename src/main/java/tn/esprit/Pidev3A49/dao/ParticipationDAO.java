@@ -91,8 +91,9 @@ public class ParticipationDAO {
     }
 
     public Participation findById(int idParticipation) {
-        String sql = "SELECT id_participation, id_event, nom_participant, email_participant, date_inscription " +
-                "FROM participation WHERE id_participation=?";
+        String sql = "SELECT p.id_participation, p.id_event, COALESCE(e.titre, CONCAT('Event #', p.id_event)) AS evenement, " +
+                "p.nom_participant, p.email_participant, p.date_inscription " +
+                "FROM participation p LEFT JOIN events e ON e.id_event = p.id_event WHERE p.id_participation=?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, idParticipation);
@@ -111,8 +112,9 @@ public class ParticipationDAO {
     }
 
     public List<Participation> getAll() {
-        String sql = "SELECT id_participation, id_event, nom_participant, email_participant, date_inscription " +
-                "FROM participation ORDER BY id_participation DESC";
+        String sql = "SELECT p.id_participation, p.id_event, COALESCE(e.titre, CONCAT('Event #', p.id_event)) AS evenement, " +
+                "p.nom_participant, p.email_participant, p.date_inscription " +
+                "FROM participation p LEFT JOIN events e ON e.id_event = p.id_event ORDER BY p.id_participation DESC";
         List<Participation> participations = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
@@ -156,6 +158,7 @@ public class ParticipationDAO {
         return new Participation(
                 resultSet.getInt("id_participation"),
                 resultSet.getInt("id_event"),
+                resultSet.getString("evenement"),
                 resultSet.getString("nom_participant"),
                 resultSet.getString("email_participant"),
                 dateInscription
