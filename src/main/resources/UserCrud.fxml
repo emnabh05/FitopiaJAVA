@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="920.0" prefWidth="1450.0" style="-fx-background-color: linear-gradient(to bottom, #fbfdfd, #f3f7f7);" xmlns="http://javafx.com/javafx/22.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.Pidev3A49.test.UserCrudController">
+    <top>
+        <VBox spacing="0.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="34.0" style="-fx-background-color: #0f2830; -fx-padding: 0 34 0 34;">
+                    <children>
+                        <Label style="-fx-text-fill: #d5e2e3; -fx-font-size: 10px;" text="Phone no:+216 58 936 689 or email us: customerservice@fitopia.com" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label style="-fx-text-fill: #d5e2e3; -fx-font-size: 10px;" text="f    t    ig" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" prefHeight="72.0" style="-fx-background-color: white; -fx-border-color: #edf2f4; -fx-border-width: 0 0 1 0; -fx-padding: 0 38 0 38;">
+                    <children>
+                        <Label style="-fx-background-color: #eef7f6; -fx-background-radius: 11; -fx-padding: 9 10 9 10; -fx-text-fill: #0e4a48; -fx-font-weight: bold;" text="F" />
+                        <Label style="-fx-text-fill: #173f44; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 0 28 0 10;" text="Fitopia" />
+                        <Button mnemonicParsing="false" onAction="#handleHome" style="-fx-background-color: transparent; -fx-text-fill: #3d5d61; -fx-font-size: 12px; -fx-padding: 0 18 0 0;" text="Home" />
+                        <Label style="-fx-text-fill: #3d5d61; -fx-font-size: 12px; -fx-padding: 0 18 0 0;" text="About Fitopia" />
+                        <Label style="-fx-text-fill: #3d5d61; -fx-font-size: 12px; -fx-padding: 0 18 0 0;" text="Diet &amp; Eating Planner" />
+                        <Label style="-fx-text-fill: #3d5d61; -fx-font-size: 12px; -fx-padding: 0 18 0 0;" text="Fitness Planner" />
+                        <Label style="-fx-text-fill: #3d5d61; -fx-font-size: 12px; -fx-padding: 0 18 0 0;" text="Supplements Shop" />
+                        <Label style="-fx-text-fill: #3d5d61; -fx-font-size: 12px; -fx-padding: 0 18 0 0;" text="Events" />
+                        <Label style="-fx-text-fill: #3d5d61; -fx-font-size: 12px;" text="Forums &amp; Blogs" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="false" onAction="#handleGetStarted" style="-fx-background-color: white; -fx-border-color: #d8e5e3; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 9 20 9 20; -fx-font-weight: bold; -fx-text-fill: #0e3a40;" text="Get Started" />
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </top>
+    <center>
+        <AnchorPane>
+            <children>
+                <HBox AnchorPane.bottomAnchor="22.0" AnchorPane.leftAnchor="92.0" AnchorPane.rightAnchor="92.0" AnchorPane.topAnchor="24.0">
+                    <children>
+                        <VBox prefWidth="460.0" style="-fx-background-color: linear-gradient(to bottom right, #0d4f53, #178668); -fx-background-radius: 18 0 0 18; -fx-padding: 38 28 38 28;">
+                            <children>
+                                <Region VBox.vgrow="ALWAYS" />
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <children>
+                                        <Label style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 10; -fx-padding: 10 12 10 12; -fx-text-fill: #0f6664; -fx-font-weight: bold;" text="F" />
+                                        <Label style="-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;" text="Fitopia" />
+                                    </children>
+                                </HBox>
+                                <Label style="-fx-padding: 22 0 0 0; -fx-text-fill: #0a2428; -fx-font-size: 34px; -fx-font-weight: bold;" text="Welcome to Fitopia" />
+                                <Label style="-fx-padding: 8 0 0 0; -fx-text-fill: rgba(255,255,255,0.82); -fx-font-size: 14px;" text="Join our community and start your transformation." wrapText="true" />
+                                <VBox spacing="12.0" style="-fx-background-color: rgba(255,255,255,0.10); -fx-background-radius: 14; -fx-padding: 18;">
+                                    <children>
+                                        <Label style="-fx-text-fill: rgba(255,255,255,0.76); -fx-font-size: 12px; -fx-font-weight: bold;" text="U will join as?" />
+                                        <GridPane hgap="10.0" vgap="10.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints percentWidth="50.0" />
+                                                <ColumnConstraints percentWidth="50.0" />
+                                            </columnConstraints>
+                                            <children>
+                                                <HBox fx:id="patientRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectPatientRole" GridPane.columnIndex="0" GridPane.rowIndex="0"><children><Label style="-fx-text-fill: #0b4649; -fx-font-weight: bold;" text="Patient" /></children></HBox>
+                                                <HBox fx:id="coachRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectCoachRole" GridPane.columnIndex="1" GridPane.rowIndex="0"><children><Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Coach" /></children></HBox>
+                                                <HBox fx:id="nutritionistRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectNutritionistRole" GridPane.columnIndex="0" GridPane.rowIndex="1"><children><Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Nutritionist" /></children></HBox>
+                                                <HBox fx:id="adminRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectAdminRole" GridPane.columnIndex="1" GridPane.rowIndex="1"><children><Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Admin" /></children></HBox>
+                                            </children>
+                                        </GridPane>
+                                    </children>
+                                </VBox>
+                                <Label fx:id="selectedRoleBadge" style="-fx-padding: 14 0 0 0; -fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 11px; -fx-font-weight: bold;" text="PATIENT" />
+                            </children>
+                        </VBox>
+                        <VBox prefWidth="800.0" style="-fx-background-color: white; -fx-background-radius: 0 18 18 0; -fx-effect: dropshadow(gaussian, rgba(16,46,56,0.12), 28, 0.2, 0, 10);">
+                            <children>
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+                                    <content>
+                                        <VBox spacing="16.0" style="-fx-background-color: white; -fx-padding: 26 24 24 24;">
+                                            <children>
+                                                <Label style="-fx-text-fill: #1b2e35; -fx-font-size: 24px; -fx-font-weight: bold;" text="Account Information" />
+                                                <Label style="-fx-text-fill: #8b98a6; -fx-font-size: 12px;" text="Complete your profile details to create and manage your account." />
+                                                <GridPane hgap="14.0" vgap="12.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints percentWidth="50.0" />
+                                                        <ColumnConstraints percentWidth="50.0" />
+                                                    </columnConstraints>
+                                                    <children>
+                                                        <TextField fx:id="firstNameField" promptText="First name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                        <TextField fx:id="lastNameField" promptText="Last name" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                                        <TextField fx:id="usernameField" promptText="Username" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                        <TextField fx:id="emailField" promptText="Email" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                        <PasswordField fx:id="passwordField" promptText="Plain password" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                        <TextField fx:id="phoneField" promptText="Phone" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                                        <DatePicker fx:id="birthDatePicker" promptText="Birth date" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                                        <RadioButton fx:id="maleRadio" mnemonicParsing="false" selected="true" style="-fx-background-color: #f6f9fb; -fx-border-color: #e3ebf0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;" text="Male" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                                        <RadioButton fx:id="femaleRadio" mnemonicParsing="false" style="-fx-background-color: #f6f9fb; -fx-border-color: #e3ebf0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 12 10 12;" text="Female" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                                                        <TextField fx:id="avatarField" promptText="Avatar profile picture" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                                        <Button mnemonicParsing="false" onAction="#handleBrowseAvatar" style="-fx-background-color: #eef5f4; -fx-text-fill: #20343a; -fx-background-radius: 8; -fx-font-weight: bold;" text="Browse" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                                    </children>
+                                                </GridPane>
+                                                <VBox fx:id="patientSection" spacing="12.0">
+                                                    <children>
+                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 12px; -fx-font-weight: bold;" text="User Health Information" />
+                                                        <GridPane hgap="14.0" vgap="12.0">
+                                                            <columnConstraints>
+                                                                <ColumnConstraints percentWidth="33.0" />
+                                                                <ColumnConstraints percentWidth="34.0" />
+                                                                <ColumnConstraints percentWidth="33.0" />
+                                                            </columnConstraints>
+                                                            <children>
+                                                                <TextField fx:id="heightField" promptText="Height (cm)" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                                <TextField fx:id="weightField" promptText="Weight (kg)" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                                                <TextField fx:id="targetWeightField" promptText="Target Weight" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                                                            </children>
+                                                        </GridPane>
+                                                        <ComboBox fx:id="fitnessLevelCombo" promptText="Fitness level" />
+                                                        <TextArea fx:id="healthConditionsArea" prefRowCount="2" promptText="Health conditions" wrapText="true" />
+                                                        <TextArea fx:id="dietaryPreferencesArea" prefRowCount="2" promptText="Dietary preferences" wrapText="true" />
+                                                        <TextArea fx:id="fitnessGoalsArea" prefRowCount="2" promptText="Fitness goals" wrapText="true" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox fx:id="professionalSection" managed="false" spacing="12.0" visible="false">
+                                                    <children>
+                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 12px; -fx-font-weight: bold;" text="Professional Information" />
+                                                        <TextField fx:id="professionalTitleField" promptText="Professional title" />
+                                                        <TextField fx:id="specializationField" promptText="Specialization" />
+                                                        <TextField fx:id="qualificationField" promptText="Qualification" />
+                                                        <TextField fx:id="yearsExperienceField" promptText="Years of experience" />
+                                                        <TextArea fx:id="bioArea" prefRowCount="3" promptText="Bio" wrapText="true" />
+                                                        <TextField fx:id="licenseNumberField" promptText="License number" />
+                                                    </children>
+                                                </VBox>
+                                                <HBox spacing="12.0">
+                                                    <children>
+                                                        <Button mnemonicParsing="false" onAction="#handleAddUser" style="-fx-background-color: #2d323c; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Create Account" />
+                                                        <Button mnemonicParsing="false" onAction="#handleUpdateUser" style="-fx-background-color: white; -fx-text-fill: #22333b; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Update" />
+                                                        <Button mnemonicParsing="false" onAction="#handleDeleteUser" style="-fx-background-color: white; -fx-text-fill: #9a2f2f; -fx-border-color: #f0c7c7; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Delete" />
+                                                        <Button mnemonicParsing="false" onAction="#handleRefresh" style="-fx-background-color: white; -fx-text-fill: #22333b; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Refresh" />
+                                                        <Button mnemonicParsing="false" onAction="#handleClear" style="-fx-background-color: #eef5f4; -fx-text-fill: #22333b; -fx-background-radius: 8; -fx-font-weight: bold;" text="Clear" />
+                                                    </children>
+                                                </HBox>
+                                                <Label fx:id="statusLabel" style="-fx-text-fill: #63717d; -fx-font-size: 12px;" text="Chargement..." wrapText="true" />
+                                                <Separator />
+                                                <Label style="-fx-text-fill: #1b2e35; -fx-font-size: 18px; -fx-font-weight: bold;" text="Users" />
+                                                <TableView fx:id="userTable" prefHeight="260.0">
+                                                    <columns>
+                                                        <TableColumn fx:id="idColumn" prefWidth="60.0" text="ID" />
+                                                        <TableColumn fx:id="fullNameColumn" prefWidth="180.0" text="Full Name" />
+                                                        <TableColumn fx:id="usernameColumn" prefWidth="130.0" text="Username" />
+                                                        <TableColumn fx:id="emailColumn" prefWidth="180.0" text="Email" />
+                                                        <TableColumn fx:id="roleColumn" prefWidth="110.0" text="Role" />
+                                                        <TableColumn fx:id="phoneColumn" prefWidth="120.0" text="Phone" />
+                                                    </columns>
+                                                </TableView>
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </AnchorPane>
+    </center>
+</BorderPane>
