@@ -34,7 +34,7 @@ public class EventService {
     }
 
     public Optional<Event> findById(int id) throws SQLException {
-        return eventDAO.findById(id);
+        return Optional.ofNullable(eventDAO.findById(id));
     }
 
     public List<Event> findAll() throws SQLException {

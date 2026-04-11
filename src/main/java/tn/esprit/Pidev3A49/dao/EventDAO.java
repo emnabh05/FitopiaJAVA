@@ -17,9 +17,6 @@ import java.util.List;
 
 public class EventDAO {
 
-    private static final String BASE_SELECT =
-            "SELECT id_event, titre, description, date_event, lieu, capacite, type_event, image_event, prix_event, created_at, is_premium FROM events";
-
     private final Connection connection;
 
     public EventDAO() {
@@ -27,84 +24,108 @@ public class EventDAO {
     }
 
     public void add(Event event) {
-        String sql = "INSERT INTO events (titre, description, date_event, lieu, capacite, type_event, image_event, prix_event, created_at, is_premium) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO events (titre, description, date_event, lieu, capacite, type_event, image_event, prix_event, created_at, is_premium) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            fillStatementForWrite(statement, event, true);
-
+            fillStatementForWrite(statement, event);
             int affectedRows = statement.executeUpdate();
+
             if (affectedRows == 0) {
-                throw new SQLException("Aucune ligne inseree dans la table events.");
+                throw new SQLException("Aucun evenement insere.");
             }
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     event.setIdEvent(generatedKeys.getInt(1));
+                    System.out.println("Event ajoute avec succes. id_event=" + event.getIdEvent());
                 }
             }
-
-            System.out.println("Event ajoute avec succes. id_event=" + event.getIdEvent());
         } catch (SQLException e) {
-            logSqlError("ajout", sql, e);
+            logSqlError(sql, e);
             throw new RuntimeException("Echec SQL lors de l'ajout de l'evenement.", e);
         }
     }
 
     public void update(Event event) {
-        String sql = "UPDATE events SET titre = ?, description = ?, date_event = ?, lieu = ?, capacite = ?, "
-                + "type_event = ?, image_event = ?, prix_event = ?, is_premium = ? WHERE id_event = ?";
+        String sql = "UPDATE events SET titre=?, description=?, date_event=?, lieu=?, capacite=?, type_event=?, image_event=?, prix_event=?, created_at=?, is_premium=? " +
+                "WHERE id_event=?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
-            fillStatementForWrite(statement, event, false);
-            statement.setInt(10, event.getIdEvent());
+            fillStatementForWrite(statement, event);
+            statement.setInt(11, event.getIdEvent());
 
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Aucun evenement trouve avec id_event=" + event.getIdEvent() + ".");
+                throw new SQLException("Aucun evenement modifie pour id_event=" + event.getIdEvent());
             }
 
             System.out.println("Event mis a jour avec succes. id_event=" + event.getIdEvent());
         } catch (SQLException e) {
-            logSqlError("mise a jour", sql, e);
-            throw new RuntimeException("Echec SQL lors de la mise a jour de l'evenement.", e);
+            logSqlError(sql, e);
+            throw new RuntimeException("Echec SQL lors de la modification de l'evenement.", e);
         }
     }
 
     public void delete(int idEvent) {
-        String sql = "DELETE FROM events WHERE id_event = ?";
+        String sql = "DELETE FROM events WHERE id_event=?";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, idEvent);
 
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
-                throw new SQLException("Aucun evenement supprime avec id_event=" + idEvent + ".");
+                throw new SQLException("Aucun evenement supprime pour id_event=" + idEvent);
             }
 
             System.out.println("Event supprime avec succes. id_event=" + idEvent);
         } catch (SQLException e) {
-            logSqlError("suppression", sql, e);
+            logSqlError(sql, e);
             throw new RuntimeException("Echec SQL lors de la suppression de l'evenement.", e);
         }
     }
 
+    public Event findById(int idEvent) {
+        String sql = "SELECT id_event, titre, description, date_event, lieu, capacite, type_event, image_event, prix_event, created_at, is_premium " +
+                "FROM events WHERE id_event=?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, idEvent);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapEvent(resultSet);
+                }
+            }
+        } catch (SQLException e) {
+            logSqlError(sql, e);
+            throw new RuntimeException("Echec SQL lors de la recherche de l'evenement.", e);
+        }
+
+        return null;
+    }
+
     public List<Event> getAll() {
-        String sql = BASE_SELECT + " ORDER BY id_event DESC";
+        String sql = "SELECT id_event, titre, description, date_event, lieu, capacite, type_event, image_event, prix_event, created_at, is_premium " +
+                "FROM events ORDER BY id_event DESC";
         List<Event> events = new ArrayList<>();
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
 
             while (resultSet.next()) {
-                events.add(mapResultSetToEvent(resultSet));
+                events.add(mapEvent(resultSet));
             }
         } catch (SQLException e) {
-            logSqlError("chargement", sql, e);
+            logSqlError(sql, e);
             throw new RuntimeException("Echec SQL lors du chargement des evenements.", e);
         }
 
         return events;
+    }
+
+    public List<Event> findAll() {
+        return getAll();
     }
 
     public void addEvent(Event event) {
@@ -119,35 +140,41 @@ public class EventDAO {
         delete(idEvent);
     }
 
+    public void deleteById(int idEvent) {
+        delete(idEvent);
+    }
+
     public List<Event> getAllEvents() {
         return getAll();
     }
 
-    private void fillStatementForWrite(PreparedStatement statement, Event event, boolean includeCreatedAt) throws SQLException {
-        LocalDate dateEvent = event.getDateEvent();
-        LocalDateTime createdAt = event.getCreatedAt() != null ? event.getCreatedAt() : LocalDateTime.now();
-        event.setCreatedAt(createdAt);
-
+    private void fillStatementForWrite(PreparedStatement statement, Event event) throws SQLException {
         statement.setString(1, event.getTitre());
         statement.setString(2, event.getDescription());
-        statement.setDate(3, Date.valueOf(dateEvent));
+
+        LocalDate dateEvent = event.getDateEvent();
+        if (dateEvent != null) {
+            statement.setDate(3, Date.valueOf(dateEvent));
+        } else {
+            statement.setDate(3, null);
+        }
+
         statement.setString(4, event.getLieu());
         statement.setInt(5, event.getCapacite());
         statement.setString(6, event.getTypeEvent());
         statement.setString(7, event.getImageEvent());
         statement.setDouble(8, event.getPrixEvent());
 
-        if (includeCreatedAt) {
-            statement.setTimestamp(9, Timestamp.valueOf(createdAt));
-            statement.setBoolean(10, event.isPremium());
-        } else {
-            statement.setBoolean(9, event.isPremium());
-        }
+        LocalDateTime createdAt = event.getCreatedAt() != null ? event.getCreatedAt() : LocalDateTime.now();
+        statement.setTimestamp(9, Timestamp.valueOf(createdAt));
+
+        statement.setBoolean(10, event.isPremium());
     }
 
-    private Event mapResultSetToEvent(ResultSet resultSet) throws SQLException {
+    private Event mapEvent(ResultSet resultSet) throws SQLException {
         Timestamp createdAtTimestamp = resultSet.getTimestamp("created_at");
         LocalDateTime createdAt = createdAtTimestamp != null ? createdAtTimestamp.toLocalDateTime() : null;
+
         Date sqlDate = resultSet.getDate("date_event");
         LocalDate dateEvent = sqlDate != null ? sqlDate.toLocalDate() : null;
 
@@ -166,8 +193,8 @@ public class EventDAO {
         );
     }
 
-    private void logSqlError(String operation, String sql, SQLException e) {
-        System.err.println("Erreur SQL lors de la " + operation + " d'un event.");
+    private void logSqlError(String sql, SQLException e) {
+        System.err.println("Erreur SQL sur events.");
         System.err.println("SQL : " + sql);
         System.err.println("Message : " + e.getMessage());
         System.err.println("SQLState : " + e.getSQLState());

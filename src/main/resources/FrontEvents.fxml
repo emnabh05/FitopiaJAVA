@@ -14,41 +14,69 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="front-scroll" xmlns="http://javafx.com/javafx/22.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.Pidev3A49.controllers.FrontEventsController">
+<ScrollPane fitToHeight="true"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            styleClass="front-scroll"
+            xmlns="http://javafx.com/javafx/22.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.FrontEventsController">
     <content>
-        <VBox fillWidth="true" spacing="22.0" styleClass="front-root">
+        <VBox fillWidth="true" spacing="24.0" styleClass="front-root">
             <padding>
-                <Insets top="24.0" right="26.0" bottom="28.0" left="26.0" />
+                <Insets top="24.0" right="26.0" bottom="32.0" left="26.0" />
             </padding>
+
             <children>
-                <HBox alignment="CENTER_LEFT" spacing="22.0" styleClass="front-hero">
+                <HBox alignment="CENTER_LEFT" spacing="18.0" styleClass="front-topbar">
                     <children>
-                        <VBox maxWidth="700.0" spacing="12.0">
+                        <VBox spacing="4.0">
                             <children>
-                                <Label text="Wellness Events" styleClass="front-eyebrow" />
+                                <Label text="FITOPIA EVENTS" styleClass="front-brand" />
+                                <Label text="Front client avec affichage dynamique des evenements de la base." styleClass="front-topbar-text" />
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                            <children>
+                                <Label fx:id="heroTotalEventsLabel" text="0 evenements" styleClass="topbar-chip" />
+                                <Label fx:id="heroOpenEventsLabel" text="0 ouverts" styleClass="topbar-chip topbar-chip-success" />
+                                <Label fx:id="heroPremiumEventsLabel" text="0 premium" styleClass="topbar-chip topbar-chip-accent" />
+                            </children>
+                        </HBox>
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="28.0" styleClass="front-hero">
+                    <children>
+                        <VBox maxWidth="700.0" spacing="14.0">
+                            <children>
+                                <Label text="FITOPIA EVENTS 2026" styleClass="front-eyebrow" />
                                 <Label text="Move With Purpose. Book Your Next Wellness Event." wrapText="true" styleClass="front-hero-title" />
-                                <Label text="Explore experiences designed around movement, mindfulness and community. Discover premium events, trending sessions and the next moment worth booking." wrapText="true" styleClass="front-hero-subtitle" />
+                                <Label text="Tous les evenements enregistres dans la base sont affiches ici automatiquement. Le client peut rechercher, filtrer, consulter les details et reserver sa place en quelques secondes." wrapText="true" styleClass="front-hero-subtitle" />
                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <children>
-                                        <Button mnemonicParsing="false" onAction="#scrollToEvents" styleClass="front-primary-button" text="Explore Events" />
-                                        <Button mnemonicParsing="false" onAction="#focusUpcomingCard" styleClass="front-secondary-button" text="Register Next Event" />
+                                        <Button mnemonicParsing="false" onAction="#scrollToEvents" styleClass="front-primary-button" text="EXPLORE EVENTS" />
+                                        <Button mnemonicParsing="false" onAction="#focusUpcomingCard" styleClass="front-secondary-button" text="REGISTER NEXT EVENT" />
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" spacing="8.0">
                                     <children>
-                                        <Label text="Curated Picks" styleClass="front-chip" />
-                                        <Label text="Premium Wellness" styleClass="front-chip" />
-                                        <Label text="Live Availability" styleClass="front-chip" />
+                                        <Label text="Live Database Sync" styleClass="front-chip" />
+                                        <Label text="Client Reservation" styleClass="front-chip" />
+                                        <Label text="CRUD Compatible" styleClass="front-chip" />
                                     </children>
                                 </HBox>
                             </children>
                         </VBox>
+
                         <Region HBox.hgrow="ALWAYS" />
-                        <VBox fx:id="upcomingEventCard" minWidth="340.0" prefWidth="360.0" spacing="12.0" styleClass="upcoming-card">
+
+                        <VBox fx:id="upcomingEventCard" minWidth="360.0" prefWidth="390.0" spacing="12.0" styleClass="upcoming-card">
                             <children>
                                 <Label text="Next Upcoming Event" styleClass="upcoming-kicker" />
                                 <Label fx:id="upcomingTitleLabel" text="No upcoming event available" wrapText="true" styleClass="upcoming-title" />
-                                <VBox spacing="7.0">
+                                <VBox spacing="8.0">
                                     <children>
                                         <Label fx:id="upcomingDateLabel" text="Date: -" styleClass="upcoming-meta" />
                                         <Label fx:id="upcomingLocationLabel" text="Lieu: -" styleClass="upcoming-meta" />
@@ -57,45 +85,46 @@
                                     </children>
                                 </VBox>
                                 <Label fx:id="upcomingDescriptionLabel" text="The next event will appear here." wrapText="true" styleClass="upcoming-description" />
+                                <Button mnemonicParsing="false" onAction="#focusUpcomingCard" styleClass="upcoming-button" text="RESERVER CET EVENEMENT" />
                             </children>
                         </VBox>
                     </children>
                 </HBox>
 
-                <VBox spacing="16.0" styleClass="front-section">
+                <VBox fx:id="eventsSectionAnchor" spacing="16.0" styleClass="front-section">
                     <children>
                         <HBox alignment="CENTER_LEFT" spacing="14.0">
                             <children>
                                 <VBox spacing="4.0">
                                     <children>
-                                        <Label text="Discover Events" styleClass="front-section-title" />
-                                        <Label text="Search, filter and browse your next wellness experience." styleClass="front-section-subtitle" />
+                                        <Label text="Nos evenements" styleClass="front-section-title" />
+                                        <Label text="Tous les evenements sauvegardes dans la base sont listes ici avec leur disponibilite." styleClass="front-section-subtitle" />
                                     </children>
                                 </VBox>
                                 <Region HBox.hgrow="ALWAYS" />
-                                <Label fx:id="resultCountLabel" text="0 events" styleClass="result-count-chip" />
+                                <Label fx:id="resultCountLabel" text="0 evenements" styleClass="result-count-chip" />
                             </children>
                         </HBox>
 
                         <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="filter-bar">
                             <children>
-                                <TextField fx:id="searchField" promptText="Search by title, type, location..." styleClass="front-search-field" HBox.hgrow="ALWAYS" />
-                                <ComboBox fx:id="categoryFilter" prefWidth="150.0" promptText="Category" styleClass="front-filter-box" />
-                                <DatePicker fx:id="dateFilter" prefWidth="150.0" styleClass="front-filter-box" />
-                                <ComboBox fx:id="priceFilter" prefWidth="140.0" promptText="Price" styleClass="front-filter-box" />
-                                <ComboBox fx:id="sortFilter" prefWidth="160.0" promptText="Sort" styleClass="front-filter-box" />
-                                <Button mnemonicParsing="false" onAction="#resetFilters" styleClass="front-filter-reset" text="Reset" />
+                                <TextField fx:id="searchField" promptText="Search by title, location or category..." styleClass="front-search-field" HBox.hgrow="ALWAYS" />
+                                <ComboBox fx:id="categoryFilter" prefWidth="180.0" promptText="Category" styleClass="front-filter-box" />
+                                <DatePicker fx:id="dateFilter" prefWidth="160.0" styleClass="front-filter-box" />
+                                <ComboBox fx:id="priceFilter" prefWidth="150.0" promptText="Price" styleClass="front-filter-box" />
+                                <ComboBox fx:id="sortFilter" prefWidth="200.0" promptText="Sort" styleClass="front-filter-box" />
+                                <Button mnemonicParsing="false" onAction="#resetFilters" styleClass="front-filter-reset" text="RESET" />
                             </children>
                         </HBox>
 
-                        <FlowPane fx:id="cardsContainer" hgap="18.0" prefWrapLength="1320.0" vgap="18.0" />
+                        <FlowPane fx:id="cardsContainer" hgap="22.0" prefWrapLength="1420.0" vgap="22.0" />
 
                         <StackPane fx:id="emptyStateBox" managed="false" visible="false" styleClass="front-empty-state">
                             <children>
                                 <VBox alignment="CENTER" spacing="8.0">
                                     <children>
                                         <Label text="No events match your filters" styleClass="front-empty-title" />
-                                        <Label text="Try adjusting your search or reset the filters to explore all available events." wrapText="true" styleClass="front-empty-text" />
+                                        <Label text="Try adjusting your search or reset the filters to display all events from the database." wrapText="true" styleClass="front-empty-text" />
                                     </children>
                                 </VBox>
                             </children>

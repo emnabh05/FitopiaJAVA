@@ -59,6 +59,9 @@ public class FrontEventsController implements Initializable {
     @FXML private Label upcomingDescriptionLabel;
 
     @FXML private Label resultCountLabel;
+    @FXML private Label heroTotalEventsLabel;
+    @FXML private Label heroOpenEventsLabel;
+    @FXML private Label heroPremiumEventsLabel;
 
     @FXML private TextField searchField;
     @FXML private ComboBox<String> categoryFilter;
@@ -74,6 +77,7 @@ public class FrontEventsController implements Initializable {
     private final ParticipationService participationService = new ParticipationService();
 
     private final List<Event> allEvents = new ArrayList<>();
+    private final List<Event> currentFilteredEvents = new ArrayList<>();
     private final Map<Integer, Long> participationCountByEvent = new HashMap<>();
     private final Set<Integer> favoriteEventIds = new HashSet<>();
 
@@ -107,7 +111,10 @@ public class FrontEventsController implements Initializable {
     @FXML
     private void focusUpcomingCard() {
         Platform.runLater(() -> {
-            if (upcomingEventCard != null) {
+            Event nextEvent = getNextUpcomingEvent(currentFilteredEvents);
+            if (nextEvent != null) {
+                openReservationWindow(nextEvent);
+            } else if (upcomingEventCard != null) {
                 upcomingEventCard.requestFocus();
             }
         });
@@ -194,10 +201,13 @@ public class FrontEventsController implements Initializable {
                 .sorted(getComparator())
                 .collect(Collectors.toList());
 
+        currentFilteredEvents.clear();
+        currentFilteredEvents.addAll(filtered);
         renderUpcomingEvent(filtered);
         renderCards(filtered);
+        updateHeroStats(filtered);
 
-        resultCountLabel.setText(filtered.size() + (filtered.size() == 1 ? " event" : " events"));
+        resultCountLabel.setText(filtered.size() + (filtered.size() == 1 ? " evenement" : " evenements"));
         emptyStateBox.setVisible(filtered.isEmpty());
         emptyStateBox.setManaged(filtered.isEmpty());
     }
@@ -266,18 +276,15 @@ public class FrontEventsController implements Initializable {
     }
 
     private void renderUpcomingEvent(List<Event> filtered) {
-        Event next = filtered.stream()
-                .filter(event -> event.getDateEvent() != null)
-                .min(Comparator.comparing(Event::getDateEvent))
-                .orElse(filtered.isEmpty() ? null : filtered.get(0));
+        Event next = getNextUpcomingEvent(filtered);
 
         if (next == null) {
-            upcomingTitleLabel.setText("No event available");
+            upcomingTitleLabel.setText("Aucun evenement disponible");
             upcomingDateLabel.setText("Date: -");
             upcomingLocationLabel.setText("Lieu: -");
             upcomingParticipantsLabel.setText("Participants: -");
             upcomingPriceLabel.setText("Prix: -");
-            upcomingDescriptionLabel.setText("Try broadening your filters to see the next available experience.");
+            upcomingDescriptionLabel.setText("Elargis les filtres pour afficher le prochain evenement disponible.");
             return;
         }
 
@@ -287,6 +294,20 @@ public class FrontEventsController implements Initializable {
         upcomingParticipantsLabel.setText("Participants: " + getParticipantCount(next) + "/" + next.getCapacite());
         upcomingPriceLabel.setText("Prix: " + formatPrice(next.getPrixEvent()));
         upcomingDescriptionLabel.setText(trimDescription(next.getDescription(), 120));
+    }
+
+    private void updateHeroStats(List<Event> filtered) {
+        long openEvents = filtered.stream()
+                .filter(event -> getRemainingPlaces(event) > 0)
+                .count();
+
+        long premiumEvents = filtered.stream()
+                .filter(Event::isPremium)
+                .count();
+
+        heroTotalEventsLabel.setText(filtered.size() + (filtered.size() == 1 ? " evenement" : " evenements"));
+        heroOpenEventsLabel.setText(openEvents + (openEvents == 1 ? " ouvert" : " ouverts"));
+        heroPremiumEventsLabel.setText(premiumEvents + " premium");
     }
 
     private void renderCards(List<Event> events) {
@@ -379,9 +400,9 @@ public class FrontEventsController implements Initializable {
         );
         reserveButton.setOnAction(actionEvent -> openReservationWindow(event));
 
-        Button priorityButton = new Button("Reservation prioritaire");
+        Button priorityButton = new Button(getRemainingPlaces(event) > 0 ? "Reservation prioritaire" : "Liste d'attente");
         priorityButton.getStyleClass().add("front-card-priority-button");
-        priorityButton.setDisable(true);
+        priorityButton.setDisable(getRemainingPlaces(event) > 0);
 
         bottomRow.getChildren().addAll(priceBox, infoButton, reserveButton, priorityButton);
 
@@ -511,11 +532,19 @@ public class FrontEventsController implements Initializable {
             stage.setScene(scene);
             stage.setMinWidth(1000);
             stage.setMinHeight(700);
+            stage.setOnHidden(windowEvent -> loadData());
             stage.show();
         } catch (Exception e) {
             showInfo("Opening error", "The reservation view could not be opened.");
             e.printStackTrace();
         }
+    }
+
+    private Event getNextUpcomingEvent(List<Event> events) {
+        return events.stream()
+                .filter(event -> event.getDateEvent() != null)
+                .min(Comparator.comparing(Event::getDateEvent))
+                .orElse(events.isEmpty() ? null : events.get(0));
     }
 
     private boolean contains(String source, String search) {
@@ -536,7 +565,7 @@ public class FrontEventsController implements Initializable {
 
     private String trimDescription(String description, int maxLength) {
         if (description == null || description.isBlank()) {
-            return "A curated wellness event designed to energize movement, connection and recovery.";
+            return "Un evenement wellness pense pour le mouvement, la communaute et une reservation rapide.";
         }
         String trimmed = description.trim();
         return trimmed.length() <= maxLength ? trimmed : trimmed.substring(0, maxLength - 3) + "...";
@@ -544,9 +573,9 @@ public class FrontEventsController implements Initializable {
 
     private String buildRatingText(Event event) {
         if (event.isPremium()) {
-            return "★★★★★ 5.0/5";
+            return "Top note 5.0/5";
         }
-        return "☆☆☆☆☆ 0.0/5";
+        return "Nouvel event 0.0/5";
     }
 
     private void showInfo(String title, String message) {

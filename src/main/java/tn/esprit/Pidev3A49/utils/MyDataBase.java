@@ -37,4 +37,8 @@ public class MyDataBase {
             throw new RuntimeException("Impossible de se connecter a la base fitopiabd : " + e.getMessage(), e);
         }
     }
+
+    public Connection getCnx() {
+        return getConnection();
+    }
 }

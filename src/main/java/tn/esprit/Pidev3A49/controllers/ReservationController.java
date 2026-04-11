@@ -11,7 +11,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.models.Event;
+import tn.esprit.Pidev3A49.models.Participation;
 import tn.esprit.Pidev3A49.models.Reservation;
+import tn.esprit.Pidev3A49.service.ParticipationService;
 import tn.esprit.Pidev3A49.service.ReservationService;
 
 import java.io.File;
@@ -46,6 +48,7 @@ public class ReservationController {
     @FXML private Label feedbackLabel;
 
     private final ReservationService reservationService = new ReservationService();
+    private final ParticipationService participationService = new ParticipationService();
 
     private Event event;
     private int remainingPlaces;
@@ -67,17 +70,27 @@ public class ReservationController {
             String lastName = requireText(fullNameField.getText(), "Le nom est obligatoire.");
             String firstName = requireText(firstNameField.getText(), "Le prenom est obligatoire.");
             String fullParticipantName = (lastName + " " + firstName).trim();
+            String email = requireEmail(emailField.getText());
+            String initialStatus = remainingPlaces > 0 ? "confirmee" : "en_attente";
 
             Reservation reservation = new Reservation(
                     event.getIdEvent(),
                     fullParticipantName,
-                    requireEmail(emailField.getText()),
+                    email,
                     LocalDateTime.now(),
                     event.getPrixEvent(),
-                    remainingPlaces > 0 ? "confirmee" : "en_attente"
+                    initialStatus
             );
 
             reservationService.add(reservation);
+            if (remainingPlaces > 0) {
+                participationService.add(new Participation(
+                        event.getIdEvent(),
+                        fullParticipantName,
+                        email,
+                        LocalDateTime.now()
+                ));
+            }
 
             feedbackLabel.setText(
                     (remainingPlaces > 0 ? "Reservation confirmee" : "Demande ajoutee en attente")

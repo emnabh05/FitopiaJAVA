@@ -123,6 +123,8 @@ public class MainController implements Initializable {
     @FXML private Label completeEventsLabel;
     @FXML private Label premiumEventsLabel;
     @FXML private Label statusLabel;
+    @FXML private Label pageTitleLabel;
+    @FXML private Label pageSubtitleLabel;
     @FXML private FlowPane crudCardsRow;
 
     private final EventService eventService = new EventService();
@@ -589,6 +591,10 @@ public class MainController implements Initializable {
         setWorkspaceActive(true);
         setSidebarContext(true, false, false);
         setQuickAccessMode(null);
+        updatePageHero(
+                "Admin Dashboard",
+                "Welcome to Fitopia Admin. Manage your platform, monitor key areas, and keep Fitopia running smoothly."
+        );
         statusLabel.setText("Page Tables active. Selectionne une section de gestion depuis la sidebar.");
     }
 
@@ -600,6 +606,10 @@ public class MainController implements Initializable {
         setWorkspaceActive(true);
         setSidebarContext(false, true, false);
         setQuickAccessMode(null);
+        updatePageHero(
+                "Events Management",
+                "Centralize event dashboard, create/update forms, and CRUD in one admin page."
+        );
         statusLabel.setText("Gestion des evenements ouverte. Choisis Create, Update, Delete ou Dashboard.");
     }
 
@@ -609,6 +619,10 @@ public class MainController implements Initializable {
         setWorkspaceActive(false);
         setSidebarContext(false, false, true);
         setQuickAccessMode(null);
+        updatePageHero(
+                "Participation Dashboard",
+                "Review registrations and participant activity linked to your events."
+        );
         participantSearchField.requestFocus();
         statusLabel.setText("Section participation active.");
     }
@@ -734,6 +748,9 @@ public class MainController implements Initializable {
     }
 
     private void toggleStyleClass(Button button, String styleClass, boolean active) {
+        if (button == null) {
+            return;
+        }
         if (active) {
             if (!button.getStyleClass().contains(styleClass)) {
                 button.getStyleClass().add(styleClass);
@@ -1002,5 +1019,14 @@ public class MainController implements Initializable {
     private void hideCrudCards() {
         crudCardsRow.setVisible(false);
         crudCardsRow.setManaged(false);
+    }
+
+    private void updatePageHero(String title, String subtitle) {
+        if (pageTitleLabel != null) {
+            pageTitleLabel.setText(title);
+        }
+        if (pageSubtitleLabel != null) {
+            pageSubtitleLabel.setText(subtitle);
+        }
     }
 }

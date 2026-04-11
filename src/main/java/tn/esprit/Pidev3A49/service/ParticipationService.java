@@ -7,13 +7,25 @@ import java.util.List;
 
 public class ParticipationService {
 
-    private final ParticipationDAO participationDAO;
+    private final ParticipationDAO participationDAO = new ParticipationDAO();
 
-    public ParticipationService() {
-        this.participationDAO = new ParticipationDAO();
+    public void add(Participation participation) {
+        participationDAO.add(participation);
+    }
+
+    public void update(Participation participation) {
+        participationDAO.update(participation);
+    }
+
+    public void delete(int idParticipation) {
+        participationDAO.deleteById(idParticipation);
+    }
+
+    public Participation getById(int idParticipation) {
+        return participationDAO.findById(idParticipation);
     }
 
     public List<Participation> getAll() {
-        return participationDAO.getAll();
+        return participationDAO.findAll();
     }
 }

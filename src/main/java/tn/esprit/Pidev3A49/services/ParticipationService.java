@@ -31,7 +31,7 @@ public class ParticipationService {
     }
 
     public Optional<Participation> findById(int id) throws SQLException {
-        return participationDAO.findById(id);
+        return Optional.ofNullable(participationDAO.findById(id));
     }
 
     public List<Participation> findAll() throws SQLException {

@@ -1,167 +1,406 @@
 .root {
     -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-background-color: linear-gradient(to bottom right, #eff8f4 0%, #f7fbff 58%, #edf5fb 100%);
 }
 
-.reservation-root {
-    -fx-background-color:
-            radial-gradient(center 88% 8%, radius 30%, rgba(220, 235, 227, 0.70), transparent 62%),
-            linear-gradient(to bottom right, #f5faf7 0%, #edf5f0 58%, #f9fcfa 100%);
-}
-
-.reservation-event-pane,
-.reservation-form-card,
-.reservation-summary-card {
-    -fx-background-color: white;
-    -fx-background-radius: 28px;
-    -fx-border-radius: 28px;
-    -fx-border-color: #e3ece7;
-    -fx-border-width: 1;
-    -fx-effect: dropshadow(gaussian, rgba(18, 52, 45, 0.08), 22, 0.14, 0, 7);
-}
-
-.reservation-event-pane {
+.front-scroll {
+    -fx-background: transparent;
     -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-effect: none;
+    -fx-padding: 0;
 }
 
-.reservation-media {
+.front-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.front-root {
     -fx-background-color:
-            radial-gradient(center 90% 12%, radius 28%, rgba(255, 255, 255, 0.18), transparent 54%),
-            linear-gradient(to bottom right, #16483b 0%, #2c725d 100%);
-    -fx-background-radius: 28px;
-    -fx-border-radius: 28px;
+        radial-gradient(center 16% 8%, radius 38%, rgba(209, 246, 228, 0.95), transparent 60%),
+        radial-gradient(center 90% 18%, radius 34%, rgba(215, 232, 255, 0.88), transparent 54%),
+        linear-gradient(to bottom right, #eef8f4 0%, #f7fbff 55%, #edf5fb 100%);
 }
 
-.reservation-media-overlay {
+.front-topbar {
+    -fx-background-color: rgba(255, 255, 255, 0.76);
+    -fx-background-radius: 22px;
+    -fx-border-color: rgba(23, 71, 59, 0.10);
+    -fx-border-radius: 22px;
+    -fx-padding: 14 18;
+}
+
+.front-brand {
+    -fx-text-fill: #143c32;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-letter-spacing: 1.4px;
+}
+
+.front-topbar-text {
+    -fx-text-fill: #6c8279;
+    -fx-font-size: 12px;
+}
+
+.topbar-chip {
+    -fx-background-color: white;
+    -fx-background-radius: 999px;
+    -fx-border-color: #dfe8e3;
+    -fx-border-radius: 999px;
+    -fx-padding: 8 12;
+    -fx-text-fill: #24483d;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.topbar-chip-success {
+    -fx-background-color: #e5f7ee;
+    -fx-border-color: #c7ead6;
+    -fx-text-fill: #1e7352;
+}
+
+.topbar-chip-accent {
+    -fx-background-color: #eef4ff;
+    -fx-border-color: #d4def2;
+    -fx-text-fill: #37578b;
+}
+
+.front-hero {
     -fx-background-color:
-            linear-gradient(to top, rgba(12, 34, 29, 0.58) 0%, rgba(12, 34, 29, 0.10) 100%);
-    -fx-background-radius: 28px;
-    -fx-padding: 22;
+        radial-gradient(center 94% 10%, radius 28%, rgba(255, 255, 255, 0.16), transparent 60%),
+        linear-gradient(to right, #103f3d 0%, #167158 48%, #49c999 100%);
+    -fx-background-radius: 38px;
+    -fx-border-radius: 38px;
+    -fx-padding: 34 34 34 34;
+    -fx-effect: dropshadow(gaussian, rgba(27, 83, 69, 0.18), 42, 0.18, 0, 16);
 }
 
-.reservation-eyebrow {
+.front-eyebrow {
     -fx-background-color: rgba(255, 255, 255, 0.14);
     -fx-background-radius: 999px;
-    -fx-text-fill: #eef8f3;
+    -fx-padding: 8 14;
+    -fx-text-fill: #e9f9f3;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.front-hero-title {
+    -fx-text-fill: #031917;
+    -fx-font-size: 40px;
+    -fx-font-weight: 900;
+}
+
+.front-hero-subtitle {
+    -fx-text-fill: rgba(255, 255, 255, 0.92);
+    -fx-font-size: 15px;
+    -fx-line-spacing: 3px;
+    -fx-max-width: 620px;
+}
+
+.front-primary-button,
+.front-secondary-button,
+.upcoming-button,
+.front-filter-reset,
+.front-card-info-button,
+.front-card-primary-button,
+.front-card-waitlist-button,
+.front-card-priority-button {
+    -fx-cursor: hand;
+    -fx-font-weight: 800;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+}
+
+.front-primary-button {
+    -fx-background-color: white;
+    -fx-text-fill: #153f35;
+    -fx-padding: 14 22;
+    -fx-font-size: 13px;
+}
+
+.front-secondary-button {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.24);
+    -fx-text-fill: #eefbf5;
+    -fx-padding: 14 22;
+    -fx-font-size: 13px;
+}
+
+.front-chip {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 999px;
+    -fx-padding: 7 12;
+    -fx-text-fill: #f3fbf7;
     -fx-font-size: 11px;
-    -fx-font-weight: 800;
-    -fx-padding: 6 10;
+    -fx-font-weight: 700;
 }
 
-.reservation-title {
-    -fx-text-fill: white;
-    -fx-font-size: 28px;
-    -fx-font-weight: 800;
-}
-
-.reservation-summary-card,
-.reservation-form-card {
+.upcoming-card {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 28px;
+    -fx-border-color: rgba(255, 255, 255, 0.24);
+    -fx-border-radius: 28px;
     -fx-padding: 22;
 }
 
-.reservation-section-title,
-.reservation-form-title {
-    -fx-text-fill: #173b31;
+.upcoming-kicker {
+    -fx-text-fill: rgba(255, 255, 255, 0.80);
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.upcoming-title {
+    -fx-text-fill: #07211e;
     -fx-font-size: 22px;
-    -fx-font-weight: 800;
+    -fx-font-weight: 900;
 }
 
-.reservation-form-subtitle {
-    -fx-text-fill: #75877f;
-    -fx-font-size: 12px;
-}
-
-.reservation-meta {
-    -fx-text-fill: #48665d;
-    -fx-font-size: 12px;
-    -fx-font-weight: 700;
-}
-
-.reservation-description {
-    -fx-background-color: linear-gradient(to bottom, #f9fcfa 0%, #f3f8f5 100%);
-    -fx-background-radius: 18px;
-    -fx-border-color: #dfeae4;
-    -fx-border-radius: 18px;
-    -fx-border-width: 1;
-    -fx-padding: 10 12;
-    -fx-text-fill: #6d837a;
-    -fx-font-size: 12px;
-}
-
-.reservation-description .content {
-    -fx-background-color: transparent;
-}
-
-.reservation-label {
-    -fx-text-fill: #32544a;
-    -fx-font-size: 11px;
-    -fx-font-weight: 800;
-}
-
-.reservation-field {
-    -fx-background-color: linear-gradient(to bottom, #fbfdfc 0%, #f4f8f6 100%);
-    -fx-background-radius: 16px;
-    -fx-border-color: #dce8e1;
-    -fx-border-radius: 16px;
-    -fx-border-width: 1;
-    -fx-padding: 11 12;
-    -fx-text-fill: #183c32;
-    -fx-prompt-text-fill: #91a69c;
-}
-
-.reservation-field:focused {
-    -fx-background-color: white;
-    -fx-border-color: #92b6a5;
-    -fx-effect: dropshadow(gaussian, rgba(76, 122, 102, 0.12), 10, 0.16, 0, 2);
-}
-
-.reservation-price-panel {
-    -fx-background-color: #f5faf7;
-    -fx-background-radius: 20px;
-    -fx-border-color: #e2ece6;
-    -fx-border-radius: 20px;
-    -fx-border-width: 1;
-    -fx-padding: 14;
-}
-
-.reservation-price-label {
-    -fx-text-fill: #6f857d;
-    -fx-font-size: 11px;
-    -fx-font-weight: 700;
-}
-
-.reservation-price-value {
-    -fx-text-fill: #173d32;
-    -fx-font-size: 18px;
-    -fx-font-weight: 800;
-}
-
-.reservation-status-chip {
-    -fx-background-color: #ddf2e7;
-    -fx-background-radius: 999px;
-    -fx-text-fill: #1f704f;
-    -fx-font-size: 11px;
-    -fx-font-weight: 800;
-    -fx-padding: 6 10;
-}
-
-.reservation-confirm-button {
-    -fx-background-color: linear-gradient(to bottom, #17473b 0%, #215d4d 100%);
-    -fx-background-radius: 18px;
-    -fx-border-radius: 18px;
-    -fx-text-fill: white;
+.upcoming-meta {
+    -fx-text-fill: #eefaf5;
     -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.upcoming-description {
+    -fx-text-fill: rgba(255, 255, 255, 0.90);
+    -fx-font-size: 13px;
+    -fx-line-spacing: 2px;
+}
+
+.upcoming-button {
+    -fx-background-color: rgba(13, 55, 50, 0.52);
+    -fx-border-color: rgba(255, 255, 255, 0.24);
+    -fx-text-fill: white;
+    -fx-padding: 12 18;
+}
+
+.front-section {
+    -fx-spacing: 16;
+}
+
+.front-section-title {
+    -fx-text-fill: #17372f;
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+}
+
+.front-section-subtitle {
+    -fx-text-fill: #70867d;
+    -fx-font-size: 13px;
+}
+
+.result-count-chip {
+    -fx-background-color: white;
+    -fx-background-radius: 999px;
+    -fx-border-color: #dbe5e1;
+    -fx-border-radius: 999px;
+    -fx-padding: 9 14;
+    -fx-text-fill: #1e4439;
+    -fx-font-size: 12px;
     -fx-font-weight: 800;
-    -fx-cursor: hand;
-    -fx-padding: 12 16;
 }
 
-.reservation-confirm-button:hover {
-    -fx-background-color: #225646;
+.filter-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.92);
+    -fx-background-radius: 28px;
+    -fx-border-color: #dde8e2;
+    -fx-border-radius: 28px;
+    -fx-padding: 18;
+    -fx-effect: dropshadow(gaussian, rgba(57, 92, 79, 0.06), 18, 0.10, 0, 4);
 }
 
-.reservation-feedback {
-    -fx-text-fill: #60776e;
+.front-search-field,
+.front-filter-box {
+    -fx-background-color: linear-gradient(to bottom, #ffffff 0%, #f7fbf9 100%);
+    -fx-background-radius: 18px;
+    -fx-border-color: #d9e4de;
+    -fx-border-radius: 18px;
+    -fx-padding: 11 14;
+    -fx-text-fill: #1a3f35;
+    -fx-prompt-text-fill: #8ea096;
+    -fx-font-size: 13px;
+}
+
+.front-filter-reset {
+    -fx-background-color: linear-gradient(to bottom, #153f35 0%, #1d5a4a 100%);
+    -fx-text-fill: white;
+    -fx-padding: 12 18;
+    -fx-font-size: 12px;
+}
+
+.front-event-card {
+    -fx-background-color: white;
+    -fx-background-radius: 30px;
+    -fx-border-color: #dfe9e4;
+    -fx-border-radius: 30px;
+    -fx-effect: dropshadow(gaussian, rgba(38, 71, 60, 0.10), 26, 0.12, 0, 8);
+}
+
+.front-card-media {
+    -fx-background-color:
+        radial-gradient(center 80% 12%, radius 24%, rgba(255, 255, 255, 0.20), transparent 54%),
+        linear-gradient(to bottom right, #d7efe6 0%, #bddad2 100%);
+    -fx-background-radius: 30px 30px 0 0;
+    -fx-border-radius: 30px 30px 0 0;
+    -fx-pref-height: 340px;
+    -fx-min-height: 340px;
+    -fx-max-height: 340px;
+}
+
+.front-card-media .image-view {
+    -fx-background-radius: 30px 30px 0 0;
+}
+
+.front-badge-bar {
+    -fx-max-width: 630px;
+}
+
+.front-badge {
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 7 12;
     -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.front-badge-default {
+    -fx-background-color: rgba(255, 255, 255, 0.90);
+    -fx-text-fill: #29463d;
+}
+
+.front-badge-premium {
+    -fx-background-color: #fff2df;
+    -fx-border-color: #f5c583;
+    -fx-text-fill: #ba5f11;
+}
+
+.front-badge-full {
+    -fx-background-color: #ffe6e5;
+    -fx-border-color: #f2beb9;
+    -fx-text-fill: #cf4d49;
+}
+
+.front-badge-trending {
+    -fx-background-color: #e2faf3;
+    -fx-border-color: #bce9dc;
+    -fx-text-fill: #0e8c6d;
+}
+
+.front-badge-recommended {
+    -fx-background-color: #e5faf8;
+    -fx-border-color: #a4ebe2;
+    -fx-text-fill: #10887d;
+}
+
+.front-badge-new {
+    -fx-background-color: #eef0ff;
+    -fx-border-color: #cfd5ff;
+    -fx-text-fill: #5b62e6;
+}
+
+.front-card-title {
+    -fx-text-fill: #19324d;
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+}
+
+.front-status-open,
+.front-status-full {
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 8 14;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.front-status-open {
+    -fx-background-color: #e4f8ee;
+    -fx-text-fill: #1d8b5e;
+}
+
+.front-status-full {
+    -fx-background-color: #ffe9e8;
+    -fx-text-fill: #d25750;
+}
+
+.front-soft-badge {
+    -fx-background-color: linear-gradient(to bottom, #f8fbfd 0%, #eef3f7 100%);
+    -fx-background-radius: 999px;
+    -fx-border-color: #d8e1ea;
+    -fx-border-radius: 999px;
+    -fx-padding: 9 14;
+    -fx-text-fill: #50627d;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.front-card-description {
+    -fx-text-fill: #6a7b94;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 2px;
+}
+
+.front-big-price {
+    -fx-text-fill: #177a62;
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+}
+
+.front-card-info-button {
+    -fx-background-color: linear-gradient(to bottom, #0f4b46 0%, #187766 100%);
+    -fx-text-fill: white;
+    -fx-padding: 14 24;
+}
+
+.front-card-primary-button {
+    -fx-background-color: linear-gradient(to bottom, #1c5fa3 0%, #2d86d4 100%);
+    -fx-text-fill: white;
+    -fx-padding: 14 24;
+}
+
+.front-card-waitlist-button,
+.front-card-priority-button {
+    -fx-background-color: linear-gradient(to bottom, #f8fbff 0%, #eef2f8 100%);
+    -fx-border-color: #d7dfe9;
+    -fx-text-fill: #50627d;
+    -fx-padding: 14 20;
+}
+
+.front-card-placeholder {
+    -fx-background-color:
+        radial-gradient(center 86% 10%, radius 28%, rgba(255, 255, 255, 0.18), transparent 54%),
+        linear-gradient(to bottom right, #103f3d 0%, #41ad87 100%);
+    -fx-background-radius: 30px 30px 0 0;
+}
+
+.front-placeholder-kicker {
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+    -fx-background-radius: 999px;
+    -fx-padding: 7 11;
+    -fx-text-fill: #effaf6;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.front-placeholder-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+}
+
+.front-empty-state {
+    -fx-background-color: rgba(255, 255, 255, 0.86);
+    -fx-background-radius: 28px;
+    -fx-border-color: #dfe8e3;
+    -fx-border-radius: 28px;
+    -fx-padding: 34;
+}
+
+.front-empty-title {
+    -fx-text-fill: #1f3f35;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+}
+
+.front-empty-text {
+    -fx-text-fill: #72857d;
+    -fx-font-size: 13px;
 }
