@@ -236,10 +236,7 @@
                                         <TableColumn fx:id="colRepasRegimeId" prefWidth="220.0" text="Regime"/>
                                     </columns>
                                 </TableView>
-                                               <HBox alignment="CENTER_RIGHT" spacing="10">
-                                                   <!-- Action bound to create repas form! -->
-                                                   <Button text="+ Ajouter un repas" onAction="#afficherCreationRepas" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 700; -fx-background-radius: 8; -fx-padding: 8 16;" />
-                                               </HBox>
+
                                           </VBox>
                                      </VBox>
                                  </VBox>

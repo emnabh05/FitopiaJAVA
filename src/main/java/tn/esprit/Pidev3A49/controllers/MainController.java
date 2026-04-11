@@ -304,6 +304,8 @@ public class MainController {
     private List<Repas> repasExplorerView = List.of();
     private Integer repasEditSelectionId;
     private int verresEau = 0;
+    private final List<Repas> sessionMeals = new java.util.ArrayList<>();
+
 
 
     @FXML
@@ -592,26 +594,7 @@ public class MainController {
 
     private void fusionnerRepasSiExiste(Repas nouveau) {
         if (nouveau == null) return;
-        User refUser = determinerUtilisateurReference();
-        List<Repas> duJour = filtrerRepasDuJour(refUser);
-        
-        Repas existing = duJour.stream()
-                .filter(r -> r.getRegimeId() != null && r.getRegimeId().equals(nouveau.getRegimeId()))
-                .findFirst()
-                .orElse(null);
-
-        if (existing != null) {
-            existing.setCalories(safeAdd(existing.getCalories(), nouveau.getCalories()));
-            existing.setProteines(safeAdd(existing.getProteines(), nouveau.getProteines()));
-            existing.setGlucides(safeAdd(existing.getGlucides(), nouveau.getGlucides()));
-            existing.setLipides(safeAdd(existing.getLipides(), nouveau.getLipides()));
-            existing.setNomRepas("Suivi nutritionnel du jour");
-            existing.setTypeRepas("Mixte");
-            serviceRepas.update(existing);
-        } else {
-            nouveau.setNomRepas("Suivi nutritionnel du jour");
-            serviceRepas.add(nouveau);
-        }
+        sessionMeals.add(nouveau);
     }
 
     private Integer safeAdd(Integer a, Integer b) {
@@ -1014,15 +997,10 @@ public class MainController {
     private void actualiserDashboardPlanner() {
         User referenceUser = determinerUtilisateurReference();
         RegimeAlimentaire activeRegime = getActualActiveRegime();
-        List<Repas> repasDuJour = filtrerRepasDuJour(referenceUser);
-        if (activeRegime != null) {
-            final Integer selectedRid = activeRegime.getId();
-            repasDuJour = repasDuJour.stream()
-                    .filter(r -> r.getRegimeId() != null && r.getRegimeId().equals(selectedRid))
-                    .toList();
-        }
+        List<Repas> repasDuJour = sessionMeals;
+
         
-        List<Repas> repasAffiches = repasDuJour.isEmpty() ? derniersRepas(referenceUser, 3) : repasDuJour.stream().limit(3).toList();
+        List<Repas> repasAffiches = repasDuJour;
 
         if (lblHeaderUser != null) {
             lblHeaderUser.setText(referenceUser == null ? "Nutrition profile" : valeurOuDefaut(referenceUser.getEmail(), "Nutrition profile"));
@@ -1449,15 +1427,17 @@ public class MainController {
 
         Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
         calories.getStyleClass().add("planner-meal-kcal");
+        calories.setStyle("-fx-text-fill: #059669;"); // Un peu de vert sur les calories
 
-        // Barre de calories "remplie jusqu'au complet" (as requested)
+        // Barre de calories verte
         ProgressBar pb = new ProgressBar(1.0);
         pb.setMaxWidth(Double.MAX_VALUE);
         pb.setPrefHeight(6);
-        pb.setStyle("-fx-accent: #0c3f44;"); // matching brand color
+        pb.setStyle("-fx-accent: #10b981;"); // Green
         
         VBox box = new VBox(6, title, meta, calories, pb);
         box.getStyleClass().add("planner-meal-card");
+        box.setStyle("-fx-border-color: #10b981; -fx-border-width: 0 0 0 6; -fx-background-color: #f0fdf4; -fx-background-radius: 12;");
         return box;
     }
 
