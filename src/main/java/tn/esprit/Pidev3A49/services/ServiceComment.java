@@ -69,6 +69,31 @@ public class ServiceComment implements IServices<Comment> {
         return comments;
     }
 
+    public List<Comment> getByForumId(int forumId) {
+        List<Comment> comments = new ArrayList<>();
+        String qry = """
+                SELECT c.id, c.content, f.id AS forum_id, f.title, f.content AS forum_content
+                FROM %s c
+                INNER JOIN %s f ON c.forum_id = f.id
+                WHERE f.id = ?
+                ORDER BY c.id DESC
+                """.formatted(TABLE_NAME, SchemaInitializer.FORUM_TABLE);
+
+        try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
+            pstm.setInt(1, forumId);
+
+            try (ResultSet rs = pstm.executeQuery()) {
+                while (rs.next()) {
+                    comments.add(mapResultSet(rs));
+                }
+            }
+        } catch (SQLException exception) {
+            throw new IllegalStateException("Impossible de recuperer les commentaires du forum " + forumId + ".", exception);
+        }
+
+        return comments;
+    }
+
     @Override
     public Comment getById(int id) {
         String qry = """

@@ -1,0 +1,238 @@
+.app-root {
+    -fx-background-color: linear-gradient(to bottom, #ecf7f2 0%, #f8fbff 42%, #eef5ff 100%);
+}
+
+.topbar {
+    -fx-background-color: rgba(255, 255, 255, 0.82);
+    -fx-background-radius: 0 0 24 24;
+    -fx-border-color: rgba(148, 163, 184, 0.2);
+    -fx-border-width: 0 0 1 0;
+}
+
+.brand-mark {
+    -fx-background-color: linear-gradient(to bottom right, #1b8f74, #0f4c45);
+    -fx-text-fill: white;
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-padding: 10 16;
+    -fx-background-radius: 999;
+}
+
+.brand-title {
+    -fx-font-size: 19px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #10213a;
+}
+
+.brand-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #5d728d;
+}
+
+.search-input,
+.text-input,
+.combo-input,
+.text-area-input,
+.quick-reply-input {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-border-color: #d8e3f1;
+    -fx-border-radius: 16;
+    -fx-padding: 12 16;
+    -fx-font-size: 13px;
+}
+
+.search-input {
+    -fx-min-width: 260;
+}
+
+.text-area-input,
+.quick-reply-input {
+    -fx-padding: 14 16;
+}
+
+.feed-scroll {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.feed-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.layout-shell {
+    -fx-background-color: transparent;
+}
+
+.hero-card,
+.sidebar-card,
+.feed-card {
+    -fx-background-color: rgba(255, 255, 255, 0.92);
+    -fx-background-radius: 28;
+    -fx-border-color: rgba(177, 196, 218, 0.55);
+    -fx-border-radius: 28;
+    -fx-effect: dropshadow(gaussian, rgba(16, 33, 58, 0.08), 26, 0.18, 0, 10);
+}
+
+.hero-card {
+    -fx-padding: 26 28;
+    -fx-background-color: linear-gradient(to bottom right, #113d35, #1e7b66 45%, #ccebdc 100%);
+}
+
+.hero-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: 800;
+}
+
+.hero-subtitle {
+    -fx-text-fill: rgba(255, 255, 255, 0.78);
+    -fx-font-size: 14px;
+    -fx-line-spacing: 2px;
+}
+
+.hero-stats {
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+    -fx-background-radius: 999;
+    -fx-padding: 10 14;
+}
+
+.sidebar-card {
+    -fx-padding: 22 22;
+}
+
+.panel-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #12233f;
+}
+
+.panel-note,
+.mini-metric {
+    -fx-text-fill: #5d728d;
+    -fx-font-size: 12px;
+    -fx-line-spacing: 2px;
+}
+
+.feed-card {
+    -fx-padding: 22 22;
+}
+
+.avatar-badge {
+    -fx-background-color: linear-gradient(to bottom right, #1b8f74, #10213a);
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 16;
+    -fx-background-radius: 999;
+}
+
+.author-name {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #12233f;
+}
+
+.author-meta {
+    -fx-font-size: 11px;
+    -fx-text-fill: #6e829a;
+}
+
+.post-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #10213a;
+}
+
+.post-content {
+    -fx-font-size: 14px;
+    -fx-text-fill: #34465f;
+    -fx-line-spacing: 2px;
+}
+
+.media-placeholder {
+    -fx-alignment: center;
+    -fx-background-color: linear-gradient(to bottom right, #d8f3e7, #dbeafe);
+    -fx-background-radius: 22;
+    -fx-border-color: rgba(27, 143, 116, 0.18);
+    -fx-border-radius: 22;
+    -fx-text-fill: #3d5c7b;
+    -fx-font-size: 18px;
+    -fx-font-weight: 700;
+}
+
+.comments-box,
+.quick-reply-box {
+    -fx-background-color: #f6faff;
+    -fx-background-radius: 20;
+    -fx-padding: 16 18;
+}
+
+.comments-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #10213a;
+}
+
+.comment-row {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 12 14;
+    -fx-border-color: #e2eaf4;
+    -fx-border-radius: 16;
+}
+
+.comment-body {
+    -fx-font-size: 13px;
+    -fx-text-fill: #334155;
+}
+
+.comment-tag,
+.comment-empty,
+.empty-feed {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6b7f97;
+}
+
+.primary-pill,
+.ghost-pill,
+.danger-pill,
+.metric-pill {
+    -fx-background-radius: 999;
+    -fx-font-weight: 800;
+    -fx-padding: 10 16;
+    -fx-cursor: hand;
+}
+
+.primary-pill {
+    -fx-background-color: linear-gradient(to right, #0f4c45, #1b8f74);
+    -fx-text-fill: white;
+}
+
+.ghost-pill {
+    -fx-background-color: #eff5fb;
+    -fx-text-fill: #163354;
+}
+
+.danger-pill {
+    -fx-background-color: #fff1f2;
+    -fx-text-fill: #be123c;
+}
+
+.metric-pill {
+    -fx-background-color: #edf7f4;
+    -fx-text-fill: #146c5d;
+}
+
+.primary-pill:hover {
+    -fx-opacity: 0.94;
+}
+
+.ghost-pill:hover,
+.danger-pill:hover,
+.metric-pill:hover {
+    -fx-opacity: 0.9;
+}
