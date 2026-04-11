@@ -97,6 +97,10 @@ public class SupplementShowcaseController {
         SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.BACK_END_VIEW);
     }
 
+    public void openFitnessFront(ActionEvent event) throws IOException {
+        SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.FITNESS_FRONT_VIEW);
+    }
+
     public void openCheckout(ActionEvent event) throws IOException {
         SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.CHECKOUT_VIEW);
     }

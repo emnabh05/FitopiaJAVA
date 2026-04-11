@@ -129,6 +129,15 @@ public class AdminDashboardController {
     }
 
     @FXML
+    public void openFitnessBackEnd(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.BACK_END_VIEW, SceneNavigator.FITNESS_BACK_VIEW);
+        } catch (IOException exception) {
+            setErrorMessage("Impossible d'ouvrir le module fitness: " + exception.getMessage());
+        }
+    }
+
+    @FXML
     public void goBackOrExit(ActionEvent event) {
         try {
             SceneNavigator.goBackOrClose(event);

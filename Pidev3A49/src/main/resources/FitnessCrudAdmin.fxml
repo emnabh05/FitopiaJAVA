@@ -1,0 +1,411 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="940.0" prefWidth="1620.0" stylesheets="@styles/admin-theme.css" styleClass="app-root"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
+    <left>
+        <VBox prefWidth="290.0" spacing="22.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="28.0" left="24.0" right="24.0" top="26.0"/>
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                <Label minHeight="46.0" minWidth="46.0" prefHeight="46.0" prefWidth="46.0" styleClass="sidebar-logo" text="F"/>
+                <VBox spacing="4.0">
+                    <Label styleClass="sidebar-title" text="Fitopia Admin"/>
+                    <Label styleClass="sidebar-subtitle" text="Fitness and nutrition dashboard"/>
+                </VBox>
+            </HBox>
+            <VBox spacing="10.0" styleClass="user-card">
+                <Label styleClass="user-label" text="Connecte en tant que"/>
+                <Label fx:id="lblCurrentUserEmail" styleClass="user-mail" text="ahmed@gmail.com"/>
+                <Label fx:id="lblCurrentUserRole" styleClass="user-label" text="ROLE_ADMIN"/>
+            </VBox>
+            <VBox spacing="10.0">
+                <Button fx:id="btnModuleRepas" maxWidth="1.7976931348623157E308" onAction="#afficherModuleRepas"
+                        styleClass="sidebar-nav-button sidebar-nav-button-active" text="Gestion des repas"/>
+                <Button fx:id="btnModuleRegimes" maxWidth="1.7976931348623157E308" onAction="#afficherModuleRegimes"
+                        styleClass="sidebar-nav-button" text="Gestion des regimes"/>
+                <Button fx:id="btnModuleExercises" maxWidth="1.7976931348623157E308" onAction="#afficherModuleExercises"
+                        styleClass="sidebar-nav-button" text="Gestion des Entrainements"/>
+            </VBox>
+            <VBox spacing="10.0">
+                <Button maxWidth="1.7976931348623157E308" onAction="#openSupplementBackEnd"
+                        styleClass="sidebar-nav-button" text="Supplement Back End"/>
+                <Button maxWidth="1.7976931348623157E308" onAction="#openSupplementFrontEnd"
+                        styleClass="sidebar-nav-button" text="Supplement Front End"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button maxWidth="1.7976931348623157E308" onAction="#rafraichirDonnees" styleClass="logout-button"
+                    text="Actualiser les donnees"/>
+        </VBox>
+    </left>
+    <center>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="app-scroll" vbarPolicy="AS_NEEDED">
+            <content>
+                <StackPane>
+                    <VBox fx:id="viewRepas" fillWidth="true" spacing="22.0" styleClass="content-root">
+                        <padding>
+                            <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
+                        </padding>
+                        <VBox spacing="8.0" styleClass="hero-banner">
+                            <Label styleClass="hero-title" text="Gestion des repas"/>
+                            <Label styleClass="hero-subtitle" text="Creation, modification, suppression et consultation des repas."/>
+                        </VBox>
+                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+                            <Button fx:id="btnActionCreerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherCreationRepas" styleClass="action-card action-card-active" text="Creer un repas&#10;Ajoutez un nouveau repas." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionModifierRepas" maxWidth="1.7976931348623157E308" onAction="#afficherModificationRepas" styleClass="action-card" text="Modifier un repas&#10;Mettez a jour un repas existant." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionSupprimerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionRepas" styleClass="action-card" text="Supprimer un repas&#10;Retirez un repas de la base." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Button fx:id="btnActionExplorerRepas" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationRepas" styleClass="action-card" text="Explorer les repas&#10;Consultez tous les repas." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <StackPane>
+                            <VBox fx:id="paneRepasCreate" spacing="18.0" styleClass="panel-card">
+                                <Label styleClass="section-title" text="Creer un repas"/>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card"><Label styleClass="field-label" text="Type"/><ComboBox fx:id="cbTypeRepas" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1"><Label styleClass="field-label" text="Nom"/><TextField fx:id="tfRepasNom" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="1"><Label styleClass="field-label" text="Date"/><DatePicker fx:id="dpDateRepas" maxWidth="1.7976931348623157E308" styleClass="date-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label styleClass="field-label" text="Calories"/><TextField fx:id="tfRepasCalories" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="2"><Label styleClass="field-label" text="Regime associe"/><ComboBox fx:id="cbRepasRegime" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2"><Label styleClass="field-label" text="Description"/><TextArea fx:id="taRepasDescription" prefHeight="100.0" styleClass="text-area-input"/></VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRepas" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#ajouterRepas" styleClass="primary-button" text="Creer le repas"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRepasEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Modifier un repas"/>
+                                <TextField fx:id="tfRepasId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableRepasEdit" prefHeight="260.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRepasIdEdit" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasNomEdit" prefWidth="150.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasDescriptionEdit" prefWidth="240.0" text="Description"/>
+                                        <TableColumn fx:id="colRepasCaloriesEdit" prefWidth="90.0" text="Calories"/>
+                                        <TableColumn fx:id="colRepasTypeEdit" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDateEdit" prefWidth="120.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasRegimeIdEdit" prefWidth="100.0" text="Regime"/>
+                                    </columns>
+                                </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card"><Label styleClass="field-label" text="Type"/><ComboBox fx:id="cbTypeRepasEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1"><Label styleClass="field-label" text="Nom"/><TextField fx:id="tfRepasNomEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="1"><Label styleClass="field-label" text="Date"/><DatePicker fx:id="dpDateRepasEdit" maxWidth="1.7976931348623157E308" styleClass="date-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label styleClass="field-label" text="Calories"/><TextField fx:id="tfRepasCaloriesEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="2"><Label styleClass="field-label" text="Regime associe"/><ComboBox fx:id="cbRepasRegimeEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2"><Label styleClass="field-label" text="Description"/><TextArea fx:id="taRepasDescriptionEdit" prefHeight="100.0" styleClass="text-area-input"/></VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRepasModification" styleClass="secondary-button" text="Reinitialiser"/>
+                                    <Button onAction="#modifierRepas" styleClass="primary-button" text="Mettre a jour"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRepasDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Supprimer un repas"/>
+                                <TableView fx:id="tableRepasDelete" prefHeight="420.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRepasIdDelete" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasNomDelete" prefWidth="150.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasDescriptionDelete" prefWidth="260.0" text="Description"/>
+                                        <TableColumn fx:id="colRepasCaloriesDelete" prefWidth="90.0" text="Calories"/>
+                                        <TableColumn fx:id="colRepasTypeDelete" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDateDelete" prefWidth="120.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasRegimeIdDelete" prefWidth="100.0" text="Regime"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblRepasSelectionDelete" styleClass="hint-label" text="Aucun repas selectionne"/>
+                                    <Button onAction="#supprimerRepas" styleClass="danger-button" text="Supprimer"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRepasExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Explorer les repas"/>
+                                <TableView fx:id="tableRepas" prefHeight="520.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRepasId" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRepasNom" prefWidth="160.0" text="Nom"/>
+                                        <TableColumn fx:id="colRepasDescription" prefWidth="300.0" text="Description"/>
+                                        <TableColumn fx:id="colRepasCalories" prefWidth="90.0" text="Calories"/>
+                                        <TableColumn fx:id="colRepasType" prefWidth="120.0" text="Type"/>
+                                        <TableColumn fx:id="colRepasDate" prefWidth="120.0" text="Date"/>
+                                        <TableColumn fx:id="colRepasRegimeId" prefWidth="100.0" text="Regime"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                    <VBox fx:id="viewRegimes" fillWidth="true" managed="false" spacing="22.0" styleClass="content-root" visible="false">
+                        <padding>
+                            <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
+                        </padding>
+                        <VBox spacing="8.0" styleClass="hero-banner">
+                            <Label styleClass="hero-title" text="Gestion des regimes"/>
+                            <Label styleClass="hero-subtitle" text="Administration complete des regimes alimentaires."/>
+                        </VBox>
+                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+                            <Button fx:id="btnActionCreerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherCreationRegime" styleClass="action-card action-card-active" text="Creer un regime&#10;Ajoutez un regime alimentaire." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionModifierRegime" maxWidth="1.7976931348623157E308" onAction="#afficherModificationRegime" styleClass="action-card" text="Modifier un regime&#10;Mettez a jour un regime existant." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionSupprimerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionRegime" styleClass="action-card" text="Supprimer un regime&#10;Retirez un regime de la base." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Button fx:id="btnActionExplorerRegime" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationRegime" styleClass="action-card" text="Explorer les regimes&#10;Consultez tous les regimes." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <StackPane>
+                            <VBox fx:id="paneRegimeCreate" spacing="18.0" styleClass="panel-card">
+                                <Label styleClass="section-title" text="Creer un regime"/>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card"><Label styleClass="field-label" text="Nom"/><TextField fx:id="tfRegimeNom" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1"><Label styleClass="field-label" text="Objectif calorique"/><TextField fx:id="tfRegimeObjectifCalorique" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="1"><Label styleClass="field-label" text="Description"/><TextArea fx:id="taRegimeDescription" prefHeight="110.0" styleClass="text-area-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label styleClass="field-label" text="Etat"/><CheckBox fx:id="chkRegimeActif" selected="true" styleClass="check-input" text="Regime actif"/></VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRegime" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#ajouterRegime" styleClass="primary-button" text="Creer le regime"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRegimeEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Modifier un regime"/>
+                                <TextField fx:id="tfRegimeId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableRegimesEdit" prefHeight="260.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRegimeIdEdit" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRegimeNomEdit" prefWidth="180.0" text="Nom"/>
+                                        <TableColumn fx:id="colRegimeDescriptionEdit" prefWidth="310.0" text="Description"/>
+                                        <TableColumn fx:id="colRegimeObjectifCaloriqueEdit" prefWidth="140.0" text="Objectif"/>
+                                        <TableColumn fx:id="colRegimeActifEdit" prefWidth="100.0" text="Actif"/>
+                                    </columns>
+                                </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card"><Label styleClass="field-label" text="Nom"/><TextField fx:id="tfRegimeNomEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1"><Label styleClass="field-label" text="Objectif calorique"/><TextField fx:id="tfRegimeObjectifCaloriqueEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="1"><Label styleClass="field-label" text="Description"/><TextArea fx:id="taRegimeDescriptionEdit" prefHeight="110.0" styleClass="text-area-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label styleClass="field-label" text="Etat"/><CheckBox fx:id="chkRegimeActifEdit" selected="true" styleClass="check-input" text="Regime actif"/></VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireRegimeModification" styleClass="secondary-button" text="Reinitialiser"/>
+                                    <Button onAction="#modifierRegime" styleClass="primary-button" text="Mettre a jour"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRegimeDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Supprimer un regime"/>
+                                <TableView fx:id="tableRegimesDelete" prefHeight="420.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRegimeIdDelete" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRegimeNomDelete" prefWidth="180.0" text="Nom"/>
+                                        <TableColumn fx:id="colRegimeDescriptionDelete" prefWidth="320.0" text="Description"/>
+                                        <TableColumn fx:id="colRegimeObjectifCaloriqueDelete" prefWidth="140.0" text="Objectif"/>
+                                        <TableColumn fx:id="colRegimeActifDelete" prefWidth="100.0" text="Actif"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblRegimeSelectionDelete" styleClass="hint-label" text="Aucun regime selectionne"/>
+                                    <Button onAction="#supprimerRegime" styleClass="danger-button" text="Supprimer"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneRegimeExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Explorer les regimes"/>
+                                <TableView fx:id="tableRegimes" prefHeight="520.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colRegimeId" prefWidth="60.0" text="ID"/>
+                                        <TableColumn fx:id="colRegimeNom" prefWidth="180.0" text="Nom"/>
+                                        <TableColumn fx:id="colRegimeDescription" prefWidth="340.0" text="Description"/>
+                                        <TableColumn fx:id="colRegimeObjectifCalorique" prefWidth="140.0" text="Objectif"/>
+                                        <TableColumn fx:id="colRegimeActif" prefWidth="100.0" text="Actif"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                    <VBox fx:id="viewExercises" fillWidth="true" managed="false" spacing="22.0" styleClass="content-root" visible="false">
+                        <padding>
+                            <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
+                        </padding>
+                        <VBox spacing="8.0" styleClass="hero-banner">
+                            <Label styleClass="hero-title" text="Gestion des Entrainements"/>
+                            <Label styleClass="hero-subtitle" text="CRUD complet des exercices fitness avec filtres, pagination et detail media."/>
+                        </VBox>
+                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+                            <Button fx:id="btnActionCreerExercise" maxWidth="1.7976931348623157E308" onAction="#afficherCreationExercise" styleClass="action-card action-card-active" text="Creer un exercice&#10;Ajoutez un nouvel exercice." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionModifierExercise" maxWidth="1.7976931348623157E308" onAction="#afficherModificationExercise" styleClass="action-card" text="Modifier un exercice&#10;Mettez a jour un exercice existant." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionSupprimerExercise" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionExercise" styleClass="action-card" text="Supprimer un exercice&#10;Retirez un exercice de la base." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Button fx:id="btnActionExplorerExercise" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationExercise" styleClass="action-card" text="Lister et consulter&#10;Filtrez, paginez et affichez les details." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <StackPane>
+                            <VBox fx:id="paneExerciseCreate" spacing="18.0" styleClass="panel-card">
+                                <Label styleClass="section-title" text="Creer un exercice"/>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card"><Label styleClass="field-label" text="Nom"/><TextField fx:id="tfExerciseName" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1"><Label styleClass="field-label" text="Groupe musculaire"/><ComboBox fx:id="cbExerciseMuscleGroup" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="1"><Label styleClass="field-label" text="Difficulte"/><ComboBox fx:id="cbExerciseDifficulty" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label styleClass="field-label" text="Description"/><TextArea fx:id="taExerciseDescription" prefHeight="100.0" styleClass="text-area-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="2"><Label styleClass="field-label" text="Series"/><TextField fx:id="tfExerciseSets" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2"><Label styleClass="field-label" text="Repetitions"/><TextField fx:id="tfExerciseRepetitions" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="3"><Label styleClass="field-label" text="Duree (minutes)"/><TextField fx:id="tfExerciseDuration" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="3"><Label styleClass="field-label" text="Video URL"/><TextField fx:id="tfExerciseVideoUrl" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"><Label styleClass="field-label" text="Image URL"/><TextField fx:id="tfExerciseImageUrl" styleClass="text-input"/></VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireExercise" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#ajouterExercise" styleClass="primary-button" text="Creer l'exercice"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneExerciseEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Modifier un exercice"/>
+                                <TextField fx:id="tfExerciseId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableExercisesEdit" prefHeight="260.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colExerciseIdEdit" prefWidth="55.0" text="ID"/>
+                                        <TableColumn fx:id="colExerciseNameEdit" prefWidth="160.0" text="Nom"/>
+                                        <TableColumn fx:id="colExerciseMuscleGroupEdit" prefWidth="130.0" text="Groupe"/>
+                                        <TableColumn fx:id="colExerciseDifficultyEdit" prefWidth="120.0" text="Difficulte"/>
+                                        <TableColumn fx:id="colExerciseSetsEdit" prefWidth="80.0" text="Series"/>
+                                        <TableColumn fx:id="colExerciseRepetitionsEdit" prefWidth="95.0" text="Repetitions"/>
+                                        <TableColumn fx:id="colExerciseDurationEdit" prefWidth="90.0" text="Duree"/>
+                                        <TableColumn fx:id="colExerciseUpdatedAtEdit" prefWidth="150.0" text="Maj"/>
+                                    </columns>
+                                </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card"><Label styleClass="field-label" text="Nom"/><TextField fx:id="tfExerciseNameEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1"><Label styleClass="field-label" text="Groupe musculaire"/><ComboBox fx:id="cbExerciseMuscleGroupEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="1"><Label styleClass="field-label" text="Difficulte"/><ComboBox fx:id="cbExerciseDifficultyEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="1"><Label styleClass="field-label" text="Description"/><TextArea fx:id="taExerciseDescriptionEdit" prefHeight="100.0" styleClass="text-area-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="2"><Label styleClass="field-label" text="Series"/><TextField fx:id="tfExerciseSetsEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="2"><Label styleClass="field-label" text="Repetitions"/><TextField fx:id="tfExerciseRepetitionsEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.rowIndex="3"><Label styleClass="field-label" text="Duree"/><TextField fx:id="tfExerciseDurationEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="1" GridPane.rowIndex="3"><Label styleClass="field-label" text="Video URL"/><TextField fx:id="tfExerciseVideoUrlEdit" styleClass="text-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2"><Label styleClass="field-label" text="Image URL"/><TextField fx:id="tfExerciseImageUrlEdit" styleClass="text-input"/></VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireExerciseModification" styleClass="secondary-button" text="Reinitialiser"/>
+                                    <Button onAction="#modifierExercise" styleClass="primary-button" text="Mettre a jour"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneExerciseDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Supprimer un exercice"/>
+                                <TableView fx:id="tableExercisesDelete" prefHeight="420.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colExerciseIdDelete" prefWidth="55.0" text="ID"/>
+                                        <TableColumn fx:id="colExerciseNameDelete" prefWidth="160.0" text="Nom"/>
+                                        <TableColumn fx:id="colExerciseMuscleGroupDelete" prefWidth="130.0" text="Groupe"/>
+                                        <TableColumn fx:id="colExerciseDifficultyDelete" prefWidth="120.0" text="Difficulte"/>
+                                        <TableColumn fx:id="colExerciseSetsDelete" prefWidth="80.0" text="Series"/>
+                                        <TableColumn fx:id="colExerciseRepetitionsDelete" prefWidth="95.0" text="Repetitions"/>
+                                        <TableColumn fx:id="colExerciseDurationDelete" prefWidth="90.0" text="Duree"/>
+                                        <TableColumn fx:id="colExerciseUpdatedAtDelete" prefWidth="150.0" text="Maj"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblExerciseSelectionDelete" styleClass="hint-label" text="Aucun exercice selectionne"/>
+                                    <Button onAction="#supprimerExercise" styleClass="danger-button" text="Supprimer"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneExerciseExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Liste et detail des exercices"/>
+                                <HBox spacing="12.0">
+                                    <VBox spacing="8.0" styleClass="field-card" HBox.hgrow="ALWAYS"><Label styleClass="field-label" text="Filtrer par groupe musculaire"/><ComboBox fx:id="cbExerciseFilterMuscleGroup" maxWidth="1.7976931348623157E308" onAction="#filtrerExercises" styleClass="combo-input"/></VBox>
+                                    <VBox spacing="8.0" styleClass="field-card" HBox.hgrow="ALWAYS"><Label styleClass="field-label" text="Filtrer par difficulte"/><ComboBox fx:id="cbExerciseFilterDifficulty" maxWidth="1.7976931348623157E308" onAction="#filtrerExercises" styleClass="combo-input"/></VBox>
+                                    <VBox alignment="BOTTOM_RIGHT" spacing="8.0"><Button onAction="#reinitialiserFiltresExercises" styleClass="secondary-button" text="Reinitialiser"/></VBox>
+                                </HBox>
+                                <HBox spacing="18.0">
+                                    <VBox spacing="12.0" HBox.hgrow="ALWAYS">
+                                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                            <Label fx:id="lblExerciseResultCount" styleClass="section-subtitle" text="0 exercice"/>
+                                            <Region HBox.hgrow="ALWAYS"/>
+                                            <Button fx:id="btnExercisePreviousPage" onAction="#pageExercisePrecedente" styleClass="secondary-button" text="Precedent"/>
+                                            <Label fx:id="lblExercisePageInfo" styleClass="hint-label" text="Page 0 / 0"/>
+                                            <Button fx:id="btnExerciseNextPage" onAction="#pageExerciseSuivante" styleClass="secondary-button" text="Suivant"/>
+                                        </HBox>
+                                        <TableView fx:id="tableExercises" prefHeight="500.0" styleClass="data-table">
+                                            <columns>
+                                                <TableColumn fx:id="colExerciseId" prefWidth="55.0" text="ID"/>
+                                                <TableColumn fx:id="colExerciseName" prefWidth="170.0" text="Nom"/>
+                                                <TableColumn fx:id="colExerciseMuscleGroup" prefWidth="130.0" text="Groupe"/>
+                                                <TableColumn fx:id="colExerciseDifficulty" prefWidth="120.0" text="Difficulte"/>
+                                                <TableColumn fx:id="colExerciseSets" prefWidth="80.0" text="Series"/>
+                                                <TableColumn fx:id="colExerciseRepetitions" prefWidth="95.0" text="Repetitions"/>
+                                                <TableColumn fx:id="colExerciseDuration" prefWidth="90.0" text="Duree"/>
+                                                <TableColumn fx:id="colExerciseUpdatedAt" prefWidth="160.0" text="Maj"/>
+                                            </columns>
+                                        </TableView>
+                                    </VBox>
+                                    <VBox prefWidth="380.0" spacing="12.0" styleClass="field-card">
+                                        <Label fx:id="lblExerciseDetailName" styleClass="section-block-title" text="Aucun exercice selectionne"/>
+                                        <ImageView fx:id="imgExercisePreview" fitHeight="170.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true"/>
+                                        <Label fx:id="lblExerciseDetailMuscleGroup" styleClass="hint-label" text="Groupe musculaire: -"/>
+                                        <Label fx:id="lblExerciseDetailDifficulty" styleClass="hint-label" text="Difficulte: -"/>
+                                        <Label fx:id="lblExerciseDetailPrescription" styleClass="hint-label" text="Series / repetitions / duree: -"/>
+                                        <Label fx:id="lblExerciseDetailDates" styleClass="hint-label" text="Creation: - | Mise a jour: -"/>
+                                        <Label fx:id="lblExerciseDetailRole" styleClass="hint-label" text="Acces reserve aux roles ROLE_ADMIN et ROLE_COACH"/>
+                                        <TextArea fx:id="taExerciseDetailDescription" editable="false" focusTraversable="false" prefHeight="120.0" styleClass="text-area-input" wrapText="true"/>
+                                        <TextField fx:id="tfExerciseDetailVideoUrl" editable="false" styleClass="text-input"/>
+                                        <TextField fx:id="tfExerciseDetailImageUrl" editable="false" styleClass="text-input"/>
+                                        <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                            <Button onAction="#ouvrirImageExercise" styleClass="secondary-button" text="Ouvrir image"/>
+                                            <Button onAction="#ouvrirVideoExercise" styleClass="primary-button" text="Ouvrir video"/>
+                                        </HBox>
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                </StackPane>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

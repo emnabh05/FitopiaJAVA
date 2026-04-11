@@ -30,6 +30,8 @@ public final class SceneNavigator {
     public static final ViewState RANKING_VIEW = new ViewState("/MonthlyRanking.fxml", "Monthly Ranking");
     public static final ViewState CHECKOUT_VIEW = new ViewState("/Checkout.fxml", "Secure Checkout");
     public static final ViewState CARD_PAYMENT_VIEW = new ViewState("/CardPayment.fxml", "Card Payment");
+    public static final ViewState FITNESS_FRONT_VIEW = new ViewState("/FitopiaHome.fxml", "Fitness Front End");
+    public static final ViewState FITNESS_BACK_VIEW = new ViewState("/FitnessCrudAdmin.fxml", "Fitness Back End");
 
     private static final Deque<ViewState> HISTORY = new ArrayDeque<>();
 

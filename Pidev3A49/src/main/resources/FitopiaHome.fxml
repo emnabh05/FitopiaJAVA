@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="920.0" prefWidth="1440.0" styleClass="front-root" stylesheets="@styles/fitopia-home.css"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.FitopiaHomeController">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="24.0" styleClass="topbar">
+            <padding>
+                <Insets bottom="18.0" left="34.0" right="34.0" top="18.0"/>
+            </padding>
+            <Label styleClass="brand-mark" text="F"/>
+            <VBox spacing="2.0">
+                <Label styleClass="brand-title" text="FITOPIA"/>
+                <Label styleClass="brand-subtitle" text="Fitness, nutrition and coaching"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <VBox alignment="CENTER_RIGHT" spacing="8.0">
+                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                    <Label styleClass="nav-link-active" text="Home"/>
+                    <Label styleClass="nav-link" text="Services"/>
+                    <Label styleClass="nav-link" text="Plans"/>
+                    <Button mnemonicParsing="false" onAction="#openSupplementFront" styleClass="nav-link-button" text="SUPPLEMENT FRONT"/>
+                    <Button mnemonicParsing="false" onAction="#openFitnessBack" styleClass="nav-link-button" text="FITNESS BACK"/>
+                    <Button mnemonicParsing="false" onAction="#scrollToPlanner" styleClass="nav-link-button" text="EXPLORE OUR FITNESS PLANNER"/>
+                    <Label styleClass="nav-link" text="Contact"/>
+                    <Button mnemonicParsing="false" styleClass="ghost-button" text="Login"/>
+                </HBox>
+            </VBox>
+        </HBox>
+    </top>
+    <center>
+        <ScrollPane fx:id="mainScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="front-scroll" vbarPolicy="AS_NEEDED">
+            <content>
+                <VBox fillWidth="true" spacing="22.0" styleClass="page-shell">
+                    <padding>
+                        <Insets bottom="28.0" left="32.0" right="32.0" top="28.0"/>
+                    </padding>
+
+                    <HBox spacing="20.0" styleClass="hero-card">
+                        <VBox spacing="18.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="hero-badge" text="Fitopia Performance Platform"/>
+                            <Label styleClass="hero-title" text="Train smarter, eat better, and stay consistent." wrapText="true"/>
+                            <Label styleClass="hero-subtitle" text="Build sustainable fitness habits with guided programs, practical nutrition plans, and clear progress tracking in one place." wrapText="true"/>
+                            <HBox spacing="12.0">
+                                <Button mnemonicParsing="false" styleClass="primary-button" text="Learn more"/>
+                                <Button mnemonicParsing="false" styleClass="light-ghost-button" text="Contact us"/>
+                            </HBox>
+                            <HBox spacing="14.0">
+                                <VBox spacing="4.0">
+                                    <Label styleClass="hero-mini-value" text="1500+"/>
+                                    <Label styleClass="hero-mini-label" text="members coached"/>
+                                </VBox>
+                                <Separator orientation="VERTICAL"/>
+                                <VBox spacing="4.0">
+                                    <Label styleClass="hero-mini-value" text="24/7"/>
+                                    <Label styleClass="hero-mini-label" text="support access"/>
+                                </VBox>
+                            </HBox>
+                        </VBox>
+                        <VBox prefWidth="320.0" spacing="14.0">
+                            <VBox spacing="6.0" styleClass="glass-stat-card">
+                                <Label styleClass="glass-stat-value" text="95&#37;"/>
+                                <Label styleClass="glass-stat-label" text="Goal completion rate"/>
+                            </VBox>
+                            <VBox spacing="6.0" styleClass="glass-stat-card">
+                                <Label styleClass="glass-stat-value" text="12 weeks"/>
+                                <Label styleClass="glass-stat-label" text="Structured transformation cycle"/>
+                            </VBox>
+                            <VBox spacing="10.0" styleClass="coach-card">
+                                <Label styleClass="coach-tag" text="Coach Focus"/>
+                                <Label styleClass="coach-title" text="Weekly habits beat short motivation spikes." wrapText="true"/>
+                                <Label styleClass="coach-text" text="Simple routines, smart meal planning, and better follow-through." wrapText="true"/>
+                            </VBox>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="14.0" styleClass="section-card">
+                        <Label styleClass="section-kicker" text="Services"/>
+                        <Label styleClass="section-heading" text="Everything you need to build a durable routine"/>
+                        <FlowPane hgap="14.0" vgap="14.0">
+                            <VBox prefWidth="360.0" spacing="10.0" styleClass="info-card">
+                                <Label styleClass="info-title" text="Exercise Program"/>
+                                <Label styleClass="info-text" text="Weekly training blocks tailored to your level, schedule and performance target." wrapText="true"/>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="10.0" styleClass="info-card">
+                                <Label styleClass="info-title" text="Nutrition Plans"/>
+                                <Label styleClass="info-text" text="Simple meal structures to improve energy, recovery and body composition." wrapText="true"/>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="10.0" styleClass="info-card">
+                                <Label styleClass="info-title" text="Diet Program"/>
+                                <Label styleClass="info-text" text="Sustainable diet coaching built around your habits instead of restrictive trends." wrapText="true"/>
+                            </VBox>
+                        </FlowPane>
+                    </VBox>
+
+                    <VBox fx:id="plannerSection" spacing="18.0" styleClass="section-card planner-section">
+                        <HBox alignment="CENTER_LEFT">
+                            <VBox spacing="4.0">
+                                <Label styleClass="section-kicker" text="Fitness Planner"/>
+                                <Label styleClass="section-heading" text="EXPLORE OUR FITNESS PLANNER"/>
+                                <Label styleClass="section-body" text="Ajoutez, modifiez et supprimez un exercice depuis le front. Chaque action est synchronisee avec le backend MySQL." wrapText="true"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label styleClass="planner-pill" text="Exercice"/>
+                        </HBox>
+
+                        <GridPane hgap="14.0" vgap="14.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="20.0"/>
+                                <ColumnConstraints percentWidth="20.0"/>
+                                <ColumnConstraints percentWidth="20.0"/>
+                                <ColumnConstraints percentWidth="20.0"/>
+                                <ColumnConstraints percentWidth="20.0"/>
+                            </columnConstraints>
+                            <TextField fx:id="tfExerciseId" editable="false" managed="false" promptText="ID" visible="false"/>
+                            <TextField fx:id="tfExerciseName" promptText="Exercise name" styleClass="text-field-modern"/>
+                            <ComboBox fx:id="cbExerciseMuscleGroup" promptText="Muscle group" styleClass="combo-modern" GridPane.columnIndex="1"/>
+                            <ComboBox fx:id="cbExerciseDifficulty" promptText="Difficulty..." styleClass="combo-modern" GridPane.columnIndex="2"/>
+                            <TextField fx:id="tfExerciseSets" promptText="Sets" styleClass="text-field-modern" GridPane.columnIndex="3"/>
+                            <TextField fx:id="tfExerciseRepetitions" promptText="Repetitions" styleClass="text-field-modern" GridPane.columnIndex="4"/>
+                            <TextField fx:id="tfExerciseDuration" promptText="Duration (min)" styleClass="text-field-modern" GridPane.rowIndex="1"/>
+                            <TextField fx:id="tfExerciseImageUrl" promptText="Image URL" styleClass="text-field-modern" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                            <TextField fx:id="tfExerciseVideoUrl" promptText="Video URL" styleClass="text-field-modern" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.columnSpan="3"/>
+                            <TextArea fx:id="taExerciseDescription" prefHeight="110.0" promptText="Description" styleClass="text-area-modern" wrapText="true" GridPane.columnSpan="5" GridPane.rowIndex="2"/>
+                        </GridPane>
+
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <Button mnemonicParsing="false" onAction="#ajouterExercise" styleClass="primary-button" text="Create Exercise"/>
+                            <Button mnemonicParsing="false" onAction="#modifierExercise" styleClass="secondary-button" text="Update Exercise"/>
+                            <Button mnemonicParsing="false" onAction="#supprimerExercise" styleClass="danger-front-button" text="Delete Exercise"/>
+                            <Button mnemonicParsing="false" onAction="#viderFormulaire" styleClass="ghost-button" text="Clear"/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label fx:id="lblExerciseStatus" styleClass="planner-status" text="Selectionnez un exercice pour modifier ou supprimer."/>
+                        </HBox>
+
+                        <TableView fx:id="tableExercises" prefHeight="300.0" styleClass="planner-table">
+                            <columns>
+                                <TableColumn fx:id="colExerciseId" prefWidth="70.0" text="ID"/>
+                                <TableColumn fx:id="colExerciseName" prefWidth="180.0" text="Exercise"/>
+                                <TableColumn fx:id="colExerciseMuscleGroup" prefWidth="150.0" text="Muscle group"/>
+                                <TableColumn fx:id="colExerciseDifficulty" prefWidth="130.0" text="Difficulty"/>
+                                <TableColumn fx:id="colExerciseSets" prefWidth="90.0" text="Sets"/>
+                                <TableColumn fx:id="colExerciseRepetitions" prefWidth="110.0" text="Repetitions"/>
+                                <TableColumn fx:id="colExerciseDuration" prefWidth="120.0" text="Duration"/>
+                            </columns>
+                        </TableView>
+                    </VBox>
+
+                    <HBox spacing="18.0">
+                        <StackPane prefHeight="320.0" prefWidth="520.0" styleClass="photo-card">
+                            <VBox alignment="CENTER" spacing="8.0">
+                                <Label styleClass="photo-badge" text="Coach Preview"/>
+                                <Label styleClass="photo-title" text="Your visual, image or banner goes here"/>
+                            </VBox>
+                        </StackPane>
+                        <VBox spacing="14.0" styleClass="section-card" HBox.hgrow="ALWAYS">
+                            <Label styleClass="section-kicker" text="About"/>
+                            <Label styleClass="section-heading" text="Health care is a natural way of improving your life quality" wrapText="true"/>
+                            <Label styleClass="section-body" text="This front page adapts your Swing mockup into a JavaFX landing page with a cleaner visual hierarchy, stronger cards and a more modern landing experience." wrapText="true"/>
+                            <HBox spacing="12.0">
+                                <Button mnemonicParsing="false" styleClass="primary-button" text="Discover Fitopia"/>
+                                <Button mnemonicParsing="false" styleClass="secondary-button" text="Meet coaches"/>
+                            </HBox>
+                        </VBox>
+                    </HBox>
+
+                    <VBox spacing="16.0" styleClass="section-card">
+                        <HBox alignment="CENTER_LEFT">
+                            <VBox spacing="4.0">
+                                <Label styleClass="section-kicker" text="Consultation"/>
+                                <Label styleClass="section-heading" text="Book a free consultation"/>
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Label styleClass="pill-label" text="30 min intro call"/>
+                        </HBox>
+                        <GridPane hgap="14.0" vgap="14.0">
+                            <columnConstraints>
+                                <ColumnConstraints percentWidth="33.33"/>
+                                <ColumnConstraints percentWidth="33.33"/>
+                                <ColumnConstraints percentWidth="33.33"/>
+                            </columnConstraints>
+                            <TextField promptText="First name" styleClass="text-field-modern"/>
+                            <TextField promptText="Last name" styleClass="text-field-modern" GridPane.columnIndex="1"/>
+                            <ComboBox promptText="Service" styleClass="combo-modern" GridPane.columnIndex="2"/>
+                            <DatePicker promptText="Date" styleClass="date-modern" GridPane.rowIndex="1"/>
+                            <TextField promptText="Time" styleClass="text-field-modern" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                            <TextArea prefHeight="110.0" promptText="Tell us about your objective" styleClass="text-area-modern" wrapText="true" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <HBox alignment="CENTER_RIGHT">
+                            <Button mnemonicParsing="false" styleClass="primary-button" text="Book now"/>
+                        </HBox>
+                    </VBox>
+
+                    <VBox spacing="14.0" styleClass="section-card">
+                        <Label styleClass="section-kicker" text="Testimonials"/>
+                        <Label styleClass="section-heading" text="Happy clients and feedbacks"/>
+                        <FlowPane hgap="14.0" vgap="14.0">
+                            <VBox prefWidth="360.0" spacing="10.0" styleClass="quote-card">
+                                <Label styleClass="quote-text" text="Great coaching and a very clear progression plan. The structure made consistency easy." wrapText="true"/>
+                                <Label styleClass="quote-name" text="Racky Henderson"/>
+                                <Label styleClass="quote-role" text="Father"/>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="10.0" styleClass="quote-card">
+                                <Label styleClass="quote-text" text="The meal guidance was simple to follow and actually worked with my schedule." wrapText="true"/>
+                                <Label styleClass="quote-name" text="Henry Dee"/>
+                                <Label styleClass="quote-role" text="Businesswoman"/>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="10.0" styleClass="quote-card">
+                                <Label styleClass="quote-text" text="Better routines, better energy, and much less guesswork around training." wrapText="true"/>
+                                <Label styleClass="quote-name" text="Mark Huff"/>
+                                <Label styleClass="quote-role" text="Entrepreneur"/>
+                            </VBox>
+                        </FlowPane>
+                    </VBox>
+
+                    <VBox spacing="14.0" styleClass="section-card">
+                        <Label styleClass="section-kicker" text="How It Works"/>
+                        <Label styleClass="section-heading" text="A simple 4-step journey"/>
+                        <FlowPane hgap="14.0" vgap="14.0">
+                            <VBox prefWidth="262.0" spacing="8.0" styleClass="step-card">
+                                <Label styleClass="step-number" text="01"/>
+                                <Label styleClass="step-title" text="Follow the program" wrapText="true"/>
+                            </VBox>
+                            <VBox prefWidth="262.0" spacing="8.0" styleClass="step-card">
+                                <Label styleClass="step-number" text="02"/>
+                                <Label styleClass="step-title" text="Work for the result" wrapText="true"/>
+                            </VBox>
+                            <VBox prefWidth="262.0" spacing="8.0" styleClass="step-card">
+                                <Label styleClass="step-number" text="03"/>
+                                <Label styleClass="step-title" text="Eat healthy food" wrapText="true"/>
+                            </VBox>
+                            <VBox prefWidth="262.0" spacing="8.0" styleClass="step-card">
+                                <Label styleClass="step-number" text="04"/>
+                                <Label styleClass="step-title" text="Enjoy your life" wrapText="true"/>
+                            </VBox>
+                        </FlowPane>
+                    </VBox>
+
+                    <VBox spacing="14.0" styleClass="section-card">
+                        <Label styleClass="section-kicker" text="Plans"/>
+                        <Label styleClass="section-heading" text="Choose your perfect plan"/>
+                        <FlowPane hgap="14.0" vgap="14.0">
+                            <VBox prefWidth="262.0" spacing="10.0" styleClass="plan-card">
+                                <Label styleClass="plan-name" text="Starter"/>
+                                <Label styleClass="plan-price" text="49 DT"/>
+                                <Label styleClass="plan-features" text="20 workouts&#10;Basic meal plan&#10;One coaching call&#10;24/7 support" wrapText="true"/>
+                                <Button mnemonicParsing="false" styleClass="secondary-button" text="Choose"/>
+                            </VBox>
+                            <VBox prefWidth="262.0" spacing="10.0" styleClass="featured-plan">
+                                <Label styleClass="plan-name" text="Standard"/>
+                                <Label styleClass="plan-price" text="79 DT"/>
+                                <Label styleClass="plan-features" text="30 workouts&#10;Meal structure&#10;Weekly coach check-in&#10;Priority support" wrapText="true"/>
+                                <Button mnemonicParsing="false" styleClass="primary-button" text="Choose"/>
+                            </VBox>
+                            <VBox prefWidth="262.0" spacing="10.0" styleClass="plan-card">
+                                <Label styleClass="plan-name" text="Premium"/>
+                                <Label styleClass="plan-price" text="109 DT"/>
+                                <Label styleClass="plan-features" text="Custom training&#10;Advanced nutrition&#10;Two coach reviews&#10;Priority support" wrapText="true"/>
+                                <Button mnemonicParsing="false" styleClass="secondary-button" text="Choose"/>
+                            </VBox>
+                            <VBox prefWidth="262.0" spacing="10.0" styleClass="plan-card">
+                                <Label styleClass="plan-name" text="Platinum"/>
+                                <Label styleClass="plan-price" text="159 DT"/>
+                                <Label styleClass="plan-features" text="Full coaching&#10;Deep habit tracking&#10;Weekly adjustments&#10;VIP support" wrapText="true"/>
+                                <Button mnemonicParsing="false" styleClass="secondary-button" text="Choose"/>
+                            </VBox>
+                        </FlowPane>
+                    </VBox>
+
+                    <VBox spacing="14.0" styleClass="section-card">
+                        <Label styleClass="section-kicker" text="Blog"/>
+                        <Label styleClass="section-heading" text="Latest news from our blog"/>
+                        <FlowPane hgap="14.0" vgap="14.0">
+                            <VBox prefWidth="360.0" spacing="12.0" styleClass="blog-card">
+                                <StackPane prefHeight="160.0" styleClass="blog-image"/>
+                                <Label styleClass="blog-date" text="January 30, 2020"/>
+                                <Label styleClass="blog-title" text="Even the all-powerful Pointing has no control about the blind texts." wrapText="true"/>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="12.0" styleClass="blog-card">
+                                <StackPane prefHeight="160.0" styleClass="blog-image"/>
+                                <Label styleClass="blog-date" text="January 30, 2020"/>
+                                <Label styleClass="blog-title" text="How to structure a realistic nutrition routine without overcomplicating it." wrapText="true"/>
+                            </VBox>
+                            <VBox prefWidth="360.0" spacing="12.0" styleClass="blog-card">
+                                <StackPane prefHeight="160.0" styleClass="blog-image"/>
+                                <Label styleClass="blog-date" text="January 30, 2020"/>
+                                <Label styleClass="blog-title" text="Small weekly changes that make a bigger difference than short intense bursts." wrapText="true"/>
+                            </VBox>
+                        </FlowPane>
+                    </VBox>
+
+                    <HBox alignment="CENTER" styleClass="footer-bar">
+                        <Label styleClass="footer-text" text="Fitopia front office mockup - JavaFX interface only"/>
+                    </HBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
