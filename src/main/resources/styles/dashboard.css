@@ -246,6 +246,39 @@
     -fx-padding: 24 26;
 }
 
+.standalone-hero-banner {
+    -fx-background-color:
+        radial-gradient(center 96% 10%, radius 24%, rgba(255, 255, 255, 0.14), transparent 50%),
+        linear-gradient(to right, #0f4949 0%, #177058 100%);
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-effect: dropshadow(gaussian, rgba(14, 48, 40, 0.16), 26, 0.16, 0, 8);
+}
+
+.standalone-hero-banner .page-title {
+    -fx-text-fill: white;
+    -fx-font-size: 30px;
+}
+
+.standalone-hero-banner .page-subtitle {
+    -fx-text-fill: rgba(255, 255, 255, 0.88);
+    -fx-font-size: 13px;
+}
+
+.standalone-hero-banner .hero-chip {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-text-fill: white;
+}
+
+.standalone-hero-banner .hero-chip-soft {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-text-fill: white;
+}
+
+.standalone-hero-banner .hero-chip-muted {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-text-fill: white;
+}
+
 .page-title {
     -fx-text-fill: #0d2146;
     -fx-font-size: 38px;

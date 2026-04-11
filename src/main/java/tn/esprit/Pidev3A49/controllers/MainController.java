@@ -1110,7 +1110,6 @@ public class MainController implements Initializable {
             rootPane.setLeft(null);
         }
         hideNode(sidebarScrollPane);
-        hideNode(heroBanner);
         hideNode(statsPane);
         hideNode(workspaceSwitcher);
         hideNode(eventsIntroBanner);
@@ -1119,6 +1118,8 @@ public class MainController implements Initializable {
         if (contentShell != null) {
             contentShell.setPadding(new Insets(22, 22, 22, 22));
         }
+
+        configureStandaloneHeader(mode);
 
         setMainView(false, true, false);
 
@@ -1137,6 +1138,37 @@ public class MainController implements Initializable {
         if (node != null) {
             node.setVisible(false);
             node.setManaged(false);
+        }
+    }
+
+    private void configureStandaloneHeader(EventWindowMode mode) {
+        if (heroBanner == null) {
+            return;
+        }
+
+        heroBanner.setVisible(true);
+        heroBanner.setManaged(true);
+        if (!heroBanner.getStyleClass().contains("standalone-hero-banner")) {
+            heroBanner.getStyleClass().add("standalone-hero-banner");
+        }
+
+        switch (mode) {
+            case CREATE -> updatePageHero(
+                    "Creer un evenement",
+                    "Ajoutez un nouvel evenement avec une interface claire et dediee."
+            );
+            case UPDATE -> updatePageHero(
+                    "Modifier un evenement",
+                    "Retrouvez vos evenements existants et mettez leurs informations a jour."
+            );
+            case DELETE -> updatePageHero(
+                    "Supprimer un evenement",
+                    "Supprimez rapidement un evenement depuis une fenetre dediee."
+            );
+            case DASHBOARD -> updatePageHero(
+                    "Dashboard des evenements",
+                    "Explorez, filtrez et suivez tous les evenements dans une vue unique."
+            );
         }
     }
 }
