@@ -611,8 +611,10 @@ public class MainController {
 
     @FXML
     private void ajouterVerreEau() {
-        verresEau++;
-        actualiserDashboardPlanner();
+        if (verresEau < 5) {
+            verresEau++;
+            actualiserDashboardPlanner();
+        }
     }
 
 
