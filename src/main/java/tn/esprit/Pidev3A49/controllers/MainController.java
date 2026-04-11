@@ -106,13 +106,13 @@ public class MainController {
 
     @FXML
     private void afficherModuleForums() {
-        afficherVue(viewForums, viewComments);
+        afficherVue(viewForums, viewForums, viewComments);
         activerBoutonModule(btnModuleForums, btnModuleComments);
     }
 
     @FXML
     private void afficherModuleComments() {
-        afficherVue(viewComments, viewForums);
+        afficherVue(viewComments, viewForums, viewComments);
         activerBoutonModule(btnModuleComments, btnModuleForums);
         afficherCreationComment();
     }
