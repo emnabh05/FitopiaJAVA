@@ -1,5 +1,7 @@
 package tn.esprit.Pidev3A49.controllers;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
@@ -149,6 +151,7 @@ public class MainController implements Initializable {
     private final Map<Integer, Long> participationCountByEvent = new HashMap<>();
     private final Map<Integer, String> eventTitleById = new HashMap<>();
     private final PdfExportService pdfExportService = new PdfExportService();
+    private final Timeline liveSyncTimeline = new Timeline();
     private enum EventWindowMode {
         CREATE,
         UPDATE,
@@ -226,9 +229,18 @@ public class MainController implements Initializable {
         configureParticipationTable();
         configureSearches();
         configureEventSelection();
+        configureLiveSync();
         syncSidebarMenus();
         refreshAllData();
         showTablesLanding();
+    }
+
+    private void configureLiveSync() {
+        liveSyncTimeline.getKeyFrames().setAll(
+                new KeyFrame(javafx.util.Duration.seconds(5), event -> refreshAllDataSilently())
+        );
+        liveSyncTimeline.setCycleCount(Timeline.INDEFINITE);
+        liveSyncTimeline.play();
     }
 
     private void configureDatePicker() {
@@ -317,6 +329,27 @@ public class MainController implements Initializable {
         updateDashboardStats();
     }
 
+    private void refreshAllDataSilently() {
+        try {
+            List<Event> events = eventService.getAll();
+            eventList.setAll(events);
+            rebuildEventTitleMap(events);
+            sortEventTableByIdDesc();
+            renderUpdateSection(events);
+            renderDeleteSection(events);
+
+            List<Participation> participations = participationService.getAll();
+            participationList.setAll(participations);
+            rebuildParticipationCountMap(participations);
+            sortParticipationTableByIdDesc();
+
+            eventTable.refresh();
+            participationTable.refresh();
+            updateDashboardStats();
+        } catch (Exception ignored) {
+        }
+    }
+
     @FXML
     private void openFrontEventsWindow() {
         try {
@@ -330,6 +363,7 @@ public class MainController implements Initializable {
             stage.setScene(scene);
             stage.setMinWidth(1280);
             stage.setMinHeight(820);
+            stage.setOnHidden(event -> refreshAllData());
             stage.show();
         } catch (Exception e) {
             showError("Ouverture impossible", "La vue front des evenements n'a pas pu etre chargee.", e);
@@ -625,6 +659,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void showParticipantsSection() {
+        refreshParticipations();
         setMainView(false, false, true);
         setWorkspaceActive(false);
         setSidebarContext(false, false, true);
