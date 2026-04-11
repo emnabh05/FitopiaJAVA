@@ -2,135 +2,265 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="720.0" prefWidth="1100.0" xmlns:fx="http://javafx.com/fxml"
+<BorderPane prefHeight="900.0" prefWidth="1560.0" stylesheets="@styles/admin-theme.css" styleClass="app-root"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="tn.esprit.Pidev3A49.controllers.MainController">
-    <top>
-        <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Fitopia - CRUD Repas &amp; Regime Alimentaire">
-            <BorderPane.margin>
-                <Insets bottom="10.0" left="16.0" right="16.0" top="16.0"/>
-            </BorderPane.margin>
-        </Label>
-    </top>
+    <left>
+        <VBox prefWidth="280.0" spacing="22.0" styleClass="sidebar">
+            <padding>
+                <Insets bottom="28.0" left="24.0" right="24.0" top="26.0"/>
+            </padding>
+            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                <Label minHeight="46.0" minWidth="46.0" prefHeight="46.0" prefWidth="46.0" styleClass="sidebar-logo" text="P"/>
+                <VBox spacing="4.0">
+                    <Label styleClass="sidebar-title" text="PiDev Forum"/>
+                    <Label styleClass="sidebar-subtitle" text="Forum and comment dashboard"/>
+                </VBox>
+            </HBox>
+            <VBox spacing="10.0" styleClass="user-card">
+                <Label styleClass="user-label" text="Connecte en tant que"/>
+                <Label styleClass="user-mail" text="admin@forum.local"/>
+            </VBox>
+            <VBox spacing="10.0">
+                <Button fx:id="btnModuleForums" maxWidth="1.7976931348623157E308" onAction="#afficherModuleForums"
+                        styleClass="sidebar-nav-button sidebar-nav-button-active" text="Gestion des forums"/>
+                <Button fx:id="btnModuleComments" maxWidth="1.7976931348623157E308" onAction="#afficherModuleComments"
+                        styleClass="sidebar-nav-button" text="Gestion des commentaires"/>
+            </VBox>
+            <Region VBox.vgrow="ALWAYS"/>
+            <Button maxWidth="1.7976931348623157E308" onAction="#rafraichirDonnees" styleClass="logout-button"
+                    text="Actualiser les donnees"/>
+        </VBox>
+    </left>
     <center>
-        <TabPane tabClosingPolicy="UNAVAILABLE">
-            <tabs>
-                <Tab text="Regimes alimentaires">
-                    <content>
-                        <VBox spacing="14.0">
-                            <padding>
-                                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
-                            </padding>
-                            <SplitPane dividerPositions="0.38">
-                                <items>
-                                    <VBox spacing="12.0">
-                                        <GridPane hgap="10.0" vgap="10.0">
-                                            <Label text="ID" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                            <TextField fx:id="tfRegimeId" editable="false" promptText="Auto" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                                            <Label text="Nom" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                            <TextField fx:id="tfRegimeNom" promptText="Nom du regime" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                                            <Label text="Description" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                                            <TextArea fx:id="taRegimeDescription" prefHeight="120.0" promptText="Description du regime" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-                                            <Label text="Objectif calorique" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                                            <TextField fx:id="tfRegimeObjectifCalorique" promptText="Ex: 2200" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                                            <Label text="Actif" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                                            <CheckBox fx:id="chkRegimeActif" selected="true" text="Regime actif" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-                                        </GridPane>
-                                        <HBox spacing="10.0">
-                                            <Button mnemonicParsing="false" onAction="#ajouterRegime" text="Ajouter"/>
-                                            <Button mnemonicParsing="false" onAction="#modifierRegime" text="Modifier"/>
-                                            <Button mnemonicParsing="false" onAction="#supprimerRegime" text="Supprimer"/>
-                                            <Button mnemonicParsing="false" onAction="#viderFormulaireRegime" text="Vider"/>
-                                        </HBox>
-                                    </VBox>
-                                    <TableView fx:id="tableRegimes">
-                                        <columns>
-                                            <TableColumn fx:id="colRegimeId" prefWidth="70.0" text="ID"/>
-                                            <TableColumn fx:id="colRegimeNom" prefWidth="150.0" text="Nom"/>
-                                            <TableColumn fx:id="colRegimeDescription" prefWidth="230.0" text="Description"/>
-                                            <TableColumn fx:id="colRegimeObjectifCalorique" prefWidth="140.0" text="Objectif"/>
-                                            <TableColumn fx:id="colRegimeActif" prefWidth="90.0" text="Actif"/>
-                                        </columns>
-                                    </TableView>
-                                </items>
-                            </SplitPane>
+        <ScrollPane fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER" styleClass="app-scroll" vbarPolicy="AS_NEEDED">
+            <content>
+                <StackPane>
+                    <VBox fx:id="viewForums" fillWidth="true" spacing="22.0" styleClass="content-root">
+                        <padding>
+                            <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
+                        </padding>
+                        <VBox spacing="8.0" styleClass="hero-banner">
+                            <Label styleClass="hero-title" text="Gestion des forums"/>
+                            <Label styleClass="hero-subtitle" text="Ajoutez, modifiez, supprimez ou explorez les discussions du forum."/>
                         </VBox>
-                    </content>
-                </Tab>
-                <Tab text="Repas">
-                    <content>
-                        <VBox spacing="14.0">
-                            <padding>
-                                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
-                            </padding>
-                            <SplitPane dividerPositions="0.38">
-                                <items>
-                                    <VBox spacing="12.0">
-                                        <GridPane hgap="10.0" vgap="10.0">
-                                            <Label text="ID" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
-                                            <TextField fx:id="tfRepasId" editable="false" promptText="Auto" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-                                            <Label text="Nom" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
-                                            <TextField fx:id="tfRepasNom" promptText="Nom du repas" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-                                            <Label text="Description" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
-                                            <TextArea fx:id="taRepasDescription" prefHeight="120.0" promptText="Description du repas" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-                                            <Label text="Calories" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
-                                            <TextField fx:id="tfRepasCalories" promptText="Ex: 650" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-                                            <Label text="Type de repas" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
-                                            <ComboBox fx:id="cbTypeRepas" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-
-                                            <Label text="Date repas" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
-                                            <DatePicker fx:id="dpDateRepas" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-
-                                            <Label text="Regime lie" GridPane.columnIndex="0" GridPane.rowIndex="6"/>
-                                            <ComboBox fx:id="cbRepasRegime" prefWidth="220.0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-                                        </GridPane>
-                                        <HBox spacing="10.0">
-                                            <Button mnemonicParsing="false" onAction="#ajouterRepas" text="Ajouter"/>
-                                            <Button mnemonicParsing="false" onAction="#modifierRepas" text="Modifier"/>
-                                            <Button mnemonicParsing="false" onAction="#supprimerRepas" text="Supprimer"/>
-                                            <Button mnemonicParsing="false" onAction="#viderFormulaireRepas" text="Vider"/>
-                                        </HBox>
+                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+                            <Button fx:id="btnActionCreerForum" maxWidth="1.7976931348623157E308" onAction="#afficherCreationForum" styleClass="action-card action-card-active" text="Creer un forum&#10;Ajoutez un nouveau sujet de discussion." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionModifierForum" maxWidth="1.7976931348623157E308" onAction="#afficherModificationForum" styleClass="action-card" text="Modifier un forum&#10;Mettez a jour un sujet existant." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionSupprimerForum" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionForum" styleClass="action-card" text="Supprimer un forum&#10;Retirez un sujet et ses commentaires." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Button fx:id="btnActionExplorerForum" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationForum" styleClass="action-card" text="Explorer les forums&#10;Consultez tous les forums enregistres." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <StackPane>
+                            <VBox fx:id="paneForumCreate" spacing="18.0" styleClass="panel-card">
+                                <Label styleClass="section-title" text="Creer un forum"/>
+                                <Label styleClass="section-subtitle" text="Saisissez le titre et le contenu de la discussion."/>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Titre"/>
+                                        <TextField fx:id="tfForumTitle" promptText="Ex: Conseils pour debuter" styleClass="text-input"/>
                                     </VBox>
-                                    <TableView fx:id="tableRepas">
-                                        <columns>
-                                            <TableColumn fx:id="colRepasId" prefWidth="60.0" text="ID"/>
-                                            <TableColumn fx:id="colRepasNom" prefWidth="130.0" text="Nom"/>
-                                            <TableColumn fx:id="colRepasDescription" prefWidth="200.0" text="Description"/>
-                                            <TableColumn fx:id="colRepasCalories" prefWidth="90.0" text="Calories"/>
-                                            <TableColumn fx:id="colRepasType" prefWidth="110.0" text="Type"/>
-                                            <TableColumn fx:id="colRepasDate" prefWidth="120.0" text="Date"/>
-                                            <TableColumn fx:id="colRepasRegimeId" prefWidth="110.0" text="Regime ID"/>
-                                        </columns>
-                                    </TableView>
-                                </items>
-                            </SplitPane>
+                                    <VBox spacing="8.0" styleClass="field-card field-card-wide" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Contenu"/>
+                                        <TextArea fx:id="taForumContent" prefHeight="140.0" promptText="Decrivez le sujet du forum..." styleClass="text-area-input"/>
+                                    </VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireForum" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#ajouterForum" styleClass="primary-button" text="Creer le forum"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneForumEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Modifier un forum"/>
+                                <Label styleClass="section-subtitle" text="Selectionnez un forum puis mettez a jour son contenu."/>
+                                <TextField fx:id="tfForumId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableForumsEdit" prefHeight="300.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colForumIdEdit" prefWidth="90.0" text="ID"/>
+                                        <TableColumn fx:id="colForumTitleEdit" prefWidth="240.0" text="Titre"/>
+                                        <TableColumn fx:id="colForumContentEdit" prefWidth="620.0" text="Contenu"/>
+                                    </columns>
+                                </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Titre"/>
+                                        <TextField fx:id="tfForumTitleEdit" styleClass="text-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card field-card-wide" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Contenu"/>
+                                        <TextArea fx:id="taForumContentEdit" prefHeight="140.0" styleClass="text-area-input"/>
+                                    </VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireForumModification" styleClass="secondary-button" text="Reinitialiser"/>
+                                    <Button onAction="#modifierForum" styleClass="primary-button" text="Mettre a jour"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneForumDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Supprimer un forum"/>
+                                <Label styleClass="section-subtitle" text="La suppression d'un forum supprimera aussi ses commentaires."/>
+                                <TableView fx:id="tableForumsDelete" prefHeight="470.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colForumIdDelete" prefWidth="90.0" text="ID"/>
+                                        <TableColumn fx:id="colForumTitleDelete" prefWidth="240.0" text="Titre"/>
+                                        <TableColumn fx:id="colForumContentDelete" prefWidth="620.0" text="Contenu"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblForumSelectionDelete" styleClass="hint-label" text="Aucun forum selectionne"/>
+                                    <Button onAction="#supprimerForum" styleClass="danger-button" text="Supprimer definitivement"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneForumExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Explorer les forums"/>
+                                <Label styleClass="section-subtitle" text="Consultez la liste complete des forums."/>
+                                <TableView fx:id="tableForums" prefHeight="560.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colForumId" prefWidth="90.0" text="ID"/>
+                                        <TableColumn fx:id="colForumTitle" prefWidth="240.0" text="Titre"/>
+                                        <TableColumn fx:id="colForumContent" prefWidth="620.0" text="Contenu"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                    <VBox fx:id="viewComments" fillWidth="true" managed="false" spacing="22.0" styleClass="content-root" visible="false">
+                        <padding>
+                            <Insets bottom="30.0" left="30.0" right="30.0" top="26.0"/>
+                        </padding>
+                        <VBox spacing="8.0" styleClass="hero-banner">
+                            <Label styleClass="hero-title" text="Gestion des commentaires"/>
+                            <Label styleClass="hero-subtitle" text="Ajoutez des commentaires lies a un forum existant."/>
                         </VBox>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
+                        <GridPane hgap="18.0" vgap="18.0" styleClass="action-grid">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                            </columnConstraints>
+                            <Button fx:id="btnActionCreerComment" maxWidth="1.7976931348623157E308" onAction="#afficherCreationComment" styleClass="action-card action-card-active" text="Creer un commentaire&#10;Ajoutez un commentaire a un forum." GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionModifierComment" maxWidth="1.7976931348623157E308" onAction="#afficherModificationComment" styleClass="action-card" text="Modifier un commentaire&#10;Mettez a jour un commentaire existant." GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                            <Button fx:id="btnActionSupprimerComment" maxWidth="1.7976931348623157E308" onAction="#afficherSuppressionComment" styleClass="action-card" text="Supprimer un commentaire&#10;Retirez un commentaire de la base." GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                            <Button fx:id="btnActionExplorerComment" maxWidth="1.7976931348623157E308" onAction="#afficherExplorationComment" styleClass="action-card" text="Explorer les commentaires&#10;Consultez tous les commentaires lies aux forums." GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        </GridPane>
+                        <StackPane>
+                            <VBox fx:id="paneCommentCreate" spacing="18.0" styleClass="panel-card">
+                                <Label styleClass="section-title" text="Creer un commentaire"/>
+                                <Label styleClass="section-subtitle" text="Choisissez d'abord un forum disponible, puis ajoutez le commentaire."/>
+                                <Label styleClass="section-block-title" text="Forums disponibles"/>
+                                <Label fx:id="lblNoForumsAvailable" managed="false" styleClass="empty-state-label" text="there is no forums available" visible="false"/>
+                                <TableView fx:id="tableForumsForComment" prefHeight="260.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colCommentForumSelectId" prefWidth="90.0" text="ID"/>
+                                        <TableColumn fx:id="colCommentForumSelectTitle" prefWidth="240.0" text="Titre"/>
+                                        <TableColumn fx:id="colCommentForumSelectContent" prefWidth="520.0" text="Contenu"/>
+                                    </columns>
+                                </TableView>
+                                <Label fx:id="lblSelectedForum" styleClass="hint-label" text="Aucun forum selectionne"/>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Forum"/>
+                                        <ComboBox fx:id="cbCommentForum" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card field-card-wide" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Contenu du commentaire"/>
+                                        <TextArea fx:id="taCommentContent" prefHeight="140.0" promptText="Votre commentaire..." styleClass="text-area-input"/>
+                                    </VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireComment" styleClass="secondary-button" text="Vider"/>
+                                    <Button onAction="#ajouterComment" styleClass="primary-button" text="Creer le commentaire"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneCommentEdit" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Modifier un commentaire"/>
+                                <Label styleClass="section-subtitle" text="Selectionnez un commentaire puis mettez a jour son contenu ou son forum."/>
+                                <TextField fx:id="tfCommentId" editable="false" managed="false" visible="false"/>
+                                <TableView fx:id="tableCommentsEdit" prefHeight="300.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colCommentIdEdit" prefWidth="90.0" text="ID"/>
+                                        <TableColumn fx:id="colCommentContentEdit" prefWidth="500.0" text="Contenu"/>
+                                        <TableColumn fx:id="colCommentForumEdit" prefWidth="280.0" text="Forum"/>
+                                    </columns>
+                                </TableView>
+                                <GridPane hgap="16.0" vgap="16.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                        <ColumnConstraints hgrow="ALWAYS" percentWidth="50.0"/>
+                                    </columnConstraints>
+                                    <VBox spacing="8.0" styleClass="field-card" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Forum"/>
+                                        <ComboBox fx:id="cbCommentForumEdit" maxWidth="1.7976931348623157E308" styleClass="combo-input"/>
+                                    </VBox>
+                                    <VBox spacing="8.0" styleClass="field-card field-card-wide" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label styleClass="field-label" text="Contenu du commentaire"/>
+                                        <TextArea fx:id="taCommentContentEdit" prefHeight="140.0" styleClass="text-area-input"/>
+                                    </VBox>
+                                </GridPane>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Button onAction="#viderFormulaireCommentModification" styleClass="secondary-button" text="Reinitialiser"/>
+                                    <Button onAction="#modifierComment" styleClass="primary-button" text="Mettre a jour"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneCommentDelete" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Supprimer un commentaire"/>
+                                <Label styleClass="section-subtitle" text="Selectionnez le commentaire a supprimer."/>
+                                <TableView fx:id="tableCommentsDelete" prefHeight="470.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colCommentIdDelete" prefWidth="90.0" text="ID"/>
+                                        <TableColumn fx:id="colCommentContentDelete" prefWidth="500.0" text="Contenu"/>
+                                        <TableColumn fx:id="colCommentForumDelete" prefWidth="280.0" text="Forum"/>
+                                    </columns>
+                                </TableView>
+                                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                    <Label fx:id="lblCommentSelectionDelete" styleClass="hint-label" text="Aucun commentaire selectionne"/>
+                                    <Button onAction="#supprimerComment" styleClass="danger-button" text="Supprimer definitivement"/>
+                                </HBox>
+                            </VBox>
+                            <VBox fx:id="paneCommentExplore" managed="false" spacing="18.0" styleClass="panel-card" visible="false">
+                                <Label styleClass="section-title" text="Explorer les commentaires"/>
+                                <Label styleClass="section-subtitle" text="Consultez tous les commentaires et leur forum associe."/>
+                                <TableView fx:id="tableComments" prefHeight="560.0" styleClass="data-table">
+                                    <columns>
+                                        <TableColumn fx:id="colCommentId" prefWidth="90.0" text="ID"/>
+                                        <TableColumn fx:id="colCommentContent" prefWidth="500.0" text="Contenu"/>
+                                        <TableColumn fx:id="colCommentForum" prefWidth="280.0" text="Forum"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                        </StackPane>
+                    </VBox>
+                </StackPane>
+            </content>
+        </ScrollPane>
     </center>
 </BorderPane>

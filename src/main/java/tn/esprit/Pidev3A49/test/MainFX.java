@@ -13,7 +13,7 @@ public class MainFX extends Application {
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(MainFX.class.getResource("/Main.fxml"));
         Scene scene = new Scene(loader.load());
-        stage.setTitle("Fitopia");
+        stage.setTitle("PiDev Forum");
         stage.setScene(scene);
         stage.show();
     }
