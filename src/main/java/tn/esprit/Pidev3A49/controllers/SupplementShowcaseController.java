@@ -3,8 +3,10 @@ package tn.esprit.Pidev3A49.controllers;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -14,6 +16,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.Models.CartItem;
 import tn.esprit.Pidev3A49.Models.Supplement;
 import tn.esprit.Pidev3A49.services.ServiceSupplement;
@@ -107,6 +110,42 @@ public class SupplementShowcaseController {
 
     public void openMyOrders(ActionEvent event) throws IOException {
         SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.FRONT_ORDERS_VIEW);
+    }
+
+    @FXML
+    public void openSupplementStore(ActionEvent event) {
+        if (rootScrollPane != null) {
+            rootScrollPane.setVvalue(0.0);
+        }
+    }
+
+    @FXML
+    public void refreshStore(ActionEvent event) {
+        loadProducts();
+        renderCart();
+        if (rootScrollPane != null) {
+            rootScrollPane.setVvalue(0.0);
+        }
+    }
+
+    @FXML
+    public void openEventsSection(ActionEvent event) {
+        if (rootScrollPane != null) {
+            rootScrollPane.setVvalue(1.0);
+        }
+    }
+
+    @FXML
+    public void openForumFeed(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/front-feed.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException exception) {
+            throw new IllegalStateException("Impossible d'ouvrir front-feed.fxml.", exception);
+        }
     }
 
     public void goBackOrExit(ActionEvent event) throws IOException {

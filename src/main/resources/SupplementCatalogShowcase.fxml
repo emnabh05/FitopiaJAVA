@@ -21,16 +21,56 @@
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
+            stylesheets="@styles/admin-theme.css"
             style="-fx-background: #E9FBF3; -fx-background-color: #E9FBF3;">
     <content>
         <VBox fx:id="contentRoot"
               prefWidth="1280.0"
               spacing="26.0"
               style="-fx-background-color: linear-gradient(to bottom right, #F7FFFB, #E5FBF3);">
-            <padding>
-                <Insets top="34.0" right="34.0" bottom="40.0" left="34.0"/>
-            </padding>
             <children>
+                <VBox styleClass="navbar-container">
+                    <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                        <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10">
+                            <Label text="ï‚š" styleClass="social-icon" />
+                            <Label text="ï‚™" styleClass="social-icon" />
+                            <Label text="ï…­" styleClass="social-icon" />
+                        </HBox>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
+                        <VBox alignment="CENTER" spacing="0">
+                            <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                            <Label text="FITOPIA" styleClass="navbar-logo-text" />
+                        </VBox>
+
+                        <Region prefWidth="20" />
+
+                        <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                        <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+
+                        <Region prefWidth="10" />
+
+                        <Button onAction="#openFitnessFront" text="EXPLORE&#10;OUR&#10;DIET&amp;EATING&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openSupplementStore" text="EXPLORE&#10;OUR&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openFitnessFront" text="EXPLORE&#10;OUR&#10;FITNESS&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openEventsSection" text="EXPLORE&#10;OUR&#10;EVENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openForumFeed" text="EXPLORE&#10;FORUMS&amp;BLOGS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#refreshStore" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                        <Button onAction="#openBackEnd" text="CHANGE&#10;SESSIONS" textAlignment="CENTER" styleClass="navbar-btn-red" />
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="26.0">
+                    <padding>
+                        <Insets top="34.0" right="34.0" bottom="40.0" left="34.0"/>
+                    </padding>
+                    <children>
                 <VBox spacing="20.0"
                       style="-fx-background-color: linear-gradient(to right, #0D3141, #1B7A61); -fx-background-radius: 34; -fx-effect: dropshadow(gaussian, rgba(5, 40, 34, 0.22), 26, 0.24, 0, 14);">
                     <padding>
@@ -38,44 +78,6 @@
                     </padding>
 
                     <children>
-                        <HBox alignment="CENTER_RIGHT">
-                            <children>
-                                <Region HBox.hgrow="ALWAYS"/>
-                                <FlowPane hgap="12.0" vgap="12.0" alignment="CENTER_RIGHT" prefWrapLength="720.0">
-                                    <children>
-                                        <Button text="Back End"
-                                                onAction="#openBackEnd"
-                                                prefHeight="42.0"
-                                                style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                        <Button text="Fitness Front"
-                                                onAction="#openFitnessFront"
-                                                prefHeight="42.0"
-                                                style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.28); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                        <Button text="My Progress"
-                                                onAction="#openProgressTracker"
-                                                prefHeight="42.0"
-                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                        <Button text="Ranking"
-                                                onAction="#openMonthlyRanking"
-                                                prefHeight="42.0"
-                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                        <Button text="Cart"
-                                                onAction="#showCartPanel"
-                                                prefHeight="42.0"
-                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                        <Button text="Checkout"
-                                                onAction="#openCheckout"
-                                                prefHeight="42.0"
-                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                        <Button text="My Orders"
-                                                onAction="#openMyOrders"
-                                                prefHeight="42.0"
-                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
-                                    </children>
-                                </FlowPane>
-                            </children>
-                        </HBox>
-
                         <HBox spacing="26.0" alignment="CENTER_LEFT">
                             <children>
                                 <VBox spacing="16.0" prefWidth="760.0">
@@ -356,6 +358,8 @@
                     </children>
                 </HBox>
 
+                    </children>
+                </VBox>
             </children>
         </VBox>
     </content>
