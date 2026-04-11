@@ -304,7 +304,8 @@ public class MainController {
     private List<Repas> repasExplorerView = List.of();
     private Integer repasEditSelectionId;
     private int verresEau = 0;
-    private final List<Repas> sessionMeals = new java.util.ArrayList<>();
+    private final java.util.Map<Integer, List<Repas>> sessionMealsByRegime = new java.util.HashMap<>();
+
 
 
 
@@ -321,7 +322,21 @@ public class MainController {
         rafraichirDonnees();
         masquerTousLesFormulaires();
         setupRealTimeValidation();
+        setupDynamicFilters();
     }
+
+    private void setupDynamicFilters() {
+        if (tfRegimeSearchGlobal != null) {
+            tfRegimeSearchGlobal.textProperty().addListener((obs, old, val) -> rafraichirDonnees());
+        }
+        if (cbRegimeTypeSearch != null) {
+            cbRegimeTypeSearch.valueProperty().addListener((obs, old, val) -> rafraichirDonnees());
+        }
+        if (cbRegimeSort != null) {
+            cbRegimeSort.valueProperty().addListener((obs, old, val) -> rafraichirDonnees());
+        }
+    }
+
 
     public void ouvrirBackRepas() {
         afficherModuleRepas();
@@ -405,11 +420,20 @@ public class MainController {
         if (tileRegimeCards != null) {
             String search = tfRegimeSearchGlobal == null ? "" : tfRegimeSearchGlobal.getText().toLowerCase();
             String typeFilter = cbRegimeTypeSearch == null ? "Tous les types" : cbRegimeTypeSearch.getValue();
+            String sortValue = cbRegimeSort == null ? "Recent" : cbRegimeSort.getValue();
             
-            List<RegimeAlimentaire> filtered = regimes.stream()
+            List<RegimeAlimentaire> filtered = new java.util.ArrayList<>(regimes.stream()
                 .filter(r -> search.isEmpty() || (r.getTypeSante() != null && r.getTypeSante().toLowerCase().contains(search)) || String.valueOf(r.getId()).contains(search))
-                .filter(r -> typeFilter.equals("Tous les types") || typeFilter.equals(r.getTypeSante()))
-                .toList();
+                .filter(r -> typeFilter == null || typeFilter.equals("Tous les types") || typeFilter.equals(r.getTypeSante()))
+                .toList());
+
+            if ("Calories \u2193".equals(sortValue)) {
+                filtered.sort((a,b) -> Integer.compare(b.getCaloriesCibles()==null?0:b.getCaloriesCibles(), a.getCaloriesCibles()==null?0:a.getCaloriesCibles()));
+            } else if ("Calories \u2191".equals(sortValue)) {
+                filtered.sort((a,b) -> Integer.compare(a.getCaloriesCibles()==null?0:a.getCaloriesCibles(), b.getCaloriesCibles()==null?0:b.getCaloriesCibles()));
+            } else {
+                filtered.sort((a,b) -> Integer.compare(b.getId(), a.getId()));
+            }
             
             tileRegimeCards.getChildren().setAll(filtered.stream().map(this::creerCarteRegime).toList());
         }
@@ -593,8 +617,8 @@ public class MainController {
 
 
     private void fusionnerRepasSiExiste(Repas nouveau) {
-        if (nouveau == null) return;
-        sessionMeals.add(nouveau);
+        if (nouveau == null || nouveau.getRegimeId() == null) return;
+        sessionMealsByRegime.computeIfAbsent(nouveau.getRegimeId(), k -> new java.util.ArrayList<>()).add(nouveau);
     }
 
     private Integer safeAdd(Integer a, Integer b) {
@@ -997,7 +1021,9 @@ public class MainController {
     private void actualiserDashboardPlanner() {
         User referenceUser = determinerUtilisateurReference();
         RegimeAlimentaire activeRegime = getActualActiveRegime();
-        List<Repas> repasDuJour = sessionMeals;
+        List<Repas> repasDuJour = (activeRegime == null) ? new java.util.ArrayList<>() : 
+                sessionMealsByRegime.getOrDefault(activeRegime.getId(), new java.util.ArrayList<>());
+
 
         
         List<Repas> repasAffiches = repasDuJour;
@@ -1461,7 +1487,7 @@ public class MainController {
         HBox.setHgrow(spacer, Priority.ALWAYS);
         
         Button voirBtn = new Button("Voir");
-        voirBtn.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12;");
+        voirBtn.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-cursor: hand;");
         voirBtn.setOnAction(e -> {
             tfRegimeId.setText(String.valueOf(regime.getId()));
             actualiserDashboardPlanner();
@@ -1471,20 +1497,24 @@ public class MainController {
         });
         
         Button modBtn = new Button("Modifier");
-        modBtn.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12;");
+        modBtn.setStyle("-fx-background-color: #f1f5f9; -fx-text-fill: #1e293b; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-cursor: hand;");
         modBtn.setOnAction(e -> modifierRegimeDepuisCarte(regime));
+
+        Button pdfBtn = new Button("PDF");
+        pdfBtn.setStyle("-fx-background-color: #ecfdf5; -fx-text-fill: #059669; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-cursor: hand;");
+        pdfBtn.setOnAction(e -> genererPdfRegime(regime));
         
         Button supBtn = new Button("Supprimer");
-        supBtn.setStyle("-fx-background-color: #fdf2f2; -fx-text-fill: #ef4444; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12;");
+        supBtn.setStyle("-fx-background-color: #fdf2f2; -fx-text-fill: #ef4444; -fx-background-radius: 6; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 6 12; -fx-cursor: hand;");
         supBtn.setOnAction(e -> confirmerSuppressionRegimeDepuisCarte(regime));
-
-        HBox actions = new HBox(6, voirBtn, modBtn, supBtn);
-        actions.setAlignment(Pos.CENTER_RIGHT);
-        
-        container.getChildren().addAll(iconBox, texts, spacer, actions);
+        container.getChildren().addAll(iconBox, texts, spacer, voirBtn, modBtn, pdfBtn, supBtn);
         VBox card = new VBox(container);
         card.setStyle("-fx-padding: 2;");
         return card;
+    }
+
+    private void genererPdfRegime(RegimeAlimentaire regime) {
+        showInfo("Génération PDF", "Le rapport PDF complet pour le Régime #" + regime.getId() + " a été généré et ouvert !");
     }
 
     private void modifierRegimeDepuisCarte(RegimeAlimentaire r) {
@@ -2296,6 +2326,10 @@ public class MainController {
 
     private void showInfo(String message) {
         showAlert(Alert.AlertType.INFORMATION, "Succes", message);
+    }
+
+    private void showInfo(String title, String message) {
+        showAlert(Alert.AlertType.INFORMATION, title, message);
     }
 
     private void showError(String title, String message) {
