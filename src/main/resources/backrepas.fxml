@@ -81,6 +81,11 @@
                             <Label styleClass="back-nav-icon" text="&#127807;" style="-fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
                         </graphic>
                     </Button>
+                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#ouvrirSupplementsAdmin" styleClass="back-nav-button back-menu-link" text="Gestion supplements" wrapText="true" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-weight: 800; -fx-font-size: 15px; -fx-padding: 12 16; -fx-alignment: center-left; -fx-graphic-text-gap: 12;" textFill="WHITE">
+                        <graphic>
+                            <Label styleClass="back-nav-icon" text="&#128722;" style="-fx-text-fill: white; -fx-font-size: 16px; -fx-min-width: 20; -fx-alignment: center;" />
+                        </graphic>
+                    </Button>
                 </VBox>
                 <Region VBox.vgrow="ALWAYS" />
                 <VBox spacing="12.0" styleClass="back-sidebar-footer">

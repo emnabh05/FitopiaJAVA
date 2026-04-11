@@ -394,6 +394,33 @@ public class MainController {
         }
     }
 
+    @FXML
+    private void ouvrirSupplementsFront() {
+        ouvrirSceneSimple("/SupplementCatalogShowcase.fxml", "Impossible d'ouvrir l'interface supplements.");
+    }
+
+    @FXML
+    private void ouvrirSupplementsAdmin() {
+        ouvrirSceneSimple("/SupplementAdmin.fxml", "Impossible d'ouvrir l'administration supplements.");
+    }
+
+    private void ouvrirSceneSimple(String resourcePath, String errorMessage) {
+        if (viewRepas == null || viewRepas.getScene() == null) {
+            showError("Navigation", errorMessage);
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(resourcePath));
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) viewRepas.getScene().getWindow();
+            stage.setScene(scene);
+            stage.show();
+        } catch (IOException exception) {
+            showError("Navigation", errorMessage + " " + exception.getMessage());
+        }
+    }
+
     @FXML private void afficherModuleRepas() { afficherVue(viewRepas, viewRegimes, viewForumComment); activerBoutonModule(btnModuleRepas, btnModuleRegimes, btnModuleForumComment); }
     @FXML private void afficherModuleRegimes() { afficherVue(viewRegimes, viewRepas, viewForumComment); activerBoutonModule(btnModuleRegimes, btnModuleRepas, btnModuleForumComment); }
     @FXML private void afficherModuleForumComment() { afficherVue(viewForumComment, viewRepas, viewRegimes); activerBoutonModule(btnModuleForumComment, btnModuleRepas, btnModuleRegimes); }

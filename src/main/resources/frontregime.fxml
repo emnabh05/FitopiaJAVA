@@ -40,7 +40,7 @@
                 
                 <!-- Action Buttons -->
                 <Button fx:id="btnModuleRegimes" onAction="#afficherModuleRegimes" text="EXPLORE&#10;OUR&#10;DIET&amp;EATING&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
-                <Button fx:id="btnModuleRepas" onAction="#afficherModuleRepas" text="EXPLORE&#10;OUR&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button fx:id="btnModuleRepas" onAction="#ouvrirSupplementsFront" text="EXPLORE&#10;OUR&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
                 <Button text="EXPLORE&#10;OUR&#10;FITNESS&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
                 <Button text="EXPLORE&#10;OUR&#10;EVENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
                 <Button fx:id="btnModuleForumComment" onAction="#afficherModuleForumComment" text="EXPLORE&#10;FORUMS&amp;BLOGS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
