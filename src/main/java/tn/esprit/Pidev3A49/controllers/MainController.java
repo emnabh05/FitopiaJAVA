@@ -1514,7 +1514,138 @@ public class MainController {
     }
 
     private void genererPdfRegime(RegimeAlimentaire regime) {
-        showInfo("Génération PDF", "Le rapport PDF complet pour le Régime #" + regime.getId() + " a été généré et ouvert !");
+        try {
+            String desktop = System.getProperty("user.home") + java.io.File.separator + "Desktop";
+            String fileName = desktop + java.io.File.separator + "Regime_" + regime.getId() + ".pdf";
+
+            // ── Colors ─────────────────────────────
+            float[] darkGreen  = {0.04f, 0.36f, 0.29f};  // #0a5c4a
+            float[] lightGreen = {0.88f, 0.97f, 0.93f};  // #e1f7ee
+            float[] white      = {1f, 1f, 1f};
+            float[] darkText   = {0.07f, 0.13f, 0.20f};
+
+            try (org.apache.pdfbox.pdmodel.PDDocument doc = new org.apache.pdfbox.pdmodel.PDDocument()) {
+                org.apache.pdfbox.pdmodel.PDPage page = new org.apache.pdfbox.pdmodel.PDPage(
+                        org.apache.pdfbox.pdmodel.common.PDRectangle.A4);
+                doc.addPage(page);
+
+                float W = page.getMediaBox().getWidth();   // 595
+                float H = page.getMediaBox().getHeight();  // 842
+
+                org.apache.pdfbox.pdmodel.PDPageContentStream cs =
+                        new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page);
+
+                org.apache.pdfbox.pdmodel.font.PDType1Font bold    = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
+                org.apache.pdfbox.pdmodel.font.PDType1Font regular = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA;
+
+                // ── Header Banner ───────────────────
+                cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
+                cs.addRect(0, H - 110, W, 110);
+                cs.fill();
+
+                // Header text
+                cs.beginText();
+                cs.setFont(bold, 26);
+                cs.setNonStrokingColor(white[0], white[1], white[2]);
+                cs.newLineAtOffset(40, H - 54);
+                cs.showText("FITOPIA - Rapport Regime");
+                cs.endText();
+
+                cs.beginText();
+                cs.setFont(regular, 13);
+                cs.setNonStrokingColor(0.7f, 0.95f, 0.85f);
+                cs.newLineAtOffset(40, H - 80);
+                String typeSante = valeurOuDefaut(regime.getTypeSante(), "N/A");
+                cs.showText("Regime #" + regime.getId() + "   Type : " + typeSante + "   Genere le : " + java.time.LocalDate.now());
+                cs.endText();
+
+                // ── Light green divider ──────────────
+                cs.setNonStrokingColor(lightGreen[0], lightGreen[1], lightGreen[2]);
+                cs.addRect(0, H - 116, W, 6);
+                cs.fill();
+
+                // ── Section : Données du régime ────
+                float y = H - 160;
+                cs.beginText();
+                cs.setFont(bold, 14);
+                cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
+                cs.newLineAtOffset(40, y);
+                cs.showText("Donnees du regime");
+                cs.endText();
+
+                // Underline
+                cs.setStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
+                cs.setLineWidth(1.5f);
+                cs.moveTo(40, y - 4);
+                cs.lineTo(W - 40, y - 4);
+                cs.stroke();
+
+                // ── Table rows ──────────────────────
+                String[][] rows = {
+                    {"Utilisateur",      valeurOuDefaut(determinerUtilisateurReference() == null ? null : determinerUtilisateurReference().getEmail(), "N/A")},
+                    {"Type de sante",    valeurOuDefaut(regime.getTypeSante(), "N/A")},
+                    {"Taille",           (regime.getTaille() == null ? "--" : regime.getTaille()) + " cm"},
+                    {"Poids",            (regime.getPoids() == null ? "--" : regime.getPoids()) + " kg"},
+                    {"Age",              (regime.getAge() == null ? "--" : regime.getAge()) + " ans"},
+                    {"BMI",              regime.getBmi() == null ? "--" : String.format("%.2f", regime.getBmi())},
+                    {"Calories cibles",  (regime.getCaloriesCibles() == null ? "--" : regime.getCaloriesCibles()) + " kcal/j"},
+                    {"Repas adequats",   valeurOuDefaut(regime.getRepasAdequats(), "Aucune recommandation")},
+                };
+
+                float rowH = 30, rowY = y - 24;
+                for (int i = 0; i < rows.length; i++) {
+                    // Alternating row background
+                    if (i % 2 == 0) {
+                        cs.setNonStrokingColor(lightGreen[0], lightGreen[1], lightGreen[2]);
+                    } else {
+                        cs.setNonStrokingColor(white[0], white[1], white[2]);
+                    }
+                    cs.addRect(40, rowY - rowH + 8, W - 80, rowH);
+                    cs.fill();
+
+                    // Label
+                    cs.beginText();
+                    cs.setFont(bold, 11);
+                    cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
+                    cs.newLineAtOffset(50, rowY - 4);
+                    cs.showText(rows[i][0]);
+                    cs.endText();
+
+                    // Value
+                    cs.beginText();
+                    cs.setFont(regular, 11);
+                    cs.setNonStrokingColor(darkText[0], darkText[1], darkText[2]);
+                    cs.newLineAtOffset(220, rowY - 4);
+                    String val = rows[i][1];
+                    if (val != null && val.length() > 60) val = val.substring(0, 57) + "...";
+                    cs.showText(val == null ? "--" : val);
+                    cs.endText();
+
+                    rowY -= rowH;
+                }
+
+                // ── Footer ──────────────────────────
+                cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
+                cs.addRect(0, 0, W, 40);
+                cs.fill();
+
+                cs.beginText();
+                cs.setFont(regular, 10);
+                cs.setNonStrokingColor(white[0], white[1], white[2]);
+                cs.newLineAtOffset(40, 14);
+                cs.showText("FITOPIA - Nutrition & Bien-etre   |   Document confidentiel");
+                cs.endText();
+
+                cs.close();
+                doc.save(fileName);
+            }
+
+            showInfo("PDF exporté !", "Fichier sauvegardé sur le Bureau :\n" + "Regime_" + regime.getId() + ".pdf");
+            java.awt.Desktop.getDesktop().open(new java.io.File(fileName));
+
+        } catch (Exception ex) {
+            showError("Erreur PDF", "Impossible de générer le PDF : " + ex.getMessage());
+        }
     }
 
     private void modifierRegimeDepuisCarte(RegimeAlimentaire r) {
