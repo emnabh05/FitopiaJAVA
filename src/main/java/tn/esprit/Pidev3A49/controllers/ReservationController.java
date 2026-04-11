@@ -15,8 +15,11 @@ import tn.esprit.Pidev3A49.models.Participation;
 import tn.esprit.Pidev3A49.models.Reservation;
 import tn.esprit.Pidev3A49.service.ParticipationService;
 import tn.esprit.Pidev3A49.service.ReservationService;
+import tn.esprit.Pidev3A49.utils.MyDataBase;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -67,6 +70,10 @@ public class ReservationController {
         }
 
         try {
+            Connection connection = MyDataBase.getInstance().getConnection();
+            boolean previousAutoCommit = connection.getAutoCommit();
+            connection.setAutoCommit(false);
+
             String lastName = requireText(fullNameField.getText(), "Le nom est obligatoire.");
             String firstName = requireText(firstNameField.getText(), "Le prenom est obligatoire.");
             String fullParticipantName = (lastName + " " + firstName).trim();
@@ -95,6 +102,9 @@ public class ReservationController {
                 ));
             }
 
+            connection.commit();
+            connection.setAutoCommit(previousAutoCommit);
+
             feedbackLabel.setText(
                     (confirmedReservation ? "Reservation confirmee" : "Demande ajoutee en attente")
                             + " pour " + reservation.getNomParticipant() + "."
@@ -105,9 +115,26 @@ public class ReservationController {
 
         } catch (IllegalArgumentException e) {
             feedbackLabel.setText(e.getMessage());
+        } catch (SQLException e) {
+            rollbackReservationTransaction();
+            showError("Reservation impossible", "Erreur lors de l'enregistrement dans la base fitopiabd.");
+            e.printStackTrace();
         } catch (Exception e) {
+            rollbackReservationTransaction();
             showError("Reservation impossible", "Erreur lors de l'enregistrement de la reservation.");
             e.printStackTrace();
+        }
+    }
+
+    private void rollbackReservationTransaction() {
+        try {
+            Connection connection = MyDataBase.getInstance().getConnection();
+            if (!connection.getAutoCommit()) {
+                connection.rollback();
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException rollbackException) {
+            rollbackException.printStackTrace();
         }
     }
 
