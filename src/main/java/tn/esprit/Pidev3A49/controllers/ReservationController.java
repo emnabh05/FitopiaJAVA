@@ -83,7 +83,10 @@ public class ReservationController {
             );
 
             reservationService.add(reservation);
-            if (remainingPlaces > 0) {
+            boolean confirmedReservation = "confirmee".equalsIgnoreCase(reservation.getStatut());
+            boolean alreadyParticipant = participationService.existsForEventAndEmail(event.getIdEvent(), email);
+
+            if (confirmedReservation && !alreadyParticipant) {
                 participationService.add(new Participation(
                         event.getIdEvent(),
                         fullParticipantName,
@@ -93,7 +96,7 @@ public class ReservationController {
             }
 
             feedbackLabel.setText(
-                    (remainingPlaces > 0 ? "Reservation confirmee" : "Demande ajoutee en attente")
+                    (confirmedReservation ? "Reservation confirmee" : "Demande ajoutee en attente")
                             + " pour " + reservation.getNomParticipant() + "."
             );
 

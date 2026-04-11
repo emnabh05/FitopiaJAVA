@@ -28,4 +28,8 @@ public class ParticipationService {
     public List<Participation> getAll() {
         return participationDAO.findAll();
     }
+
+    public boolean existsForEventAndEmail(int idEvent, String emailParticipant) {
+        return participationDAO.existsByEventAndEmail(idEvent, emailParticipant);
+    }
 }
