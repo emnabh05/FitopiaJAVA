@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="820.0" prefWidth="1350.0" style="-fx-background-color: linear-gradient(to bottom, #f5f9f8, #e5efec);" xmlns="http://javafx.com/javafx/22.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.Pidev3A49.test.AdminDashboardController">
+    <children>
+        <VBox spacing="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="34.0" style="-fx-background-color: #0f2830; -fx-padding: 0 34 0 34;">
+                    <children>
+                        <Label style="-fx-text-fill: #d5e2e3; -fx-font-size: 10px;" text="Back Office - Gestion Utilisateur Fitopia" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label style="-fx-text-fill: #d5e2e3; -fx-font-size: 10px;" text="admin panel" />
+                    </children>
+                </HBox>
+                <HBox alignment="CENTER_LEFT" prefHeight="70.0" style="-fx-background-color: white; -fx-border-color: #e8eef0; -fx-border-width: 0 0 1 0; -fx-padding: 0 30 0 30;">
+                    <children>
+                        <Label style="-fx-background-color: #eef7f6; -fx-background-radius: 11; -fx-padding: 9 10 9 10; -fx-text-fill: #0e4a48; -fx-font-weight: bold;" text="F" />
+                        <Label style="-fx-text-fill: #173f44; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 0 28 0 10;" text="Fitopia Admin Dashboard" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label style="-fx-text-fill: #456861;" text="Connecte:" />
+                        <Label fx:id="adminLabel" style="-fx-font-weight: bold; -fx-text-fill: #1a4d44;" text="admin" />
+                        <Button mnemonicParsing="false" onAction="#handleRefresh" style="-fx-background-color: #eef5f4; -fx-text-fill: #22333b; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Refresh" />
+                        <Button mnemonicParsing="false" onAction="#handleLogout" style="-fx-background-color: #2f3540; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Logout" />
+                    </children>
+                </HBox>
+                <VBox spacing="10.0" style="-fx-padding: 18 28 22 28;" VBox.vgrow="ALWAYS">
+                    <children>
+                        <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1b2e35;" text="Tableau des Utilisateurs" />
+                        <Label fx:id="statusLabel" style="-fx-text-fill: #4f625e;" text="Chargement..." />
+                        <TableView fx:id="usersTable" style="-fx-background-radius: 12; -fx-border-color: #dce6e8; -fx-border-radius: 12;" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="idCol" prefWidth="90.0" text="Numero" />
+                                <TableColumn fx:id="nomCol" prefWidth="170.0" text="Nom" />
+                                <TableColumn fx:id="prenomCol" prefWidth="170.0" text="Prenom" />
+                                <TableColumn fx:id="usernameCol" prefWidth="170.0" text="Username" />
+                                <TableColumn fx:id="emailCol" prefWidth="280.0" text="Mail" />
+                                <TableColumn fx:id="roleCol" prefWidth="130.0" text="Role" />
+                                <TableColumn fx:id="phoneCol" prefWidth="170.0" text="Telephone" />
+                            </columns>
+                        </TableView>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

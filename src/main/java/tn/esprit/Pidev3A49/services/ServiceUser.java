@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ServiceUser {
     private static final String TABLE_NAME = "fitopia_users";
@@ -43,6 +44,32 @@ public class ServiceUser {
         return users;
     }
 
+    public Optional<FitopiaUser> authenticate(String identifier, String password) {
+        ensureConnection();
+        String query = "SELECT * FROM `" + TABLE_NAME + "` WHERE (LOWER(email)=LOWER(?) OR LOWER(username)=LOWER(?)) AND password=? LIMIT 1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, identifier);
+            pstm.setString(2, identifier);
+            pstm.setString(3, password);
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapUser(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la connexion utilisateur : " + e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    public boolean emailExists(String email) {
+        return existsByColumn("email", email);
+    }
+
+    public boolean usernameExists(String username) {
+        return existsByColumn("username", username);
+    }
+
     public void add(FitopiaUser user) {
         ensureConnection();
         String query = "INSERT INTO `" + TABLE_NAME + "` (first_name,last_name,username,email,password,phone,birth_date,gender,role,avatar_path,"
@@ -54,6 +81,19 @@ public class ServiceUser {
             pstm.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de l'ajout de l'utilisateur : " + e.getMessage(), e);
+        }
+    }
+
+    private boolean existsByColumn(String column, String value) {
+        ensureConnection();
+        String query = "SELECT 1 FROM `" + TABLE_NAME + "` WHERE LOWER(" + column + ")=LOWER(?) LIMIT 1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, value);
+            try (ResultSet rs = pstm.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la verification " + column + " : " + e.getMessage(), e);
         }
     }
 
