@@ -1,0 +1,662 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Events | Fitopia{% endblock %}
+
+{% block stylesheets %}
+  {{ parent() }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Sora:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --events-bg: #f5f8fb;
+      --events-surface: #ffffff;
+      --events-text: #0f172a;
+      --events-muted: #55627a;
+      --events-brand: #0f7a5f;
+      --events-brand-dark: #0b3a3d;
+      --events-border: #dde6ef;
+      --events-shadow: 0 20px 40px rgba(15, 32, 48, 0.08);
+    }
+    .events-shell {
+      background: radial-gradient(circle at 18% 10%, #e5fff3 0%, transparent 32%),
+                  radial-gradient(circle at 85% 12%, #e8f3ff 0%, transparent 30%),
+                  var(--events-bg);
+      padding: 48px 0 70px;
+      font-family: "Manrope", "Sora", sans-serif;
+      color: var(--events-text);
+    }
+    .events-container {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+    .events-hero {
+      background: linear-gradient(125deg, #0b3a3d 0%, #0f7a5f 55%, #3dcf9f 100%);
+      border-radius: 24px;
+      color: #fff;
+      overflow: hidden;
+      position: relative;
+      box-shadow: var(--events-shadow);
+      margin-bottom: 22px;
+    }
+    .events-hero::after {
+      content: "";
+      position: absolute;
+      right: -90px;
+      top: -90px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.11);
+    }
+    .events-hero-content {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 20px;
+      padding: 36px;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-kicker {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 7px 14px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .events-hero h1 {
+      margin: 0;
+      font-size: clamp(32px, 4.2vw, 52px);
+      font-weight: 800;
+      line-height: 1.05;
+    }
+    .hero-copy {
+      margin-top: 14px;
+      max-width: 48ch;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+    .hero-ctas {
+      margin-top: 22px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .hero-btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-weight: 800;
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-btn:hover { transform: translateY(-2px); }
+    .hero-btn-primary {
+      background: #fff;
+      color: #0b3a3d;
+      box-shadow: 0 12px 24px rgba(8, 26, 35, .2);
+    }
+    .hero-btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+    .featured-panel {
+      background: rgba(255, 255, 255, 0.17);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 16px;
+      padding: 18px;
+      backdrop-filter: blur(4px);
+    }
+    .featured-panel h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+    }
+    .featured-meta {
+      margin-top: 8px;
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+      color: rgba(255, 255, 255, .9);
+    }
+    .trust-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .trust-badge {
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid var(--events-border);
+      color: #203047;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 8px 16px rgba(15, 32, 48, 0.06);
+    }
+    .events-toolbar {
+      background: var(--events-surface);
+      border: 1px solid var(--events-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 1.4fr repeat(4, 1fr);
+      gap: 12px;
+      box-shadow: var(--events-shadow);
+      margin-bottom: 20px;
+    }
+    .events-input, .events-select {
+      border: 1px solid #d5dfe9;
+      border-radius: 12px;
+      min-height: 44px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #173049;
+      width: 100%;
+      background: #fff;
+    }
+    .events-input:focus, .events-select:focus {
+      outline: none;
+      border-color: #3cae8c;
+      box-shadow: 0 0 0 3px rgba(60, 174, 140, .15);
+    }
+    .events-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+    .event-card {
+      background: var(--events-surface);
+      border: 1px solid var(--events-border);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: var(--events-shadow);
+      transition: transform .22s ease, box-shadow .22s ease;
+      animation: cardIn .35s ease both;
+    }
+    .event-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 28px 44px rgba(15, 32, 48, 0.13);
+    }
+    .event-media {
+      aspect-ratio: 16/8;
+      width: 100%;
+      object-fit: cover;
+    }
+    .event-body {
+      padding: 16px;
+    }
+    .event-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .event-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 800;
+      color: #0f2139;
+    }
+    .state-badge {
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      font-weight: 800;
+    }
+    .state-open { background: #e9fbf3; color: #0f7a5f; }
+    .state-full { background: #ffe8e8; color: #ba3030; }
+    .event-meta {
+      margin: 11px 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      color: #415069;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .event-pill {
+      background: #f0f4f8;
+      border-radius: 999px;
+      padding: 7px 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .event-description {
+      margin: 0 0 15px;
+      color: var(--events-muted);
+      line-height: 1.65;
+      font-size: 16px;
+      min-height: 78px;
+    }
+    .event-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .event-price {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0e6f57;
+    }
+    .register-btn {
+      border: 0;
+      background: linear-gradient(120deg, #0b3a3d, #0f7a5f);
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-radius: 12px;
+      padding: 11px 16px;
+      text-decoration: none;
+      transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+      box-shadow: 0 10px 18px rgba(11, 58, 61, .2);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .register-btn:hover { opacity: .95; transform: translateY(-2px); color: #fff; }
+    .register-btn.disabled {
+      background: #d6dfe8;
+      box-shadow: none;
+      color: #5c6a7f;
+      pointer-events: none;
+    }
+    .details-panel {
+      margin-top: 26px;
+      background: #fff;
+      border-radius: 18px;
+      border: 1px solid var(--events-border);
+      box-shadow: var(--events-shadow);
+      padding: 18px;
+    }
+    .details-header {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 18px;
+    }
+    .details-image {
+      width: 100%;
+      border-radius: 14px;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      margin-top: 12px;
+    }
+    .book-panel {
+      border: 1px solid var(--events-border);
+      border-radius: 14px;
+      padding: 14px;
+      background: #fbfdff;
+    }
+    .book-panel h4 { margin: 0 0 8px; font-weight: 800; }
+    .book-panel .form-label { font-size: 13px; font-weight: 700; }
+    .book-panel .form-control {
+      border-radius: 10px;
+      min-height: 42px;
+      border: 1px solid #d6e2ed;
+    }
+    .book-panel .book-trust {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .book-chip {
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 999px;
+      border: 1px solid #d9e7f3;
+      color: #27405a;
+      padding: 5px 10px;
+      background: #fff;
+    }
+    .social-proof {
+      margin-top: 26px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .proof-card {
+      background: #fff;
+      border: 1px solid var(--events-border);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: 0 12px 22px rgba(15, 32, 48, 0.06);
+    }
+    .proof-card p {
+      margin: 0;
+      color: #44526a;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .proof-author {
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      color: #0f2b45;
+    }
+    .empty-note {
+      background: #fff;
+      border: 1px solid var(--events-border);
+      border-radius: 14px;
+      padding: 18px;
+      color: var(--events-muted);
+    }
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 1080px) {
+      .events-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .events-grid { grid-template-columns: 1fr; }
+      .details-header { grid-template-columns: 1fr; }
+      .social-proof { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 768px) {
+      .events-shell { padding-top: 28px; }
+      .events-hero-content { grid-template-columns: 1fr; padding: 24px; }
+      .hero-copy { font-size: 16px; }
+      .events-toolbar { grid-template-columns: 1fr; padding: 12px; }
+      .event-title { font-size: 19px; }
+      .event-description { min-height: 0; font-size: 15px; }
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+{% set events = events|default([]) %}
+{% set stats = stats|default({}) %}
+{% set selectedEvent = selectedEvent|default(null) %}
+{% set upcomingEvent = upcomingEvent|default(null) %}
+{% set typeImages = {
+  'Yoga': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1400&q=80',
+  'Nutrition': 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1400&q=80',
+  'Sport': 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?auto=format&fit=crop&w=1400&q=80',
+  'Cardio': 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1400&q=80'
+} %}
+
+<section class="events-shell">
+  <div class="events-container">
+    {% for message in app.flashes('success') %}<div class="alert alert-success">{{ message }}</div>{% endfor %}
+    {% for message in app.flashes('error') %}<div class="alert alert-danger">{{ message }}</div>{% endfor %}
+
+    <header class="events-hero">
+      <div class="events-hero-content">
+        <div>
+          <span class="hero-kicker">Fitopia Events 2026</span>
+          <h1>Move With Purpose. Book Your Next Wellness Event.</h1>
+          <p class="hero-copy">
+            Premium coaching experiences, real community energy, and a fast secure registration flow.
+            Find the right event and reserve your spot in under a minute.
+          </p>
+          <div class="hero-ctas">
+            <a class="hero-btn hero-btn-primary" href="#events-catalog"><i class="fa fa-bolt"></i> Explore Events</a>
+            {% if upcomingEvent %}
+              <a class="hero-btn hero-btn-secondary" href="{{ path('events', {event: upcomingEvent.id, q: search|default(''), sort: sort|default('asc'), type: selectedType|default('')}) }}"><i class="fa fa-calendar-check-o"></i> Register Next Event</a>
+            {% endif %}
+          </div>
+        </div>
+        <aside class="featured-panel">
+          <h3><i class="fa fa-star"></i> Next Upcoming Event</h3>
+          {% if upcomingEvent %}
+            {% set featuredCount = stats[upcomingEvent.id].participants|default(0) %}
+            <div class="featured-meta">
+              <div><strong>{{ upcomingEvent.titre }}</strong></div>
+              <div><i class="fa fa-calendar"></i> {{ upcomingEvent.dateEvent|date('Y-m-d') }}</div>
+              <div><i class="fa fa-map-marker"></i> {{ upcomingEvent.lieu }}</div>
+              <div><i class="fa fa-users"></i> {{ featuredCount }}/{{ upcomingEvent.capacite }} participants</div>
+              <div><i class="fa fa-money"></i> {% if upcomingEvent.prixEvent|default('0') > 0 %}{{ upcomingEvent.prixEvent }} DT{% else %}Free{% endif %}</div>
+            </div>
+          {% else %}
+            <div class="featured-meta"><div>No event is scheduled yet.</div></div>
+          {% endif %}
+        </aside>
+      </div>
+    </header>
+
+    <div class="trust-row">
+      <span class="trust-badge"><i class="fa fa-check-circle"></i> Verified Coaches</span>
+      <span class="trust-badge"><i class="fa fa-lock"></i> Secure Registration</span>
+      <span class="trust-badge"><i class="fa fa-shield"></i> GDPR Ready</span>
+      <span class="trust-badge"><i class="fa fa-star"></i> Rated 4.8/5 by Members</span>
+    </div>
+
+    <section class="events-toolbar" id="events-catalog" aria-label="Events filters">
+      <input id="eventSearch" class="events-input" type="search" placeholder="Search by title, location, or category..." value="{{ search|default('') }}">
+      <select id="eventCategory" class="events-select">
+        <option value="">All categories</option>
+        {% for type in types|default([]) %}<option value="{{ type }}">{{ type }}</option>{% endfor %}
+      </select>
+      <select id="eventDateFilter" class="events-select">
+        <option value="">All dates</option>
+        <option value="upcoming">Upcoming only</option>
+        <option value="this_month">This month</option>
+      </select>
+      <select id="eventPriceFilter" class="events-select">
+        <option value="">All prices</option>
+        <option value="free">Free</option>
+        <option value="paid">Paid</option>
+        <option value="under25">Under 25 DT</option>
+        <option value="under50">Under 50 DT</option>
+      </select>
+      <select id="eventSort" class="events-select">
+        <option value="date_asc">Sort: Date (soonest)</option>
+        <option value="date_desc">Sort: Date (latest)</option>
+        <option value="price_asc">Sort: Price (low-high)</option>
+        <option value="price_desc">Sort: Price (high-low)</option>
+        <option value="popularity_desc">Sort: Most popular</option>
+      </select>
+    </section>
+
+    <div class="events-grid" id="eventsGrid">
+      {% if events is empty %}
+        <div class="empty-note">No events are available right now.</div>
+      {% endif %}
+      {% for event in events %}
+        {% set participants = stats[event.id].participants|default(0) %}
+        {% set isFull = participants >= event.capacite %}
+        {% set price = event.prixEvent|default('0') + 0 %}
+        {% set imageSrc = (event.imageEvent and event.imageEvent starts with 'event-') ? asset('uploads/events/' ~ event.imageEvent) : typeImages[event.typeEvent]|default('https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1400&q=80') %}
+        <article class="event-card js-event-card"
+          data-title="{{ event.titre|lower }}"
+          data-location="{{ event.lieu|lower }}"
+          data-category="{{ event.typeEvent|lower }}"
+          data-date="{{ event.dateEvent|date('Y-m-d') }}"
+          data-price="{{ price }}"
+          data-popularity="{{ participants }}">
+          <img class="event-media" src="{{ imageSrc }}" alt="{{ event.titre }}">
+          <div class="event-body">
+            <div class="event-top">
+              <h3 class="event-title">{{ event.titre }}</h3>
+              <span class="state-badge {% if isFull %}state-full{% else %}state-open{% endif %}">{% if isFull %}Full{% else %}Open{% endif %}</span>
+            </div>
+            <div class="event-meta">
+              <span class="event-pill"><i class="fa fa-calendar"></i> {{ event.dateEvent|date('Y-m-d') }}</span>
+              <span class="event-pill"><i class="fa fa-map-marker"></i> {{ event.lieu }}</span>
+              <span class="event-pill"><i class="fa fa-tag"></i> {{ event.typeEvent }}</span>
+            </div>
+            <p class="event-description">{{ event.description|length > 170 ? event.description|slice(0, 170) ~ '...' : event.description }}</p>
+            <div class="event-footer">
+              <div class="event-price">{% if price > 0 %}{{ event.prixEvent }} DT{% else %}Free{% endif %}</div>
+              <a class="register-btn {% if isFull %}disabled{% endif %}" href="{{ path('events', {event: event.id, q: search|default(''), sort: sort|default('asc'), type: selectedType|default('')}) }}">
+                <i class="fa fa-check-circle"></i> Register Now
+              </a>
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+
+    {% if selectedEvent %}
+      {% set participants = stats[selectedEvent.id].participants|default(0) %}
+      {% set isFull = participants >= selectedEvent.capacite %}
+      {% set selectedPrice = selectedEvent.prixEvent|default('0') + 0 %}
+      {% set selectedImage = (selectedEvent.imageEvent and selectedEvent.imageEvent starts with 'event-') ? asset('uploads/events/' ~ selectedEvent.imageEvent) : typeImages[selectedEvent.typeEvent]|default('https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?auto=format&fit=crop&w=1400&q=80') %}
+      <section class="details-panel" id="event-register">
+        <div class="details-header">
+          <div>
+            <h3 style="font-size:30px;line-height:1.1;margin:0;font-weight:800;">{{ selectedEvent.titre }}</h3>
+            <div class="event-meta">
+              <span class="event-pill"><i class="fa fa-calendar"></i> {{ selectedEvent.dateEvent|date('Y-m-d') }}</span>
+              <span class="event-pill"><i class="fa fa-map-marker"></i> {{ selectedEvent.lieu }}</span>
+              <span class="event-pill"><i class="fa fa-users"></i> {{ participants }}/{{ selectedEvent.capacite }} participants</span>
+            </div>
+            <p class="event-description" style="min-height:auto;">{{ selectedEvent.description|nl2br }}</p>
+            <img class="details-image" src="{{ selectedImage }}" alt="{{ selectedEvent.titre }}">
+          </div>
+          <aside class="book-panel">
+            <h4>Reserve Your Spot</h4>
+            <p class="text-muted mb-2">Complete registration now. Confirmation is instant.</p>
+            {% if isFull %}
+              <div class="alert alert-warning mb-0">This event is currently full.</div>
+            {% else %}
+              <form method="post" action="{{ path('events_register') }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('events_register') }}">
+                <input type="hidden" name="event_id" value="{{ selectedEvent.id }}">
+                <div class="mb-2"><label class="form-label">Full Name</label><input class="form-control" name="nom_participant" required></div>
+                <div class="mb-2"><label class="form-label">Email Address</label><input class="form-control" name="email_participant" type="email" required></div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <strong style="font-size:20px;color:#0b6d57;">{% if selectedPrice > 0 %}{{ selectedEvent.prixEvent }} DT{% else %}Free{% endif %}</strong>
+                  <small class="text-muted">{{ participants }} joined</small>
+                </div>
+                <button class="register-btn w-100 justify-content-center" type="submit"><i class="fa fa-lock"></i> Register Securely</button>
+              </form>
+              <div class="book-trust">
+                <span class="book-chip">SSL Protected</span>
+                <span class="book-chip">No hidden fees</span>
+                <span class="book-chip">Instant confirmation</span>
+              </div>
+            {% endif %}
+          </aside>
+        </div>
+      </section>
+    {% endif %}
+
+    <section class="social-proof">
+      <article class="proof-card">
+        <p>"Fitopia events are the first wellness sessions I never miss. Coaching quality is elite."</p>
+        <div class="proof-author">Nadia H. • Member</div>
+      </article>
+      <article class="proof-card">
+        <p>"Registration is fast and clear. I always know what to expect before I arrive."</p>
+        <div class="proof-author">Karim B. • Athlete</div>
+      </article>
+      <article class="proof-card">
+        <p>"Great balance between nutrition and training events. The platform feels premium."</p>
+        <div class="proof-author">Sarra M. • Coach</div>
+      </article>
+    </section>
+  </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cards = Array.from(document.querySelectorAll('.js-event-card'));
+      const searchInput = document.getElementById('eventSearch');
+      const categorySelect = document.getElementById('eventCategory');
+      const dateSelect = document.getElementById('eventDateFilter');
+      const priceSelect = document.getElementById('eventPriceFilter');
+      const sortSelect = document.getElementById('eventSort');
+      const grid = document.getElementById('eventsGrid');
+
+      if (!grid || cards.length === 0) return;
+
+      const getDateNum = (value) => new Date(value + 'T00:00:00').getTime();
+      const now = new Date();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+      const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).getTime();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+      function matchesFilters(card) {
+        const q = (searchInput?.value || '').trim().toLowerCase();
+        const cat = (categorySelect?.value || '').toLowerCase();
+        const dateMode = dateSelect?.value || '';
+        const priceMode = priceSelect?.value || '';
+
+        const title = card.dataset.title || '';
+        const location = card.dataset.location || '';
+        const category = card.dataset.category || '';
+        const eventDate = getDateNum(card.dataset.date || '');
+        const price = Number(card.dataset.price || 0);
+
+        const searchOk = q === '' || title.includes(q) || location.includes(q) || category.includes(q);
+        const catOk = cat === '' || category === cat.toLowerCase();
+        const dateOk =
+          dateMode === '' ||
+          (dateMode === 'upcoming' && eventDate >= today) ||
+          (dateMode === 'this_month' && eventDate >= monthStart && eventDate <= monthEnd);
+        const priceOk =
+          priceMode === '' ||
+          (priceMode === 'free' && price === 0) ||
+          (priceMode === 'paid' && price > 0) ||
+          (priceMode === 'under25' && price <= 25) ||
+          (priceMode === 'under50' && price <= 50);
+
+        return searchOk && catOk && dateOk && priceOk;
+      }
+
+      function sortCards(list) {
+        const mode = sortSelect?.value || 'date_asc';
+        return list.sort((a, b) => {
+          const dateA = getDateNum(a.dataset.date || '');
+          const dateB = getDateNum(b.dataset.date || '');
+          const priceA = Number(a.dataset.price || 0);
+          const priceB = Number(b.dataset.price || 0);
+          const popA = Number(a.dataset.popularity || 0);
+          const popB = Number(b.dataset.popularity || 0);
+
+          if (mode === 'date_desc') return dateB - dateA;
+          if (mode === 'price_asc') return priceA - priceB;
+          if (mode === 'price_desc') return priceB - priceA;
+          if (mode === 'popularity_desc') return popB - popA;
+          return dateA - dateB;
+        });
+      }
+
+      function applyFilters() {
+        const visible = sortCards(cards.filter(matchesFilters));
+        grid.innerHTML = '';
+        visible.forEach((card) => grid.appendChild(card));
+        if (visible.length === 0) {
+          const note = document.createElement('div');
+          note.className = 'empty-note';
+          note.textContent = 'No events match your filters. Try broadening your selection.';
+          grid.appendChild(note);
+        }
+      }
+
+      [searchInput, categorySelect, dateSelect, priceSelect, sortSelect].forEach((el) => {
+        el?.addEventListener('input', applyFilters);
+        el?.addEventListener('change', applyFilters);
+      });
+
+      applyFilters();
+    });
+  </script>
+{% endblock %}
+
+{% block footer %}{% endblock %}
