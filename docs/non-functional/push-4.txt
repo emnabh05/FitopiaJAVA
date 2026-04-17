@@ -1,1 +1,2 @@
-Non-functional commit 4.
+﻿Non-functional note 4
+Updated on 2026-04-18 as a harmless documentation-only change.
