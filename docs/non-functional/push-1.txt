@@ -1,2 +1,2 @@
 ﻿Non-functional note 1
-Updated on 2026-04-18 to keep branch activity without affecting runtime behavior.
+Updated on 2026-04-18 to remove obsolete wording without affecting application behavior.
