@@ -1,0 +1,771 @@
+.root {
+    -fx-font-family: "Segoe UI";
+}
+
+.front-root {
+    -fx-background-color: linear-gradient(to bottom right, #edf5f2, #f9fbfa);
+}
+
+.front-scroll,
+.front-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.page-shell {
+    -fx-min-width: 1180px;
+}
+
+.topbar {
+    -fx-background-color: #0d3435;
+    -fx-border-color: rgba(255, 255, 255, 0.08);
+    -fx-border-width: 0 0 1 0;
+}
+
+.brand-mark {
+    -fx-background-color: linear-gradient(to bottom right, #3cd2c0, #ffffff);
+    -fx-background-radius: 16;
+    -fx-min-width: 42;
+    -fx-min-height: 42;
+    -fx-alignment: center;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #0d3435;
+}
+
+.brand-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.brand-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+}
+
+.nav-link,
+.nav-link-active {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: rgba(255, 255, 255, 0.74);
+    -fx-padding: 8 10 8 10;
+}
+
+.nav-link-active {
+    -fx-text-fill: white;
+}
+
+.nav-link-button {
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+    -fx-background-radius: 999;
+    -fx-border-color: rgba(255, 255, 255, 0.16);
+    -fx-border-radius: 999;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-padding: 8 14 8 14;
+    -fx-cursor: hand;
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+}
+
+
+.hero-card {
+    -fx-background-color: linear-gradient(to bottom right, #0d393a, #167568);
+    -fx-background-radius: 32;
+    -fx-padding: 30;
+    -fx-effect: dropshadow(gaussian, rgba(13, 57, 58, 0.22), 32, 0.18, 0, 12);
+}
+
+.hero-badge {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-radius: 999;
+    -fx-padding: 8 14 8 14;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #e7fffb;
+}
+
+.hero-title {
+    -fx-font-size: 42px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.hero-subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: rgba(244, 250, 248, 0.9);
+    -fx-max-width: 720;
+}
+
+.hero-mini-value {
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.hero-mini-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(244, 250, 248, 0.74);
+}
+
+.glass-stat-card {
+    -fx-background-color: rgba(255, 255, 255, 0.13);
+    -fx-background-radius: 24;
+    -fx-border-color: rgba(255, 255, 255, 0.20);
+    -fx-border-radius: 24;
+    -fx-padding: 18;
+}
+
+.glass-stat-value {
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+}
+
+.glass-stat-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: rgba(244, 250, 248, 0.8);
+}
+
+.coach-card {
+    -fx-background-color: #f5fbf8;
+    -fx-background-radius: 24;
+    -fx-padding: 18;
+}
+
+.coach-tag {
+    -fx-text-fill: #167568;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.coach-title {
+    -fx-text-fill: #1e2735;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+}
+
+.coach-text {
+    -fx-text-fill: #647181;
+    -fx-font-size: 13px;
+}
+
+.section-card {
+    -fx-background-color: rgba(255, 255, 255, 0.88);
+    -fx-background-radius: 28;
+    -fx-padding: 24;
+    -fx-border-color: #dce9e3;
+    -fx-border-radius: 28;
+}
+
+.planner-section {
+    -fx-background-color: linear-gradient(to bottom right, rgba(255, 255, 255, 0.96), rgba(239, 248, 245, 0.96));
+}
+
+.planner-pill {
+    -fx-background-color: #12695f;
+    -fx-background-radius: 999;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-padding: 10 18 10 18;
+}
+
+.planner-tab-button {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 999;
+    -fx-border-color: #d4ddd8;
+    -fx-border-radius: 999;
+    -fx-padding: 14 24 14 24;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1f3350;
+    -fx-cursor: hand;
+}
+
+.planner-tab-button-active {
+    -fx-background-color: linear-gradient(to right, #157f6d, #20a084);
+    -fx-background-radius: 999;
+    -fx-border-color: transparent;
+    -fx-border-radius: 999;
+    -fx-padding: 14 24 14 24;
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-text-fill: white;
+}
+
+.planner-return {
+    -fx-font-size: 15px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #25657f;
+    -fx-padding: 12 0 8 0;
+}
+
+.planner-section-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1f2b3a;
+}
+
+.planner-section-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6a7687;
+}
+
+.program-list {
+    -fx-fill-width: true;
+}
+
+.planner-status {
+    -fx-text-fill: #50606f;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.planner-table {
+    -fx-background-color: white;
+    -fx-background-radius: 22;
+    -fx-border-color: #dce9e3;
+    -fx-border-radius: 22;
+    -fx-padding: 8;
+}
+
+.planner-table .column-header-background {
+    -fx-background-color: #eff7f4;
+    -fx-background-radius: 18 18 0 0;
+}
+
+.planner-table .column-header,
+.planner-table .filler {
+    -fx-background-color: transparent;
+    -fx-size: 42;
+    -fx-border-color: transparent transparent #dce9e3 transparent;
+}
+
+.planner-table .table-row-cell {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #eef3f1 transparent;
+}
+
+.planner-table .table-row-cell:selected {
+    -fx-background-color: #dff4ec;
+}
+
+.program-card-button {
+    -fx-pref-height: 176;
+    -fx-background-radius: 26;
+    -fx-border-radius: 26;
+    -fx-padding: 24 22 24 22;
+    -fx-alignment: top-left;
+    -fx-content-display: text-only;
+    -fx-font-size: 22px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+    -fx-wrap-text: true;
+    -fx-effect: dropshadow(gaussian, rgba(10, 24, 33, 0.18), 20, 0.16, 0, 6);
+}
+
+.program-card-chest {
+    -fx-background-color: linear-gradient(rgba(8, 18, 26, 0.58), rgba(8, 18, 26, 0.58)), linear-gradient(to right, #1f2428, #7a6f65 45%, #3a3f46);
+}
+
+.program-card-back {
+    -fx-background-color: linear-gradient(rgba(5, 12, 18, 0.62), rgba(5, 12, 18, 0.62)), linear-gradient(to right, #0f171d, #5f3f2d 46%, #120f11);
+}
+
+.program-card-shoulder {
+    -fx-background-color: linear-gradient(rgba(10, 22, 28, 0.56), rgba(10, 22, 28, 0.56)), linear-gradient(to right, #183239, #4c7c84 48%, #213743);
+}
+
+.program-card-biceps {
+    -fx-background-color: linear-gradient(rgba(15, 18, 22, 0.56), rgba(15, 18, 22, 0.56)), linear-gradient(to right, #2e211d, #8e684f 48%, #251e1e);
+}
+
+.program-card-triceps {
+    -fx-background-color: linear-gradient(rgba(12, 20, 26, 0.56), rgba(12, 20, 26, 0.56)), linear-gradient(to right, #243039, #4d6a78 48%, #1e252f);
+}
+
+.program-card-legs {
+    -fx-background-color: linear-gradient(rgba(12, 22, 28, 0.54), rgba(12, 22, 28, 0.54)), linear-gradient(to right, #14252d, #31525d 42%, #d4ddd7 100%);
+}
+
+.modal-backdrop {
+    -fx-background-color: rgba(10, 28, 36, 0.42);
+}
+
+.program-modal-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 26;
+    -fx-border-color: #e4ece8;
+    -fx-border-radius: 26;
+    -fx-padding: 16;
+    -fx-effect: dropshadow(gaussian, rgba(18, 37, 41, 0.24), 34, 0.2, 0, 12);
+}
+
+.program-modal-back {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2a6d81;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 8 10 8 0;
+    -fx-cursor: hand;
+}
+
+.program-modal-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #20303b;
+}
+
+.program-modal-subtitle {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #7a8797;
+}
+
+.training-option-card {
+    -fx-pref-height: 116;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-padding: 18;
+    -fx-alignment: top-left;
+    -fx-content-display: text-only;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+    -fx-wrap-text: true;
+    -fx-cursor: hand;
+}
+
+.gym-card {
+    -fx-background-color: linear-gradient(rgba(6, 16, 20, 0.54), rgba(6, 16, 20, 0.54)), linear-gradient(to right, #25363d, #5c4438);
+}
+
+.home-card {
+    -fx-background-color: linear-gradient(rgba(6, 16, 20, 0.36), rgba(6, 16, 20, 0.36)), linear-gradient(to right, #6e8b87, #c49873);
+}
+
+.difficulty-card {
+    -fx-pref-height: 116;
+    -fx-background-radius: 22;
+    -fx-border-radius: 22;
+    -fx-padding: 18;
+    -fx-alignment: center-left;
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.beginner-card {
+    -fx-background-color: linear-gradient(rgba(8, 16, 18, 0.46), rgba(8, 16, 18, 0.46)), linear-gradient(to right, #29353d, #665b52);
+}
+
+.advanced-card {
+    -fx-background-color: linear-gradient(rgba(8, 16, 18, 0.44), rgba(8, 16, 18, 0.44)), linear-gradient(to right, #3a454a, #7f7b72);
+}
+
+.expert-card {
+    -fx-background-color: linear-gradient(rgba(8, 16, 18, 0.48), rgba(8, 16, 18, 0.48)), linear-gradient(to right, #1f2730, #596873);
+}
+
+.exercise-item-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 18;
+    -fx-border-color: #dce8e2;
+    -fx-border-radius: 18;
+    -fx-padding: 12;
+}
+
+.exercise-selection-status {
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #667485;
+}
+
+.exercise-item-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #20303b;
+}
+
+.exercise-item-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #7a8797;
+}
+
+.video-action-button {
+    -fx-background-color: #eef6f3;
+    -fx-background-radius: 16;
+    -fx-border-color: #d7e5de;
+    -fx-border-radius: 16;
+    -fx-text-fill: #20303b;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 18 12 18;
+    -fx-cursor: hand;
+}
+
+.exercise-cart-button {
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 18 12 18;
+    -fx-cursor: hand;
+}
+
+.exercise-cart-button-add {
+    -fx-background-color: linear-gradient(to right, #106a60, #1ca07f);
+    -fx-text-fill: white;
+}
+
+.exercise-cart-button-selected {
+    -fx-background-color: #fff5e9;
+    -fx-border-color: #f2d2a8;
+    -fx-text-fill: #7a4c11;
+}
+
+.exercise-cart-button-locked {
+    -fx-background-color: #f0f4f6;
+    -fx-border-color: #d9e2e8;
+    -fx-text-fill: #748292;
+}
+
+.exercise-confirm-button {
+    -fx-background-color: linear-gradient(to right, #106a60, #1ca07f);
+    -fx-background-radius: 16;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 900;
+    -fx-padding: 11 18 11 18;
+    -fx-cursor: hand;
+}
+
+.program-empty-state {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #6f7c8d;
+    -fx-padding: 8 0 4 0;
+}
+
+.plan-session-card {
+    -fx-pref-width: 348;
+    -fx-min-width: 320;
+    -fx-max-width: 348;
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 22;
+    -fx-border-color: #d9e5ec;
+    -fx-border-radius: 22;
+    -fx-padding: 18;
+}
+
+.plan-session-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1d313f;
+}
+
+.plan-session-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #66788d;
+}
+
+.plan-session-list {
+    -fx-padding: 2 0 0 0;
+}
+
+.plan-session-bullet,
+.plan-session-item {
+    -fx-font-size: 12px;
+    -fx-text-fill: #67798c;
+}
+
+.plan-session-bullet {
+    -fx-font-weight: 900;
+}
+
+.plan-session-item {
+    -fx-font-weight: 700;
+}
+
+.plan-card-action-button {
+    -fx-pref-height: 52;
+    -fx-pref-width: 170;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
+}
+
+.plan-card-start-button {
+    -fx-background-color: #1b7b70;
+    -fx-text-fill: white;
+}
+
+.plan-card-delete-button {
+    -fx-background-color: #ca2618;
+    -fx-text-fill: white;
+}
+
+.training-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1e2c37;
+}
+
+.training-subtitle {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #748292;
+}
+
+.training-stage-layout {
+    -fx-alignment: top-left;
+}
+
+.training-video-card,
+.training-side-card,
+.training-playlist-card,
+.training-volume-card,
+.training-metric-card,
+.training-stat-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 20;
+    -fx-border-color: #dce8e2;
+    -fx-border-radius: 20;
+}
+
+.training-video-card {
+    -fx-padding: 16;
+}
+
+.training-video-shell {
+    -fx-background-color: #0d141a;
+    -fx-background-radius: 18;
+    -fx-border-color: #20313b;
+    -fx-border-radius: 18;
+    -fx-padding: 6;
+}
+
+.training-side-card {
+    -fx-padding: 14;
+}
+
+.training-metric-card,
+.training-stat-card {
+    -fx-padding: 12;
+}
+
+.training-playlist-card,
+.training-volume-card {
+    -fx-padding: 12;
+}
+
+.training-metric-label,
+.training-stat-label,
+.training-panel-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #6f7c8d;
+}
+
+.training-stat-value {
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #21313d;
+}
+
+.training-stat-emphasis {
+    -fx-text-fill: #0f7d68;
+}
+
+.training-input {
+    -fx-background-color: #f5faf8;
+    -fx-background-radius: 14;
+    -fx-border-color: #d7e4de;
+    -fx-border-radius: 14;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-padding: 10 12 10 12;
+}
+
+.training-status {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #3d4e5c;
+}
+
+.training-control-button {
+    -fx-pref-height: 56;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+    -fx-font-size: 14px;
+    -fx-font-weight: 900;
+    -fx-padding: 12 18 12 18;
+    -fx-cursor: hand;
+}
+
+.training-control-button-primary {
+    -fx-background-color: #19756b;
+    -fx-text-fill: white;
+}
+
+.training-control-button-secondary {
+    -fx-background-color: #eef3f5;
+    -fx-border-color: #d7e4eb;
+    -fx-text-fill: #17324b;
+}
+
+.training-control-button-wide {
+    -fx-pref-height: 58;
+}
+
+.playlist-list {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+}
+
+.playlist-list .list-cell {
+    -fx-background-color: #f4f9f7;
+    -fx-background-radius: 12;
+    -fx-text-fill: #24323d;
+    -fx-font-weight: 700;
+    -fx-padding: 10 12 10 12;
+}
+
+.playlist-list .list-cell:filled:selected {
+    -fx-background-color: linear-gradient(to right, #106a60, #1ca07f);
+    -fx-text-fill: white;
+}
+
+.danger-front-button {
+    -fx-background-color: linear-gradient(to right, #b84b5b, #d76a6a);
+    -fx-background-radius: 16;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
+}
+
+.section-kicker {
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #167568;
+    -fx-letter-spacing: 1px;
+}
+
+.section-heading {
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #1a2232;
+}
+
+.section-body {
+    -fx-font-size: 15px;
+    -fx-text-fill: #667282;
+}
+
+.info-card {
+    -fx-background-color: white;
+    -fx-background-radius: 24;
+    -fx-border-color: #e1ece7;
+    -fx-border-radius: 24;
+    -fx-padding: 18;
+}
+
+.info-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #1c2434;
+}
+
+.info-text {
+    -fx-font-size: 14px;
+    -fx-text-fill: #697485;
+}
+
+.photo-card {
+    -fx-background-color: linear-gradient(to bottom right, #d9ece8, #c8dfdb);
+    -fx-background-radius: 28;
+    -fx-border-color: #d2e5e0;
+    -fx-border-radius: 28;
+}
+
+.photo-badge {
+    -fx-background-color: rgba(13, 57, 58, 0.12);
+    -fx-background-radius: 999;
+    -fx-padding: 7 12 7 12;
+    -fx-text-fill: #0d393a;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.photo-title {
+    -fx-text-fill: #365255;
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+}
+
+.text-field-modern,
+.combo-modern,
+.date-modern,
+.text-area-modern {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 18;
+    -fx-border-color: #d7e4de;
+    -fx-border-radius: 18;
+    -fx-font-size: 14px;
+    -fx-padding: 13 14 13 14;
+}
+
+.text-area-modern .content {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 18;
+}
+
+.primary-button {
+    -fx-background-color: linear-gradient(to right, #106a60, #1ca07f);
+    -fx-background-radius: 16;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
+}
+
+.secondary-button,
+.ghost-button,
+.light-ghost-button {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-border-color: #d7e4de;
+    -fx-border-radius: 16;
+    -fx-text-fill: #20303b;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-padding: 12 20 12 20;
+    -fx-cursor: hand;
+}
+
+.light-ghost-button {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.24);
+    -fx-text-fill: white;
+}
+
+.footer-bar {
+    -fx-background-color: #103f40;
+    -fx-background-radius: 22;
+    -fx-padding: 16;
+}
+
+.footer-text {
+    -fx-text-fill: #d7eeea;
+    -fx-font-size: 13px;
+}
