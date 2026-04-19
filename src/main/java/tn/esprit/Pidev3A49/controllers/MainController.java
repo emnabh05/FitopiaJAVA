@@ -136,7 +136,7 @@ public class MainController {
     @FXML private Label lblRepasRegimeContextEdit;
     
     @FXML private VBox boxResultatIA;
-    @FXML private Label lblIARepasNom;
+    @FXML private TextField tfIARepasNomParticulier;
     @FXML private Label lblIACalories;
     @FXML private javafx.scene.image.ImageView ivScanImagePreview;
     @FXML private VBox paneWeeklyProgram;
@@ -2566,10 +2566,10 @@ public class MainController {
                     String finalFoodsStr = preTraduire(detectedCategory);
                     Platform.runLater(() -> {
                         pbScanProgress.setVisible(false);
-                        lblIARepasNom.setText("Plat : " + finalFoodsStr);
                         // Afficher aussi les macros en un coup d'oeil
                         lblIACalories.setText("Énergie : " + caloriesArrondies + " kcal (P:" + p + "g|C:" + c + "g|F:" + f + "g)");
                         boxResultatIA.setVisible(true); boxResultatIA.setManaged(true);
+                        if (tfIARepasNomParticulier != null) tfIARepasNomParticulier.setText(finalFoodsStr);
                         
                         lastScannedCalories = String.valueOf(caloriesArrondies);
                         lastScannedNom = finalFoodsStr;
@@ -2592,17 +2592,19 @@ public class MainController {
 
     @FXML
     void appliquerCaloriesScan(javafx.event.ActionEvent event) {
+        String nomFinal = (tfIARepasNomParticulier != null) ? tfIARepasNomParticulier.getText() : lastScannedNom;
+
         if (tfRepasCaloriesEdit != null) tfRepasCaloriesEdit.setText(lastScannedCalories);
         if (tfRepasCalories != null) tfRepasCalories.setText(lastScannedCalories);
         
-        if (tfRepasNomEdit != null && (tfRepasNomEdit.getText() == null || tfRepasNomEdit.getText().isEmpty())) tfRepasNomEdit.setText(lastScannedNom);
-        if (tfRepasNom != null && (tfRepasNom.getText() == null || tfRepasNom.getText().isEmpty())) tfRepasNom.setText(lastScannedNom);
+        if (tfRepasNomEdit != null) tfRepasNomEdit.setText(nomFinal);
+        if (tfRepasNom != null) tfRepasNom.setText(nomFinal);
         
         // --- Injection directe dans le tracking du jour ---
         RegimeAlimentaire regimeActif = getActualActiveRegime();
         if (regimeActif != null) {
             Repas repasScanne = new Repas();
-            repasScanne.setNomRepas(lastScannedNom + " (Scan IA)");
+            repasScanne.setNomRepas(nomFinal);
             try { repasScanne.setCalories(Integer.parseInt(lastScannedCalories)); } catch(Exception e) { repasScanne.setCalories(0); }
             repasScanne.setTypeRepas("Déjeuner"); // Type par défaut pour l'insert auto
             repasScanne.setProteines(lastScannedP);

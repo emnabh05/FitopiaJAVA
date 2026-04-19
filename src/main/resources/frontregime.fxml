@@ -649,9 +649,10 @@
                         <Label text="Reconnaissance Visuelle de Repas" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #065f46;"/>
                         <Label text="Téléchargez l'image de votre plat, nous estimerons les calories." style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
                         
-                        <!-- Cadre Vert de Résultat -->
-                        <VBox fx:id="boxResultatIA" style="-fx-background-color: #d1fae5; -fx-border-color: #10b981; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;" managed="false" visible="false">
-                             <Label fx:id="lblIARepasNom" text="Repas détecté : -" style="-fx-font-weight: 800; -fx-text-fill: #065f46; -fx-font-size: 14px;"/>
+                        <!-- Cadre Vert de Résultat avec Nom Modifiable -->
+                        <VBox fx:id="boxResultatIA" spacing="10" style="-fx-background-color: #d1fae5; -fx-border-color: #10b981; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;" managed="false" visible="false">
+                             <Label text="Repas détecté (vous pouvez corriger) :" style="-fx-font-weight: 700; -fx-text-fill: #065f46; -fx-font-size: 12px;"/>
+                             <TextField fx:id="tfIARepasNomParticulier" style="-fx-background-color: white; -fx-border-color: #10b981; -fx-border-radius: 5; -fx-font-weight: 800; -fx-text-fill: #065f46;"/>
                              <Label fx:id="lblIACalories" text="Calories estimées : - kcal" style="-fx-font-weight: 800; -fx-text-fill: #065f46; -fx-font-size: 14px;"/>
                         </VBox>
 
