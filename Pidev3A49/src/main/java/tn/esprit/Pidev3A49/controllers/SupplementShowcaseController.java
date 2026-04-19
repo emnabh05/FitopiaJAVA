@@ -23,6 +23,7 @@ import tn.esprit.Pidev3A49.Models.Supplement;
 import tn.esprit.Pidev3A49.services.ServiceSupplement;
 import tn.esprit.Pidev3A49.utils.CartStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
+import tn.esprit.Pidev3A49.utils.SelectedSupplementStore;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -316,10 +317,7 @@ public class SupplementShowcaseController {
         Label visualLabel = new Label((valueOrDefault(supplement.getCategory()) + " visual").toUpperCase(Locale.ROOT));
         visualLabel.setStyle("-fx-text-fill: rgba(9, 41, 53, 0.48); -fx-font-size: 18px; -fx-font-weight: 800;");
 
-        Label topBadge = createChip(stockLabel(supplement), stockChipStyle(supplement));
-        StackPane.setMargin(topBadge, new Insets(14.0, 14.0, 0.0, 0.0));
-        StackPane.setAlignment(topBadge, Pos.TOP_RIGHT);
-        visualPane.getChildren().addAll(visualLabel, topBadge);
+        visualPane.getChildren().add(visualLabel);
 
         VBox detailsBox = new VBox(10.0);
         detailsBox.setPadding(new Insets(0.0, 18.0, 18.0, 18.0));
@@ -344,17 +342,12 @@ public class SupplementShowcaseController {
             tagRow.getChildren().add(createChip(supplement.getCalories() + " kcal", "-fx-background-color: #EEF6FF; -fx-text-fill: #245C83;"));
         }
 
-        Button quickViewButton = new Button("Quick View");
-        quickViewButton.setPrefHeight(34.0);
-        quickViewButton.setMaxWidth(Double.MAX_VALUE);
-        quickViewButton.setStyle("-fx-background-color: transparent; -fx-background-radius: 12; -fx-border-color: #D4E2EA; "
+        Button viewDetailsButton = new Button("View Details");
+        viewDetailsButton.setPrefHeight(34.0);
+        viewDetailsButton.setMaxWidth(Double.MAX_VALUE);
+        viewDetailsButton.setStyle("-fx-background-color: transparent; -fx-background-radius: 12; -fx-border-color: #D4E2EA; "
                 + "-fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;");
-
-        Button stockButton = new Button("Stock: " + supplement.getStock());
-        stockButton.setPrefHeight(34.0);
-        stockButton.setMaxWidth(Double.MAX_VALUE);
-        stockButton.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D4E2EA; "
-                + "-fx-border-radius: 12; -fx-text-fill: #496170; -fx-font-size: 13px; -fx-font-weight: 700;");
+        viewDetailsButton.setOnAction(event -> openProductDetails(event, supplement));
 
         Button addToCartButton = new Button("ADD TO CART");
         addToCartButton.setPrefHeight(42.0);
@@ -370,8 +363,7 @@ public class SupplementShowcaseController {
                 descriptionLabel,
                 priceLabel,
                 tagRow,
-                quickViewButton,
-                stockButton,
+                viewDetailsButton,
                 addToCartButton
         );
 
@@ -387,6 +379,20 @@ public class SupplementShowcaseController {
         } catch (RuntimeException exception) {
             setCartMessage(exception.getMessage(), true);
             showCartPanel();
+        }
+    }
+
+    private void openProductDetails(ActionEvent event, Supplement supplement) {
+        if (supplement == null) {
+            setCartMessage("Product details are unavailable right now.", true);
+            return;
+        }
+
+        SelectedSupplementStore.getInstance().setSelectedSupplement(supplement);
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.PRODUCT_DETAILS_VIEW);
+        } catch (IOException exception) {
+            setCartMessage("Could not open product details.", true);
         }
     }
 
@@ -537,26 +543,6 @@ public class SupplementShowcaseController {
         Label chip = new Label(text);
         chip.setStyle(colors + " -fx-background-radius: 999; -fx-font-size: 11px; -fx-font-weight: 800; -fx-padding: 7 10 7 10;");
         return chip;
-    }
-
-    private String stockLabel(Supplement supplement) {
-        if (supplement.getStock() <= 0) {
-            return "OUT OF STOCK";
-        }
-        if (supplement.getStock() <= 5) {
-            return "LOW STOCK";
-        }
-        return "IN STOCK";
-    }
-
-    private String stockChipStyle(Supplement supplement) {
-        if (supplement.getStock() <= 0) {
-            return "-fx-background-color: #FFF1F2; -fx-text-fill: #D92D20;";
-        }
-        if (supplement.getStock() <= 5) {
-            return "-fx-background-color: #FFF7E6; -fx-text-fill: #B66905;";
-        }
-        return "-fx-background-color: #EEF9F1; -fx-text-fill: #1D7E56;";
     }
 
     private String buildHintMessage(String query, int selectedCategoryCount) {
