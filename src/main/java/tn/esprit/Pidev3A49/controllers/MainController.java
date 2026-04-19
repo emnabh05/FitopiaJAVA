@@ -2842,15 +2842,58 @@ public class MainController {
     }
 
     private String preTraduire(String source) {
-        // Simple beautifier to make API Ninjas English YOLO matches look better in French
+        if (source == null || source.isEmpty()) return "Repas";
         String s = source.toLowerCase();
-        s = s.replace("and ", "et ");
-        s = s.replace("apple", "Pomme").replace("banana", "Banane").replace("hot dog", "Hot Dog");
-        s = s.replace("pizza", "Pizza").replace("cake", "Gâteau").replace("donut", "Beignet");
-        s = s.replace("sandwich", "Sandwich").replace("orange", "Orange").replace("carrot", "Carotte");
-        s = s.replace("broccoli", "Brocoli").replace("burger", "Burger").replace("bowl", "Bol (Salade/Mix)");
-        // Capitaliser
-        return s.substring(0, 1).toUpperCase() + s.substring(1);
+        
+        // Dictionnaire de traduction étendu
+        Map<String, String> dict = new LinkedHashMap<>();
+        dict.put("chicken", "Poulet");
+        dict.put("rice", "Riz");
+        dict.put("pasta", "Pâtes");
+        dict.put("salad", "Salade");
+        dict.put("steak", "Steak");
+        dict.put("fish", "Poisson");
+        dict.put("salmon", "Saumon");
+        dict.put("soup", "Soupe");
+        dict.put("with", "avec");
+        dict.put("and", "et");
+        dict.put("beef", "Bœuf");
+        dict.put("pork", "Porc");
+        dict.put("veggie", "Végétarien");
+        dict.put("roasted", "Grillé");
+        dict.put("baked", "Au four");
+        dict.put("fried", "Frit");
+        dict.put("stew", "Ragoût");
+        dict.put("breakfast", "Petit-déjeuner");
+        dict.put("burrito", "Burrito");
+        dict.put("sauce", "Sauce");
+        dict.put("garlic", "Ail");
+        dict.put("lemon", "Citron");
+        dict.put("potato", "Pomme de terre");
+        dict.put("tomato", "Tomate");
+        dict.put("cheese", "Fromage");
+        dict.put("egg", "Œuf");
+        dict.put("meat", "Viande");
+        dict.put("pancake", "Crêpe");
+        dict.put("spaghetti", "Spaghetti");
+        dict.put("noodle", "Nouilles");
+        dict.put("bread", "Pain");
+        dict.put("cake", "Gâteau");
+        dict.put("fruit", "Fruit");
+        dict.put("apple", "Pomme");
+        dict.put("banana", "Banane");
+        dict.put("orange", "Orange");
+        dict.put("carrot", "Carotte");
+
+        for (Map.Entry<String, String> entry : dict.entrySet()) {
+            s = s.replace(entry.getKey(), entry.getValue());
+        }
+
+        // Capitaliser la première lettre
+        if (s.length() > 1) {
+            return s.substring(0, 1).toUpperCase() + s.substring(1);
+        }
+        return s;
     }
 
     private String detecterAlimentsSpoonacular(File file) throws IOException {
