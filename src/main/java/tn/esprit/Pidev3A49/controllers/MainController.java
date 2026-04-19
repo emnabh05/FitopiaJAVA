@@ -12,6 +12,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -59,6 +60,9 @@ import java.util.stream.Collectors;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import okhttp3.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class MainController {
 
@@ -100,6 +104,8 @@ public class MainController {
     @FXML private VBox paneRegimeEdit;
     @FXML private VBox paneRegimeDelete;
     @FXML private VBox paneRegimeExplore;
+    @FXML private VBox paneScanIA;
+
     @FXML private Label lblHeaderUser;
     @FXML private Label lblPlannerWelcome;
     @FXML private Label lblPlannerHealthBadge;
@@ -128,6 +134,17 @@ public class MainController {
     @FXML private Label lblRepasContextTarget;
     @FXML private Label lblRepasRegimeContext;
     @FXML private Label lblRepasRegimeContextEdit;
+    
+    @FXML private VBox boxResultatIA;
+    @FXML private Label lblIARepasNom;
+    @FXML private Label lblIACalories;
+    @FXML private javafx.scene.image.ImageView ivScanImagePreview;
+    @FXML private ProgressBar pbScanProgress;
+    @FXML private Button btnAppliquerCalories;
+    private String lastScannedCalories = "0";
+    private String lastScannedNom = "";
+    private int lastScannedP = 0, lastScannedC = 0, lastScannedL = 0;
+
 
     @FXML private Button btnModuleRepas;
     @FXML private Button btnModuleRegimes;
@@ -369,6 +386,7 @@ public class MainController {
         if (paneRepasEdit != null) { paneRepasEdit.setVisible(false); paneRepasEdit.setManaged(false); }
         if (paneRepasDelete != null) { paneRepasDelete.setVisible(false); paneRepasDelete.setManaged(false); }
         if (paneRepasExplore != null) { paneRepasExplore.setVisible(false); paneRepasExplore.setManaged(false); }
+        if (paneScanIA != null) { paneScanIA.setVisible(false); paneScanIA.setManaged(false); }
     }
 
     @FXML
@@ -918,7 +936,7 @@ public class MainController {
 
         double bmi = poids / Math.pow(taille / 100.0, 2);
         String typeSante = determinerTypeSanteAutomatique(bmi);
-        int calories = calculerCaloriesCibles(poids, age, bmi);
+        int calories = calculerCaloriesCibles(poids, taille, age, bmi);
 
         bmiField.setText(String.format(Locale.US, "%.1f", bmi));
         typeField.setValue(typeSante);
@@ -1358,19 +1376,26 @@ public class MainController {
         return "obesite";
     }
 
-    private int calculerCaloriesCibles(double poids, Integer age, double bmi) {
-        int calories = (int) Math.round(poids * 30);
+    private int calculerCaloriesCibles(double poids, double taille, Integer age, double bmi) {
+        int valAge = (age != null && age > 0) ? age : 30; // 30 ans par defaut
+        // Formule de Mifflin-St Jeor (Moyenne homme/femme)
+        double bmr = (10.0 * poids) + (6.25 * taille) - (5.0 * valAge) + 5;
+        
+        // Calories de maintenance (Sédentaire/Légèrement actif)
+        double maintenance = bmr * 1.375;
+        int calories = (int) Math.round(maintenance);
+
+        // Ajustement clinique selon l'IMC
         if (bmi < 18.5) {
-            calories += 250;
+            calories += 400; // Prise de masse
         } else if (bmi >= 30) {
-            calories -= 350;
+            calories -= 800; // Déficit agressif
         } else if (bmi >= 25) {
-            calories -= 200;
+            calories -= 400; // Déficit modéré
         }
-        if (age != null && age > 45) {
-            calories -= 80;
-        }
-        return Math.max(calories, 1200);
+
+        int caloriesFinales = Math.max(calories, 1200); // Minimum vital
+        return Math.min(caloriesFinales, 4000); // Plafond de sécurité pour régime cohérent
     }
 
     private String genererRepasAdequats(String typeSante, Integer age) {
@@ -2476,5 +2501,331 @@ public class MainController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    private static final String API_KEY_SPOONACULAR = "2dbafe503ab145ad9181043b77d55eef";
+
+    @FXML
+    void afficherPopupScanIA(javafx.event.ActionEvent event) {
+        masquerTousLesFormulaires();
+        if(paneScanIA != null) {
+            paneScanIA.setVisible(true);
+            paneScanIA.setManaged(true);
+            if (boxResultatIA != null) { boxResultatIA.setVisible(false); boxResultatIA.setManaged(false); }
+            if (btnAppliquerCalories != null) { btnAppliquerCalories.setVisible(false); btnAppliquerCalories.setManaged(false); }
+            if (ivScanImagePreview != null) ivScanImagePreview.setImage(null);
+            if (pbScanProgress != null) pbScanProgress.setVisible(false);
+        }
+    }
+
+    @FXML
+    void chargerImagePourScan(javafx.event.ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choisir l'image du repas");
+        fileChooser.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Toutes les Images", "*.jpg", "*.png", "*.jpeg", "*.webp", "*.bmp", "*.gif", "*.heic", "*.tiff", "*.jfif", "*.avif"),
+            new FileChooser.ExtensionFilter("Tous les fichiers", "*.*")
+        );
+        
+        Stage stage = (Stage) viewRepas.getScene().getWindow();
+        File file = fileChooser.showOpenDialog(stage);
+
+        if (file != null) {
+            try {
+                ivScanImagePreview.setImage(new javafx.scene.image.Image(file.toURI().toString()));
+            } catch(Exception e) {}
+
+            boxResultatIA.setVisible(false); boxResultatIA.setManaged(false);
+            btnAppliquerCalories.setVisible(false); btnAppliquerCalories.setManaged(false);
+            pbScanProgress.setVisible(true);
+
+            new Thread(() -> {
+                try {
+                    String detectedCategory = detecterAlimentsSpoonacular(file);
+                    
+                    if (detectedCategory == null || detectedCategory.isEmpty()) {
+                        Platform.runLater(() -> {
+                            pbScanProgress.setVisible(false);
+                            showError("Erreur API", "Spoonacular n'a pas pu identifier la catégorie du plat sur l'image.");
+                        });
+                        return;
+                    }
+
+                    System.out.println("Plat détecté : " + detectedCategory);
+                    
+                    double[] macros = calculerNutritionSpoonacular(detectedCategory);
+
+                    long caloriesArrondies = Math.round(macros[0]);
+                    int p = (int) Math.round(macros[1]);
+                    int c = (int) Math.round(macros[2]);
+                    int f = (int) Math.round(macros[3]);
+
+                    String finalFoodsStr = preTraduire(detectedCategory);
+                    Platform.runLater(() -> {
+                        pbScanProgress.setVisible(false);
+                        lblIARepasNom.setText("Plat : " + finalFoodsStr);
+                        // Afficher aussi les macros en un coup d'oeil
+                        lblIACalories.setText("Énergie : " + caloriesArrondies + " kcal (P:" + p + "g|C:" + c + "g|F:" + f + "g)");
+                        boxResultatIA.setVisible(true); boxResultatIA.setManaged(true);
+                        
+                        lastScannedCalories = String.valueOf(caloriesArrondies);
+                        lastScannedNom = finalFoodsStr;
+                        lastScannedP = p;
+                        lastScannedC = c;
+                        lastScannedL = f;
+                        btnAppliquerCalories.setVisible(true); btnAppliquerCalories.setManaged(true);
+                    });
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        pbScanProgress.setVisible(false);
+                        showError("Erreur", "Une erreur API Spoonacular s'est produite : " + e.getMessage());
+                    });
+                }
+            }).start();
+        }
+    }
+
+    @FXML
+    void appliquerCaloriesScan(javafx.event.ActionEvent event) {
+        if (tfRepasCaloriesEdit != null) tfRepasCaloriesEdit.setText(lastScannedCalories);
+        if (tfRepasCalories != null) tfRepasCalories.setText(lastScannedCalories);
+        
+        if (tfRepasNomEdit != null && (tfRepasNomEdit.getText() == null || tfRepasNomEdit.getText().isEmpty())) tfRepasNomEdit.setText(lastScannedNom);
+        if (tfRepasNom != null && (tfRepasNom.getText() == null || tfRepasNom.getText().isEmpty())) tfRepasNom.setText(lastScannedNom);
+        
+        // --- Injection directe dans le tracking du jour ---
+        RegimeAlimentaire regimeActif = getActualActiveRegime();
+        if (regimeActif != null) {
+            Repas repasScanne = new Repas();
+            repasScanne.setNomRepas(lastScannedNom + " (Scan IA)");
+            try { repasScanne.setCalories(Integer.parseInt(lastScannedCalories)); } catch(Exception e) { repasScanne.setCalories(0); }
+            repasScanne.setTypeRepas("Déjeuner"); // Type par défaut pour l'insert auto
+            repasScanne.setProteines(lastScannedP);
+            repasScanne.setGlucides(lastScannedC);
+            repasScanne.setLipides(lastScannedL);
+            repasScanne.setDateRepas(LocalDateTime.now());
+            User u = determinerUtilisateurReference();
+            if (u != null) repasScanne.setUserId(u.getId());
+            repasScanne.setRegimeId(regimeActif.getId());
+            
+            // On l'ajoute dans le système et on relance la checklist/barre de progression
+            fusionnerRepasSiExiste(repasScanne);
+            actualiserDashboardPlanner();
+            
+            showInfo("Scan Appliqué", "Génial ! Le repas (" + lastScannedNom + ") a été directement ajouté à votre checklist d'aujourd'hui, et les " + lastScannedCalories + " kcal ont mis à jour votre barre d'avancement !");
+        } else {
+            showInfo("Scan Appliqué", "Les informations ont été copiées dans le formulaire, mais aucun régime n'étant ouvert, le repas n'a pas pu s'ajouter tout seul à la checklist.");
+        }
+        // ---------------------------------------------------
+
+        masquerTousLesFormulaires();
+    }
+
+    @FXML
+    void genererSemaineIARegimeActif(javafx.event.ActionEvent event) {
+        RegimeAlimentaire regimeActif = getActualActiveRegime();
+        if (regimeActif == null) {
+            showError("Erreur IA", "Vous devez sélectionner un Régime Actif dans l'explorateur ou en créer un avant de lancer l'IA.");
+            return;
+        }
+        
+        int cibles = regimeActif.getCaloriesCibles() != null ? regimeActif.getCaloriesCibles() : 2000;
+        
+        TextInputDialog dialog = new TextInputDialog("");
+        dialog.setTitle("Planificateur Magique IA");
+        dialog.setHeaderText("Générer 7 Jours de Repas par l'Intelligence Artificielle");
+        dialog.setContentText("Avez-vous un régime particulier ? (Ex: Vegetarian, Gluten Free, Paleo... laissez vide sinon) :");
+        
+        dialog.showAndWait().ifPresent(diet -> {
+            // Afficher une alerte ou barre de progression
+            Alert alertLoading = new Alert(Alert.AlertType.INFORMATION);
+            alertLoading.setTitle("Création...");
+            alertLoading.setHeaderText("L'IA consulte plus de 300 000 recettes...");
+            alertLoading.setContentText("Veuillez patienter pendant l'importation de la base de données.");
+            alertLoading.show();
+
+            new Thread(() -> {
+                try {
+                    OkHttpClient client = new OkHttpClient.Builder()
+                       .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                       .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                       .build();
+    
+                    HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spoonacular.com/mealplanner/generate").newBuilder();
+                    urlBuilder.addQueryParameter("timeFrame", "week");
+                    urlBuilder.addQueryParameter("targetCalories", String.valueOf(cibles));
+                    if (!diet.isEmpty()) {
+                        urlBuilder.addQueryParameter("diet", diet); 
+                    }
+                    urlBuilder.addQueryParameter("apiKey", API_KEY_SPOONACULAR);
+    
+                    Request request = new Request.Builder().url(urlBuilder.build().toString()).build();
+    
+                    try (Response response = client.newCall(request).execute()) {
+                        if (!response.isSuccessful()) throw new IOException("Erreur API IA Planificateur: " + response.code());
+                        
+                        String jsonResp = response.body().string();
+                        JSONObject root = new JSONObject(jsonResp);
+                        JSONObject week = root.getJSONObject("week");
+                        
+                        String[] days = {"monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"};
+                        int dayOffset = 0;
+                        int totalMealsGenerated = 0;
+                        
+                        for (String day : days) {
+                            JSONObject dayObj = week.optJSONObject(day);
+                            if (dayObj != null) {
+                                JSONArray meals = dayObj.getJSONArray("meals");
+                                JSONObject nutrients = dayObj.getJSONObject("nutrients");
+                                
+                                // Diviser les macros globaux de la journée par 3
+                                double cals = nutrients.optDouble("calories", 0) / 3.0;
+                                double p = nutrients.optDouble("protein", 0) / 3.0;
+                                double c = nutrients.optDouble("carbohydrates", 0) / 3.0;
+                                double l = nutrients.optDouble("fat", 0) / 3.0;
+                                
+                                for (int i = 0; i < meals.length(); i++) {
+                                    JSONObject meal = meals.getJSONObject(i);
+                                    String title = meal.optString("title", "Repas IA");
+                                    
+                                    Repas r = new Repas();
+                                    r.setNomRepas(preTraduire(title)); // Utilise le traducteur basique
+                                    r.setCalories((int) Math.round(cals));
+                                    r.setProteines((int) Math.round(p));
+                                    r.setGlucides((int) Math.round(c));
+                                    r.setLipides((int) Math.round(l));
+                                    r.setRegimeId(regimeActif.getId());
+                                    
+                                    String type = i == 0 ? "Petit dejeuner" : (i == 1 ? "Dejeuner" : "Diner");
+                                    r.setTypeRepas(type);
+                                    r.setDateRepas(LocalDateTime.now().plusDays(dayOffset));
+                                    
+                                    User u = determinerUtilisateurReference();
+                                    if (u != null) r.setUserId(u.getId());
+                                    
+                                    // 1. Sauvegarde en BDD SQL
+                                    serviceRepas.add(r);
+                                    
+                                    // 2. Si c'est aujourd'hui, l'ajouter au Dashboard visuel
+                                    if (dayOffset == 0) {
+                                        fusionnerRepasSiExiste(r);
+                                    }
+                                    totalMealsGenerated++;
+                                }
+                            }
+                            dayOffset++;
+                        }
+                        
+                        final int finalCount = totalMealsGenerated;
+                        Platform.runLater(() -> {
+                            alertLoading.hide();
+                            actualiserDashboardPlanner();
+                            rafraichirDonnees();
+                            showInfo("✨ Magie IA Réussie ✨", "L'IA Spoonacular vient de générer et insérer exactement " + finalCount + " repas structurés sur 7 jours ! Ils complètent parfaitement vos " + cibles + " kcal quotidiennes.");
+                        });
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        alertLoading.hide();
+                        showError("Erreur Algorithme", "L'IA a échoué : " + e.getMessage());
+                    });
+                }
+            }).start();
+        });
+    }
+
+    private String preTraduire(String source) {
+        // Simple beautifier to make API Ninjas English YOLO matches look better in French
+        String s = source.toLowerCase();
+        s = s.replace("and ", "et ");
+        s = s.replace("apple", "Pomme").replace("banana", "Banane").replace("hot dog", "Hot Dog");
+        s = s.replace("pizza", "Pizza").replace("cake", "Gâteau").replace("donut", "Beignet");
+        s = s.replace("sandwich", "Sandwich").replace("orange", "Orange").replace("carrot", "Carotte");
+        s = s.replace("broccoli", "Brocoli").replace("burger", "Burger").replace("bowl", "Bol (Salade/Mix)");
+        // Capitaliser
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    private String detecterAlimentsSpoonacular(File file) throws IOException {
+        OkHttpClient client = new OkHttpClient.Builder()
+           .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+           .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+           .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+           .build();
+
+        String mimeType = java.net.URLConnection.guessContentTypeFromName(file.getName());
+        if (mimeType == null) mimeType = "image/jpeg";
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("file", file.getName(),
+                        RequestBody.create(file, MediaType.parse(mimeType)))
+                .build();
+
+        Request request = new Request.Builder()
+                .url("https://api.spoonacular.com/food/images/classify?apiKey=" + API_KEY_SPOONACULAR)
+                .post(requestBody)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                String resError = response.body() != null ? response.body().string() : "";
+                throw new IOException("Erreur 400 (Détail: " + resError + ")");
+            }
+
+            String jsonResponse = response.body().string();
+            JSONObject obj = new JSONObject(jsonResponse);
+            
+            return obj.optString("category", "");
+        }
+    }
+
+    private double[] calculerNutritionSpoonacular(String category) throws IOException {
+        long timeoutSeconds = 15;
+        OkHttpClient client = new OkHttpClient.Builder()
+           .connectTimeout(timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS)
+           .readTimeout(timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS)
+           .build();
+
+        String cleanCategory = category.replace(" ", "+");
+        
+        Request request = new Request.Builder()
+                .url("https://api.spoonacular.com/recipes/guessNutrition?title=" + cleanCategory + "&apiKey=" + API_KEY_SPOONACULAR)
+                .build();
+
+        try (Response response = client.newCall(request).execute()) {
+            if (!response.isSuccessful()) {
+                 throw new IOException("Erreur Spoonacular Nutrition API: " + response.code());
+            }
+
+            String jsonResponse = response.body().string();
+            JSONObject nutritionObj = new JSONObject(jsonResponse);
+            
+            double cal = nutritionObj.has("calories") ? nutritionObj.getJSONObject("calories").optDouble("value", 0.0) : 0;
+            double prot = nutritionObj.has("protein") ? nutritionObj.getJSONObject("protein").optDouble("value", 0.0) : 0;
+            double carbs = nutritionObj.has("carbs") ? nutritionObj.getJSONObject("carbs").optDouble("value", 0.0) : 0;
+            double fat = nutritionObj.has("fat") ? nutritionObj.getJSONObject("fat").optDouble("value", 0.0) : 0;
+
+            return new double[]{cal, prot, carbs, fat};
+        }
+    }
+
+    @FXML
+    void hoverScannerOn(javafx.scene.input.MouseEvent event) {
+        javafx.scene.Node btn = (javafx.scene.Node) event.getSource();
+        btn.setStyle("-fx-background-color: #1a7177; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.6), 15, 0, 0, 5); -fx-cursor: hand;");
+        btn.setScaleX(1.05);
+        btn.setScaleY(1.05);
+    }
+
+    @FXML
+    void hoverScannerOff(javafx.scene.input.MouseEvent event) {
+        javafx.scene.Node btn = (javafx.scene.Node) event.getSource();
+        btn.setStyle("-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.4), 10, 0, 0, 5); -fx-cursor: hand;");
+        btn.setScaleX(1.0);
+        btn.setScaleY(1.0);
     }
 }

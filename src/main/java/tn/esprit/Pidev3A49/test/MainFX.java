@@ -15,6 +15,7 @@ public class MainFX extends Application {
         Scene scene = new Scene(loader.load());
         stage.setTitle("Fitopia");
         stage.setScene(scene);
+        stage.setMaximized(true); // Permet de respecter la barre de tache de Windows
         stage.show();
     }
 
