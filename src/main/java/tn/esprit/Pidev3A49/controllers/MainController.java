@@ -2947,7 +2947,7 @@ public class MainController {
                 .build();
 
         Request request = new Request.Builder()
-                .url("https://api.logmeal.es/v2/image/segmentation/complete")
+                .url("https://api.logmeal.es/v2/image/recognition/dish")
                 .header("Authorization", "Bearer " + API_KEY_LOGMEAL.trim())
                 .post(requestBody)
                 .build();
@@ -2962,18 +2962,10 @@ public class MainController {
             
             JSONObject root = new JSONObject(jsonResp);
             
-            // Dans segmentation/complete, le nom est souvent dans segmentation_results
-            if (root.has("segmentation_results")) {
-                JSONArray res = root.getJSONArray("segmentation_results");
+            if (root.has("recognition_results")) {
+                JSONArray res = root.getJSONArray("recognition_results");
                 if (res.length() > 0) {
-                    JSONObject first = res.getJSONObject(0);
-                    // On cherche le nom de la nourriture detectee
-                    if (first.has("food_item")) {
-                         JSONArray items = first.getJSONArray("food_item");
-                         if (items.length() > 0) {
-                             return items.getJSONObject(0).getString("name");
-                         }
-                    }
+                    return res.getJSONObject(0).getString("name");
                 }
             }
             return "Plat inconnu";
