@@ -2807,13 +2807,9 @@ public class MainController {
                                     User u = determinerUtilisateurReference();
                                     if (u != null) r.setUserId(u.getId());
                                     
-                                    // 1. Sauvegarde en BDD SQL
+                                    // 1. Sauvegarde en BDD SQL pour le planning (persistant)
                                     serviceRepas.add(r);
                                     
-                                    // 2. Si c'est aujourd'hui, l'ajouter au Dashboard visuel
-                                    if (dayOffset == 0) {
-                                        fusionnerRepasSiExiste(r);
-                                    }
                                     totalMealsGenerated++;
                                 }
                             }
