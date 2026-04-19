@@ -2754,8 +2754,15 @@ public class MainController {
                     HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spoonacular.com/mealplanner/generate").newBuilder();
                     urlBuilder.addQueryParameter("timeFrame", "week");
                     urlBuilder.addQueryParameter("targetCalories", String.valueOf(cibles));
-                    if (!diet.isEmpty()) {
-                        urlBuilder.addQueryParameter("diet", diet); 
+                    String dietParam = diet.toLowerCase().trim();
+                    if (dietParam.contains("végétarien")) dietParam = "vegetarian";
+                    if (dietParam.contains("végétalien") || dietParam.contains("vegan")) dietParam = "status:vegan";
+                    if (dietParam.contains("sans gluten")) dietParam = "gluten free";
+                    if (dietParam.contains("cétogène") || dietParam.contains("keto")) dietParam = "ketogenic";
+                    if (dietParam.contains("paléo")) dietParam = "paleo";
+                    
+                    if (!dietParam.isEmpty()) {
+                        urlBuilder.addQueryParameter("diet", dietParam); 
                     }
                     urlBuilder.addQueryParameter("apiKey", API_KEY_SPOONACULAR);
     
