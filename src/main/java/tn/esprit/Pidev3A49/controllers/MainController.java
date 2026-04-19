@@ -389,6 +389,7 @@ public class MainController {
         if (paneRepasDelete != null) { paneRepasDelete.setVisible(false); paneRepasDelete.setManaged(false); }
         if (paneRepasExplore != null) { paneRepasExplore.setVisible(false); paneRepasExplore.setManaged(false); }
         if (paneScanIA != null) { paneScanIA.setVisible(false); paneScanIA.setManaged(false); }
+        if (paneWeeklyProgram != null) { paneWeeklyProgram.setVisible(false); paneWeeklyProgram.setManaged(false); }
     }
 
     @FXML
@@ -2830,7 +2831,12 @@ public class MainController {
                     e.printStackTrace();
                     Platform.runLater(() -> {
                         alertLoading.hide();
-                        showError("Erreur Algorithme", "L'IA a échoué : " + e.getMessage());
+                        String msg = e.getMessage() != null ? e.getMessage() : e.toString();
+                        if (msg.contains("502")) {
+                            showError("Serveur Surchargé (502)", "Le serveur de nutrition (Spoonacular) est temporairement indisponible. Veuillez réessayer dans quelques instants.");
+                        } else {
+                            showError("Erreur Algorithme", "L'IA a échoué : " + msg);
+                        }
                     });
                 }
             }).start();
