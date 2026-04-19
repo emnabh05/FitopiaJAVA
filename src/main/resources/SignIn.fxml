@@ -66,6 +66,18 @@
                                 <Label style="-fx-text-fill: #5d6f76; -fx-padding: 12 0 0 0;" text="Mot de passe" />
                                 <PasswordField fx:id="passwordField" promptText="Password" />
 
+                                <VBox spacing="10.0" style="-fx-background-color: #f7fafb; -fx-border-color: #d6d9dc; -fx-border-radius: 10; -fx-background-radius: 10; -fx-padding: 14 16 14 16;">
+                                    <children>
+                                        <Label style="-fx-text-fill: #1c2f35; -fx-font-weight: bold;" text="Verification anti-robot" />
+                                        <Label fx:id="botChallengeLabel" style="-fx-text-fill: #587077; -fx-font-size: 12px;" text="Anti-robot : question..." wrapText="true" />
+                                        <TextField fx:id="botAnswerField" promptText="Entrez votre reponse" />
+                                        <Button mnemonicParsing="false" onAction="#handleRefreshBotChallenge" style="-fx-background-color: white; -fx-border-color: #d3dde0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #314850; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="RENOUVELER LE CHALLENGE" />
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="14.0" />
+                                    </VBox.margin>
+                                </VBox>
+
                                 <VBox fx:id="faceIdSummaryBox" managed="false" spacing="8.0" style="-fx-background-color: #f4f8f8; -fx-background-radius: 12; -fx-border-color: #d6e2e4; -fx-border-radius: 12; -fx-padding: 12;" visible="false">
                                     <children>
                                         <Label style="-fx-text-fill: #1c2f35; -fx-font-weight: bold;" text="Verification Face ID" />

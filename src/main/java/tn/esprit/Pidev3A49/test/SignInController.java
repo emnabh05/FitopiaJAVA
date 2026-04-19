@@ -10,9 +10,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
+import tn.esprit.Pidev3A49.api.AuthController;
+import tn.esprit.Pidev3A49.api.dto.LoginRequest;
+import tn.esprit.Pidev3A49.api.dto.LoginResponse;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.security.AuthenticationResult;
 
 import java.io.File;
+import java.security.SecureRandom;
 import java.util.Optional;
 
 public class SignInController {
@@ -21,11 +26,16 @@ public class SignInController {
     @FXML private Label statusLabel;
     @FXML private Button faceIdButton;
     @FXML private Button verifyFaceIdButton;
+    @FXML private Label botChallengeLabel;
+    @FXML private TextField botAnswerField;
     @FXML private VBox faceIdSummaryBox;
     @FXML private ImageView facePreview;
     @FXML private Label faceIdSummaryLabel;
 
     private final ServiceUser serviceUser = new ServiceUser();
+    private final AuthController authController = new AuthController(serviceUser);
+    private final SecureRandom random = new SecureRandom();
+    private int expectedBotAnswer;
 
     @FXML
     public void initialize() {
@@ -37,18 +47,21 @@ public class SignInController {
             emailField.setText(identifier);
             showFaceIdSummary(currentUser, identifier);
             statusLabel.setText("Face ID deja enregistre pour ce compte. Verifiez l'email et l'apercu, puis cliquez sur VERIFIER MON FACE ID.");
+            refreshBotChallenge();
             return;
         }
 
         faceIdSummaryBox.setVisible(false);
         faceIdSummaryBox.setManaged(false);
-        statusLabel.setText("Choisissez votre mode de connexion: email + mot de passe ou Face ID.");
+        refreshBotChallenge();
+        statusLabel.setText("Renseignez vos identifiants puis resolvez le challenge anti-robot.");
     }
 
     @FXML
     private void handleSignIn() {
         String email = emailField.getText() == null ? "" : emailField.getText().trim();
         String password = passwordField.getText() == null ? "" : passwordField.getText().trim();
+        String botAnswer = botAnswerField.getText() == null ? "" : botAnswerField.getText().trim();
 
         if (email.isBlank() || password.isBlank()) {
             statusLabel.setText("Email et mot de passe sont obligatoires.");
@@ -58,16 +71,35 @@ public class SignInController {
             statusLabel.setText("Connexion MySQL indisponible. Verifiez fitopiabd.");
             return;
         }
-
-        Optional<FitopiaUser> found = serviceUser.authenticate(email, password);
-        if (found.isEmpty()) {
-            statusLabel.setText("Compte introuvable. Verifiez vos informations.");
+        if (!isHumanVerified(botAnswer)) {
+            statusLabel.setText("Verification anti-robot invalide. Reessayez.");
+            refreshBotChallenge();
             return;
         }
 
-        FitopiaUser connected = found.get();
+        LoginResponse response = authController.login(new LoginRequest(email, password));
+        if (response.status() != AuthenticationResult.Status.SUCCESS) {
+            statusLabel.setText(response.message());
+            refreshBotChallenge();
+            return;
+        }
+
+        Optional<FitopiaUser> connectedOpt = serviceUser.findByIdentifier(email);
+        if (connectedOpt.isEmpty()) {
+            statusLabel.setText("Utilisateur introuvable apres authentification.");
+            refreshBotChallenge();
+            return;
+        }
+
+        FitopiaUser connected = connectedOpt.get();
         UserSession.setCurrentUser(connected);
         openHomeFor(connected);
+    }
+
+    @FXML
+    private void handleRefreshBotChallenge() {
+        refreshBotChallenge();
+        statusLabel.setText("Challenge anti-robot renouvelle.");
     }
 
     @FXML
@@ -132,5 +164,37 @@ public class SignInController {
         }
 
         facePreview.setImage(new Image(faceFile.toURI().toString(), true));
+    }
+
+    private void refreshBotChallenge() {
+        int first = random.nextInt(8) + 2;
+        int second = random.nextInt(8) + 2;
+        int mode = random.nextInt(3);
+        botAnswerField.clear();
+
+        if (mode == 0) {
+            expectedBotAnswer = first + second;
+            botChallengeLabel.setText("Anti-robot : combien font " + first + " + " + second + " ?");
+            return;
+        }
+        if (mode == 1) {
+            expectedBotAnswer = first * second;
+            botChallengeLabel.setText("Anti-robot : combien font " + first + " x " + second + " ?");
+            return;
+        }
+
+        expectedBotAnswer = second;
+        botChallengeLabel.setText("Anti-robot : tapez le nombre " + second + " pour continuer.");
+    }
+
+    private boolean isHumanVerified(String answer) {
+        if (answer.isBlank()) {
+            return false;
+        }
+        try {
+            return Integer.parseInt(answer) == expectedBotAnswer;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
