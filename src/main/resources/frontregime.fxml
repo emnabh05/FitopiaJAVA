@@ -205,8 +205,9 @@
                                                         <Label fx:id="lblPlannerCaloriesProgress" text="1139 / 1800 kcal (661 restantes)" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
                                                     </VBox>
                                                     
-                                                    <HBox>
-                                                        <Button text="+ Ajouter un repas" onAction="#afficherCreationRepas" style="-fx-background-color: #f1f5f9; -fx-text-fill: #0c3f44; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-border-color: #e2e8f0; -fx-border-radius: 8;"/>
+                                                    <HBox spacing="10">
+                                                         <Button text="+ Ajouter un repas" onAction="#afficherCreationRepas" style="-fx-background-color: #f1f5f9; -fx-text-fill: #0c3f44; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-border-color: #e2e8f0; -fx-border-radius: 8;"/>
+                                                         <Button text="📅 Planning de 7 jours" onAction="#afficherProgrammeHebdomadaire" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(12, 63, 68, 0.3), 8, 0, 0, 4);"/>
                                                     </HBox>
                                                 </VBox>
                                             </VBox>
@@ -216,7 +217,7 @@
                                      <VBox style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #e2e8f0; -fx-border-radius: 14; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 20, 0, 0, 10);">
                                           <HBox style="-fx-padding: 14 18; -fx-border-color: transparent transparent #e2e8f0 transparent; -fx-border-width: 0 0 1 0;" alignment="CENTER_LEFT">
                                                <Label text="Today's Meals List" style="-fx-font-weight: 800; -fx-text-fill: #1f2937; -fx-font-size: 15px;"/>
-                                               <Button text="📅 Mon Programme Hebdo" onAction="#afficherProgrammeHebdomadaire" style="-fx-background-color: #059669; -fx-text-fill: white; -fx-background-radius: 8; -fx-border-radius: 8; -fx-font-weight: 800; -fx-font-size: 11px; -fx-effect: dropshadow(gaussian, rgba(5, 150, 105, 0.4), 8, 0, 0, 4); -fx-cursor: hand;"/>
+                                               <Region HBox.hgrow="ALWAYS" />
                                                <Button text="Checklist du jour" style="-fx-background-color: #f0f4f8; -fx-border-color: #cbd5e1; -fx-text-fill: #10b981; -fx-background-radius: 8; -fx-border-radius: 8; -fx-font-weight: 700; -fx-font-size: 11px;"/>
                                           </HBox>
                                           <VBox style="-fx-padding: 18;" spacing="14">
@@ -638,39 +639,7 @@
                     </ScrollPane>
                 </VBox>
 
-                <!-- 9. SCAN IA POPUP -->
-                         <Button fx:id="btnAppliquerCalories" text="💾 Sauvegarder dans mon formulaire" onAction="#appliquerCaloriesScan" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 14; -fx-cursor: hand;" maxWidth="Infinity" managed="false" visible="false"/>
-                    </VBox>
-                </VBox>
-
-                <!-- 10. WEEKLY PROGRAM POPUP (VERT/BLANC PREMIUM) -->
-                <VBox fx:id="paneWeeklyProgram" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
-                    <VBox maxWidth="1100" maxHeight="750" spacing="0" style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 40, 0, 0, 20); -fx-overflow: hidden;">
-                        
-                        <!-- Header Premium Vert -->
-                        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: linear-gradient(to right, #065f46, #10b981); -fx-padding: 30; -fx-background-radius: 20 20 0 0;">
-                            <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                <Label text="📅 Mon Programme Nutrition" style="-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: white;"/>
-                                <Label text="Planning hebdomadaire personnalisé selon vos besoins caloriques." style="-fx-font-size: 14px; -fx-text-fill: #ecfdf5;"/>
-                            </VBox>
-                            <Button text="Re-générer la semaine" onAction="#genererSemaineIARegimeActif" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 10 20; -fx-cursor: hand;"/>
-                            <Button onAction="#masquerTousLesFormulaires" text="✕" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 18px; -fx-background-radius: 10; -fx-min-width: 45; -fx-min-height: 45; -fx-cursor: hand;"/>
-                        </HBox>
-
-                        <!-- Menu des Jours -->
-                        <ScrollPane fitToWidth="true" style="-fx-background-color: white; -fx-background: white; -fx-padding: 20;">
-                            <VBox fx:id="boxWeeklyDaysContainer" spacing="25" style="-fx-padding: 10;">
-                                <!-- Les cartes de jours (Lundi, Mardi...) seront injectées ici par le code Java -->
-                            </VBox>
-                        </ScrollPane>
-
-                        <!-- Footer -->
-                        <HBox alignment="CENTER" style="-fx-padding: 15; -fx-background-color: #f8fafc; -fx-background-radius: 0 0 20 20; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
-                            <Label text="Cliquez sur le 'plus' pour ajouter un plat à votre suivi d'aujourd'hui." style="-fx-text-fill: #64748b; -fx-font-style: italic;"/>
-                        </HBox>
-                    </VBox>
-                </VBox>
-                
+                <!-- 9. SCAN IMAGE POPUP -->
                 <VBox fx:id="paneScanIA" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
                     <VBox maxWidth="550" spacing="18.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
                         <HBox alignment="CENTER_RIGHT">
@@ -679,14 +648,56 @@
                         
                         <Label text="Reconnaissance Visuelle de Repas" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #065f46;"/>
                         <Label text="Téléchargez l'image de votre plat, nous estimerons les calories." style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                        
+                        <!-- Cadre Vert de Résultat -->
+                        <VBox fx:id="boxResultatIA" style="-fx-background-color: #d1fae5; -fx-border-color: #10b981; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;" managed="false" visible="false">
+                             <Label fx:id="lblIARepasNom" text="Repas détecté : -" style="-fx-font-weight: 800; -fx-text-fill: #065f46; -fx-font-size: 14px;"/>
+                             <Label fx:id="lblIACalories" text="Calories estimées : - kcal" style="-fx-font-weight: 800; -fx-text-fill: #065f46; -fx-font-size: 14px;"/>
+                        </VBox>
+
+                        <!-- Zone d'Importation Image -->
+                        <VBox alignment="CENTER" spacing="20" style="-fx-border-color: #cbd5e1; -fx-border-width: 2; -fx-border-style: dashed; -fx-border-radius: 8; -fx-padding: 30; -fx-background-color: #f8fafc;">
+                             <ImageView fx:id="ivScanImagePreview" fitWidth="300" fitHeight="200" preserveRatio="true"/>
+                             <Button text="📁 Importer la photo" onAction="#chargerImagePourScan" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 12 24; -fx-cursor: hand;"/>
+                        </VBox>
+                        
+                        <VBox alignment="CENTER" spacing="10">
+                             <ProgressBar fx:id="pbScanProgress" prefWidth="300" visible="false"/>
+                        </VBox>
+                        <Button fx:id="btnAppliquerCalories" text="💾 Sauvegarder dans mon formulaire" onAction="#appliquerCaloriesScan" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 14; -fx-cursor: hand;" maxWidth="Infinity" managed="false" visible="false"/>
+                    </VBox>
+                </VBox>
+
+                <!-- 10. WEEKLY PROGRAM POPUP -->
+                <VBox fx:id="paneWeeklyProgram" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
+                    <VBox maxWidth="1100" maxHeight="750" spacing="0" style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 40, 0, 0, 20); -fx-overflow: hidden;">
+                        
+                        <!-- Header Premium Vert Sombre -->
+                        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: linear-gradient(to right, #0c3f44, #1a7177); -fx-padding: 30; -fx-background-radius: 20 20 0 0;">
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <Label text="📅 Mon Programme de Nutrition" style="-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: white;"/>
+                                <Label text="Planning hebdomadaire personnalisé selon vos besoins caloriques." style="-fx-font-size: 14px; -fx-text-fill: #ecfdf5;"/>
+                            </VBox>
+                            <Button text="Re-générer la semaine" onAction="#genererSemaineIARegimeActif" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 10 20; -fx-cursor: hand;"/>
+                            <Button onAction="#masquerTousLesFormulaires" text="✕" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 18px; -fx-background-radius: 10; -fx-min-width: 45; -fx-min-height: 45; -fx-cursor: hand;"/>
+                        </HBox>
+
+                        <ScrollPane fitToWidth="true" style="-fx-background-color: white; -fx-background: white; -fx-padding: 20;">
+                            <VBox fx:id="boxWeeklyDaysContainer" spacing="25" style="-fx-padding: 10;" />
+                        </ScrollPane>
+
+                        <HBox alignment="CENTER" style="-fx-padding: 15; -fx-background-color: #f8fafc; -fx-background-radius: 0 0 20 20; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
+                            <Label text="Cliquez sur le 'plus' pour ajouter un plat à votre suivi d'aujourd'hui." style="-fx-text-fill: #64748b; -fx-font-style: italic;"/>
+                        </HBox>
+                    </VBox>
+                </VBox>
             </StackPane>
             
-            <!-- Floating Buttons absolute positioned -->
+            <!-- Floating Buttons -->
             <Button text="📷 Scanner un plat" onAction="#afficherPopupScanIA" 
                     onMouseEntered="#hoverScannerOn" onMouseExited="#hoverScannerOff"
                     style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.4), 10, 0, 0, 5); -fx-cursor: hand;"
                     StackPane.alignment="BOTTOM_RIGHT" translateX="-24" translateY="-24" />
         </StackPane>
     </center>
-
 </BorderPane>

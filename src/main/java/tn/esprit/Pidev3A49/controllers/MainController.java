@@ -2697,7 +2697,13 @@ public class MainController {
             btnAdd.setOnAction(e -> {
                 fusionnerRepasSiExiste(meal);
                 actualiserDashboardPlanner();
-                showInfo("Ajouté !", meal.getNomRepas() + " a été ajouté à votre suivi d'aujourd'hui.");
+                // Feedback visuel : Rouge pour indiquer que c'est mange
+                mealPill.setStyle("-fx-background-color: #fee2e2; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #ef4444; -fx-border-width: 2;");
+                lblNom.setStyle("-fx-font-weight: 700; -fx-text-fill: #b91c1c;");
+                btnAdd.setText("✓");
+                btnAdd.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-font-weight: 900;");
+                
+                showInfo("Plat Consommé !", meal.getNomRepas() + " a été ajouté à votre compteur de calories.");
             });
 
             titleRow.getChildren().addAll(textCol, btnAdd);
@@ -2771,22 +2777,25 @@ public class MainController {
                                 JSONArray meals = dayObj.getJSONArray("meals");
                                 JSONObject nutrients = dayObj.getJSONObject("nutrients");
                                 
-                                // Diviser les macros globaux de la journée par 3
-                                double cals = nutrients.optDouble("calories", 0) / 3.0;
-                                double p = nutrients.optDouble("protein", 0) / 3.0;
-                                double c = nutrients.optDouble("carbohydrates", 0) / 3.0;
-                                double l = nutrients.optDouble("fat", 0) / 3.0;
+                                // Repas equilibres : 25% Petit Dej, 45% Dejeuner, 30% Diner
+                                double[] repartitions = {0.25, 0.45, 0.30};
+                                double dailyCals = nutrients.optDouble("calories", 2000);
+                                double dailyP = nutrients.optDouble("protein", 60);
+                                double dailyC = nutrients.optDouble("carbohydrates", 250);
+                                double dailyF = nutrients.optDouble("fat", 70);
                                 
                                 for (int i = 0; i < meals.length(); i++) {
                                     JSONObject meal = meals.getJSONObject(i);
-                                    String title = meal.optString("title", "Repas IA");
+                                    String title = meal.optString("title", "Repas");
                                     
                                     Repas r = new Repas();
-                                    r.setNomRepas(preTraduire(title)); // Utilise le traducteur basique
-                                    r.setCalories((int) Math.round(cals));
-                                    r.setProteines((int) Math.round(p));
-                                    r.setGlucides((int) Math.round(c));
-                                    r.setLipides((int) Math.round(l));
+                                    r.setNomRepas(preTraduire(title)); 
+                                    
+                                    double factor = (i < repartitions.length) ? repartitions[i] : 0.33;
+                                    r.setCalories((int) Math.round(dailyCals * factor));
+                                    r.setProteines((int) Math.round(dailyP * factor));
+                                    r.setGlucides((int) Math.round(dailyC * factor));
+                                    r.setLipides((int) Math.round(dailyF * factor));
                                     r.setRegimeId(regimeActif.getId());
                                     
                                     String type = i == 0 ? "Petit dejeuner" : (i == 1 ? "Dejeuner" : "Diner");
