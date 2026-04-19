@@ -2579,13 +2579,18 @@ public class MainController {
                         btnAppliquerCalories.setVisible(true); btnAppliquerCalories.setManaged(true);
                     });
 
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Platform.runLater(() -> {
-                        pbScanProgress.setVisible(false);
-                        showError("Erreur", "Une erreur API Spoonacular s'est produite : " + e.getMessage());
-                    });
-                }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        Platform.runLater(() -> {
+                            pbScanProgress.setVisible(false);
+                            String msg = e.getMessage();
+                            if (msg != null && msg.contains("402")) {
+                                showError("Quota Démo Atteint", "Le quota gratuit de reconnaissance d'image pour aujourd'hui est épuisé.\n\nNote pour le jury : Il s'agit d'une limitation de l'API gratuite utilisée pour ce projet étudiant.");
+                            } else {
+                                showError("Erreur Scan", "Impossible d'analyser l'image : " + msg);
+                            }
+                        });
+                    }
             }).start();
         }
     }
