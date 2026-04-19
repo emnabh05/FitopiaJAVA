@@ -56,6 +56,9 @@
                                 <TableColumn fx:id="emailCol" prefWidth="280.0" text="Mail" />
                                 <TableColumn fx:id="roleCol" prefWidth="130.0" text="Role" />
                                 <TableColumn fx:id="phoneCol" prefWidth="170.0" text="Telephone" />
+                                <TableColumn fx:id="riskCol" prefWidth="90.0" text="Risque" />
+                                <TableColumn fx:id="accountStatusCol" prefWidth="120.0" text="Statut" />
+                                <TableColumn fx:id="securityCol" prefWidth="280.0" text="Alertes" />
                             </columns>
                         </TableView>
                         <GridPane hgap="10.0" vgap="10.0">
@@ -80,6 +83,7 @@
                                         <Button mnemonicParsing="false" onAction="#handleClearEditor" style="-fx-background-color: #eef5f4; -fx-text-fill: #22333b; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Vider" />
                                     </children>
                                 </HBox>
+                                <Label fx:id="securityDetailsLabel" style="-fx-text-fill: #56706b;" text="Selectionnez un utilisateur pour afficher les alertes de securite." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" />
                             </children>
                         </GridPane>
                     </children>

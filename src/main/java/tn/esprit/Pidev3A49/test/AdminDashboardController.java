@@ -12,8 +12,13 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import tn.esprit.Pidev3A49.api.AdminSecurityController;
+import tn.esprit.Pidev3A49.api.UserSecurityController;
+import tn.esprit.Pidev3A49.api.dto.ChangePasswordRequest;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.security.AdminSecurityAlert;
+import tn.esprit.Pidev3A49.services.security.UserSecuritySnapshot;
 
 import java.util.Comparator;
 import java.util.List;
@@ -41,8 +46,14 @@ public class AdminDashboardController {
     @FXML private TableColumn<FitopiaUser, String> emailCol;
     @FXML private TableColumn<FitopiaUser, String> roleCol;
     @FXML private TableColumn<FitopiaUser, String> phoneCol;
+    @FXML private TableColumn<FitopiaUser, Number> riskCol;
+    @FXML private TableColumn<FitopiaUser, String> accountStatusCol;
+    @FXML private TableColumn<FitopiaUser, String> securityCol;
+    @FXML private Label securityDetailsLabel;
 
     private final ServiceUser serviceUser = new ServiceUser();
+    private final UserSecurityController userSecurityController = new UserSecurityController(serviceUser);
+    private final AdminSecurityController adminSecurityController = new AdminSecurityController(serviceUser);
     private final ObservableList<FitopiaUser> users = FXCollections.observableArrayList();
     private FitopiaUser selectedUser;
     private boolean editingMode;
@@ -128,17 +139,21 @@ public class AdminDashboardController {
         selectedUser.setEmail(email);
         selectedUser.setPhone(phone);
         selectedUser.setRole(role);
-        if (!newPassword.isBlank()) {
-            if (!isStrongPassword(newPassword)) {
-                statusLabel.setText("Le mot de passe doit contenir au moins 1 majuscule et 1 chiffre.");
-                return;
-            }
-            selectedUser.setPassword(newPassword);
-        }
-
         try {
-            serviceUser.update(selectedUser);
-            statusLabel.setText("Utilisateur modifie avec succes.");
+            serviceUser.updateProfile(selectedUser);
+            if (!newPassword.isBlank()) {
+                var response = userSecurityController.changePassword(selectedUser.getId(), new ChangePasswordRequest(
+                        newPassword,
+                        selectedUser.getFirstName(),
+                        selectedUser.getLastName(),
+                        selectedUser.getUsername(),
+                        selectedUser.getEmail(),
+                        selectedUser.getBirthDate()
+                ));
+                statusLabel.setText("Utilisateur modifie. Nouveau mot de passe: " + response.passwordScore() + "/100.");
+            } else {
+                statusLabel.setText("Utilisateur modifie avec succes.");
+            }
             setEditingMode(false);
             loadUsers();
         } catch (RuntimeException e) {
@@ -182,6 +197,9 @@ public class AdminDashboardController {
         emailCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getEmail())));
         roleCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getRole())));
         phoneCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getPhone())));
+        riskCol.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getRiskScore()));
+        accountStatusCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getAccountStatus())));
+        securityCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getSecurityAlertSummary())));
         usersTable.setItems(users);
     }
 
@@ -196,6 +214,7 @@ public class AdminDashboardController {
 
     private void applyFilters() {
         List<FitopiaUser> list = serviceUser.getAll();
+        List<AdminSecurityAlert> alertEntries = adminSecurityController.listSecurityAlerts(null, null, false);
         String search = safe(searchField.getText()).trim().toLowerCase();
         if (!search.isEmpty()) {
             list = list.stream().filter(u ->
@@ -219,6 +238,11 @@ public class AdminDashboardController {
             list.sort((a, b) -> Integer.compare(b.getId(), a.getId()));
         }
 
+        list.forEach(user -> alertEntries.stream()
+                .filter(alert -> alert.userId() == user.getId())
+                .findFirst()
+                .ifPresent(alert -> user.setSecurityAlertSummary(alert.securityAlertSummary())));
+
         users.setAll(list);
         statusLabel.setText("Total utilisateurs: " + users.size());
     }
@@ -235,6 +259,8 @@ public class AdminDashboardController {
         phoneField.setText(safe(user.getPhone()));
         newPasswordField.clear();
         roleCombo.setValue(safe(user.getRole()).isBlank() ? "Patient" : user.getRole());
+        UserSecuritySnapshot snapshot = userSecurityController.getSecuritySnapshot(user.getId());
+        securityDetailsLabel.setText(buildSecuritySnapshotText(snapshot));
         setEditingMode(false);
     }
 
@@ -246,6 +272,7 @@ public class AdminDashboardController {
         phoneField.clear();
         newPasswordField.clear();
         roleCombo.setValue("Patient");
+        securityDetailsLabel.setText("Selectionnez un utilisateur pour afficher les alertes de securite.");
     }
 
     private void setEditingMode(boolean enabled) {
@@ -269,7 +296,12 @@ public class AdminDashboardController {
         return value == null ? "" : value;
     }
 
-    private boolean isStrongPassword(String password) {
-        return password.matches("^(?=.*[A-Z])(?=.*\\d).+$");
+    private String buildSecuritySnapshotText(UserSecuritySnapshot snapshot) {
+        return "Score mot de passe: " + snapshot.passwordScore() + "/100 (" + snapshot.passwordStrength() + ")"
+                + " | Risque: " + snapshot.riskScore()
+                + " | Echecs: " + snapshot.failedLoginAttempts()
+                + " | Statut: " + snapshot.accountStatus()
+                + " | Dernier changement: " + safe(snapshot.passwordLastChangedAt())
+                + " | Alertes: " + String.join(" / ", snapshot.alerts());
     }
 }

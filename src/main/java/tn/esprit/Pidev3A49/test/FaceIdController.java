@@ -20,6 +20,7 @@ import javafx.util.Duration;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.services.FaceRecognitionService;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.security.AuthenticationResult;
 
 import javax.imageio.ImageIO;
 import java.awt.Dimension;
@@ -162,11 +163,12 @@ public class FaceIdController {
         }
 
         try {
-            FitopiaUser authenticated = serviceUser.authenticate(identifier, password).orElse(null);
-            if (authenticated == null) {
-                statusLabel.setText("Compte introuvable. Verifiez vos informations.");
+            AuthenticationResult authResult = serviceUser.authenticateSecure(identifier, password);
+            if (authResult.status() != AuthenticationResult.Status.SUCCESS) {
+                statusLabel.setText(authResult.message());
                 return;
             }
+            FitopiaUser authenticated = authResult.user();
 
             Path output = Paths.get("faces", "users", "user_" + authenticated.getId() + "_face.png").toAbsolutePath();
             faceRecognitionService.saveFaceImage(currentFrame, output);

@@ -22,6 +22,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.security.PasswordPolicyReport;
 
 import java.io.File;
 import java.io.IOException;
@@ -104,8 +105,9 @@ public class UserCrudController {
     @FXML
     private void handleAddUser() {
         try {
-            serviceUser.add(buildUserFromForm());
-            setStatus("Utilisateur ajoute avec succes.");
+            FitopiaUser user = buildUserFromForm();
+            PasswordPolicyReport report = serviceUser.registerUser(user, passwordField.getText().trim());
+            setStatus("Utilisateur ajoute avec succes. Score mot de passe: " + report.score() + "/100.");
             clearForm();
             loadUsers();
         } catch (RuntimeException e) {
@@ -122,8 +124,14 @@ public class UserCrudController {
         try {
             FitopiaUser updated = buildUserFromForm();
             updated.setId(selectedUser.getId());
-            serviceUser.update(updated);
-            setStatus("Utilisateur modifie avec succes.");
+            serviceUser.updateProfile(updated);
+            String newPassword = passwordField.getText().trim();
+            if (!newPassword.isBlank()) {
+                PasswordPolicyReport report = serviceUser.changePassword(updated.getId(), newPassword, updated);
+                setStatus("Utilisateur modifie. Nouveau mot de passe: " + report.score() + "/100.");
+            } else {
+                setStatus("Utilisateur modifie avec succes.");
+            }
             clearForm();
             loadUsers();
         } catch (RuntimeException e) {
@@ -213,7 +221,7 @@ public class UserCrudController {
         lastNameField.setText(valueOrEmpty(user.getLastName()));
         usernameField.setText(valueOrEmpty(user.getUsername()));
         emailField.setText(valueOrEmpty(user.getEmail()));
-        passwordField.setText(valueOrEmpty(user.getPassword()));
+        passwordField.clear();
         phoneField.setText(valueOrEmpty(user.getPhone()));
         birthDatePicker.setValue(parseDate(user.getBirthDate()));
         maleRadio.setSelected(!"Female".equalsIgnoreCase(user.getGender()));
@@ -244,8 +252,11 @@ public class UserCrudController {
         String username = usernameField.getText().trim();
         String email = emailField.getText().trim();
         String password = passwordField.getText().trim();
-        if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || email.isEmpty() || password.isEmpty()) {
-            throw new RuntimeException("First name, last name, username, email et password sont obligatoires.");
+        if (firstName.isEmpty() || lastName.isEmpty() || username.isEmpty() || email.isEmpty()) {
+            throw new RuntimeException("First name, last name, username et email sont obligatoires.");
+        }
+        if (selectedUser == null && password.isEmpty()) {
+            throw new RuntimeException("Le mot de passe est obligatoire a la creation.");
         }
 
         FitopiaUser user = new FitopiaUser();
@@ -253,7 +264,7 @@ public class UserCrudController {
         user.setLastName(lastName);
         user.setUsername(username);
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(selectedUser == null ? password : "");
         user.setPhone(phoneField.getText().trim());
         user.setBirthDate(birthDatePicker.getValue() == null ? "" : birthDatePicker.getValue().toString());
         user.setGender(femaleRadio.isSelected() ? "Female" : "Male");

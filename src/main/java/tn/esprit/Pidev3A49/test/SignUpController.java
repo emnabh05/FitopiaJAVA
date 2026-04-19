@@ -2,19 +2,23 @@ package tn.esprit.Pidev3A49.test;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
-import tn.esprit.Pidev3A49.Models.FitopiaUser;
-import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.api.AuthController;
+import tn.esprit.Pidev3A49.api.dto.RegisterRequest;
+import tn.esprit.Pidev3A49.api.dto.RegisterResponse;
 
 public class SignUpController {
     @FXML private TextField nomField;
     @FXML private TextField prenomField;
     @FXML private TextField usernameField;
     @FXML private TextField emailField;
+    @FXML private DatePicker birthDatePicker;
     @FXML private PasswordField passwordField;
+    @FXML private Label passwordGuidanceLabel;
     @FXML private Label statusLabel;
     @FXML private Label selectedRoleBadge;
     @FXML private HBox patientRoleCard;
@@ -22,13 +26,14 @@ public class SignUpController {
     @FXML private HBox nutritionistRoleCard;
     @FXML private HBox adminRoleCard;
 
-    private final ServiceUser serviceUser = new ServiceUser();
+    private final AuthController authController = new AuthController();
     private String selectedRole = "Patient";
 
     @FXML
     public void initialize() {
         applyRole("Patient");
         statusLabel.setText("Remplissez le formulaire pour creer un compte.");
+        passwordGuidanceLabel.setText("Le mot de passe doit etre long, unique et ne pas contenir vos informations personnelles.");
     }
 
     @FXML private void selectPatientRole() { applyRole("Patient"); }
@@ -42,6 +47,7 @@ public class SignUpController {
         String prenom = safe(prenomField.getText());
         String username = safe(usernameField.getText());
         String email = safe(emailField.getText());
+        String birthDate = birthDatePicker.getValue() == null ? "" : birthDatePicker.getValue().toString();
         String password = safe(passwordField.getText());
         String role = safe(selectedRole);
 
@@ -49,53 +55,24 @@ public class SignUpController {
             statusLabel.setText("Nom, prenom, username, email et mot de passe sont obligatoires.");
             return;
         }
-        if (!serviceUser.isAvailable()) {
-            statusLabel.setText("Connexion MySQL indisponible. Verifiez fitopiabd.");
-            return;
-        }
-        if (serviceUser.emailExists(email) || serviceUser.usernameExists(username)) {
-            Alert duplicate = new Alert(Alert.AlertType.WARNING);
-            duplicate.setTitle("Compte existant");
-            duplicate.setHeaderText("Ce compte est deja cree");
-            duplicate.setContentText("Connectez-vous depuis la page Sign In.");
-            duplicate.showAndWait();
-            SceneNavigator.goTo(statusLabel, "/SignIn.fxml", "Sign In", 1460, 860);
-            return;
-        }
-
-        FitopiaUser user = new FitopiaUser();
-        user.setFirstName(prenom);
-        user.setLastName(nom);
-        user.setUsername(username);
-        user.setEmail(email);
-        user.setPassword(password);
-        user.setRole(role.isBlank() ? "Patient" : role);
-        user.setPhone("");
-        user.setBirthDate("");
-        user.setGender("Male");
-        user.setAvatarPath("");
-        user.setProfessionalTitle("");
-        user.setSpecialization("");
-        user.setQualification("");
-        user.setYearsExperience("");
-        user.setBio("");
-        user.setLicenseNumber("");
-        user.setHeight("");
-        user.setWeight("");
-        user.setTargetWeight("");
-        user.setFitnessLevel("");
-        user.setHealthConditions("");
-        user.setDietaryPreferences("");
-        user.setFitnessGoals("");
-        user.setFaceIdEnabled(false);
-        user.setFaceImagePath("");
 
         try {
-            serviceUser.add(user);
+            RegisterResponse response = authController.register(new RegisterRequest(
+                    prenom,
+                    nom,
+                    username,
+                    email,
+                    password,
+                    birthDate,
+                    role,
+                    "",
+                    "Male"
+            ));
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Compte cree");
             success.setHeaderText("Creation reussie");
-            success.setContentText("Votre compte est cree. Connectez-vous maintenant.");
+            success.setContentText("Votre compte est cree. Score mot de passe: " + response.passwordScore()
+                    + "/100 (" + response.passwordStrength() + "). Statut: " + response.accountStatus() + ".");
             success.showAndWait();
             SceneNavigator.goTo(statusLabel, "/SignIn.fxml", "Sign In", 1460, 860);
         } catch (RuntimeException e) {

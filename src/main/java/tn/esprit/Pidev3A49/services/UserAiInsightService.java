@@ -52,8 +52,17 @@ public class UserAiInsightService {
         if (!user.isFaceIdEnabled()) {
             flags.add("Face ID non active");
         }
-        if (safe(user.getPassword()).length() < 8) {
-            flags.add("mot de passe court");
+        if (user.getPasswordScore() < 70) {
+            flags.add("mot de passe faible " + user.getPasswordScore() + "/100");
+        }
+        if (user.isCompromisedPassword()) {
+            flags.add("mot de passe compromis");
+        }
+        if (user.getFailedLoginAttempts() > 0) {
+            flags.add("echecs de connexion=" + user.getFailedLoginAttempts());
+        }
+        if ("TEMP_LOCKED".equalsIgnoreCase(safe(user.getAccountStatus()))) {
+            flags.add("compte temporairement bloque");
         }
         if (safe(user.getPhone()).isBlank()) {
             flags.add("telephone absent");
@@ -63,7 +72,8 @@ public class UserAiInsightService {
         }
 
         if (flags.isEmpty()) {
-            return "Niveau de confiance: eleve. Compte pret pour MFA, journalisation d'acces et verification contextuelle.";
+            return "Niveau de confiance: eleve. Score mot de passe " + user.getPasswordScore()
+                    + "/100. Compte pret pour MFA, audit et verification contextuelle.";
         }
         return "Niveau de confiance: moyen. Points a corriger: " + String.join(", ", flags) + ".";
     }
