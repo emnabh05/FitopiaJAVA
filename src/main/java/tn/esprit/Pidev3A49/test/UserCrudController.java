@@ -22,6 +22,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.UserAiInsightService;
 import tn.esprit.Pidev3A49.services.security.PasswordPolicyReport;
 
 import java.io.File;
@@ -61,6 +62,11 @@ public class UserCrudController {
     @FXML private TextArea healthConditionsArea;
     @FXML private TextArea dietaryPreferencesArea;
     @FXML private TextArea fitnessGoalsArea;
+    @FXML private Label aiImprovementsLabel;
+    @FXML private Label aiUsernameLabel;
+    @FXML private Label aiPhoneLabel;
+    @FXML private TextArea aiBioArea;
+    @FXML private TextArea aiSummaryArea;
     @FXML private TableView<FitopiaUser> userTable;
     @FXML private TableColumn<FitopiaUser, Number> idColumn;
     @FXML private TableColumn<FitopiaUser, String> fullNameColumn;
@@ -70,9 +76,11 @@ public class UserCrudController {
     @FXML private TableColumn<FitopiaUser, String> phoneColumn;
 
     private final ServiceUser serviceUser = new ServiceUser();
+    private final UserAiInsightService userAiInsightService = new UserAiInsightService();
     private final ObservableList<FitopiaUser> users = FXCollections.observableArrayList();
     private String selectedRole = "Patient";
     private FitopiaUser selectedUser;
+    private UserAiInsightService.ProfileCompletionSuggestion latestSuggestion;
 
     @FXML
     public void initialize() {
@@ -81,6 +89,7 @@ public class UserCrudController {
         birthDatePicker.setValue(LocalDate.now().minusYears(20));
         configureTable();
         applyRole("Patient");
+        resetAiSuggestionPane();
         loadUsers();
         userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> populateForm(newValue));
     }
@@ -175,6 +184,43 @@ public class UserCrudController {
     }
 
     @FXML
+    private void handleGenerateAiSuggestions() {
+        try {
+            FitopiaUser draft = buildUserFromFormDraft();
+            latestSuggestion = userAiInsightService.buildProfileCompletionSuggestion(draft);
+            aiUsernameLabel.setText(valueOrEmpty(latestSuggestion.suggestedUsername()));
+            aiPhoneLabel.setText(valueOrEmpty(latestSuggestion.normalizedPhone()));
+            aiBioArea.setText(valueOrEmpty(latestSuggestion.improvedBio()));
+            aiSummaryArea.setText(valueOrEmpty(latestSuggestion.profileSummary()));
+            aiImprovementsLabel.setText(String.join(" | ", latestSuggestion.improvements()));
+            setStatus("Suggestions IA generees pour le profil.");
+        } catch (RuntimeException e) {
+            setStatus(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleApplyAiSuggestions() {
+        if (latestSuggestion == null) {
+            setStatus("Generez d'abord les suggestions IA.");
+            return;
+        }
+        firstNameField.setText(valueOrEmpty(latestSuggestion.suggestedFirstName()));
+        lastNameField.setText(valueOrEmpty(latestSuggestion.suggestedLastName()));
+        if (!valueOrEmpty(latestSuggestion.suggestedUsername()).isBlank()) {
+            usernameField.setText(latestSuggestion.suggestedUsername());
+        }
+        if (!valueOrEmpty(latestSuggestion.normalizedPhone()).isBlank()) {
+            phoneField.setText(latestSuggestion.normalizedPhone());
+        }
+        if (!valueOrEmpty(latestSuggestion.improvedBio()).isBlank()) {
+            bioArea.setText(latestSuggestion.improvedBio());
+        }
+        aiSummaryArea.setText(valueOrEmpty(latestSuggestion.profileSummary()));
+        setStatus("Suggestions IA appliquees au formulaire.");
+    }
+
+    @FXML
     private void handleHome() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/User.fxml"));
@@ -243,6 +289,8 @@ public class UserCrudController {
         dietaryPreferencesArea.setText(valueOrEmpty(user.getDietaryPreferences()));
         fitnessGoalsArea.setText(valueOrEmpty(user.getFitnessGoals()));
         applyRole(valueOrEmpty(user.getRole()).isBlank() ? "Patient" : user.getRole());
+        latestSuggestion = null;
+        resetAiSuggestionPane();
         setStatus("Edition utilisateur #" + user.getId());
     }
 
@@ -290,6 +338,33 @@ public class UserCrudController {
         return user;
     }
 
+    private FitopiaUser buildUserFromFormDraft() {
+        FitopiaUser user = new FitopiaUser();
+        user.setFirstName(valueOrEmpty(firstNameField.getText()).trim());
+        user.setLastName(valueOrEmpty(lastNameField.getText()).trim());
+        user.setUsername(valueOrEmpty(usernameField.getText()).trim());
+        user.setEmail(valueOrEmpty(emailField.getText()).trim());
+        user.setPhone(valueOrEmpty(phoneField.getText()).trim());
+        user.setBirthDate(birthDatePicker.getValue() == null ? "" : birthDatePicker.getValue().toString());
+        user.setGender(femaleRadio.isSelected() ? "Female" : "Male");
+        user.setRole(selectedRole);
+        user.setAvatarPath(valueOrEmpty(avatarField.getText()).trim());
+        user.setProfessionalTitle(valueOrEmpty(professionalTitleField.getText()).trim());
+        user.setSpecialization(valueOrEmpty(specializationField.getText()).trim());
+        user.setQualification(valueOrEmpty(qualificationField.getText()).trim());
+        user.setYearsExperience(valueOrEmpty(yearsExperienceField.getText()).trim());
+        user.setBio(valueOrEmpty(bioArea.getText()).trim());
+        user.setLicenseNumber(valueOrEmpty(licenseNumberField.getText()).trim());
+        user.setHeight(valueOrEmpty(heightField.getText()).trim());
+        user.setWeight(valueOrEmpty(weightField.getText()).trim());
+        user.setTargetWeight(valueOrEmpty(targetWeightField.getText()).trim());
+        user.setFitnessLevel(fitnessLevelCombo.getValue());
+        user.setHealthConditions(valueOrEmpty(healthConditionsArea.getText()).trim());
+        user.setDietaryPreferences(valueOrEmpty(dietaryPreferencesArea.getText()).trim());
+        user.setFitnessGoals(valueOrEmpty(fitnessGoalsArea.getText()).trim());
+        return user;
+    }
+
     private void clearForm() {
         selectedUser = null;
         userTable.getSelectionModel().clearSelection();
@@ -316,7 +391,17 @@ public class UserCrudController {
         healthConditionsArea.clear();
         dietaryPreferencesArea.clear();
         fitnessGoalsArea.clear();
+        latestSuggestion = null;
+        resetAiSuggestionPane();
         applyRole("Patient");
+    }
+
+    private void resetAiSuggestionPane() {
+        aiImprovementsLabel.setText("Les recommandations IA s'afficheront ici.");
+        aiUsernameLabel.setText("-");
+        aiPhoneLabel.setText("-");
+        aiBioArea.clear();
+        aiSummaryArea.clear();
     }
 
     private void applyRole(String role) {

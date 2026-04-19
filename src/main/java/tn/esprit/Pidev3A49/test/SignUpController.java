@@ -5,19 +5,29 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import tn.esprit.Pidev3A49.api.AuthController;
 import tn.esprit.Pidev3A49.api.dto.RegisterRequest;
 import tn.esprit.Pidev3A49.api.dto.RegisterResponse;
+import tn.esprit.Pidev3A49.Models.FitopiaUser;
+import tn.esprit.Pidev3A49.services.UserAiInsightService;
 
 public class SignUpController {
     @FXML private TextField nomField;
     @FXML private TextField prenomField;
     @FXML private TextField usernameField;
     @FXML private TextField emailField;
+    @FXML private TextField phoneField;
     @FXML private DatePicker birthDatePicker;
     @FXML private PasswordField passwordField;
+    @FXML private TextArea bioArea;
+    @FXML private Label aiImprovementsLabel;
+    @FXML private Label aiUsernameLabel;
+    @FXML private Label aiPhoneLabel;
+    @FXML private TextArea aiBioArea;
+    @FXML private TextArea aiSummaryArea;
     @FXML private Label passwordGuidanceLabel;
     @FXML private Label statusLabel;
     @FXML private Label selectedRoleBadge;
@@ -27,13 +37,16 @@ public class SignUpController {
     @FXML private HBox adminRoleCard;
 
     private final AuthController authController = new AuthController();
+    private final UserAiInsightService userAiInsightService = new UserAiInsightService();
     private String selectedRole = "Patient";
+    private UserAiInsightService.ProfileCompletionSuggestion latestSuggestion;
 
     @FXML
     public void initialize() {
         applyRole("Patient");
         statusLabel.setText("Remplissez le formulaire pour creer un compte.");
         passwordGuidanceLabel.setText("Le mot de passe doit etre long, unique et ne pas contenir vos informations personnelles.");
+        resetAiSuggestionPane();
     }
 
     @FXML private void selectPatientRole() { applyRole("Patient"); }
@@ -47,8 +60,10 @@ public class SignUpController {
         String prenom = safe(prenomField.getText());
         String username = safe(usernameField.getText());
         String email = safe(emailField.getText());
+        String phone = safe(phoneField.getText());
         String birthDate = birthDatePicker.getValue() == null ? "" : birthDatePicker.getValue().toString();
         String password = safe(passwordField.getText());
+        String bio = safe(bioArea.getText());
         String role = safe(selectedRole);
 
         if (nom.isBlank() || prenom.isBlank() || username.isBlank() || email.isBlank() || password.isBlank()) {
@@ -65,8 +80,9 @@ public class SignUpController {
                     password,
                     birthDate,
                     role,
-                    "",
-                    "Male"
+                    phone,
+                    "Male",
+                    bio
             ));
             Alert success = new Alert(Alert.AlertType.INFORMATION);
             success.setTitle("Compte cree");
@@ -81,12 +97,66 @@ public class SignUpController {
     }
 
     @FXML
+    private void handleGenerateAiSuggestions() {
+        FitopiaUser draft = buildDraftUser();
+        latestSuggestion = userAiInsightService.buildProfileCompletionSuggestion(draft);
+        aiImprovementsLabel.setText(String.join(" | ", latestSuggestion.improvements()));
+        aiUsernameLabel.setText(safe(latestSuggestion.suggestedUsername()).isBlank() ? "-" : latestSuggestion.suggestedUsername());
+        aiPhoneLabel.setText(safe(latestSuggestion.normalizedPhone()).isBlank() ? "-" : latestSuggestion.normalizedPhone());
+        aiBioArea.setText(safe(latestSuggestion.improvedBio()));
+        aiSummaryArea.setText(safe(latestSuggestion.profileSummary()));
+        statusLabel.setText("Suggestions IA generees pour votre inscription.");
+    }
+
+    @FXML
+    private void handleApplyAiSuggestions() {
+        if (latestSuggestion == null) {
+            statusLabel.setText("Cliquez d'abord sur Generer les suggestions IA.");
+            return;
+        }
+        prenomField.setText(safe(latestSuggestion.suggestedFirstName()));
+        nomField.setText(safe(latestSuggestion.suggestedLastName()));
+        if (!safe(latestSuggestion.suggestedUsername()).isBlank()) {
+            usernameField.setText(latestSuggestion.suggestedUsername());
+        }
+        if (!safe(latestSuggestion.normalizedPhone()).isBlank()) {
+            phoneField.setText(latestSuggestion.normalizedPhone());
+        }
+        if (!safe(latestSuggestion.improvedBio()).isBlank()) {
+            bioArea.setText(latestSuggestion.improvedBio());
+        }
+        statusLabel.setText("Suggestions IA appliquees au formulaire.");
+    }
+
+    @FXML
     private void handleBackToSignIn() {
         SceneNavigator.goTo(statusLabel, "/SignIn.fxml", "Sign In", 1460, 860);
     }
 
     private String safe(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private FitopiaUser buildDraftUser() {
+        FitopiaUser user = new FitopiaUser();
+        user.setFirstName(safe(prenomField.getText()));
+        user.setLastName(safe(nomField.getText()));
+        user.setUsername(safe(usernameField.getText()));
+        user.setEmail(safe(emailField.getText()));
+        user.setPhone(safe(phoneField.getText()));
+        user.setBirthDate(birthDatePicker.getValue() == null ? "" : birthDatePicker.getValue().toString());
+        user.setBio(safe(bioArea.getText()));
+        user.setRole(selectedRole);
+        return user;
+    }
+
+    private void resetAiSuggestionPane() {
+        latestSuggestion = null;
+        aiImprovementsLabel.setText("Les suggestions IA apparaitront ici.");
+        aiUsernameLabel.setText("-");
+        aiPhoneLabel.setText("-");
+        aiBioArea.clear();
+        aiSummaryArea.clear();
     }
 
     private void applyRole(String role) {

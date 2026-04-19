@@ -35,7 +35,7 @@ public class AuthController {
         user.setSpecialization("");
         user.setQualification("");
         user.setYearsExperience("");
-        user.setBio("");
+        user.setBio(safe(request.bio()));
         user.setLicenseNumber("");
         user.setHeight("");
         user.setWeight("");

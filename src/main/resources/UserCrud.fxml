@@ -144,6 +144,43 @@
                                                         <TextField fx:id="licenseNumberField" promptText="License number" />
                                                     </children>
                                                 </VBox>
+                                                <VBox spacing="12.0" style="-fx-background-color: #f7fafb; -fx-background-radius: 12; -fx-border-color: #d9e5e7; -fx-border-radius: 12; -fx-padding: 16;">
+                                                    <children>
+                                                        <Label style="-fx-text-fill: #1b2e35; -fx-font-size: 15px; -fx-font-weight: bold;" text="AI Profile Assistant" />
+                                                        <Label style="-fx-text-fill: #6d7d84; -fx-font-size: 12px;" text="L'assistant reformule les donnees du profil, normalise le telephone, suggere un username et ameliore la bio." wrapText="true" />
+                                                        <HBox spacing="12.0">
+                                                            <children>
+                                                                <Button mnemonicParsing="false" onAction="#handleGenerateAiSuggestions" style="-fx-background-color: #244c5a; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Generer les suggestions IA" />
+                                                                <Button mnemonicParsing="false" onAction="#handleApplyAiSuggestions" style="-fx-background-color: white; -fx-text-fill: #244c5a; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Appliquer au formulaire" />
+                                                            </children>
+                                                        </HBox>
+                                                        <Label fx:id="aiImprovementsLabel" style="-fx-text-fill: #56706b; -fx-font-size: 12px;" text="Les recommandations IA s'afficheront ici." wrapText="true" />
+                                                        <GridPane hgap="12.0" vgap="10.0">
+                                                            <columnConstraints>
+                                                                <ColumnConstraints percentWidth="50.0" />
+                                                                <ColumnConstraints percentWidth="50.0" />
+                                                            </columnConstraints>
+                                                            <children>
+                                                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                                                    <children>
+                                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 11px; -fx-font-weight: bold;" text="Username suggere" />
+                                                                        <Label fx:id="aiUsernameLabel" style="-fx-text-fill: #22333b;" text="-" wrapText="true" />
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                                    <children>
+                                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 11px; -fx-font-weight: bold;" text="Telephone normalise" />
+                                                                        <Label fx:id="aiPhoneLabel" style="-fx-text-fill: #22333b;" text="-" wrapText="true" />
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </GridPane>
+                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 11px; -fx-font-weight: bold;" text="Bio professionnelle amelioree" />
+                                                        <TextArea fx:id="aiBioArea" editable="false" prefRowCount="4" promptText="La bio reformulee apparaitra ici" wrapText="true" />
+                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 11px; -fx-font-weight: bold;" text="Resume propre du profil" />
+                                                        <TextArea fx:id="aiSummaryArea" editable="false" prefRowCount="4" promptText="Le resume du profil apparaitra ici" wrapText="true" />
+                                                    </children>
+                                                </VBox>
                                                 <HBox spacing="12.0">
                                                     <children>
                                                         <Button mnemonicParsing="false" onAction="#handleAddUser" style="-fx-background-color: #2d323c; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Create Account" />

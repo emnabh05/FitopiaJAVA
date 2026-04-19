@@ -9,6 +9,7 @@ public record RegisterRequest(
         String birthDate,
         String role,
         String phone,
-        String gender
+        String gender,
+        String bio
 ) {
 }
