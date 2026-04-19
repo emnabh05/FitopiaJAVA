@@ -25,6 +25,8 @@ public class FitopiaUser {
     private String healthConditions;
     private String dietaryPreferences;
     private String fitnessGoals;
+    private boolean faceIdEnabled;
+    private String faceImagePath;
 
     public int getId() {
         return id;
@@ -216,5 +218,21 @@ public class FitopiaUser {
 
     public void setFitnessGoals(String fitnessGoals) {
         this.fitnessGoals = fitnessGoals;
+    }
+
+    public boolean isFaceIdEnabled() {
+        return faceIdEnabled;
+    }
+
+    public void setFaceIdEnabled(boolean faceIdEnabled) {
+        this.faceIdEnabled = faceIdEnabled;
+    }
+
+    public String getFaceImagePath() {
+        return faceImagePath;
+    }
+
+    public void setFaceImagePath(String faceImagePath) {
+        this.faceImagePath = faceImagePath;
     }
 }

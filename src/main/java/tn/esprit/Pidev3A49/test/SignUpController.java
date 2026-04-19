@@ -87,6 +87,8 @@ public class SignUpController {
         user.setHealthConditions("");
         user.setDietaryPreferences("");
         user.setFitnessGoals("");
+        user.setFaceIdEnabled(false);
+        user.setFaceImagePath("");
 
         try {
             serviceUser.add(user);

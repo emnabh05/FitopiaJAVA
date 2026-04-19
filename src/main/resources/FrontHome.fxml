@@ -39,7 +39,7 @@
                 </HBox>
                 <AnchorPane prefHeight="560.0" style="-fx-background-color: linear-gradient(to bottom right, #0c4549, #1b7b7f);" VBox.vgrow="ALWAYS">
                     <children>
-                        <VBox spacing="12.0" style="-fx-background-color: rgba(5,26,39,0.50); -fx-background-radius: 16; -fx-padding: 26;" AnchorPane.leftAnchor="250.0" AnchorPane.topAnchor="80.0">
+                        <VBox spacing="12.0" style="-fx-background-color: rgba(5,26,39,0.50); -fx-background-radius: 16; -fx-padding: 26;" AnchorPane.leftAnchor="150.0" AnchorPane.topAnchor="70.0">
                             <children>
                                 <Label style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 20; -fx-padding: 6 12 6 12; -fx-font-size: 10px; -fx-text-fill: rgba(255,255,255,0.90); -fx-font-weight: bold;" text="FITOPIA PERFORMANCE PLATFORM" />
                                 <Label style="-fx-font-size: 58px; -fx-font-weight: bold; -fx-text-fill: white; -fx-line-spacing: -8px;" text="Train smarter, eat&#10;better, and stay&#10;consistent." />
@@ -51,6 +51,20 @@
                                         <Button mnemonicParsing="false" style="-fx-background-color: white; -fx-text-fill: #22333b; -fx-background-radius: 16; -fx-font-size: 10px; -fx-font-weight: bold;" text="CONTACT US" />
                                     </children>
                                 </HBox>
+                            </children>
+                        </VBox>
+                        <VBox spacing="10.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 16; -fx-padding: 22;" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" prefWidth="430.0">
+                            <children>
+                                <Label style="-fx-text-fill: #17363b; -fx-font-size: 22px; -fx-font-weight: bold;" text="API / IA Insights" />
+                                <Label style="-fx-text-fill: #476168; -fx-font-size: 11px;" text="Bloc avance pour la gestion utilisateur, la securite et les integrations intelligentes." wrapText="true" />
+                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Analyse profil" />
+                                <Label fx:id="profileSummaryLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
+                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Securite" />
+                                <Label fx:id="securitySummaryLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
+                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="APIs recommandees" />
+                                <Label fx:id="apiIdeasLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
+                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="IA recommandees" />
+                                <Label fx:id="aiIdeasLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
                             </children>
                         </VBox>
                     </children>

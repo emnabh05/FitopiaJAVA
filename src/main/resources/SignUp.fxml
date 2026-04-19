@@ -46,7 +46,7 @@
                                         <Region VBox.vgrow="ALWAYS" />
                                         <HBox alignment="CENTER_LEFT" spacing="8.0">
                                             <children>
-                                                <Label style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 8; -fx-padding: 7 9 7 9; -fx-text-fill: #0f6664; -fx-font-weight: bold;" text="F" />
+                                                <Label style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 8; -fx-padding: 7 9 7 9; -fx-text-fill: #0f6664; -fx-font-weight: bold;" text="fitopia" />
                                                 <Label style="-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Fitopia" />
                                             </children>
                                         </HBox>

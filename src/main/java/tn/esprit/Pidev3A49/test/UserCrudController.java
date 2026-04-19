@@ -272,6 +272,10 @@ public class UserCrudController {
         user.setHealthConditions(healthConditionsArea.getText().trim());
         user.setDietaryPreferences(dietaryPreferencesArea.getText().trim());
         user.setFitnessGoals(fitnessGoalsArea.getText().trim());
+        if (selectedUser != null) {
+            user.setFaceIdEnabled(selectedUser.isFaceIdEnabled());
+            user.setFaceImagePath(selectedUser.getFaceImagePath());
+        }
         return user;
     }
 

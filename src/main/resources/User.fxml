@@ -17,7 +17,7 @@
             <children>
                 <VBox maxWidth="470.0" prefHeight="310.0" prefWidth="470.0" style="-fx-background-color: linear-gradient(to bottom right, #0c4c50, #168a67); -fx-background-radius: 14; -fx-padding: 30 30 30 30;">
                     <children>
-                        <Label style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 8; -fx-padding: 10 12 10 12; -fx-text-fill: #0e6563; -fx-font-weight: bold;" text="F" />
+                        <Label style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 8; -fx-padding: 10 12 10 12; -fx-text-fill: #0e6563; -fx-font-weight: bold;" text="fitopia" />
                         <Label style="-fx-padding: 22 0 0 0; -fx-text-fill: #071d22; -fx-font-size: 32px; -fx-font-weight: bold;" text="Welcome Fitopia" />
                         <Label style="-fx-padding: 14 0 0 0; -fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 14px;" text="Access your Fitopia account, track your progress, and manage your personalized journey." wrapText="true" />
                         <VBox spacing="10.0" style="-fx-padding: 22 0 0 0;">

@@ -5,15 +5,34 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class AdminDashboardController {
     @FXML private Label statusLabel;
     @FXML private Label adminLabel;
+    @FXML private TextField searchField;
+    @FXML private ComboBox<String> sortCombo;
+    @FXML private TextField nomField;
+    @FXML private TextField prenomField;
+    @FXML private TextField usernameField;
+    @FXML private TextField emailField;
+    @FXML private TextField phoneField;
+    @FXML private PasswordField newPasswordField;
+    @FXML private ComboBox<String> roleCombo;
+    @FXML private Button modifierButton;
+    @FXML private Button enregistrerButton;
     @FXML private TableView<FitopiaUser> usersTable;
     @FXML private TableColumn<FitopiaUser, Number> idCol;
     @FXML private TableColumn<FitopiaUser, String> nomCol;
@@ -25,13 +44,20 @@ public class AdminDashboardController {
 
     private final ServiceUser serviceUser = new ServiceUser();
     private final ObservableList<FitopiaUser> users = FXCollections.observableArrayList();
+    private FitopiaUser selectedUser;
+    private boolean editingMode;
 
     @FXML
     public void initialize() {
         FitopiaUser current = UserSession.getCurrentUser();
         adminLabel.setText(current == null ? "Admin" : current.getEmail());
+        roleCombo.setItems(FXCollections.observableArrayList("Patient", "Coach", "Nutritionist", "Admin"));
+        sortCombo.setItems(FXCollections.observableArrayList("ID desc", "ID asc", "Nom A-Z", "Role A-Z"));
+        sortCombo.getSelectionModel().select("ID desc");
         setupTable();
         loadUsers();
+        usersTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> populateEditor(newV));
+        setEditingMode(false);
     }
 
     @FXML
@@ -43,6 +69,109 @@ public class AdminDashboardController {
     private void handleLogout() {
         UserSession.clear();
         SceneNavigator.goTo(statusLabel, "/SignIn.fxml", "Sign In", 1460, 860);
+    }
+
+    @FXML
+    private void handleSearch() {
+        applyFilters();
+    }
+
+    @FXML
+    private void handleSort() {
+        applyFilters();
+    }
+
+    @FXML
+    private void handleUpdateUser() {
+        if (selectedUser == null) {
+            statusLabel.setText("Selectionnez un utilisateur a modifier.");
+            return;
+        }
+        setEditingMode(true);
+        statusLabel.setText("Mode edition actif. Cliquez sur Enregistrer pour valider.");
+    }
+
+    @FXML
+    private void handleSaveUser() {
+        if (selectedUser == null) {
+            statusLabel.setText("Selectionnez un utilisateur a modifier.");
+            return;
+        }
+        if (!editingMode) {
+            statusLabel.setText("Cliquez d'abord sur Modifier.");
+            return;
+        }
+        String nom = safe(nomField.getText()).trim();
+        String prenom = safe(prenomField.getText()).trim();
+        String username = safe(usernameField.getText()).trim();
+        String email = safe(emailField.getText()).trim();
+        String phone = safe(phoneField.getText()).trim();
+        String newPassword = safe(newPasswordField.getText()).trim();
+        String role = safe(roleCombo.getValue()).trim();
+
+        if (nom.isBlank() || prenom.isBlank() || username.isBlank() || email.isBlank() || role.isBlank()) {
+            statusLabel.setText("Nom, prenom, username, email et role sont obligatoires.");
+            return;
+        }
+        if (serviceUser.emailExistsForOtherUser(email, selectedUser.getId())) {
+            statusLabel.setText("Cet email est deja utilise par un autre compte.");
+            return;
+        }
+        if (serviceUser.usernameExistsForOtherUser(username, selectedUser.getId())) {
+            statusLabel.setText("Ce username est deja utilise par un autre compte.");
+            return;
+        }
+
+        selectedUser.setLastName(nom);
+        selectedUser.setFirstName(prenom);
+        selectedUser.setUsername(username);
+        selectedUser.setEmail(email);
+        selectedUser.setPhone(phone);
+        selectedUser.setRole(role);
+        if (!newPassword.isBlank()) {
+            if (!isStrongPassword(newPassword)) {
+                statusLabel.setText("Le mot de passe doit contenir au moins 1 majuscule et 1 chiffre.");
+                return;
+            }
+            selectedUser.setPassword(newPassword);
+        }
+
+        try {
+            serviceUser.update(selectedUser);
+            statusLabel.setText("Utilisateur modifie avec succes.");
+            setEditingMode(false);
+            loadUsers();
+        } catch (RuntimeException e) {
+            statusLabel.setText(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleDeleteUser() {
+        if (selectedUser == null) {
+            statusLabel.setText("Selectionnez un utilisateur a supprimer.");
+            return;
+        }
+        try {
+            int id = selectedUser.getId();
+            serviceUser.delete(id);
+            selectedUser = null;
+            setEditingMode(false);
+            clearEditor();
+            loadUsers();
+            statusLabel.setText("Utilisateur #" + id + " supprime.");
+        } catch (RuntimeException e) {
+            statusLabel.setText(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleClearEditor() {
+        selectedUser = null;
+        usersTable.getSelectionModel().clearSelection();
+        setEditingMode(false);
+        clearEditor();
+        statusLabel.setText("Formulaire vide.");
     }
 
     private void setupTable() {
@@ -62,11 +191,85 @@ public class AdminDashboardController {
             statusLabel.setText("Connexion MySQL indisponible. Verifiez fitopiabd.");
             return;
         }
-        users.setAll(serviceUser.getAll());
+        applyFilters();
+    }
+
+    private void applyFilters() {
+        List<FitopiaUser> list = serviceUser.getAll();
+        String search = safe(searchField.getText()).trim().toLowerCase();
+        if (!search.isEmpty()) {
+            list = list.stream().filter(u ->
+                    safe(u.getFirstName()).toLowerCase().contains(search)
+                            || safe(u.getLastName()).toLowerCase().contains(search)
+                            || safe(u.getUsername()).toLowerCase().contains(search)
+                            || safe(u.getEmail()).toLowerCase().contains(search)
+                            || safe(u.getRole()).toLowerCase().contains(search)
+                            || String.valueOf(u.getId()).contains(search)
+            ).collect(Collectors.toList());
+        }
+
+        String sort = sortCombo.getValue();
+        if ("ID asc".equals(sort)) {
+            list.sort(Comparator.comparingInt(FitopiaUser::getId));
+        } else if ("Nom A-Z".equals(sort)) {
+            list.sort(Comparator.comparing(u -> safe(u.getLastName()).toLowerCase()));
+        } else if ("Role A-Z".equals(sort)) {
+            list.sort(Comparator.comparing(u -> safe(u.getRole()).toLowerCase()));
+        } else {
+            list.sort((a, b) -> Integer.compare(b.getId(), a.getId()));
+        }
+
+        users.setAll(list);
         statusLabel.setText("Total utilisateurs: " + users.size());
+    }
+
+    private void populateEditor(FitopiaUser user) {
+        selectedUser = user;
+        if (user == null) {
+            return;
+        }
+        nomField.setText(safe(user.getLastName()));
+        prenomField.setText(safe(user.getFirstName()));
+        usernameField.setText(safe(user.getUsername()));
+        emailField.setText(safe(user.getEmail()));
+        phoneField.setText(safe(user.getPhone()));
+        newPasswordField.clear();
+        roleCombo.setValue(safe(user.getRole()).isBlank() ? "Patient" : user.getRole());
+        setEditingMode(false);
+    }
+
+    private void clearEditor() {
+        nomField.clear();
+        prenomField.clear();
+        usernameField.clear();
+        emailField.clear();
+        phoneField.clear();
+        newPasswordField.clear();
+        roleCombo.setValue("Patient");
+    }
+
+    private void setEditingMode(boolean enabled) {
+        editingMode = enabled;
+        setEditorDisabled(!enabled);
+        enregistrerButton.setDisable(!enabled);
+        modifierButton.setDisable(enabled);
+    }
+
+    private void setEditorDisabled(boolean disabled) {
+        nomField.setDisable(disabled);
+        prenomField.setDisable(disabled);
+        usernameField.setDisable(disabled);
+        emailField.setDisable(disabled);
+        phoneField.setDisable(disabled);
+        newPasswordField.setDisable(disabled);
+        roleCombo.setDisable(disabled);
     }
 
     private String safe(String value) {
         return value == null ? "" : value;
+    }
+
+    private boolean isStrongPassword(String password) {
+        return password.matches("^(?=.*[A-Z])(?=.*\\d).+$");
     }
 }

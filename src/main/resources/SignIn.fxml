@@ -6,6 +6,7 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -39,7 +40,7 @@
                     <children>
                         <VBox maxWidth="520.0" prefHeight="640.0" prefWidth="520.0" style="-fx-background-color: linear-gradient(to bottom right, #0c4c50, #1b8e6e); -fx-background-radius: 18; -fx-padding: 34;">
                             <children>
-                                <Label style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 9 12 9 12; -fx-text-fill: #0f6361; -fx-font-weight: bold;" text="F" />
+                                <Label style="-fx-background-color: white; -fx-background-radius: 8; -fx-padding: 9 12 9 12; -fx-text-fill: #0f6361; -fx-font-weight: bold;" text="fitopia" />
                                 <Label style="-fx-padding: 22 0 0 0; -fx-text-fill: #06232a; -fx-font-size: 36px; -fx-font-weight: bold;" text="Welcome to Fitopia" />
                                 <Label style="-fx-padding: 14 0 0 0; -fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 14px;" text="Connectez-vous pour acceder a votre espace front ou admin selon votre role." wrapText="true" />
                                 <VBox spacing="10.0" style="-fx-padding: 24 0 0 0;">
@@ -65,9 +66,27 @@
                                 <Label style="-fx-text-fill: #5d6f76; -fx-padding: 12 0 0 0;" text="Mot de passe" />
                                 <PasswordField fx:id="passwordField" promptText="Password" />
 
+                                <VBox fx:id="faceIdSummaryBox" managed="false" spacing="8.0" style="-fx-background-color: #f4f8f8; -fx-background-radius: 12; -fx-border-color: #d6e2e4; -fx-border-radius: 12; -fx-padding: 12;" visible="false">
+                                    <children>
+                                        <Label style="-fx-text-fill: #1c2f35; -fx-font-weight: bold;" text="Verification Face ID" />
+                                        <ImageView fx:id="facePreview" fitHeight="90.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" />
+                                        <Label fx:id="faceIdSummaryLabel" style="-fx-text-fill: #587077; -fx-font-size: 12px;" text="Apercu du visage enregistre" wrapText="true" />
+                                        <Button fx:id="verifyFaceIdButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleVerifyRegisteredFaceId" style="-fx-background-color: #1f6a6d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="VERIFIER MON FACE ID" />
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="14.0" />
+                                    </VBox.margin>
+                                </VBox>
+
                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleSignIn" style="-fx-background-color: #243943; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 12 0 12 0;" text="SE CONNECTER">
                                     <VBox.margin>
                                         <Insets top="18.0" />
+                                    </VBox.margin>
+                                </Button>
+
+                                <Button fx:id="faceIdButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleFaceId" style="-fx-background-color: white; -fx-border-color: #d3dde0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #314850; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="UTILISER FACE ID">
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
                                     </VBox.margin>
                                 </Button>
 

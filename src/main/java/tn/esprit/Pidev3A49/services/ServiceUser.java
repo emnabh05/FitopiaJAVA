@@ -4,6 +4,7 @@ import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.utils.MyDataBase;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,6 +63,54 @@ public class ServiceUser {
         return Optional.empty();
     }
 
+    public Optional<FitopiaUser> findByIdentifier(String identifier) {
+        ensureConnection();
+        String query = "SELECT * FROM `" + TABLE_NAME + "` WHERE LOWER(email)=LOWER(?) OR LOWER(username)=LOWER(?) LIMIT 1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, identifier);
+            pstm.setString(2, identifier);
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapUser(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la recherche utilisateur : " + e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<FitopiaUser> authenticateWithFaceId(String identifier) {
+        ensureConnection();
+        String query = "SELECT * FROM `" + TABLE_NAME + "` WHERE (LOWER(email)=LOWER(?) OR LOWER(username)=LOWER(?)) "
+                + "AND face_id_enabled=1 AND face_image_path IS NOT NULL AND face_image_path <> '' LIMIT 1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, identifier);
+            pstm.setString(2, identifier);
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapUser(rs));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de l'authentification Face ID : " + e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    public void enableFaceId(int userId, String faceImagePath) {
+        ensureConnection();
+        String query = "UPDATE `" + TABLE_NAME + "` SET face_id_enabled=?, face_image_path=? WHERE id=?";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setBoolean(1, true);
+            pstm.setString(2, faceImagePath);
+            pstm.setInt(3, userId);
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de l'activation Face ID : " + e.getMessage(), e);
+        }
+    }
+
     public boolean emailExists(String email) {
         return existsByColumn("email", email);
     }
@@ -70,11 +119,19 @@ public class ServiceUser {
         return existsByColumn("username", username);
     }
 
+    public boolean emailExistsForOtherUser(String email, int userId) {
+        return existsByColumnForOtherUser("email", email, userId);
+    }
+
+    public boolean usernameExistsForOtherUser(String username, int userId) {
+        return existsByColumnForOtherUser("username", username, userId);
+    }
+
     public void add(FitopiaUser user) {
         ensureConnection();
         String query = "INSERT INTO `" + TABLE_NAME + "` (first_name,last_name,username,email,password,phone,birth_date,gender,role,avatar_path,"
                 + "professional_title,specialization,qualification,years_experience,bio,license_number,height,weight,target_weight,"
-                + "fitness_level,health_conditions,dietary_preferences,fitness_goals) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "fitness_level,health_conditions,dietary_preferences,fitness_goals,face_id_enabled,face_image_path) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try (PreparedStatement pstm = cnx.prepareStatement(query)) {
             fillStatement(pstm, user, false);
@@ -97,11 +154,25 @@ public class ServiceUser {
         }
     }
 
+    private boolean existsByColumnForOtherUser(String column, String value, int userId) {
+        ensureConnection();
+        String query = "SELECT 1 FROM `" + TABLE_NAME + "` WHERE LOWER(" + column + ")=LOWER(?) AND id<>? LIMIT 1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, value);
+            pstm.setInt(2, userId);
+            try (ResultSet rs = pstm.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la verification " + column + " : " + e.getMessage(), e);
+        }
+    }
+
     public void update(FitopiaUser user) {
         ensureConnection();
         String query = "UPDATE `" + TABLE_NAME + "` SET first_name=?,last_name=?,username=?,email=?,password=?,phone=?,birth_date=?,gender=?,role=?,avatar_path=?,"
                 + "professional_title=?,specialization=?,qualification=?,years_experience=?,bio=?,license_number=?,height=?,weight=?,target_weight=?,"
-                + "fitness_level=?,health_conditions=?,dietary_preferences=?,fitness_goals=? WHERE id=?";
+                + "fitness_level=?,health_conditions=?,dietary_preferences=?,fitness_goals=?,face_id_enabled=?,face_image_path=? WHERE id=?";
 
         try (PreparedStatement pstm = cnx.prepareStatement(query)) {
             fillStatement(pstm, user, true);
@@ -148,11 +219,15 @@ public class ServiceUser {
                 + "fitness_level VARCHAR(50),"
                 + "health_conditions TEXT,"
                 + "dietary_preferences TEXT,"
-                + "fitness_goals TEXT"
+                + "fitness_goals TEXT,"
+                + "face_id_enabled BOOLEAN NOT NULL DEFAULT FALSE,"
+                + "face_image_path VARCHAR(255)"
                 + ")";
 
         try (Statement statement = cnx.createStatement()) {
             statement.executeUpdate(query);
+            ensureColumn("face_id_enabled", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN face_id_enabled BOOLEAN NOT NULL DEFAULT FALSE");
+            ensureColumn("face_image_path", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN face_image_path VARCHAR(255)");
         } catch (SQLException e) {
             throw new RuntimeException("Impossible de preparer la table utilisateur : " + e.getMessage(), e);
         }
@@ -188,8 +263,10 @@ public class ServiceUser {
         pstm.setString(21, user.getHealthConditions());
         pstm.setString(22, user.getDietaryPreferences());
         pstm.setString(23, user.getFitnessGoals());
+        pstm.setBoolean(24, user.isFaceIdEnabled());
+        pstm.setString(25, user.getFaceImagePath());
         if (includeId) {
-            pstm.setInt(24, user.getId());
+            pstm.setInt(26, user.getId());
         }
     }
 
@@ -219,6 +296,19 @@ public class ServiceUser {
         user.setHealthConditions(rs.getString("health_conditions"));
         user.setDietaryPreferences(rs.getString("dietary_preferences"));
         user.setFitnessGoals(rs.getString("fitness_goals"));
+        user.setFaceIdEnabled(rs.getBoolean("face_id_enabled"));
+        user.setFaceImagePath(rs.getString("face_image_path"));
         return user;
+    }
+
+    private void ensureColumn(String columnName, String alterQuery) throws SQLException {
+        DatabaseMetaData metaData = cnx.getMetaData();
+        try (ResultSet rs = metaData.getColumns(null, null, TABLE_NAME, columnName)) {
+            if (!rs.next()) {
+                try (Statement statement = cnx.createStatement()) {
+                    statement.executeUpdate(alterQuery);
+                }
+            }
+        }
     }
 }
