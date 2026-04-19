@@ -7,10 +7,12 @@ import javafx.scene.control.TextField;
 import tn.esprit.Pidev3A49.Models.SupplementOrder;
 import tn.esprit.Pidev3A49.services.ServiceSupplementOrder;
 import tn.esprit.Pidev3A49.utils.CartStore;
+import tn.esprit.Pidev3A49.utils.ConfirmedOrderStore;
 import tn.esprit.Pidev3A49.utils.PendingOrderStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 public class CardPaymentController {
@@ -39,6 +41,7 @@ public class CardPaymentController {
 
     private final PendingOrderStore pendingOrderStore = PendingOrderStore.getInstance();
     private final CartStore cartStore = CartStore.getInstance();
+    private final ConfirmedOrderStore confirmedOrderStore = ConfirmedOrderStore.getInstance();
     private ServiceSupplementOrder serviceSupplementOrder;
 
     @FXML
@@ -73,11 +76,14 @@ public class CardPaymentController {
         try {
             validateCardFields();
             int orderId = serviceSupplementOrder.placeOrder(pendingOrder);
+            pendingOrder.setId(orderId);
+            pendingOrder.setCreatedAt(LocalDateTime.now());
             cartStore.setLastCheckoutEmail(pendingOrder.getEmail());
+            confirmedOrderStore.setConfirmedOrder(pendingOrder);
             cartStore.clear();
             pendingOrderStore.clear();
             setSuccessMessage("Payment accepted. Order #" + orderId + " confirmed.");
-            SceneNavigator.navigate(event, SceneNavigator.CARD_PAYMENT_VIEW, SceneNavigator.FRONT_ORDERS_VIEW);
+            SceneNavigator.navigate(event, SceneNavigator.CARD_PAYMENT_VIEW, SceneNavigator.ORDER_CONFIRMATION_VIEW);
         } catch (RuntimeException | IOException exception) {
             setErrorMessage(exception.getMessage());
         }

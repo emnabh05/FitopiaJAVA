@@ -19,6 +19,7 @@ import tn.esprit.Pidev3A49.Models.SupplementOrder;
 import tn.esprit.Pidev3A49.Models.SupplementOrderItem;
 import tn.esprit.Pidev3A49.services.ServiceSupplementOrder;
 import tn.esprit.Pidev3A49.utils.CartStore;
+import tn.esprit.Pidev3A49.utils.ConfirmedOrderStore;
 import tn.esprit.Pidev3A49.utils.PendingOrderStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
 
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -135,6 +137,7 @@ public class CheckoutController {
 
     private final CartStore cartStore = CartStore.getInstance();
     private final PendingOrderStore pendingOrderStore = PendingOrderStore.getInstance();
+    private final ConfirmedOrderStore confirmedOrderStore = ConfirmedOrderStore.getInstance();
     private ServiceSupplementOrder serviceSupplementOrder;
     private BigDecimal appliedDiscountAmount = BigDecimal.ZERO;
 
@@ -230,13 +233,22 @@ public class CheckoutController {
             }
 
             int orderId = serviceSupplementOrder.placeOrder(order);
+            order.setId(orderId);
+            order.setCreatedAt(LocalDateTime.now());
             cartStore.setLastCheckoutEmail(order.getEmail());
+            confirmedOrderStore.setConfirmedOrder(order);
 
             cartStore.clear();
             appliedDiscountAmount = BigDecimal.ZERO;
             clearForm();
             refreshSummary();
-            setSuccessMessage("Commande #" + orderId + " enregistree avec succes.");
+            pendingOrderStore.clear();
+
+            try {
+                SceneNavigator.navigate(event, SceneNavigator.CHECKOUT_VIEW, SceneNavigator.ORDER_CONFIRMATION_VIEW);
+            } catch (IOException exception) {
+                throw new IllegalStateException("Commande enregistree mais impossible d'ouvrir la page de confirmation.");
+            }
         } catch (RuntimeException exception) {
             setErrorMessage(exception.getMessage());
         }
