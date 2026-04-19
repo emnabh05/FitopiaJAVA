@@ -2948,7 +2948,7 @@ public class MainController {
 
         Request request = new Request.Builder()
                 .url("https://api.logmeal.es/v2/image/recognition/complete/v1.0")
-                .header("Authorization", "Bearer " + API_KEY_LOGMEAL)
+                .header("Authorization", "Token " + API_KEY_LOGMEAL)
                 .post(requestBody)
                 .build();
 
