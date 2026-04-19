@@ -269,7 +269,8 @@
                                         <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
                                     </padding>
                                     <children>
-                                        <TextField promptText="Search supplement name..."
+                                        <TextField fx:id="searchField"
+                                                   promptText="Search supplement name..."
                                                    prefHeight="42.0"
                                                    style="-fx-background-color: #F8FAFC; -fx-background-radius: 14; -fx-border-color: #DEE7ED; -fx-border-radius: 14; -fx-font-size: 13px; -fx-prompt-text-fill: #98A7B3;"/>
                                     </children>
@@ -286,25 +287,14 @@
                                                 <Label text="Categories"
                                                        style="-fx-text-fill: #163848; -fx-font-size: 16px; -fx-font-weight: 800;"/>
                                                 <Region HBox.hgrow="ALWAYS"/>
-                                                <Label text="FILTER"
-                                                       style="-fx-text-fill: #425C6A; -fx-font-size: 12px; -fx-font-weight: 900;"/>
+                                                <Button text="Clear"
+                                                        onAction="#clearFilters"
+                                                        prefHeight="28.0"
+                                                        style="-fx-background-color: #ECF4F8; -fx-background-radius: 10; -fx-text-fill: #3E5D6E; -fx-font-size: 12px; -fx-font-weight: 800;"/>
                                             </children>
                                         </HBox>
 
-                                        <VBox spacing="10.0">
-                                            <children>
-                                                <CheckBox text="Protein"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Creatine"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Pre-workout"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Mass gainer"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                                <CheckBox text="Vitamins"
-                                                          style="-fx-font-size: 13px; -fx-text-fill: #667A86;"/>
-                                            </children>
-                                        </VBox>
+                                        <VBox fx:id="categoryFiltersContainer" spacing="10.0"/>
                                     </children>
                                 </VBox>
                             </children>
@@ -331,8 +321,10 @@
                                             </children>
                                         </VBox>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <ComboBox prefWidth="220.0"
-                                                  promptText="Sort by Name (A-Z)"
+                                        <ComboBox fx:id="sortComboBox"
+                                                  prefWidth="250.0"
+                                                  visibleRowCount="7"
+                                                  promptText="Sort products"
                                                   style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #D4E5DE; -fx-border-radius: 14; -fx-font-size: 14px;"/>
                                     </children>
                                 </HBox>

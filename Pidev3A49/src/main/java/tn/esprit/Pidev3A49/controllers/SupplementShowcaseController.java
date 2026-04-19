@@ -1,13 +1,17 @@
 package tn.esprit.Pidev3A49.controllers;
 
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -23,8 +27,14 @@ import tn.esprit.Pidev3A49.utils.SceneNavigator;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class SupplementShowcaseController {
 
@@ -33,6 +43,14 @@ public class SupplementShowcaseController {
 
     private static final String CART_ERROR_STYLE =
             "-fx-text-fill: #D92D20; -fx-font-size: 13px; -fx-font-weight: 700;";
+
+    private static final String SORT_DEFAULT = "Sort by...";
+    private static final String SORT_DATE_NEWEST = "Date posted (Newest)";
+    private static final String SORT_DATE_OLDEST = "Date posted (Oldest)";
+    private static final String SORT_NAME_ASC = "Name (A-Z)";
+    private static final String SORT_NAME_DESC = "Name (Z-A)";
+    private static final String SORT_PRICE_ASC = "Price (Low to High)";
+    private static final String SORT_PRICE_DESC = "Price (High to Low)";
 
     @FXML
     private ScrollPane rootScrollPane;
@@ -51,6 +69,15 @@ public class SupplementShowcaseController {
 
     @FXML
     private Label productHintLabel;
+
+    @FXML
+    private TextField searchField;
+
+    @FXML
+    private VBox categoryFiltersContainer;
+
+    @FXML
+    private ComboBox<String> sortComboBox;
 
     @FXML
     private Label heroCountLabel;
@@ -78,9 +105,12 @@ public class SupplementShowcaseController {
 
     private final CartStore cartStore = CartStore.getInstance();
     private ServiceSupplement serviceSupplement;
+    private List<Supplement> allSupplements = List.of();
+    private final List<CheckBox> categoryCheckBoxes = new ArrayList<>();
 
     @FXML
     private void initialize() {
+        configureFilterControls();
         loadProducts();
         renderCart();
     }
@@ -138,14 +168,49 @@ public class SupplementShowcaseController {
         cartPanel.setManaged(false);
     }
 
+    @FXML
+    private void clearFilters() {
+        if (searchField != null) {
+            searchField.clear();
+        }
+        for (CheckBox categoryCheckBox : categoryCheckBoxes) {
+            categoryCheckBox.setSelected(false);
+        }
+        if (sortComboBox != null) {
+            sortComboBox.getSelectionModel().select(SORT_DEFAULT);
+        }
+        applyFilters();
+    }
+
+    private void configureFilterControls() {
+        sortComboBox.setItems(FXCollections.observableArrayList(
+                SORT_DEFAULT,
+                SORT_DATE_NEWEST,
+                SORT_DATE_OLDEST,
+                SORT_NAME_ASC,
+                SORT_NAME_DESC,
+                SORT_PRICE_ASC,
+                SORT_PRICE_DESC
+        ));
+        sortComboBox.getSelectionModel().select(SORT_DEFAULT);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
+        sortComboBox.valueProperty().addListener((observable, oldValue, newValue) -> applyFilters());
+    }
+
     private void loadProducts() {
         try {
             serviceSupplement = new ServiceSupplement();
             List<Supplement> supplements = serviceSupplement.getAll();
+            allSupplements = supplements;
             updateHeader(supplements.size());
-            renderProducts(supplements);
+            renderCategoryFilters(supplements);
+            applyFilters();
         } catch (RuntimeException exception) {
+            allSupplements = List.of();
             updateHeader(0);
+            categoryCheckBoxes.clear();
+            categoryFiltersContainer.getChildren().setAll(buildCategoryHintLabel("No category data available."));
             productSummaryLabel.setText("Showing 0 products");
             productHintLabel.setText("MySQL is unavailable. Start the database to load products added from the back end.");
             productGrid.getChildren().setAll(buildEmptyCard(
@@ -160,9 +225,57 @@ public class SupplementShowcaseController {
         availableProductsCountLabel.setText(Integer.toString(productCount));
     }
 
-    private void renderProducts(List<Supplement> supplements) {
+    private void applyFilters() {
+        if (allSupplements.isEmpty()) {
+            renderProducts(List.of(), 0, "", 0);
+            return;
+        }
+
+        String query = searchField.getText() == null ? "" : searchField.getText().trim().toLowerCase(Locale.ROOT);
+        Set<String> selectedCategories = categoryCheckBoxes.stream()
+                .filter(CheckBox::isSelected)
+                .map(checkBox -> normalizeCategory(checkBox.getText()))
+                .collect(Collectors.toSet());
+
+        Comparator<Supplement> comparator = resolveComparator(sortComboBox.getValue());
+
+        List<Supplement> filteredSupplements = allSupplements.stream()
+                .filter(supplement -> matchesSearch(supplement, query))
+                .filter(supplement -> selectedCategories.isEmpty()
+                        || selectedCategories.contains(normalizeCategory(supplement.getCategory())))
+                .sorted(comparator)
+                .toList();
+
+        renderProducts(filteredSupplements, allSupplements.size(), query, selectedCategories.size());
+    }
+
+    private void renderCategoryFilters(List<Supplement> supplements) {
+        categoryCheckBoxes.clear();
+        categoryFiltersContainer.getChildren().clear();
+
+        TreeSet<String> uniqueCategories = supplements.stream()
+                .map(Supplement::getCategory)
+                .filter(category -> category != null && !category.isBlank())
+                .map(String::trim)
+                .collect(Collectors.toCollection(() -> new TreeSet<>(String.CASE_INSENSITIVE_ORDER)));
+
+        if (uniqueCategories.isEmpty()) {
+            categoryFiltersContainer.getChildren().add(buildCategoryHintLabel("No categories yet."));
+            return;
+        }
+
+        for (String category : uniqueCategories) {
+            CheckBox categoryCheckBox = new CheckBox(category);
+            categoryCheckBox.setStyle("-fx-font-size: 13px; -fx-text-fill: #667A86;");
+            categoryCheckBox.setOnAction(event -> applyFilters());
+            categoryCheckBoxes.add(categoryCheckBox);
+            categoryFiltersContainer.getChildren().add(categoryCheckBox);
+        }
+    }
+
+    private void renderProducts(List<Supplement> supplements, int totalProducts, String query, int selectedCategoryCount) {
         productGrid.getChildren().clear();
-        if (supplements.isEmpty()) {
+        if (totalProducts == 0) {
             productSummaryLabel.setText("Showing 0 products");
             productHintLabel.setText("Add a supplement from the back end and it will appear here automatically.");
             productGrid.getChildren().add(buildEmptyCard(
@@ -172,8 +285,18 @@ public class SupplementShowcaseController {
             return;
         }
 
-        productSummaryLabel.setText("Showing " + supplements.size() + " of " + supplements.size() + " products");
-        productHintLabel.setText("These products are loaded directly from the supplements table used by the back end.");
+        productSummaryLabel.setText("Showing " + supplements.size() + " of " + totalProducts + " products");
+
+        if (supplements.isEmpty()) {
+            productHintLabel.setText("No product matches your search/filter selection.");
+            productGrid.getChildren().add(buildEmptyCard(
+                    "No matching supplements",
+                    "Try a different keyword, clear some categories, or change the sorting mode."
+            ));
+            return;
+        }
+
+        productHintLabel.setText(buildHintMessage(query, selectedCategoryCount));
 
         for (Supplement supplement : supplements) {
             productGrid.getChildren().add(buildProductCard(supplement));
@@ -434,6 +557,83 @@ public class SupplementShowcaseController {
             return "-fx-background-color: #FFF7E6; -fx-text-fill: #B66905;";
         }
         return "-fx-background-color: #EEF9F1; -fx-text-fill: #1D7E56;";
+    }
+
+    private String buildHintMessage(String query, int selectedCategoryCount) {
+        boolean hasQuery = query != null && !query.isBlank();
+        boolean hasCategoryFilter = selectedCategoryCount > 0;
+
+        if (!hasQuery && !hasCategoryFilter) {
+            return "These products are loaded directly from the supplements table used by the back end.";
+        }
+        if (hasQuery && hasCategoryFilter) {
+            return "Search and category filters are active (" + selectedCategoryCount + " categories selected).";
+        }
+        if (hasQuery) {
+            return "Search filter is active. Clear it to see the full catalog.";
+        }
+        return "Category filter is active (" + selectedCategoryCount + " selected).";
+    }
+
+    private Comparator<Supplement> resolveComparator(String selectedSort) {
+        String sort = selectedSort == null ? SORT_DEFAULT : selectedSort;
+        return switch (sort) {
+            case SORT_DATE_OLDEST -> Comparator.comparing(this::postedAtDate);
+            case SORT_NAME_ASC -> Comparator.comparing(
+                    supplement -> valueOrDefault(supplement.getName()).toLowerCase(Locale.ROOT)
+            );
+            case SORT_NAME_DESC -> Comparator.comparing(
+                    (Supplement supplement) -> valueOrDefault(supplement.getName()).toLowerCase(Locale.ROOT)
+            ).reversed();
+            case SORT_PRICE_ASC -> Comparator.comparing(this::safePrice);
+            case SORT_PRICE_DESC -> Comparator.comparing(this::safePrice).reversed();
+            default -> Comparator.comparing(this::postedAtDate).reversed();
+        };
+    }
+
+    private LocalDateTime postedAtDate(Supplement supplement) {
+        if (supplement.getCreatedAt() != null) {
+            return supplement.getCreatedAt();
+        }
+        if (supplement.getUpdatedAt() != null) {
+            return supplement.getUpdatedAt();
+        }
+        return LocalDateTime.MIN;
+    }
+
+    private BigDecimal safePrice(Supplement supplement) {
+        return supplement.getPrice() == null ? BigDecimal.ZERO : supplement.getPrice();
+    }
+
+    private boolean matchesSearch(Supplement supplement, String query) {
+        if (query == null || query.isBlank()) {
+            return true;
+        }
+        return containsIgnoreCase(supplement.getName(), query)
+                || containsIgnoreCase(supplement.getBrand(), query)
+                || containsIgnoreCase(supplement.getCategory(), query)
+                || containsIgnoreCase(supplement.getDescription(), query);
+    }
+
+    private boolean containsIgnoreCase(String value, String query) {
+        if (value == null || query == null) {
+            return false;
+        }
+        return value.toLowerCase(Locale.ROOT).contains(query);
+    }
+
+    private String normalizeCategory(String category) {
+        if (category == null) {
+            return "";
+        }
+        return category.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private Label buildCategoryHintLabel(String message) {
+        Label hintLabel = new Label(message);
+        hintLabel.setWrapText(true);
+        hintLabel.setStyle("-fx-text-fill: #7C909C; -fx-font-size: 12px; -fx-font-weight: 600;");
+        return hintLabel;
     }
 
     private String valueOrDefault(String value) {
