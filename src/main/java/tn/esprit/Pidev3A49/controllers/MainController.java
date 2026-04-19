@@ -2821,6 +2821,7 @@ public class MainController {
                             alertLoading.hide();
                             actualiserDashboardPlanner();
                             rafraichirDonnees();
+                            afficherProgrammeHebdomadaire(null);
                             showInfo("✨ Magie IA Réussie ✨", "L'IA Spoonacular vient de générer et insérer exactement " + finalCount + " repas structurés sur 7 jours ! Ils complètent parfaitement vos " + cibles + " kcal quotidiennes.");
                         });
                     }
