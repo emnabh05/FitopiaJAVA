@@ -1,6 +1,5 @@
 package tn.esprit.Pidev3A49.controllers;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -30,9 +29,6 @@ public class OrderedCustomersController {
 
     @FXML
     private TableView<SupplementOrder> orderedCustomersTable;
-
-    @FXML
-    private TableColumn<SupplementOrder, Number> orderIdColumn;
 
     @FXML
     private TableColumn<SupplementOrder, String> fullNameColumn;
@@ -103,7 +99,6 @@ public class OrderedCustomersController {
     }
 
     private void configureColumns() {
-        orderIdColumn.setCellValueFactory(cell -> new SimpleIntegerProperty(cell.getValue().getId()));
         fullNameColumn.setCellValueFactory(cell -> new SimpleStringProperty(
                 (safe(cell.getValue().getFirstName()) + " " + safe(cell.getValue().getLastName())).trim()
         ));

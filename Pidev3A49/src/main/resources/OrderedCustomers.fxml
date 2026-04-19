@@ -137,7 +137,6 @@
                                    prefHeight="620.0"
                                    style="-fx-background-radius: 16; -fx-border-color: #E5EAF0; -fx-border-radius: 16;">
                             <columns>
-                                <TableColumn fx:id="orderIdColumn" text="Order ID"/>
                                 <TableColumn fx:id="fullNameColumn" text="Customer"/>
                                 <TableColumn fx:id="emailColumn" text="Email"/>
                                 <TableColumn fx:id="phoneColumn" text="Phone"/>
