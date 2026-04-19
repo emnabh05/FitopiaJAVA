@@ -10,6 +10,7 @@ import tn.esprit.Pidev3A49.services.security.PasswordPolicyReport;
 import tn.esprit.Pidev3A49.services.security.PasswordSecurityService;
 import tn.esprit.Pidev3A49.services.security.PwnedPasswordClient;
 import tn.esprit.Pidev3A49.services.security.UserSecuritySnapshot;
+import tn.esprit.Pidev3A49.services.security.EmailOtpService;
 import tn.esprit.Pidev3A49.utils.MyDataBase;
 
 import java.sql.Connection;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.security.SecureRandom;
 import java.util.stream.Collectors;
 
 public class ServiceUser {
@@ -33,12 +35,16 @@ public class ServiceUser {
     private static final String PASSWORD_HISTORY_TABLE = "fitopia_user_password_history";
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final Duration LOCK_DURATION = Duration.ofMinutes(15);
+    private static final Duration RESET_OTP_DURATION = Duration.ofMinutes(10);
     private static final int PASSWORD_HISTORY_LIMIT = 3;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final String DEFAULT_RESET_PHONE = "58860916";
 
     private final Connection cnx;
     private final PasswordHasher passwordHasher = new BCryptPasswordHasher();
     private final PasswordSecurityService passwordSecurityService = new PasswordSecurityService(new PwnedPasswordClient());
+    private final EmailOtpService emailOtpService = new EmailOtpService();
+    private final SecureRandom secureRandom = new SecureRandom();
 
     public ServiceUser() {
         cnx = MyDataBase.getInstance().getCnx();
@@ -206,6 +212,71 @@ public class ServiceUser {
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de l'activation Face ID : " + e.getMessage(), e);
         }
+    }
+
+    public void requestPasswordReset(String email) {
+        ensureConnection();
+        FitopiaUser user = findByEmail(email).orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet email."));
+        String code = emailOtpService.generateOtpCode();
+        String expiresAt = LocalDateTime.now().plus(RESET_OTP_DURATION).truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER);
+        String query = "UPDATE `" + TABLE_NAME + "` SET reset_password_code=?, reset_password_expires_at=? WHERE id=?";
+
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, code);
+            pstm.setString(2, expiresAt);
+            pstm.setInt(3, user.getId());
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Impossible de preparer la reinitialisation du mot de passe : " + e.getMessage(), e);
+        }
+
+        try {
+            emailOtpService.sendPasswordResetOtp(user.getEmail(), user.getEmail(), code, LocalDateTime.parse(expiresAt, DATE_FORMATTER));
+        } catch (RuntimeException e) {
+            clearPasswordResetChallenge(user.getId());
+            throw e;
+        }
+    }
+
+    public PasswordResetOtpInfo requestPasswordResetBySmsDemo(String identifier) {
+        ensureConnection();
+        FitopiaUser user = findByIdentifier(identifier)
+                .orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet identifiant."));
+
+        String phone = safe(user.getPhone()).isBlank() ? DEFAULT_RESET_PHONE : normalizePhoneForSms(user.getPhone());
+        String code = String.format("%06d", secureRandom.nextInt(1_000_000));
+        String expiresAt = LocalDateTime.now().plus(RESET_OTP_DURATION).truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER);
+        String query = "UPDATE `" + TABLE_NAME + "` SET reset_password_code=?, reset_password_expires_at=? WHERE id=?";
+
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, code);
+            pstm.setString(2, expiresAt);
+            pstm.setInt(3, user.getId());
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Impossible de preparer la reinitialisation du mot de passe : " + e.getMessage(), e);
+        }
+
+        return new PasswordResetOtpInfo(user.getEmail(), phone, code, expiresAt);
+    }
+
+    public PasswordPolicyReport resetPasswordWithOtp(String email, String otpCode, String newPassword) {
+        ensureConnection();
+        FitopiaUser user = findByEmail(email).orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet email."));
+        ResetChallenge challenge = getResetChallenge(user.getId())
+                .orElseThrow(() -> new RuntimeException("Aucune demande de reinitialisation en attente pour cet email."));
+
+        if (challenge.isExpired()) {
+            clearPasswordResetChallenge(user.getId());
+            throw new RuntimeException("Le code de reinitialisation a expire.");
+        }
+        if (!challenge.code().equals(safe(otpCode).trim())) {
+            throw new RuntimeException("Code de reinitialisation invalide.");
+        }
+
+        PasswordPolicyReport report = changePassword(user.getId(), newPassword, user);
+        clearPasswordResetChallenge(user.getId());
+        return report;
     }
 
     public PasswordPolicyReport changePassword(int userId, String rawPassword, FitopiaUser contextUser) {
@@ -565,6 +636,8 @@ public class ServiceUser {
                 + "risk_score INT NOT NULL DEFAULT 0,"
                 + "account_status VARCHAR(50) NOT NULL DEFAULT 'ACTIVE',"
                 + "password_last_changed_at VARCHAR(50),"
+                + "reset_password_code VARCHAR(20),"
+                + "reset_password_expires_at VARCHAR(50),"
                 + "locked_until VARCHAR(50),"
                 + "last_login_at VARCHAR(50),"
                 + "last_failed_login_at VARCHAR(50)"
@@ -591,6 +664,8 @@ public class ServiceUser {
             ensureColumn("risk_score", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN risk_score INT NOT NULL DEFAULT 0");
             ensureColumn("account_status", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN account_status VARCHAR(50) NOT NULL DEFAULT 'ACTIVE'");
             ensureColumn("password_last_changed_at", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN password_last_changed_at VARCHAR(50)");
+            ensureColumn("reset_password_code", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN reset_password_code VARCHAR(20)");
+            ensureColumn("reset_password_expires_at", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN reset_password_expires_at VARCHAR(50)");
             ensureColumn("locked_until", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN locked_until VARCHAR(50)");
             ensureColumn("last_login_at", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN last_login_at VARCHAR(50)");
             ensureColumn("last_failed_login_at", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN last_failed_login_at VARCHAR(50)");
@@ -717,6 +792,53 @@ public class ServiceUser {
         return Optional.empty();
     }
 
+    private Optional<FitopiaUser> findByEmail(String email) {
+        String query = "SELECT * FROM `" + TABLE_NAME + "` WHERE LOWER(email)=LOWER(?) LIMIT 1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, email);
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    FitopiaUser user = mapUser(rs);
+                    user.setSecurityAlertSummary(buildSecurityAlertSummary(user));
+                    return Optional.of(user);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la recherche par email : " + e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    private Optional<ResetChallenge> getResetChallenge(int userId) {
+        String query = "SELECT reset_password_code, reset_password_expires_at FROM `" + TABLE_NAME + "` WHERE id=? LIMIT 1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setInt(1, userId);
+            try (ResultSet rs = pstm.executeQuery()) {
+                if (rs.next()) {
+                    String code = safe(rs.getString("reset_password_code"));
+                    String expiresAt = safe(rs.getString("reset_password_expires_at"));
+                    if (code.isBlank() || expiresAt.isBlank()) {
+                        return Optional.empty();
+                    }
+                    return Optional.of(new ResetChallenge(code, LocalDateTime.parse(expiresAt, DATE_FORMATTER)));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors du chargement du code de reinitialisation : " + e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    private void clearPasswordResetChallenge(int userId) {
+        String query = "UPDATE `" + TABLE_NAME + "` SET reset_password_code=NULL, reset_password_expires_at=NULL WHERE id=?";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setInt(1, userId);
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors du nettoyage du code de reinitialisation : " + e.getMessage(), e);
+        }
+    }
+
     private void increaseRiskScore(int userId, int amount) {
         String query = "UPDATE `" + TABLE_NAME + "` SET risk_score=LEAST(risk_score + ?, 100) WHERE id=?";
         try (PreparedStatement pstm = cnx.prepareStatement(query)) {
@@ -799,5 +921,25 @@ public class ServiceUser {
 
     private String safe(String value) {
         return value == null ? "" : value;
+    }
+
+    private String normalizePhoneForSms(String phone) {
+        String digits = safe(phone).replaceAll("\\D", "");
+        if (digits.isBlank()) {
+            return DEFAULT_RESET_PHONE;
+        }
+        if (digits.startsWith("216") && digits.length() >= 11) {
+            return digits.substring(3);
+        }
+        return digits;
+    }
+
+    private record ResetChallenge(String code, LocalDateTime expiresAt) {
+        private boolean isExpired() {
+            return expiresAt.isBefore(LocalDateTime.now());
+        }
+    }
+
+    public record PasswordResetOtpInfo(String email, String phone, String code, String expiresAt) {
     }
 }

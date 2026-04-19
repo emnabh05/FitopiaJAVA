@@ -3,8 +3,11 @@ package tn.esprit.Pidev3A49.api;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.api.dto.LoginRequest;
 import tn.esprit.Pidev3A49.api.dto.LoginResponse;
+import tn.esprit.Pidev3A49.api.dto.ForgotPasswordRequest;
+import tn.esprit.Pidev3A49.api.dto.PasswordResetResponse;
 import tn.esprit.Pidev3A49.api.dto.RegisterRequest;
 import tn.esprit.Pidev3A49.api.dto.RegisterResponse;
+import tn.esprit.Pidev3A49.api.dto.ResetPasswordRequest;
 import tn.esprit.Pidev3A49.services.ServiceUser;
 import tn.esprit.Pidev3A49.services.security.AuthenticationResult;
 import tn.esprit.Pidev3A49.services.security.PasswordPolicyReport;
@@ -71,6 +74,18 @@ public class AuthController {
                 user == null ? null : user.getRiskScore(),
                 user == null ? null : user.getAccountStatus()
         );
+    }
+
+    public PasswordResetResponse requestPasswordReset(ForgotPasswordRequest request) {
+        String email = safe(request.email());
+        serviceUser.requestPasswordReset(email);
+        return new PasswordResetResponse("Password reset code sent", email);
+    }
+
+    public PasswordResetResponse resetPassword(ResetPasswordRequest request) {
+        String email = safe(request.email());
+        serviceUser.resetPasswordWithOtp(email, safe(request.otpCode()), safe(request.newPassword()));
+        return new PasswordResetResponse("Password updated", email);
     }
 
     private String safe(String value) {

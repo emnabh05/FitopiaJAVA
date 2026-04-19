@@ -42,9 +42,47 @@ public class EmailOtpService {
 
         String code = generateCode();
         OtpChallenge challenge = new OtpChallenge(recipient, code, LocalDateTime.now().plusMinutes(OTP_VALIDITY_MINUTES));
-        sendEmail(smtpEmail, smtpPassword, challenge, loginIdentifier);
+        sendEmail(
+                smtpEmail,
+                smtpPassword,
+                recipient,
+                "Fitopia - Verification anti-robot",
+                "Bonjour,\n\n"
+                        + "Une verification anti-robot a ete demandee pour l'identifiant: " + loginIdentifier + ".\n\n"
+                        + "Code de verification Fitopia: " + challenge.code() + "\n"
+                        + "Expiration: " + challenge.expiresAt() + "\n\n"
+                        + "Entrez ce code dans l'ecran de connexion Fitopia pour confirmer que vous n'etes pas un robot.\n\n"
+                        + "Si ce n'est pas vous, ignorez cet email."
+        );
         pendingChallenge = challenge;
         return challenge;
+    }
+
+    public String generateOtpCode() {
+        return generateCode();
+    }
+
+    public void sendPasswordResetOtp(String recipientEmail, String identifier, String code, LocalDateTime expiresAt) {
+        Properties config = loadConfig();
+        String smtpEmail = read(config, "FITOPIA_SMTP_EMAIL", "smtp.email");
+        String smtpPassword = read(config, "FITOPIA_SMTP_APP_PASSWORD", "smtp.appPassword");
+
+        if (smtpEmail.isBlank() || smtpPassword.isBlank()) {
+            throw new RuntimeException("Email OTP non configure. Remplissez mail.properties avec smtp.email et smtp.appPassword.");
+        }
+
+        sendEmail(
+                smtpEmail,
+                smtpPassword,
+                recipientEmail,
+                "Fitopia - Reinitialisation du mot de passe",
+                "Bonjour,\n\n"
+                        + "Une demande de reinitialisation du mot de passe a ete faite pour le compte: " + identifier + ".\n\n"
+                        + "Code de reinitialisation: " + code + "\n"
+                        + "Expiration: " + expiresAt + "\n\n"
+                        + "Saisissez ce code dans Fitopia puis choisissez un nouveau mot de passe.\n\n"
+                        + "Si vous n'etes pas a l'origine de cette demande, ignorez cet email."
+        );
     }
 
     public boolean verifyCode(String code) {
@@ -66,7 +104,7 @@ public class EmailOtpService {
         return Optional.ofNullable(pendingChallenge);
     }
 
-    private void sendEmail(String smtpEmail, String smtpPassword, OtpChallenge challenge, String loginIdentifier) {
+    private void sendEmail(String smtpEmail, String smtpPassword, String recipient, String subject, String body) {
         Properties properties = new Properties();
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.starttls.enable", "true");
@@ -83,16 +121,9 @@ public class EmailOtpService {
         try {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(smtpEmail));
-            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(challenge.recipient()));
-            message.setSubject("Fitopia - Verification anti-robot");
-            message.setText(
-                    "Bonjour,\n\n"
-                            + "Une verification anti-robot a ete demandee pour l'identifiant: " + loginIdentifier + ".\n\n"
-                            + "Code de verification Fitopia: " + challenge.code() + "\n"
-                            + "Expiration: " + challenge.expiresAt() + "\n\n"
-                            + "Entrez ce code dans l'ecran de connexion Fitopia pour confirmer que vous n'etes pas un robot.\n\n"
-                            + "Si ce n'est pas vous, ignorez cet email."
-            );
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipient));
+            message.setSubject(subject);
+            message.setText(body);
             Transport.send(message);
         } catch (MessagingException e) {
             throw new RuntimeException("Envoi de l'OTP impossible: " + e.getMessage(), e);
