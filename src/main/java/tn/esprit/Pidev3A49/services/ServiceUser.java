@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class ServiceUser {
     private static final String TABLE_NAME = "fitopia_users";
     private static final String PASSWORD_HISTORY_TABLE = "fitopia_user_password_history";
-    private static final int MAX_FAILED_ATTEMPTS = 5;
+    private static final int MAX_FAILED_ATTEMPTS = 3;
     private static final Duration LOCK_DURATION = Duration.ofMinutes(15);
     private static final Duration RESET_OTP_DURATION = Duration.ofMinutes(10);
     private static final int PASSWORD_HISTORY_LIMIT = 3;
