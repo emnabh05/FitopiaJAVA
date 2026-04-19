@@ -2507,6 +2507,7 @@ public class MainController {
     }
 
     private static final String API_KEY_SPOONACULAR = "2dbafe503ab145ad9181043b77d55eef";
+    private static final String API_KEY_LOGMEAL = "0bd3f6e3a12c39aa3543f0839869df408c112f66";
 
     @FXML
     void afficherPopupScanIA(javafx.event.ActionEvent event) {
@@ -2544,12 +2545,12 @@ public class MainController {
 
             new Thread(() -> {
                 try {
-                    String detectedCategory = detecterAlimentsSpoonacular(file);
+                    String detectedCategory = detecterAlimentsLogMeal(file);
                     
                     if (detectedCategory == null || detectedCategory.isEmpty()) {
                         Platform.runLater(() -> {
                             pbScanProgress.setVisible(false);
-                            showError("Erreur API", "Spoonacular n'a pas pu identifier la catégorie du plat sur l'image.");
+                            showError("Erreur API", "LogMeal n'a pas pu identifier le plat sur l'image.");
                         });
                         return;
                     }
@@ -2930,11 +2931,10 @@ public class MainController {
         return s;
     }
 
-    private String detecterAlimentsSpoonacular(File file) throws IOException {
+    private String detecterAlimentsLogMeal(File file) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
            .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
            .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-           .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
            .build();
 
         String mimeType = java.net.URLConnection.guessContentTypeFromName(file.getName());
@@ -2942,25 +2942,29 @@ public class MainController {
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", file.getName(),
+                .addFormDataPart("image", file.getName(),
                         RequestBody.create(file, MediaType.parse(mimeType)))
                 .build();
 
         Request request = new Request.Builder()
-                .url("https://api.spoonacular.com/food/images/classify?apiKey=" + API_KEY_SPOONACULAR)
+                .url("https://api.logmeal.es/v2/image/recognition/complete/v1.0")
+                .header("Authorization", "Bearer " + API_KEY_LOGMEAL)
                 .post(requestBody)
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                String resError = response.body() != null ? response.body().string() : "";
-                throw new IOException("Erreur 400 (Détail: " + resError + ")");
+                throw new IOException("Erreur LogMeal API: " + response.code());
             }
-
-            String jsonResponse = response.body().string();
-            JSONObject obj = new JSONObject(jsonResponse);
-            
-            return obj.optString("category", "");
+            String jsonResp = response.body().string();
+            JSONObject root = new JSONObject(jsonResp);
+            if (root.has("recognition_results")) {
+                JSONArray res = root.getJSONArray("recognition_results");
+                if (res.length() > 0) {
+                    return res.getJSONObject(0).getString("name");
+                }
+            }
+            return "Plat inconnu";
         }
     }
 
