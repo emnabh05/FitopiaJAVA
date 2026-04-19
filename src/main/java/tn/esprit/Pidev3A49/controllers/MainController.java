@@ -139,6 +139,8 @@ public class MainController {
     @FXML private Label lblIARepasNom;
     @FXML private Label lblIACalories;
     @FXML private javafx.scene.image.ImageView ivScanImagePreview;
+    @FXML private VBox paneWeeklyProgram;
+    @FXML private VBox boxWeeklyDaysContainer;
     @FXML private ProgressBar pbScanProgress;
     @FXML private Button btnAppliquerCalories;
     private String lastScannedCalories = "0";
@@ -2621,6 +2623,95 @@ public class MainController {
         // ---------------------------------------------------
 
         masquerTousLesFormulaires();
+    }
+
+    @FXML
+    void afficherProgrammeHebdomadaire(javafx.event.ActionEvent event) {
+        masquerTousLesFormulaires();
+        RegimeAlimentaire regime = getActualActiveRegime();
+        if (regime == null) {
+            showError("Régime Introuvable", "Veuillez d'abord sélectionner un régime actif dans l'explorateur.");
+            return;
+        }
+
+        paneWeeklyProgram.setVisible(true);
+        paneWeeklyProgram.setManaged(true);
+        boxWeeklyDaysContainer.getChildren().clear();
+
+        // Récupérer les repas de la semaine pour ce régime
+        List<Repas> tousLesRepas = serviceRepas.getAll();
+        Map<LocalDate, List<Repas>> mealsByDate = tousLesRepas.stream()
+                .filter(r -> r.getRegimeId() != null && r.getRegimeId().equals(regime.getId()))
+                .filter(r -> r.getDateRepas() != null)
+                .collect(Collectors.groupingBy(r -> r.getDateRepas().toLocalDate()));
+
+        // Trier les dates
+        List<LocalDate> dates = mealsByDate.keySet().stream().sorted().toList();
+
+        if (dates.isEmpty()) {
+            Label placeholder = new Label("Aucun programme généré pour cette semaine. Cliquez sur 'Re-générer' pour commencer !");
+            placeholder.setStyle("-fx-text-fill: #94a3b8; -fx-padding: 40; -fx-font-style: italic;");
+            boxWeeklyDaysContainer.getChildren().add(placeholder);
+            return;
+        }
+
+        for (LocalDate date : dates) {
+            boxWeeklyDaysContainer.getChildren().add(creerRangeeJour(date, mealsByDate.get(date)));
+        }
+    }
+
+    private VBox creerRangeeJour(LocalDate date, List<Repas> meals) {
+        VBox dayCard = new VBox(15);
+        dayCard.setStyle("-fx-background-color: #f0fdf4; -fx-background-radius: 12; -fx-padding: 20; -fx-border-color: #10b981; -fx-border-width: 0 0 0 6;");
+
+        // Header du jour (Date + Jour de la semaine)
+        String dayName = date.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, Locale.FRENCH);
+        Label lblDay = new Label(dayName.toUpperCase() + " - " + date.format(java.time.format.DateTimeFormatter.ofPattern("dd MMMM")));
+        lblDay.setStyle("-fx-font-weight: 900; -fx-text-fill: #065f46; -fx-font-size: 16px;");
+        dayCard.getChildren().add(lblDay);
+
+        HBox mealsRow = new HBox(20);
+        for (Repas meal : meals) {
+            VBox mealPill = new VBox(5);
+            mealPill.setMinWidth(280);
+            mealPill.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 5);");
+
+            HBox titleRow = new HBox(10);
+            titleRow.setAlignment(Pos.CENTER_LEFT);
+            
+            VBox textCol = new VBox(2);
+            Label lblType = new Label(meal.getTypeRepas());
+            lblType.setStyle("-fx-font-size: 10px; -fx-text-fill: #10b981; -fx-font-weight: 800; -fx-background-color: #ecfdf5; -fx-padding: 2 6; -fx-background-radius: 4;");
+            
+            Label lblNom = new Label(meal.getNomRepas());
+            lblNom.setStyle("-fx-font-weight: 700; -fx-text-fill: #1e293b;");
+            
+            Label lblCals = new Label(meal.getCalories() + " kcal");
+            lblCals.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b;");
+            
+            textCol.getChildren().addAll(lblType, lblNom, lblCals);
+            textCol.setPrefWidth(200);
+
+            Button btnAdd = new Button("+");
+            btnAdd.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-font-weight: 900; -fx-cursor: hand;");
+            btnAdd.setOnAction(e -> {
+                fusionnerRepasSiExiste(meal);
+                actualiserDashboardPlanner();
+                showInfo("Ajouté !", meal.getNomRepas() + " a été ajouté à votre suivi d'aujourd'hui.");
+            });
+
+            titleRow.getChildren().addAll(textCol, btnAdd);
+            mealPill.getChildren().add(titleRow);
+            mealsRow.getChildren().add(mealPill);
+        }
+
+        dayCard.getChildren().add(mealsRow);
+        
+        // Animation au survol
+        dayCard.setOnMouseEntered(e -> dayCard.setStyle("-fx-background-color: #dcfce7; -fx-background-radius: 12; -fx-padding: 20; -fx-border-color: #10b981; -fx-border-width: 0 0 0 10;"));
+        dayCard.setOnMouseExited(e -> dayCard.setStyle("-fx-background-color: #f0fdf4; -fx-background-radius: 12; -fx-padding: 20; -fx-border-color: #10b981; -fx-border-width: 0 0 0 6;"));
+
+        return dayCard;
     }
 
     @FXML
