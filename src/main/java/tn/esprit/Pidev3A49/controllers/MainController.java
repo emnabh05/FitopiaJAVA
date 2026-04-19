@@ -2699,14 +2699,16 @@ public class MainController {
             btnAdd.setStyle("-fx-background-color: #10b981; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-font-weight: 900; -fx-cursor: hand;");
             btnAdd.setOnAction(e -> {
                 fusionnerRepasSiExiste(meal);
+                // Synchronisation forcée pour que le prof voie le changement direct
                 actualiserDashboardPlanner();
+                rafraichirDonnees();
+                
                 // Feedback visuel : Rouge pour indiquer que c'est mange
                 mealPill.setStyle("-fx-background-color: #fee2e2; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #ef4444; -fx-border-width: 2;");
                 lblNom.setStyle("-fx-font-weight: 700; -fx-text-fill: #b91c1c;");
                 btnAdd.setText("✓");
+                btnAdd.setDisable(true); // Eviter les doubles clics accidentels
                 btnAdd.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-font-weight: 900;");
-                
-                showInfo("Plat Consommé !", meal.getNomRepas() + " a été ajouté à votre compteur de calories.");
             });
 
             titleRow.getChildren().addAll(textCol, btnAdd);
@@ -2893,6 +2895,24 @@ public class MainController {
         dict.put("banana", "Banane");
         dict.put("orange", "Orange");
         dict.put("carrot", "Carotte");
+        dict.put("spinach", "Épinards");
+        dict.put("mushroom", "Champignons");
+        dict.put("shrimp", "Crevettes");
+        dict.put("tuna", "Thon");
+        dict.put("pasta", "Pâtes");
+        dict.put("noodle", "Nouilles");
+        dict.put("rice", "Riz");
+        dict.put("brown", "Complet");
+        dict.put("white", "Blanc");
+        dict.put("sweet", "Doux");
+        dict.put("spicy", "Épicé");
+        dict.put("milk", "Lait");
+        dict.put("yogurt", "Yaourt");
+        dict.put("yoghourt", "Yaourt");
+        dict.put("sandwich", "Sandwich");
+        dict.put("pizza", "Pizza");
+        dict.put("hamburger", "Burger");
+        dict.put("hot dog", "Hot-Dog");
 
         for (Map.Entry<String, String> entry : dict.entrySet()) {
             s = s.replace(entry.getKey(), entry.getValue());
