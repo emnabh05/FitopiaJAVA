@@ -2778,9 +2778,10 @@ public class MainController {
                                 JSONArray meals = dayObj.getJSONArray("meals");
                                 JSONObject nutrients = dayObj.getJSONObject("nutrients");
                                 
-                                // Repas equilibres : 25% Petit Dej, 45% Dejeuner, 30% Diner
+                                // Force l'objectif exact de l'utilisateur
+                                double dailyCals = (double) cibles;
                                 double[] repartitions = {0.25, 0.45, 0.30};
-                                double dailyCals = nutrients.optDouble("calories", 2000);
+                                
                                 double dailyP = nutrients.optDouble("protein", 60);
                                 double dailyC = nutrients.optDouble("carbohydrates", 250);
                                 double dailyF = nutrients.optDouble("fat", 70);
