@@ -84,6 +84,11 @@
                                     </children>
                                 </HBox>
                                 <Label fx:id="securityDetailsLabel" style="-fx-text-fill: #56706b;" text="Selectionnez un utilisateur pour afficher les alertes de securite." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" />
+                                <Label style="-fx-text-fill: #1b2e35; -fx-font-weight: bold;" text="Detection IA des doublons" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" />
+                                <Label style="-fx-text-fill: #5d6b77;" text="Score doublon" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <Label fx:id="duplicateScoreLabel" style="-fx-text-fill: #173f44; -fx-font-weight: bold;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                <Label fx:id="duplicateRecommendationLabel" style="-fx-text-fill: #56706b;" text="Selectionnez un utilisateur pour analyser les doublons." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7" />
+                                <Label fx:id="duplicateFindingsLabel" style="-fx-text-fill: #56706b;" text="Aucune analyse en cours." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="8" />
                             </children>
                         </GridPane>
                     </children>

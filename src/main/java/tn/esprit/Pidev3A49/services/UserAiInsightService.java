@@ -77,6 +77,66 @@ public class UserAiInsightService {
         );
     }
 
+    public DuplicateDetectionResult detectPotentialDuplicates(FitopiaUser referenceUser, List<FitopiaUser> users) {
+        if (referenceUser == null) {
+            return new DuplicateDetectionResult(0, List.of("Aucun utilisateur selectionne."), "Aucune verification possible.");
+        }
+
+        List<String> findings = new ArrayList<>();
+        int score = 0;
+        String referenceEmail = safe(referenceUser.getEmail()).trim().toLowerCase(Locale.ROOT);
+        String referencePhone = digitsOnly(referenceUser.getPhone());
+        String referenceFullName = (safe(referenceUser.getFirstName()) + " " + safe(referenceUser.getLastName())).trim().toLowerCase(Locale.ROOT);
+        String referenceUsername = safe(referenceUser.getUsername()).trim().toLowerCase(Locale.ROOT);
+
+        for (FitopiaUser candidate : users) {
+            if (candidate == null || candidate.getId() == referenceUser.getId()) {
+                continue;
+            }
+
+            String candidateEmail = safe(candidate.getEmail()).trim().toLowerCase(Locale.ROOT);
+            String candidatePhone = digitsOnly(candidate.getPhone());
+            String candidateFullName = (safe(candidate.getFirstName()) + " " + safe(candidate.getLastName())).trim().toLowerCase(Locale.ROOT);
+            String candidateUsername = safe(candidate.getUsername()).trim().toLowerCase(Locale.ROOT);
+
+            if (!referenceEmail.isBlank() && referenceEmail.equals(candidateEmail)) {
+                score += 70;
+                findings.add("Email identique avec #" + candidate.getId() + " (" + safe(candidate.getUsername()) + ").");
+            } else if (isEmailVeryClose(referenceEmail, candidateEmail)) {
+                score += 25;
+                findings.add("Email tres proche de #" + candidate.getId() + " (" + candidateEmail + ").");
+            }
+
+            if (!referencePhone.isBlank() && referencePhone.equals(candidatePhone)) {
+                score += 40;
+                findings.add("Telephone identique avec #" + candidate.getId() + ".");
+            }
+
+            if (!referenceFullName.isBlank() && referenceFullName.equals(candidateFullName)) {
+                score += 30;
+                findings.add("Nom complet identique avec #" + candidate.getId() + ".");
+            } else if (nameSimilarity(referenceFullName, candidateFullName) >= 0.82) {
+                score += 20;
+                findings.add("Nom tres similaire a #" + candidate.getId() + " (" + safe(candidate.getFirstName()) + " " + safe(candidate.getLastName()) + ").");
+            }
+
+            if (!referenceUsername.isBlank() && referenceUsername.equals(candidateUsername)) {
+                score += 30;
+                findings.add("Username identique avec #" + candidate.getId() + ".");
+            } else if (usernameSimilarity(referenceUsername, candidateUsername) >= 0.75) {
+                score += 15;
+                findings.add("Username proche de #" + candidate.getId() + " (" + safe(candidate.getUsername()) + ").");
+            }
+        }
+
+        if (findings.isEmpty()) {
+            findings.add("Aucun doublon evident detecte.");
+        }
+
+        score = Math.min(score, 100);
+        return new DuplicateDetectionResult(score, findings, buildDuplicateRecommendation(score));
+    }
+
     private int computeCompleteness(FitopiaUser user) {
         int total = 10;
         int score = 0;
@@ -303,6 +363,68 @@ public class UserAiInsightService {
         return "";
     }
 
+    private boolean isEmailVeryClose(String left, String right) {
+        if (left.isBlank() || right.isBlank() || !left.contains("@") || !right.contains("@")) {
+            return false;
+        }
+        String leftLocal = left.substring(0, left.indexOf('@'));
+        String rightLocal = right.substring(0, right.indexOf('@'));
+        String leftDomain = left.substring(left.indexOf('@') + 1);
+        String rightDomain = right.substring(right.indexOf('@') + 1);
+        return leftDomain.equals(rightDomain) && similarity(leftLocal, rightLocal) >= 0.75;
+    }
+
+    private double nameSimilarity(String left, String right) {
+        return similarity(left.replace(" ", ""), right.replace(" ", ""));
+    }
+
+    private double usernameSimilarity(String left, String right) {
+        return similarity(left, right);
+    }
+
+    private double similarity(String left, String right) {
+        if (left.isBlank() || right.isBlank()) {
+            return 0;
+        }
+        int distance = levenshtein(left, right);
+        int max = Math.max(left.length(), right.length());
+        return max == 0 ? 1 : 1 - (distance / (double) max);
+    }
+
+    private int levenshtein(String left, String right) {
+        int[][] dp = new int[left.length() + 1][right.length() + 1];
+        for (int i = 0; i <= left.length(); i++) {
+            dp[i][0] = i;
+        }
+        for (int j = 0; j <= right.length(); j++) {
+            dp[0][j] = j;
+        }
+        for (int i = 1; i <= left.length(); i++) {
+            for (int j = 1; j <= right.length(); j++) {
+                int cost = left.charAt(i - 1) == right.charAt(j - 1) ? 0 : 1;
+                dp[i][j] = Math.min(
+                        Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1),
+                        dp[i - 1][j - 1] + cost
+                );
+            }
+        }
+        return dp[left.length()][right.length()];
+    }
+
+    private String digitsOnly(String value) {
+        return safe(value).replaceAll("\\D", "");
+    }
+
+    private String buildDuplicateRecommendation(int score) {
+        if (score >= 70) {
+            return "Risque fort de doublon. Verifiez les comptes proches avant validation.";
+        }
+        if (score >= 40) {
+            return "Doublon possible. Controle manuel recommande.";
+        }
+        return "Faible probabilite de doublon. Aucun blocage necessaire.";
+    }
+
     private String buildMissingFieldsSummary(FitopiaUser user) {
         List<String> missing = new ArrayList<>();
         if (safe(user.getPhone()).isBlank()) {
@@ -342,6 +464,13 @@ public class UserAiInsightService {
             String improvedBio,
             String profileSummary,
             List<String> improvements
+    ) {
+    }
+
+    public record DuplicateDetectionResult(
+            int duplicateScore,
+            List<String> findings,
+            String recommendation
     ) {
     }
 }

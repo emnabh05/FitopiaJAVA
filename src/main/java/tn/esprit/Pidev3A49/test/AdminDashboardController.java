@@ -17,6 +17,7 @@ import tn.esprit.Pidev3A49.api.UserSecurityController;
 import tn.esprit.Pidev3A49.api.dto.ChangePasswordRequest;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.UserAiInsightService;
 import tn.esprit.Pidev3A49.services.security.AdminSecurityAlert;
 import tn.esprit.Pidev3A49.services.security.UserSecuritySnapshot;
 
@@ -50,10 +51,14 @@ public class AdminDashboardController {
     @FXML private TableColumn<FitopiaUser, String> accountStatusCol;
     @FXML private TableColumn<FitopiaUser, String> securityCol;
     @FXML private Label securityDetailsLabel;
+    @FXML private Label duplicateScoreLabel;
+    @FXML private Label duplicateRecommendationLabel;
+    @FXML private Label duplicateFindingsLabel;
 
     private final ServiceUser serviceUser = new ServiceUser();
     private final UserSecurityController userSecurityController = new UserSecurityController(serviceUser);
     private final AdminSecurityController adminSecurityController = new AdminSecurityController(serviceUser);
+    private final UserAiInsightService userAiInsightService = new UserAiInsightService();
     private final ObservableList<FitopiaUser> users = FXCollections.observableArrayList();
     private FitopiaUser selectedUser;
     private boolean editingMode;
@@ -69,6 +74,9 @@ public class AdminDashboardController {
         loadUsers();
         usersTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> populateEditor(newV));
         setEditingMode(false);
+        duplicateScoreLabel.setText("-");
+        duplicateRecommendationLabel.setText("Selectionnez un utilisateur pour analyser les doublons.");
+        duplicateFindingsLabel.setText("Aucune analyse en cours.");
     }
 
     @FXML
@@ -261,6 +269,11 @@ public class AdminDashboardController {
         roleCombo.setValue(safe(user.getRole()).isBlank() ? "Patient" : user.getRole());
         UserSecuritySnapshot snapshot = userSecurityController.getSecuritySnapshot(user.getId());
         securityDetailsLabel.setText(buildSecuritySnapshotText(snapshot));
+        UserAiInsightService.DuplicateDetectionResult duplicateResult =
+                userAiInsightService.detectPotentialDuplicates(user, serviceUser.getAll());
+        duplicateScoreLabel.setText(duplicateResult.duplicateScore() + "/100");
+        duplicateRecommendationLabel.setText(duplicateResult.recommendation());
+        duplicateFindingsLabel.setText(String.join(" | ", duplicateResult.findings()));
         setEditingMode(false);
     }
 
@@ -273,6 +286,9 @@ public class AdminDashboardController {
         newPasswordField.clear();
         roleCombo.setValue("Patient");
         securityDetailsLabel.setText("Selectionnez un utilisateur pour afficher les alertes de securite.");
+        duplicateScoreLabel.setText("-");
+        duplicateRecommendationLabel.setText("Selectionnez un utilisateur pour analyser les doublons.");
+        duplicateFindingsLabel.setText("Aucune analyse en cours.");
     }
 
     private void setEditingMode(boolean enabled) {
