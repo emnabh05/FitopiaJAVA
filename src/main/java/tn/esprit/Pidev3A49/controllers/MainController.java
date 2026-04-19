@@ -2953,10 +2953,13 @@ public class MainController {
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
+            String jsonResp = response.body() != null ? response.body().string() : "{}";
+            
             if (!response.isSuccessful()) {
-                throw new IOException("Erreur LogMeal API: " + response.code());
+                System.err.println("Détail Erreur LogMeal (" + response.code() + ") : " + jsonResp);
+                throw new IOException("Erreur LogMeal API " + response.code() + " : " + jsonResp);
             }
-            String jsonResp = response.body().string();
+            
             JSONObject root = new JSONObject(jsonResp);
             
             // Dans segmentation/complete, le nom est souvent dans segmentation_results
