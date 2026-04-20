@@ -24,15 +24,23 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.TilePane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.stage.Modality;
+import javafx.scene.control.DialogPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.animation.ScaleTransition;
+import javafx.util.Duration;
 import javafx.util.StringConverter;
+import java.util.Optional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -44,6 +52,13 @@ import tn.esprit.Pidev3A49.Models.User;
 import tn.esprit.Pidev3A49.services.ServiceRepas;
 import tn.esprit.Pidev3A49.services.ServiceRegimeAlimentaire;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.BarcodeScannerService;
+import tn.esprit.Pidev3A49.services.SimulatedBarcodeScannerService;
+import tn.esprit.Pidev3A49.services.RealWebcamScannerService;
+import tn.esprit.Pidev3A49.services.OptimizedBarcodeScannerService;
+import tn.esprit.Pidev3A49.services.SupermarketScannerService;
+import tn.esprit.Pidev3A49.services.RobustBarcodeScannerService;
+import tn.esprit.Pidev3A49.services.OpenFoodFactsService;
 
 import java.text.Normalizer;
 import java.io.File;
@@ -58,8 +73,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -70,12 +83,6 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import com.github.sarxos.webcam.Webcam;
-import com.github.sarxos.webcam.WebcamResolution;
-import com.google.zxing.*;
-import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
-import com.google.zxing.common.HybridBinarizer;
-import javafx.embed.swing.SwingFXUtils;
 
 public class MainController {
 
@@ -105,19 +112,6 @@ public class MainController {
             TYPE_DINER, "#1f8d6a",
             TYPE_COLLATION, "#39b77d"
     );
-
-    @FXML private VBox paneBarcodeScanner;
-    @FXML private ImageView ivBarcodeWebcam;
-    @FXML private Label lblBarcodeStatus;
-    @FXML private Label lblBarcodeNutriScore;
-    @FXML private Label lblBarcodeProductName;
-    @FXML private Label lblBarcodeBrand;
-    @FXML private Label lblBarcodeCompatibility;
-    @FXML private VBox boxBarcodeResult;
-
-    private Webcam webcam = null;
-    private boolean isScanning = false;
-    private String lastScannedCode = "";
 
     @FXML private VBox viewRepas;
     @FXML private VBox viewRegimes;
@@ -343,6 +337,8 @@ public class MainController {
     private final ServiceRepas serviceRepas = new ServiceRepas();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceUser serviceUser = new ServiceUser();
+    private final RobustBarcodeScannerService barcodeScanner = new RobustBarcodeScannerService();
+    private final OpenFoodFactsService openFoodFacts = new OpenFoodFactsService();
     private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
     private List<User> allUsers = List.of();
     private List<RegimeAlimentaire> allRegimes = List.of();
@@ -356,25 +352,18 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        System.out.println("🚀 [DEBUG] Initialisation du MainController...");
-        try {
-            initialiserColonnes();
-            initialiserCombos();
-            initialiserExplorateurRepas();
-            initialiserCalculsRegimeAutomatiques();
-            initialiserValidationRepas();
-            initialiserInteractionsRepasRegime();
-            initialiserSelections();
-            initialiserSelectionRepasJointure();
-            rafraichirDonnees();
-            masquerTousLesFormulaires();
-            setupRealTimeValidation();
-            setupDynamicFilters();
-            System.out.println("✅ [DEBUG] Initialisation terminée avec succès.");
-        } catch (Exception e) {
-            System.err.println("❌ [ERROR] Échec de l'initialisation : " + e.getMessage());
-            e.printStackTrace();
-        }
+        initialiserColonnes();
+        initialiserCombos();
+        initialiserExplorateurRepas();
+        initialiserCalculsRegimeAutomatiques();
+        initialiserValidationRepas();
+        initialiserInteractionsRepasRegime();
+        initialiserSelections();
+        initialiserSelectionRepasJointure();
+        rafraichirDonnees();
+        masquerTousLesFormulaires();
+        setupRealTimeValidation();
+        setupDynamicFilters();
     }
 
     private void setupDynamicFilters() {
@@ -413,10 +402,6 @@ public class MainController {
 
     @FXML
     private void masquerTousLesFormulaires() {
-        // Force unlock interface
-        if (appScrollPane != null) appScrollPane.setMouseTransparent(false);
-        if (paneOverlay != null) paneOverlay.setMouseTransparent(true);
-        
         if (paneRegimeCreate != null) { paneRegimeCreate.setVisible(false); paneRegimeCreate.setManaged(false); }
         if (paneRegimeEdit != null) { paneRegimeEdit.setVisible(false); paneRegimeEdit.setManaged(false); }
         if (paneRegimeDelete != null) { paneRegimeDelete.setVisible(false); paneRegimeDelete.setManaged(false); }
@@ -426,43 +411,38 @@ public class MainController {
         if (paneRepasDelete != null) { paneRepasDelete.setVisible(false); paneRepasDelete.setManaged(false); }
         if (paneRepasExplore != null) { paneRepasExplore.setVisible(false); paneRepasExplore.setManaged(false); }
         if (paneScanIA != null) { paneScanIA.setVisible(false); paneScanIA.setManaged(false); }
-        if (paneBarcodeScanner != null) { paneBarcodeScanner.setVisible(false); paneBarcodeScanner.setManaged(false); }
         if (paneWeeklyProgram != null) { paneWeeklyProgram.setVisible(false); paneWeeklyProgram.setManaged(false); }
     }
 
     @FXML
     private void rafraichirDonnees() {
-        System.out.println("🔄 [DEBUG] Rafraîchissement des données...");
         List<User> users = serviceUser.getAll();
         List<RegimeAlimentaire> regimes = serviceRegime.getAll();
         List<Repas> repas = serviceRepas.getAll();
-        
-        allUsers = (users != null) ? List.copyOf(users) : List.of();
-        allRegimes = (regimes != null) ? List.copyOf(regimes) : List.of();
+        allUsers = List.copyOf(users);
+        allRegimes = List.copyOf(regimes);
 
-        if (cbRepasUser != null) cbRepasUser.setItems(FXCollections.observableArrayList(allUsers));
-        if (cbRepasUserEdit != null) cbRepasUserEdit.setItems(FXCollections.observableArrayList(allUsers));
-        if (cbRegimeUser != null) cbRegimeUser.setItems(FXCollections.observableArrayList(allUsers));
-        if (cbRegimeUserEdit != null) cbRegimeUserEdit.setItems(FXCollections.observableArrayList(allUsers));
+        if (cbRepasUser != null) cbRepasUser.setItems(FXCollections.observableArrayList(users));
+        if (cbRepasUserEdit != null) cbRepasUserEdit.setItems(FXCollections.observableArrayList(users));
+        if (cbRegimeUser != null) cbRegimeUser.setItems(FXCollections.observableArrayList(users));
+        if (cbRegimeUserEdit != null) cbRegimeUserEdit.setItems(FXCollections.observableArrayList(users));
 
-        if (cbRepasRegime != null) cbRepasRegime.setItems(FXCollections.observableArrayList(allRegimes));
-        if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(allRegimes));
+        if (cbRepasRegime != null) cbRepasRegime.setItems(FXCollections.observableArrayList(regimes));
+        if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
 
-        allRepas.setAll(repas != null ? repas : List.of());
-        if (tableRepas != null) tableRepas.setItems(FXCollections.observableArrayList(allRepas));
-        if (tableRepasEdit != null) tableRepasEdit.setItems(FXCollections.observableArrayList(allRepas));
-        if (tableRepasDelete != null) tableRepasDelete.setItems(FXCollections.observableArrayList(allRepas));
-        restaurerSelectionRepasEdit(allRepas);
+        allRepas.setAll(repas);
+        if (tableRepas != null) tableRepas.setItems(FXCollections.observableArrayList(repas));
+        if (tableRepasEdit != null) tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
+        if (tableRepasDelete != null) tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
+        restaurerSelectionRepasEdit(repas);
 
-        if (tableRegimes != null) tableRegimes.setItems(FXCollections.observableArrayList(allRegimes));
-        if (tableRegimesEdit != null) tableRegimesEdit.setItems(FXCollections.observableArrayList(allRegimes));
-        if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(allRegimes));
-        
-        System.out.println("✨ [DEBUG] Données rafraîchies : " + allUsers.size() + " users, " + allRegimes.size() + " régimes, " + allRepas.size() + " repas.");
+        if (tableRegimes != null) tableRegimes.setItems(FXCollections.observableArrayList(regimes));
+        if (tableRegimesEdit != null) tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
+        if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
 
         if (cbRegimeSort != null && cbRegimeSort.getItems().isEmpty()) {
-            cbRegimeSort.setItems(FXCollections.observableArrayList("Calories ↓", "Calories ↑", "Recent"));
-            cbRegimeSort.setValue("Calories ↓");
+            cbRegimeSort.setItems(FXCollections.observableArrayList("Calories \u2193", "Calories \u2191", "Recent"));
+            cbRegimeSort.setValue("Calories \u2193");
         }
         if (cbRegimeTypeSearch != null && cbRegimeTypeSearch.getItems().isEmpty()) {
             List<String> types = new java.util.ArrayList<>(List.of("Tous les types"));
@@ -490,9 +470,9 @@ public class MainController {
                 .filter(r -> typeFilter == null || typeFilter.equals("Tous les types") || typeFilter.equals(r.getTypeSante()))
                 .toList());
 
-            if ("Calories ↓".equals(sortValue)) {
+            if ("Calories \u2193".equals(sortValue)) {
                 filtered.sort((a,b) -> Integer.compare(b.getCaloriesCibles()==null?0:b.getCaloriesCibles(), a.getCaloriesCibles()==null?0:a.getCaloriesCibles()));
-            } else if ("Calories ↑".equals(sortValue)) {
+            } else if ("Calories \u2191".equals(sortValue)) {
                 filtered.sort((a,b) -> Integer.compare(a.getCaloriesCibles()==null?0:a.getCaloriesCibles(), b.getCaloriesCibles()==null?0:b.getCaloriesCibles()));
             } else {
                 filtered.sort((a,b) -> Integer.compare(b.getId(), a.getId()));
@@ -886,7 +866,7 @@ public class MainController {
     private void configurerValidationRepas(TextField nomField, TextArea descField, TextField protField, TextField glucField, TextField lipField, TextField calField) {
         if (nomField == null || descField == null || protField == null || glucField == null || lipField == null || calField == null) return;
         
-        calField.setEditable(false);
+        calField.setEditable(false); // Calcul automatique, donc on l'empeche d'editer manuellement
 
         nomField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() < 5) {
@@ -916,7 +896,7 @@ public class MainController {
 
         protField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                protField.setText(newValue.replaceAll("\\D", ""));
+                protField.setText(newValue.replaceAll("[^\\d]", ""));
             } else {
                 calculCalories.run();
                 protField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
@@ -925,7 +905,7 @@ public class MainController {
 
         glucField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                glucField.setText(newValue.replaceAll("\\D", ""));
+                glucField.setText(newValue.replaceAll("[^\\d]", ""));
             } else {
                 calculCalories.run();
                 glucField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
@@ -934,7 +914,7 @@ public class MainController {
 
         lipField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                lipField.setText(newValue.replaceAll("\\D", ""));
+                lipField.setText(newValue.replaceAll("[^\\d]", ""));
             } else {
                 calculCalories.run();
                 lipField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
@@ -1024,6 +1004,24 @@ public class MainController {
         }
         if (comboBox.getValue() == null && !filtered.isEmpty()) {
             comboBox.setValue(filtered.get(0));
+        }
+    }
+
+    private void appliquerSelectionsFrontParDefaut() {
+        User referenceUser = determinerUtilisateurReference();
+        if (referenceUser != null) {
+            if (cbRegimeUser != null && cbRegimeUser.getValue() == null) {
+                cbRegimeUser.setValue(referenceUser);
+            }
+            if (cbRepasUser != null && cbRepasUser.getValue() == null) {
+                cbRepasUser.setValue(referenceUser);
+            }
+        }
+        if (dpDateRepas != null && dpDateRepas.getValue() == null) {
+            dpDateRepas.setValue(LocalDate.now());
+        }
+        if (cbTypeRepas != null && cbTypeRepas.getValue() == null) {
+            cbTypeRepas.setValue(TYPE_PETIT_DEJEUNER);
         }
     }
 
@@ -1132,7 +1130,7 @@ public class MainController {
                 lblBadgeHydrationDesc.setText("Objectif : 1L par jour (" + verresEau + "/5 verres)");
             }
 
-            boolean semaineParfaite = curKcal > 0 && Math.abs(curKcal - target) <= (target * 0.05);
+            boolean semaineParfaite = curKcal > 0 && Math.abs(curKcal - target) <= (target * 0.05); // within 5%
             
             styleBadge(paneBadgeWinStreak, lblBadgeWinStreakIcon, lblBadgeWinStreakTitle, lblBadgeWinStreakDesc, semaineParfaite);
             styleBadge(paneBadgeHydration, lblBadgeHydrationIcon, lblBadgeHydrationTitle, lblBadgeHydrationDesc, hydratationOk);
@@ -1149,6 +1147,7 @@ public class MainController {
                     : repasAffiches.stream().map(this::creerCarteMiniRepas).toList());
         }
 
+        // Logic for refreshing current view lists
         rafraichirListesDashboard();
         actualiserSelectionRepasJointure();
     }
@@ -1359,6 +1358,28 @@ public class MainController {
         return null;
     }
 
+    private RegimeAlimentaire determinerRegimeReference(User user) {
+        return allRegimes.stream()
+                .filter(regime -> user == null || (regime.getUserId() != null && regime.getUserId() == user.getId()))
+                .max(Comparator.comparingInt(RegimeAlimentaire::getId))
+                .orElse(allRegimes.isEmpty() ? null : allRegimes.get(Math.max(0, allRegimes.size() - 1)));
+    }
+
+    private List<Repas> filtrerRepasDuJour(User user) {
+        LocalDate today = LocalDate.now();
+        return allRepas.stream()
+                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
+                .filter(repas -> repas.getDateRepas() != null && repas.getDateRepas().toLocalDate().equals(today))
+                .toList();
+    }
+
+    private List<Repas> derniersRepas(User user, int limit) {
+        return allRepas.stream()
+                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
+                .limit(limit)
+                .toList();
+    }
+
     private int sommeRepas(List<Repas> repas, Function<Repas, Integer> extractor) {
         return repas.stream()
                 .map(extractor)
@@ -1381,22 +1402,25 @@ public class MainController {
     }
 
     private int calculerCaloriesCibles(double poids, double taille, Integer age, double bmi) {
-        int valAge = (age != null && age > 0) ? age : 30;
+        int valAge = (age != null && age > 0) ? age : 30; // 30 ans par defaut
+        // Formule de Mifflin-St Jeor (Moyenne homme/femme)
         double bmr = (10.0 * poids) + (6.25 * taille) - (5.0 * valAge) + 5;
         
+        // Calories de maintenance (Sédentaire/Légèrement actif)
         double maintenance = bmr * 1.375;
         int calories = (int) Math.round(maintenance);
 
+        // Ajustement clinique selon l'IMC
         if (bmi < 18.5) {
-            calories += 400;
+            calories += 400; // Prise de masse
         } else if (bmi >= 30) {
-            calories -= 800;
+            calories -= 800; // Déficit agressif
         } else if (bmi >= 25) {
-            calories -= 400;
+            calories -= 400; // Déficit modéré
         }
 
-        int caloriesFinales = Math.max(calories, 1200);
-        return Math.min(caloriesFinales, 4000);
+        int caloriesFinales = Math.max(calories, 1200); // Minimum vital
+        return Math.min(caloriesFinales, 4000); // Plafond de sécurité pour régime cohérent
     }
 
     private String genererRepasAdequats(String typeSante, Integer age) {
@@ -1418,6 +1442,16 @@ public class MainController {
         }
         String normalized = value.replace('_', ' ');
         return normalized.substring(0, 1).toUpperCase(Locale.ROOT) + normalized.substring(1);
+    }
+
+    private int compterElementsRepas(String value) {
+        if (value == null || value.isBlank()) {
+            return 0;
+        }
+        return (int) java.util.Arrays.stream(value.split("[,;\\n]"))
+                .map(String::trim)
+                .filter(item -> !item.isBlank())
+                .count();
     }
 
     private double ratio(int value, int target) {
@@ -1442,7 +1476,7 @@ public class MainController {
         if (icon != null) {
             icon.getStyleClass().removeAll("badge-icon-locked", "badge-icon-unlocked");
             icon.getStyleClass().add(active ? "badge-icon-unlocked" : "badge-icon-locked");
-            icon.setText(active ? "✔" : "🔒"); 
+            icon.setText(active ? "\u2714" : "\uD83D\uDD12"); 
         }
         
         if (title != null) {
@@ -1471,12 +1505,13 @@ public class MainController {
 
         Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
         calories.getStyleClass().add("planner-meal-kcal");
-        calories.setStyle("-fx-text-fill: #059669;");
+        calories.setStyle("-fx-text-fill: #059669;"); // Un peu de vert sur les calories
 
+        // Barre de calories verte
         ProgressBar pb = new ProgressBar(1.0);
         pb.setMaxWidth(Double.MAX_VALUE);
         pb.setPrefHeight(6);
-        pb.setStyle("-fx-accent: #10b981;");
+        pb.setStyle("-fx-accent: #10b981;"); // Green
         
         VBox box = new VBox(6, title, meta, calories, pb);
         box.getStyleClass().add("planner-meal-card");
@@ -1489,7 +1524,7 @@ public class MainController {
         container.getStyleClass().add("regime-list-card");
         container.setStyle("-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 12; -fx-border-color: #f1f5f9; -fx-alignment: CENTER_LEFT;");
         
-        StackPane iconBox = new StackPane(new Label("💖"));
+        StackPane iconBox = new StackPane(new Label("&#128153;"));
         iconBox.setStyle("-fx-background-color: #f1f5f9; -fx-background-radius: 8; -fx-padding: 10;");
         
         VBox texts = new VBox(2);
@@ -1536,8 +1571,9 @@ public class MainController {
             String desktop = System.getProperty("user.home") + java.io.File.separator + "Desktop";
             String fileName = desktop + java.io.File.separator + "Regime_" + regime.getId() + ".pdf";
 
-            float[] darkGreen  = {0.04f, 0.36f, 0.29f};
-            float[] lightGreen = {0.88f, 0.97f, 0.93f};
+            // ── Colors ─────────────────────────────
+            float[] darkGreen  = {0.04f, 0.36f, 0.29f};  // #0a5c4a
+            float[] lightGreen = {0.88f, 0.97f, 0.93f};  // #e1f7ee
             float[] white      = {1f, 1f, 1f};
             float[] darkText   = {0.07f, 0.13f, 0.20f};
 
@@ -1546,8 +1582,8 @@ public class MainController {
                         org.apache.pdfbox.pdmodel.common.PDRectangle.A4);
                 doc.addPage(page);
 
-                float W = page.getMediaBox().getWidth();
-                float H = page.getMediaBox().getHeight();
+                float W = page.getMediaBox().getWidth();   // 595
+                float H = page.getMediaBox().getHeight();  // 842
 
                 org.apache.pdfbox.pdmodel.PDPageContentStream cs =
                         new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page);
@@ -1555,10 +1591,12 @@ public class MainController {
                 org.apache.pdfbox.pdmodel.font.PDType1Font bold    = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
                 org.apache.pdfbox.pdmodel.font.PDType1Font regular = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA;
 
+                // ── Header Banner ───────────────────
                 cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
                 cs.addRect(0, H - 110, W, 110);
                 cs.fill();
 
+                // Header text
                 cs.beginText();
                 cs.setFont(bold, 26);
                 cs.setNonStrokingColor(white[0], white[1], white[2]);
@@ -1574,10 +1612,12 @@ public class MainController {
                 cs.showText("Regime #" + regime.getId() + "   Type : " + typeSante + "   Genere le : " + java.time.LocalDate.now());
                 cs.endText();
 
+                // ── Light green divider ──────────────
                 cs.setNonStrokingColor(lightGreen[0], lightGreen[1], lightGreen[2]);
                 cs.addRect(0, H - 116, W, 6);
                 cs.fill();
 
+                // ── Section : Données du régime ────
                 float y = H - 160;
                 cs.beginText();
                 cs.setFont(bold, 14);
@@ -1586,12 +1626,14 @@ public class MainController {
                 cs.showText("Donnees du regime");
                 cs.endText();
 
+                // Underline
                 cs.setStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
                 cs.setLineWidth(1.5f);
                 cs.moveTo(40, y - 4);
                 cs.lineTo(W - 40, y - 4);
                 cs.stroke();
 
+                // ── Table rows ──────────────────────
                 String[][] rows = {
                     {"Utilisateur",      valeurOuDefaut(determinerUtilisateurReference() == null ? null : determinerUtilisateurReference().getEmail(), "N/A")},
                     {"Type de sante",    valeurOuDefaut(regime.getTypeSante(), "N/A")},
@@ -1605,6 +1647,7 @@ public class MainController {
 
                 float rowH = 30, rowY = y - 24;
                 for (int i = 0; i < rows.length; i++) {
+                    // Alternating row background
                     if (i % 2 == 0) {
                         cs.setNonStrokingColor(lightGreen[0], lightGreen[1], lightGreen[2]);
                     } else {
@@ -1613,6 +1656,7 @@ public class MainController {
                     cs.addRect(40, rowY - rowH + 8, W - 80, rowH);
                     cs.fill();
 
+                    // Label
                     cs.beginText();
                     cs.setFont(bold, 11);
                     cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
@@ -1620,6 +1664,7 @@ public class MainController {
                     cs.showText(rows[i][0]);
                     cs.endText();
 
+                    // Value
                     cs.beginText();
                     cs.setFont(regular, 11);
                     cs.setNonStrokingColor(darkText[0], darkText[1], darkText[2]);
@@ -1632,6 +1677,7 @@ public class MainController {
                     rowY -= rowH;
                 }
 
+                // ── Footer ──────────────────────────
                 cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
                 cs.addRect(0, 0, W, 40);
                 cs.fill();
@@ -2011,6 +2057,37 @@ public class MainController {
         }
     }
 
+    private HBox creerCarteSuppressionRepas(Repas repas) {
+        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Repas sans nom"));
+        title.getStyleClass().add("repas-delete-title");
+
+        Label meta = new Label(valeurOuDefaut(repas.getDateDisplay(), "--") + " · " + valeurOuDefaut(repas.getUserEmail(), "Utilisateur inconnu"));
+        meta.getStyleClass().add("repas-delete-meta");
+
+        Label type = new Label(normaliserTypeRepas(repas.getTypeRepas()));
+        type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
+
+        Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
+        calories.getStyleClass().add("repas-delete-calories-pill");
+
+        HBox badges = new HBox(10, type, calories);
+        badges.setAlignment(Pos.CENTER_LEFT);
+
+        VBox content = new VBox(10, title, meta, badges);
+        content.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(content, javafx.scene.layout.Priority.ALWAYS);
+
+        Button deleteButton = new Button("Supprimer");
+        deleteButton.getStyleClass().add("repas-delete-button");
+        deleteButton.setOnAction(event -> confirmerSuppressionDepuisCarte(repas));
+
+        HBox card = new HBox(16, content, deleteButton);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.getStyleClass().add("repas-delete-card");
+        card.setMaxWidth(Double.MAX_VALUE);
+        return card;
+    }
+
     private void confirmerSuppressionDepuisCarte(Repas repas) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Supprimer un repas");
@@ -2383,15 +2460,11 @@ public class MainController {
     }
 
     private void afficherPaneRepas(VBox paneActif, Button boutonActif) {
-        masquerTousLesFormulaires();
-        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
         afficherVue(paneActif, paneRepasCreate, paneRepasEdit, paneRepasDelete, paneRepasExplore);
         activerBoutonAction(boutonActif, btnActionCreerRepas, btnActionModifierRepas, btnActionSupprimerRepas, btnActionExplorerRepas);
     }
 
     private void afficherPaneRegime(VBox paneActif, Button boutonActif) {
-        masquerTousLesFormulaires();
-        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
         afficherVue(paneActif, paneRegimeCreate, paneRegimeEdit, paneRegimeDelete, paneRegimeExplore);
         activerBoutonAction(boutonActif, btnActionCreerRegime, btnActionModifierRegime, btnActionSupprimerRegime, btnActionExplorerRegime);
     }
@@ -2455,15 +2528,13 @@ public class MainController {
         alert.showAndWait();
     }
 
-    private static final String API_KEY_SPOONACULAR = "02582f34796041079ba6f1943bf1e028"; // Clef Spoonacular IA
-    
-    @FXML private BorderPane rootPane;
-    @FXML private StackPane paneOverlay;
+    private static final String API_KEY_SPOONACULAR = "30a9a10cfa384b50bdc269ec539acdbe";
+    private static final String API_KEY_LOGMEAL = "0bd3f6e3a12c39aa3543f0839869df408c112f66";
 
     @FXML
-    private void afficherPopupScanIA() {
+    void afficherPopupScanIA(javafx.event.ActionEvent event) {
         masquerTousLesFormulaires();
-        if (paneScanIA != null) {
+        if(paneScanIA != null) {
             paneScanIA.setVisible(true);
             paneScanIA.setManaged(true);
             if (boxResultatIA != null) { boxResultatIA.setVisible(false); boxResultatIA.setManaged(false); }
@@ -2498,7 +2569,7 @@ public class MainController {
 
             new Thread(() -> {
                 try {
-                    // 1. Détection de l'aliment avec Spoonacular Vision
+                    // 1. Détection de l'aliment avec Spoonacular Vision (Remplace LogMeal)
                     String detectedCategory = detecterFoodSpoonacular(file);
                     
                     if (detectedCategory == null || detectedCategory.equalsIgnoreCase("Plat inconnu")) {
@@ -2590,7 +2661,7 @@ public class MainController {
     }
 
     @FXML
-    private void afficherProgrammeHebdomadaire() {
+    void afficherProgrammeHebdomadaire(javafx.event.ActionEvent event) {
         masquerTousLesFormulaires();
         RegimeAlimentaire regime = getActualActiveRegime();
         if (regime == null) {
@@ -2667,7 +2738,7 @@ public class MainController {
                 // Feedback visuel : Rouge pour indiquer que c'est mange
                 mealPill.setStyle("-fx-background-color: #fee2e2; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #ef4444; -fx-border-width: 2;");
                 lblNom.setStyle("-fx-font-weight: 700; -fx-text-fill: #b91c1c;");
-                btnAdd.setText("✔");
+                btnAdd.setText("✓");
                 btnAdd.setDisable(true); // Eviter les doubles clics accidentels
                 btnAdd.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-font-weight: 900;");
             });
@@ -2716,9 +2787,7 @@ public class MainController {
                        .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                        .build();
     
-                    HttpUrl parsedUrl = HttpUrl.parse("https://api.spoonacular.com/mealplanner/generate");
-                    if (parsedUrl == null) throw new IOException("URL API Invalide");
-                    HttpUrl.Builder urlBuilder = parsedUrl.newBuilder();
+                    HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spoonacular.com/mealplanner/generate").newBuilder();
                     urlBuilder.addQueryParameter("timeFrame", "week");
                     urlBuilder.addQueryParameter("targetCalories", String.valueOf(cibles));
                     String dietParam = diet.toLowerCase().trim();
@@ -2795,7 +2864,7 @@ public class MainController {
                             alertLoading.hide();
                             actualiserDashboardPlanner();
                             rafraichirDonnees();
-                            afficherProgrammeHebdomadaire();
+                            afficherProgrammeHebdomadaire(null);
                             showInfo("✨ Magie IA Réussie ✨", "L'IA Spoonacular vient de générer et insérer exactement " + finalCount + " repas structurés sur 7 jours ! Ils complètent parfaitement vos " + cibles + " kcal quotidiennes.");
                         });
                     }
@@ -2862,6 +2931,9 @@ public class MainController {
         dict.put("mushroom", "Champignons");
         dict.put("shrimp", "Crevettes");
         dict.put("tuna", "Thon");
+        dict.put("pasta", "Pâtes");
+        dict.put("noodle", "Nouilles");
+        dict.put("rice", "Riz");
         dict.put("brown", "Complet");
         dict.put("white", "Blanc");
         dict.put("sweet", "Doux");
@@ -2980,176 +3052,9 @@ public class MainController {
     }
 
     @FXML
-    private void afficherBarcodeScanner() {
-        masquerTousLesFormulaires();
-        if (paneBarcodeScanner != null) {
-            paneBarcodeScanner.setVisible(true);
-            paneBarcodeScanner.setManaged(true);
-            if (boxBarcodeResult != null) { boxBarcodeResult.setVisible(false); boxBarcodeResult.setManaged(false); }
-            if (lblBarcodeStatus != null) lblBarcodeStatus.setText("Initialisation de la webcam...");
-            isScanning = true;
-            lastScannedCode = "";
-        }
-
-        new Thread(() -> {
-            try {
-                // Safety: make sure to release any previous lock
-                for (Webcam w : Webcam.getWebcams()) { if (w.isOpen()) w.close(); }
-                
-                webcam = Webcam.getDefault();
-                if (webcam == null) {
-                    Platform.runLater(() -> {
-                        showError("Erreur Webcam", "Aucune webcam détectée.");
-                        stopperBarcodeScanner();
-                    });
-                    return;
-                }
-                
-                webcam.setViewSize(WebcamResolution.VGA.getSize());
-                try {
-                    webcam.open();
-                } catch (Exception e) {
-                    System.err.println("Webcam locked, trying to re-open...");
-                    Webcam.getWebcams().forEach(Webcam::close);
-                    webcam.open();
-                }
-
-                Platform.runLater(() -> lblBarcodeStatus.setText("En attente d'un code-barres..."));
-
-                while (isScanning) {
-                    BufferedImage image = webcam.getImage();
-                    if (image != null) {
-                        Platform.runLater(() -> ivBarcodeWebcam.setImage(SwingFXUtils.toFXImage(image, null)));
-                        
-                        try {
-                            LuminanceSource source = new BufferedImageLuminanceSource(image);
-                            BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-                            Result result = new MultiFormatReader().decode(bitmap);
-                            
-                            String code = result.getText();
-                            if (!code.equals(lastScannedCode)) {
-                                lastScannedCode = code;
-                                Platform.runLater(() -> lblBarcodeStatus.setText("Code détecté : " + code));
-                                fetchOpenFoodFacts(code);
-                            }
-                        } catch (NotFoundException e) {
-                            // Pas de code détecté dans cette frame
-                        }
-                    }
-                    try { Thread.sleep(50); } catch (InterruptedException ignored) {}
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (webcam != null && webcam.isOpen()) webcam.close();
-            }
-        }).start();
-    }
-
-    @FXML
-    private void stopperBarcodeScanner() {
-        isScanning = false;
-        // Hide UI immediately
-        if (paneBarcodeScanner != null) {
-            paneBarcodeScanner.setVisible(false);
-            paneBarcodeScanner.setManaged(false);
-        }
-        // Unlock scroll
-        if (appScrollPane != null) appScrollPane.setMouseTransparent(false);
-        
-        // Release webcam asynchronously
-        new Thread(() -> {
-            try {
-                if (webcam != null && webcam.isOpen()) {
-                    webcam.close();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
-
-        masquerTousLesFormulaires();
-    }
-
-    private void fetchOpenFoodFacts(String barcode) {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url("https://world.openfoodfacts.org/api/v0/product/" + barcode + ".json")
-                .header("User-Agent", "Fitopia - Windows - Version 1.0")
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Platform.runLater(() -> lblBarcodeStatus.setText("Erreur réseau OpenFoodFacts"));
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String json = response.body().string();
-                    JSONObject root = new JSONObject(json);
-                    
-                    if (root.getInt("status") == 1) {
-                        JSONObject product = root.getJSONObject("product");
-                        String name = product.optString("product_name", "Produit inconnu");
-                        String brand = product.optString("brands", "Marque inconnue");
-                        String nutriScore = product.optString("nutriscore_grade", "?").toUpperCase();
-                        
-                        double caloriesPer100 = product.optJSONObject("nutriments") != null ? 
-                                product.optJSONObject("nutriments").optDouble("energy-kcal_100g", 0.0) : 0.0;
-
-                        Platform.runLater(() -> {
-                            lblBarcodeProductName.setText(name);
-                            lblBarcodeBrand.setText(brand);
-                            lblBarcodeNutriScore.setText(nutriScore);
-                            
-                            // Style Nutri-Score
-                            String color = "#9ca3af"; // Gris par défaut
-                            if (nutriScore.equals("A")) color = "#166534"; // Vert foncé
-                            if (nutriScore.equals("B")) color = "#22c55e"; // Vert
-                            if (nutriScore.equals("C")) color = "#eab308"; // Jaune
-                            if (nutriScore.equals("D")) color = "#f97316"; // Orange
-                            if (nutriScore.equals("E")) color = "#ef4444"; // Rouge
-                            lblBarcodeNutriScore.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8;");
-                            
-                            // Vérification compatibilité (Demo simple)
-                            if (nutriScore.equals("D") || nutriScore.equals("E")) {
-                                lblBarcodeCompatibility.setText("⚠️ Attention : Nutri-Score élevé !");
-                                lblBarcodeCompatibility.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
-                            } else {
-                                lblBarcodeCompatibility.setText("✅ Produit sain et compatible.");
-                                lblBarcodeCompatibility.setStyle("-fx-text-fill: #166534; -fx-font-weight: bold;");
-                            }
-
-                            boxBarcodeResult.setVisible(true);
-                            boxBarcodeResult.setManaged(true);
-                            
-                            // On stocke pour l'application finale
-                            lastScannedNom = name;
-                            lastScannedCalories = String.valueOf(Math.round(caloriesPer100)); // On prend pour 100g par défaut
-                        });
-                    } else {
-                        Platform.runLater(() -> lblBarcodeStatus.setText("Produit non trouvé : " + barcode));
-                    }
-                }
-            }
-        });
-    }
-
-    @FXML
-    private void appliquerProduitBarcode() {
-        // Appliquer les données au formulaire de repas
-        if (tfRepasNom != null) tfRepasNom.setText(lastScannedNom);
-        if (tfRepasCalories != null) tfRepasCalories.setText(lastScannedCalories);
-        
-        stopperBarcodeScanner();
-        afficherCreationRepas(); // Ouvre le formulaire pour finir la saisie
-    }
-
-    @FXML
     void hoverScannerOn(javafx.scene.input.MouseEvent event) {
         javafx.scene.Node btn = (javafx.scene.Node) event.getSource();
+        btn.setStyle("-fx-background-color: #1a7177; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.6), 15, 0, 0, 5); -fx-cursor: hand;");
         btn.setScaleX(1.05);
         btn.setScaleY(1.05);
     }
@@ -3157,7 +3062,490 @@ public class MainController {
     @FXML
     void hoverScannerOff(javafx.scene.input.MouseEvent event) {
         javafx.scene.Node btn = (javafx.scene.Node) event.getSource();
+        btn.setStyle("-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.4), 10, 0, 0, 5); -fx-cursor: hand;");
         btn.setScaleX(1.0);
         btn.setScaleY(1.0);
+    }
+
+    @FXML
+    void handleBarcodeScan() {
+        // Créer une fenêtre de scan
+        Stage scanStage = new Stage();
+        scanStage.setTitle("Scan Code-Barres - Webcam Réelle");
+        scanStage.initModality(Modality.APPLICATION_MODAL);
+        
+        VBox root = new VBox(20);
+        root.setStyle("-fx-background-color: #2d3748; -fx-padding: 30;");
+        root.setAlignment(Pos.CENTER);
+        
+        // Titre
+        Label title = new Label("Scan Code-Barres - Webcam");
+        title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
+        
+        // Instructions
+        Label instructions = new Label("Positionnez un code-barres devant la webcam\nLa capture sera automatique lors de la détection");
+        instructions.setStyle("-fx-font-size: 14px; -fx-text-fill: #cbd5e0; -fx-text-alignment: center;");
+        instructions.setWrapText(true);
+        
+        // Zone de preview webcam avec effet de scan
+        StackPane cameraPane = new StackPane();
+        cameraPane.setStyle("-fx-background-color: #1a202c; -fx-border-color: #4a5568; -fx-border-width: 2; -fx-border-radius: 10;");
+        cameraPane.setPrefSize(480, 360); // Résolution optimisée
+        
+        ImageView cameraView = new ImageView();
+        cameraView.setFitWidth(480);
+        cameraView.setFitHeight(360);
+        cameraView.setPreserveRatio(true);
+        
+        // Effet de scan visuel
+        Rectangle scanEffect = new Rectangle(480, 360);
+        scanEffect.setFill(Color.TRANSPARENT);
+        scanEffect.setStroke(Color.LIME);
+        scanEffect.setStrokeWidth(3);
+        scanEffect.setVisible(false);
+        
+        Label placeholder = new Label("Initialisation de la webcam...");
+        placeholder.setStyle("-fx-font-size: 16px; -fx-text-fill: #718096;");
+        
+        cameraPane.getChildren().addAll(placeholder, cameraView, scanEffect);
+        
+        // Status
+        Label statusLabel = new Label("Initialisation de la webcam...");
+        statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #63b3ed;");
+        
+        // Zone de saisie manuelle
+        VBox manualEntryBox = new VBox(10);
+        manualEntryBox.setAlignment(Pos.CENTER);
+        manualEntryBox.setStyle("-fx-background-color: #2d3748; -fx-padding: 15; -fx-border-radius: 8; -fx-border-color: #4a5568; -fx-border-width: 1;");
+        
+        Label manualLabel = new Label("Ou entrer le code-barres manuellement :");
+        manualLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #cbd5e0;");
+        
+        HBox manualInputBox = new HBox(10);
+        manualInputBox.setAlignment(Pos.CENTER);
+        
+        TextField barcodeInput = new TextField();
+        barcodeInput.setPromptText("Ex: 7622210419288");
+        barcodeInput.setStyle("-fx-background-color: #1a202c; -fx-text-fill: white; -fx-border-color: #4a5568; -fx-border-width: 1; -fx-border-radius: 5; -fx-padding: 8;");
+        barcodeInput.setPrefWidth(200);
+        
+        Button manualScanButton = new Button("Scanner");
+        manualScanButton.setStyle("-fx-background-color: #38b2ac; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 8 15; -fx-cursor: hand;");
+        
+        manualInputBox.getChildren().addAll(barcodeInput, manualScanButton);
+        manualEntryBox.getChildren().addAll(manualLabel, manualInputBox);
+        
+        // Boutons
+        HBox buttonBox = new HBox(15);
+        buttonBox.setAlignment(Pos.CENTER);
+        
+        Button cancelButton = new Button("Annuler");
+        cancelButton.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;");
+        cancelButton.setOnAction(e -> {
+            barcodeScanner.stopScanning();
+            barcodeScanner.releaseCamera();
+            scanStage.close();
+        });
+        
+        buttonBox.getChildren().add(cancelButton);
+        
+        root.getChildren().addAll(title, instructions, cameraPane, manualEntryBox, statusLabel, buttonBox);
+        
+        Scene scene = new Scene(root, 550, 650); // Taille augmentée pour le champ manuel
+        scanStage.setScene(scene);
+        
+        // Logique pour la saisie manuelle
+        manualScanButton.setOnAction(e -> {
+            String manualBarcode = barcodeInput.getText().trim();
+            if (manualBarcode.isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Erreur");
+                alert.setHeaderText("Code-barres manquant");
+                alert.setContentText("Veuillez entrer un code-barres valide.");
+                alert.showAndWait();
+                return;
+            }
+            
+            // Valider le format du code-barres
+            if (!manualBarcode.matches("\\d+")) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Erreur");
+                alert.setHeaderText("Format invalide");
+                alert.setContentText("Le code-barres doit contenir uniquement des chiffres.");
+                alert.showAndWait();
+                return;
+            }
+            
+            int length = manualBarcode.length();
+            if (length < 8 || length > 13) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Erreur");
+                alert.setHeaderText("Longueur invalide");
+                alert.setContentText("Le code-barres doit contenir entre 8 et 13 chiffres.");
+                alert.showAndWait();
+                return;
+            }
+            
+            // Traiter le code-barres manuel
+            // Le traitement est maintenant géré par le onAction ci-dessus
+        });
+        
+        // Permettre l'appui sur Entrée dans le champ de saisie
+        barcodeInput.setOnAction(e -> {
+            String manualBarcode = barcodeInput.getText().trim();
+            if (!manualBarcode.isEmpty()) {
+                // Traiter le code-barres manuel avec la même logique que le scan
+                try {
+                    OpenFoodFactsService.ProductInfo product = openFoodFacts.getProductInfo(manualBarcode);
+                    
+                    // Obtenir le régime actuel
+                    String currentRegimeType = "equilibré";
+                    if (cbRegimeUser.getValue() != null) {
+                        User selectedUser = allUsers.stream()
+                            .filter(u -> u.getDisplayName().equals(cbRegimeUser.getValue().toString()))
+                            .findFirst()
+                            .orElse(null);
+                        if (selectedUser != null) {
+                            RegimeAlimentaire currentRegime = allRegimes.stream()
+                                .filter(r -> r.getUserId() != null && r.getUserId() == selectedUser.getId())
+                                .findFirst()
+                                .orElse(null);
+                            if (currentRegime != null) {
+                                currentRegimeType = currentRegime.getTypeSante();
+                            }
+                        }
+                    }
+                    
+                    // Vérifier la compatibilité
+                    String compatibilityMessage = openFoodFacts.getCompatibilityMessage(product, currentRegimeType);
+                    boolean isCompatible = compatibilityMessage.contains("Compatible");
+                    
+                    // Afficher le résultat
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setTitle("Produit Scanné - Manuel");
+                    alert.setHeaderText(product.getName());
+                    
+                    String regimeDisplay = currentRegimeType;
+                    if (cbRegimeUser.getValue() != null) {
+                        regimeDisplay = currentRegimeType + " (" + cbRegimeUser.getValue().toString() + ")";
+                    }
+                    
+                    String contentText = String.format(
+                        "Code-barres: %s\nMarque: %s\nNutri-Score: %s\nCalories: %.0f kcal/100g\nProtéines: %.1f g/100g\nGlucides: %.1f g/100g\nLipides: %.1f g/100g\n\nRégime: %s\nCompatibilité: %s",
+                        product.getBarcode(),
+                        product.getBrand() != null ? product.getBrand() : "Non spécifiée",
+                        product.getNutriScore(),
+                        product.getCaloriesPer100g(),
+                        product.getProteinsPer100g(),
+                        product.getCarbohydratesPer100g(),
+                        product.getLipidesPer100g(),
+                        regimeDisplay,
+                        compatibilityMessage
+                    );
+                    
+                    alert.setContentText(contentText);
+                    
+                    // Ajouter le bouton d'ajout si compatible
+                    if (isCompatible) {
+                        ButtonType addButton = new ButtonType("Ajouter aux calories du jour");
+                        ButtonType closeButton = new ButtonType("Fermer");
+                        alert.getButtonTypes().setAll(addButton, closeButton);
+                        
+                        Optional<ButtonType> result = alert.showAndWait();
+                        
+                        if (result.isPresent() && result.get() == addButton) {
+                            addProductToDailyCalories(product, regimeDisplay);
+                        }
+                    } else {
+                        alert.showAndWait();
+                    }
+                    
+                    scanStage.close();
+                    
+                } catch (IOException ex) {
+                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                    errorAlert.setTitle("Erreur");
+                    errorAlert.setHeaderText("Impossible de récupérer les informations du produit");
+                    errorAlert.setContentText("Code-barres: " + manualBarcode + "\nErreur: " + ex.getMessage());
+                    errorAlert.showAndWait();
+                    scanStage.close();
+                }
+            }
+        });
+        
+        // Configurer le callback pour le service robuste SANS OpenCV
+        barcodeScanner.setCallback(new RobustBarcodeScannerService.ScannerCallback() {
+            @Override
+            public void onFrameReady(Image frame, boolean frozen) {
+                // Mettre à jour l'affichage du flux de scan
+                Platform.runLater(() -> {
+                    if (!cameraPane.getChildren().contains(cameraView)) {
+                        cameraPane.getChildren().setAll(cameraView, scanEffect);
+                    }
+                    cameraView.setImage(frame);
+                    
+                    // Effet visuel quand gelé sur un code-barres
+                    if (frozen) {
+                        scanEffect.setVisible(true);
+                        scanEffect.setStroke(Color.GREEN);
+                        scanEffect.setStrokeWidth(5);
+                    } else {
+                        scanEffect.setVisible(false);
+                    }
+                });
+            }
+            
+            @Override
+            public void onBarcodeDetected(String barcode, java.awt.image.BufferedImage capturedImage) {
+                Platform.runLater(() -> {
+                    statusLabel.setText("Code-barres détecté: " + barcode + " - Analyse en cours...");
+                    
+                    // Récupérer les informations du produit
+                    try {
+                        OpenFoodFactsService.ProductInfo product = openFoodFacts.getProductInfo(barcode);
+                        
+                        // Obtenir le régime actuel
+                        String currentRegimeType = "equilibré"; // Default
+                        if (cbRegimeUser.getValue() != null) {
+                            User selectedUser = allUsers.stream()
+                                .filter(u -> u.getDisplayName().equals(cbRegimeUser.getValue().toString()))
+                                .findFirst()
+                                .orElse(null);
+                            if (selectedUser != null) {
+                                RegimeAlimentaire currentRegime = allRegimes.stream()
+                                    .filter(r -> r.getUserId() != null && r.getUserId() == selectedUser.getId())
+                                    .findFirst()
+                                    .orElse(null);
+                                if (currentRegime != null) {
+                                    currentRegimeType = currentRegime.getTypeSante();
+                                }
+                            }
+                        }
+                        
+                        // Vérifier la compatibilité avec affichage TRÈS CLAIR
+                        String compatibilityMessage = openFoodFacts.getCompatibilityMessage(product, currentRegimeType);
+                        boolean isCompatible = compatibilityMessage.contains("Compatible");
+                        
+                        // Afficher le résultat avec indicateurs visuels FORTS
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        
+                        // Titre selon compatibilité
+                        if (isCompatible) {
+                            alert.setTitle("PRODUIT RECOMMANDÉ - Scanner Robuste");
+                        } else {
+                            alert.setTitle("PRODUIT DÉCONSEILLÉ - Scanner Robuste");
+                        }
+                        
+                        alert.setHeaderText(product.getName());
+                        
+                        // Obtenir le régime actuel pour l'affichage DÉTAILLÉ
+                        String regimeDisplay = currentRegimeType;
+                        if (cbRegimeUser.getValue() != null) {
+                            regimeDisplay = currentRegimeType + " (" + cbRegimeUser.getValue().toString() + ")";
+                        }
+                        
+                        // Affichage COMPLET avec indicateurs visuels CLAIRS
+                        String compatibilityStatus = isCompatible ? "BON POUR VOTRE RÉGIME" : "NON RECOMMANDÉ POUR VOTRE RÉGIME";
+                        String compatibilityIcon = isCompatible ? "BON POUR VOTRE RÉGIME" : "NON RECOMMANDÉ POUR VOTRE RÉGIME";
+                        
+                        String contentText = String.format(
+                            "Code-barres: %s\n" +
+                            "Marque: %s\n" +
+                            "Catégories: %s\n" +
+                            "Nutri-Score: %s\n" +
+                            "Calories: %.0f kcal/100g\n" +
+                            "Protéines: %.1f g/100g\n" +
+                            "Glucides: %.1f g/100g\n" +
+                            "Lipides: %.1f g/100g\n\n" +
+                            "Régime actuel: %s\n\n" +
+                            "COMPATIBILITÉ: %s\n" +
+                            "Analyse: %s\n\n" +
+                            "Format international: Reconnu\n" +
+                            "Capture sauvegardée dans barcode_captures/",
+                            product.getBarcode(),
+                            product.getBrand() != null ? product.getBrand() : "Non spécifiée",
+                            product.getCategories() != null ? product.getCategories() : "Non spécifiées",
+                            product.getNutriScore(),
+                            product.getCaloriesPer100g(),
+                            product.getProteinsPer100g(),
+                            product.getCarbohydratesPer100g(),
+                            product.getLipidesPer100g(),
+                            regimeDisplay,
+                            compatibilityStatus,
+                            compatibilityMessage
+                        );
+                        
+                        alert.setContentText(contentText);
+                        
+                        // Style VISUEL FORT selon compatibilité
+                        DialogPane dialogPane = alert.getDialogPane();
+                        
+                        if (isCompatible) {
+                            // VERT pour produits compatibles
+                            dialogPane.setStyle("-fx-background-color: #f0fff4; -fx-border-color: #22c55e; -fx-border-width: 3; -fx-font-weight: bold;");
+                        } else {
+                            // ROUGE pour produits non compatibles
+                            dialogPane.setStyle("-fx-background-color: #fef2f2; -fx-border-color: #ef4444; -fx-border-width: 3; -fx-font-weight: bold;");
+                        }
+                        
+                        // Style supplémentaire selon Nutri-Score
+                        String nutriScoreStyle = "";
+                        if (product.getNutriScore().equals("E")) {
+                            nutriScoreStyle = "\n\nATTENTION: Nutri-Score E (très mauvais)";
+                        } else if (product.getNutriScore().equals("D")) {
+                            nutriScoreStyle = "\n\nATTENTION: Nutri-Score D (mauvais)";
+                        } else if (product.getNutriScore().equals("A") || product.getNutriScore().equals("B")) {
+                            nutriScoreStyle = "\n\nEXCELLENT: Nutri-Score " + product.getNutriScore() + " (bon)";
+                        }
+                        
+                        alert.setContentText(contentText + nutriScoreStyle);
+                        
+                        // Ajouter des boutons personnalisés selon compatibilité
+                        if (isCompatible) {
+                            ButtonType addButton = new ButtonType("Ajouter aux calories du jour");
+                            ButtonType cancelButton = new ButtonType("Fermer");
+                            alert.getButtonTypes().setAll(addButton, cancelButton);
+                            
+                            Optional<ButtonType> result = alert.showAndWait();
+                            
+                            if (result.isPresent() && result.get() == addButton) {
+                                // Ajouter le produit au suivi des calories
+                                addProductToDailyCalories(product, regimeDisplay);
+                            }
+                        } else {
+                            // Pour les produits non compatibles, juste un bouton fermer
+                            alert.showAndWait();
+                        }
+                        
+                        // Arrêter le scan et fermer la fenêtre
+                        barcodeScanner.stopScanning();
+                        barcodeScanner.releaseCamera();
+                        scanStage.close();
+                        
+                    } catch (IOException ex) {
+                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                        errorAlert.setTitle("Erreur");
+                        errorAlert.setHeaderText("Impossible de récupérer les informations du produit");
+                        errorAlert.setContentText("Code-barres: " + barcode + "\nErreur: " + ex.getMessage());
+                        errorAlert.showAndWait();
+                        barcodeScanner.stopScanning();
+                        barcodeScanner.releaseCamera();
+                        scanStage.close();
+                    }
+                });
+            }
+            
+            @Override
+            public void onError(String message) {
+                Platform.runLater(() -> {
+                    statusLabel.setText("Erreur: " + message);
+                    placeholder.setText("Scanner robuste: " + message + "\n\nCe scanner utilise:\n- Capture d'écran (pas OpenCV)\n- Tous les formats internationaux\n- Pas d'erreurs MSMF\n\nPlacez un code-barres dans la zone centrale");
+                });
+            }
+            
+            @Override
+            public void onStatusUpdate(String status) {
+                Platform.runLater(() -> {
+                    statusLabel.setText(status);
+                });
+            }
+            
+            @Override
+            public void onScanEffect(boolean active) {
+                Platform.runLater(() -> {
+                    if (active) {
+                        statusLabel.setText("FOCUS SUR CODE-BARRES - VALIDATION...");
+                        // Animation de focus plus visible
+                        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(300), scanEffect);
+                        scaleTransition.setFromX(0.98);
+                        scaleTransition.setFromY(0.98);
+                        scaleTransition.setToX(1.02);
+                        scaleTransition.setToY(1.02);
+                        scaleTransition.setAutoReverse(true);
+                        scaleTransition.setCycleCount(3);
+                        scaleTransition.play();
+                    }
+                });
+            }
+        });
+        
+        // Initialiser le scanner robuste et démarrer le scan
+        new Thread(() -> {
+            try {
+                if (barcodeScanner.initializeCamera()) {
+                    Platform.runLater(() -> {
+                        statusLabel.setText("Scanner robuste prêt! Placez un code-barres dans la zone centrale...");
+                    });
+                    
+                    // Démarrer le scan
+                    barcodeScanner.startScanning();
+                    
+                } else {
+                    Platform.runLater(() -> {
+                        statusLabel.setText("Erreur: Impossible d'initialiser le scanner robuste");
+                        placeholder.setText("Scanner robuste non disponible\n\nCe scanner utilise:\n- Capture d'écran (pas OpenCV)\n- Tous les formats internationaux\n- Pas d'erreurs MSMF\n\nPlacez un code-barres dans la zone centrale de l'écran");
+                    });
+                }
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    statusLabel.setText("Erreur: " + e.getMessage());
+                    placeholder.setText("Erreur du scanner robuste: " + e.getMessage() + "\n\nCe scanner utilise capture d'écran\nsans dépendance OpenCV");
+                });
+            }
+        }).start();
+        
+        // Gérer la fermeture de la fenêtre
+        scanStage.setOnCloseRequest(e -> {
+            barcodeScanner.stopScanning();
+            barcodeScanner.releaseCamera();
+            scanStage.close();
+        });
+    }
+    
+    private void addProductToDailyCalories(OpenFoodFactsService.ProductInfo product, String regimeDisplay) {
+        try {
+            // Obtenir l'utilisateur actuel
+            User currentUser = null;
+            if (cbRegimeUser.getValue() != null) {
+                currentUser = allUsers.stream()
+                    .filter(u -> u.getDisplayName().equals(cbRegimeUser.getValue().toString()))
+                    .findFirst()
+                    .orElse(null);
+            }
+            
+            if (currentUser == null) {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Erreur");
+                errorAlert.setHeaderText("Aucun utilisateur sélectionné");
+                errorAlert.setContentText("Veuillez sélectionner un utilisateur dans la liste déroulante avant d'ajouter des calories.");
+                errorAlert.showAndWait();
+                return;
+            }
+            
+            // Afficher une confirmation simple
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            successAlert.setTitle("Ajout Réussi");
+            successAlert.setHeaderText("Produit ajouté à votre suivi");
+            successAlert.setContentText(String.format(
+                "%s (%.0f kcal) a été ajouté à votre suivi du jour.\n\nRégime: %s\nNutri-Score: %s\n\nNote: Le suivi des calories sera mis à jour automatiquement.",
+                product.getName(),
+                product.getCaloriesPer100g(),
+                regimeDisplay,
+                product.getNutriScore()
+            ));
+            
+            // Style vert pour le succès
+            DialogPane successDialogPane = successAlert.getDialogPane();
+            successDialogPane.setStyle("-fx-background-color: #f0fff4; -fx-border-color: #22c55e; -fx-border-width: 2;");
+            
+            successAlert.showAndWait();
+            
+        } catch (Exception e) {
+            Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+            errorAlert.setTitle("Erreur");
+            errorAlert.setHeaderText("Impossible d'ajouter le produit");
+            errorAlert.setContentText("Erreur lors de l'ajout au suivi des calories: " + e.getMessage());
+            errorAlert.showAndWait();
+        }
     }
 }
