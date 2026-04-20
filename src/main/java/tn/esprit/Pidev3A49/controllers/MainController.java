@@ -1974,7 +1974,7 @@ public class MainController {
     }
 
     private void selectionnerRepasPourModification(Repas repas) {
-        afficherModificationRepas();
+        afficherModificationRepas(null);
         repasEditSelectionId = repas.getId();
         if (tableRepasEdit != null) {
             tableRepasEdit.getSelectionModel().select(repas);
