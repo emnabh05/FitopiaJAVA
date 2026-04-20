@@ -63,6 +63,10 @@ import javafx.stage.Stage;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import javax.imageio.ImageIO;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 
 public class MainController {
 
@@ -2506,7 +2510,7 @@ public class MainController {
         alert.showAndWait();
     }
 
-    private static final String API_KEY_SPOONACULAR = "2dbafe503ab145ad9181043b77d55eef";
+    private static final String API_KEY_SPOONACULAR = "30a9a10cfa384b50bdc269ec539acdbe";
     private static final String API_KEY_LOGMEAL = "0bd3f6e3a12c39aa3543f0839869df408c112f66";
 
     @FXML
@@ -2545,18 +2549,20 @@ public class MainController {
 
             new Thread(() -> {
                 try {
-                    String detectedCategory = detecterAlimentsLogMeal(file);
+                    // 1. Détection de l'aliment avec Spoonacular Vision (Remplace LogMeal)
+                    String detectedCategory = detecterFoodSpoonacular(file);
                     
-                    if (detectedCategory == null || detectedCategory.isEmpty()) {
+                    if (detectedCategory == null || detectedCategory.equalsIgnoreCase("Plat inconnu")) {
                         Platform.runLater(() -> {
                             pbScanProgress.setVisible(false);
-                            showError("Erreur API", "LogMeal n'a pas pu identifier le plat sur l'image.");
+                            showError("Erreur IA", "L'IA n'a pas pu identifier le plat. Essayez une image plus nette.");
                         });
                         return;
                     }
 
-                    System.out.println("Plat détecté : " + detectedCategory);
+                    System.out.println("Plat détecté via Spoonacular : " + detectedCategory);
                     
+                    // 2. Calcul des nutriments (Toujours via Spoonacular)
                     double[] macros = calculerNutritionSpoonacular(detectedCategory);
 
                     long caloriesArrondies = Math.round(macros[0]);
@@ -2567,8 +2573,7 @@ public class MainController {
                     String finalFoodsStr = preTraduire(detectedCategory);
                     Platform.runLater(() -> {
                         pbScanProgress.setVisible(false);
-                        // Afficher aussi les macros en un coup d'oeil
-                        lblIACalories.setText("Énergie : " + caloriesArrondies + " kcal (P:" + p + "g|C:" + c + "g|F:" + f + "g)");
+                        lblIACalories.setText("Énergie estimée : " + caloriesArrondies + " kcal (P:" + p + "g | C:" + c + "g | F:" + f + "g)");
                         boxResultatIA.setVisible(true); boxResultatIA.setManaged(true);
                         if (tfIARepasNomParticulier != null) tfIARepasNomParticulier.setText(finalFoodsStr);
                         
@@ -2580,18 +2585,19 @@ public class MainController {
                         btnAppliquerCalories.setVisible(true); btnAppliquerCalories.setManaged(true);
                     });
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        Platform.runLater(() -> {
-                            pbScanProgress.setVisible(false);
-                            String msg = e.getMessage();
-                            if (msg != null && msg.contains("402")) {
-                                showError("Quota Démo Atteint", "Le quota gratuit de reconnaissance d'image pour aujourd'hui est épuisé.\n\nNote pour le jury : Il s'agit d'une limitation de l'API gratuite utilisée pour ce projet étudiant.");
-                            } else {
-                                showError("Erreur Scan", "Impossible d'analyser l'image : " + msg);
-                            }
-                        });
-                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Platform.runLater(() -> {
+                        pbScanProgress.setVisible(false);
+                        if (e.getMessage() != null && (e.getMessage().contains("401") || e.getMessage().contains("403"))) {
+                            showError("Erreur Authentification", "Votre clé API Spoonacular est invalide ou expirée.\nVeuillez en générer une nouvelle sur spoonacular.com");
+                        } else if (e.getMessage() != null && e.getMessage().contains("402")) {
+                            showError("Quota Épuisé", "Vous avez atteint la limite de scans gratuits pour aujourd'hui.");
+                        } else {
+                            showError("Erreur Scan", "Problème de connexion à l'IA : " + e.getMessage());
+                        }
+                    });
+                }
             }).start();
         }
     }
@@ -2917,7 +2923,6 @@ public class MainController {
         dict.put("yoghourt", "Yaourt");
         dict.put("sandwich", "Sandwich");
         dict.put("pizza", "Pizza");
-        dict.put("hamburger", "Burger");
         dict.put("hot dog", "Hot-Dog");
 
         for (Map.Entry<String, String> entry : dict.entrySet()) {
@@ -2931,83 +2936,77 @@ public class MainController {
         return s;
     }
 
-    private String detecterAlimentsLogMeal(File file) throws IOException {
+    private String detecterFoodSpoonacular(File file) throws IOException {
         OkHttpClient client = new OkHttpClient.Builder()
-           .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-           .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
-           .build();
-
-        String mimeType = java.net.URLConnection.guessContentTypeFromName(file.getName());
-        if (mimeType == null) mimeType = "image/jpeg";
+                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
+        
+        // --- Compression & Redimensionnement ---
+        BufferedImage originalImage = ImageIO.read(file);
+        if (originalImage == null) throw new IOException("Image invalide. Utilisez JPG ou PNG.");
+        
+        int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+        double scale = Math.min(1.0, 600.0 / Math.max(originalImage.getWidth(), originalImage.getHeight()));
+        int targetWidth = (int) (originalImage.getWidth() * scale);
+        int targetHeight = (int) (originalImage.getHeight() * scale);
+        
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, type);
+        Graphics2D g = resizedImage.createGraphics();
+        g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        g.dispose();
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ImageIO.write(resizedImage, "jpg", baos);
+        byte[] imageBytes = baos.toByteArray();
 
         RequestBody requestBody = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("image", file.getName(),
-                        RequestBody.create(file, MediaType.parse(mimeType)))
+                .addFormDataPart("file", "image.jpg",
+                        RequestBody.create(imageBytes, MediaType.parse("image/jpeg")))
                 .build();
 
+        // --- Appel Unique Spoonacular Vision ---
         Request request = new Request.Builder()
-                .url("https://api.logmeal.com/v2/image/segmentation/complete")
-                .header("Authorization", "Bearer " + API_KEY_LOGMEAL.trim())
+                .url("https://api.spoonacular.com/food/images/classify?apiKey=" + API_KEY_SPOONACULAR.trim())
+                .addHeader("x-api-key", API_KEY_SPOONACULAR.trim())
+                .addHeader("User-Agent", "Mozilla/5.0")
                 .post(requestBody)
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
             String jsonResp = response.body() != null ? response.body().string() : "{}";
-            
-            if (!response.isSuccessful()) {
-                System.err.println("Détail Erreur LogMeal (" + response.code() + ") : " + jsonResp);
-                throw new IOException("Erreur LogMeal API " + response.code() + " : " + jsonResp);
-            }
+            if (!response.isSuccessful()) throw new IOException("Erreur Spoonacular (" + response.code() + ") : " + jsonResp);
             
             JSONObject root = new JSONObject(jsonResp);
-            
-            // Tentative 1 : Format Recognition Standard
-            if (root.has("recognition_results")) {
-                JSONArray res = root.getJSONArray("recognition_results");
-                if (res.length() > 0) return res.getJSONObject(0).getString("name");
-            }
-            
-            // Tentative 2 : Format Segmentation (comme demandé dans ta doc)
-            if (root.has("segmentation_results")) {
-                JSONArray res = root.getJSONArray("segmentation_results");
-                if (res.length() > 0) {
-                    JSONObject first = res.getJSONObject(0);
-                    if (first.has("food_item")) {
-                         JSONArray items = first.getJSONArray("food_item");
-                         if (items.length() > 0) return items.getJSONObject(0).getString("name");
-                    }
-                }
-            }
-            return "Plat inconnu";
+            return root.optString("category", "Plat inconnu");
         }
     }
 
     private double[] calculerNutritionSpoonacular(String category) throws IOException {
-        long timeoutSeconds = 15;
         OkHttpClient client = new OkHttpClient.Builder()
-           .connectTimeout(timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS)
-           .readTimeout(timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS)
-           .build();
-
+                .connectTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
         String cleanCategory = category.replace(" ", "+");
         
         Request request = new Request.Builder()
-                .url("https://api.spoonacular.com/recipes/guessNutrition?title=" + cleanCategory + "&apiKey=" + API_KEY_SPOONACULAR)
+                .url("https://api.spoonacular.com/recipes/guessNutrition?title=" + cleanCategory)
+                .addHeader("x-api-key", API_KEY_SPOONACULAR.trim())
                 .build();
 
         try (Response response = client.newCall(request).execute()) {
-            if (!response.isSuccessful()) {
-                 throw new IOException("Erreur Spoonacular Nutrition API: " + response.code());
-            }
-
-            String jsonResponse = response.body().string();
-            JSONObject nutritionObj = new JSONObject(jsonResponse);
+            String jsonResp = response.body() != null ? response.body().string() : "{}";
+            if (response.code() == 401 || response.code() == 403) throw new IOException("401 Unauthorized : Clé invalide.");
+            if (!response.isSuccessful()) throw new IOException("Erreur Nutrition Spoonacular " + response.code() + " : " + jsonResp);
             
-            double cal = nutritionObj.has("calories") ? nutritionObj.getJSONObject("calories").optDouble("value", 0.0) : 0;
-            double prot = nutritionObj.has("protein") ? nutritionObj.getJSONObject("protein").optDouble("value", 0.0) : 0;
-            double carbs = nutritionObj.has("carbs") ? nutritionObj.getJSONObject("carbs").optDouble("value", 0.0) : 0;
-            double fat = nutritionObj.has("fat") ? nutritionObj.getJSONObject("fat").optDouble("value", 0.0) : 0;
+            JSONObject root = new JSONObject(jsonResp);
+            
+            double cal = root.has("calories") ? root.getJSONObject("calories").optDouble("value", 0.0) : 0;
+            double prot = root.has("protein") ? root.getJSONObject("protein").optDouble("value", 0.0) : 0;
+            double carbs = root.has("carbs") ? root.getJSONObject("carbs").optDouble("value", 0.0) : 0;
+            double fat = root.has("fat") ? root.getJSONObject("fat").optDouble("value", 0.0) : 0;
 
             return new double[]{cal, prot, carbs, fat};
         }

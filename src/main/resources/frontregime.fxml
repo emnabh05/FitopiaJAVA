@@ -654,6 +654,7 @@
                              <Label text="Repas détecté (vous pouvez corriger) :" style="-fx-font-weight: 700; -fx-text-fill: #065f46; -fx-font-size: 12px;"/>
                              <TextField fx:id="tfIARepasNomParticulier" style="-fx-background-color: white; -fx-border-color: #10b981; -fx-border-radius: 5; -fx-font-weight: 800; -fx-text-fill: #065f46;"/>
                              <Label fx:id="lblIACalories" text="Calories estimées : - kcal" style="-fx-font-weight: 800; -fx-text-fill: #065f46; -fx-font-size: 14px;"/>
+                             <Button fx:id="btnAppliquerCalories" text="💾 Sauvegarder dans mon formulaire" onAction="#appliquerCaloriesScan" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;" maxWidth="Infinity" managed="false" visible="false"/>
                         </VBox>
 
                         <!-- Zone d'Importation Image -->
@@ -665,7 +666,6 @@
                         <VBox alignment="CENTER" spacing="10">
                              <ProgressBar fx:id="pbScanProgress" prefWidth="300" visible="false"/>
                         </VBox>
-                        <Button fx:id="btnAppliquerCalories" text="💾 Sauvegarder dans mon formulaire" onAction="#appliquerCaloriesScan" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 14; -fx-cursor: hand;" maxWidth="Infinity" managed="false" visible="false"/>
                     </VBox>
                 </VBox>
 
