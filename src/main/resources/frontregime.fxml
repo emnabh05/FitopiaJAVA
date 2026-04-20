@@ -639,9 +639,6 @@
                     </ScrollPane>
                 </VBox>
 
-                    </StackPane>
-                </content>
-            </ScrollPane>
 
             <!-- 9. SCAN IMAGE POPUP (FIXED) -->
             <VBox fx:id="paneScanIA" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
