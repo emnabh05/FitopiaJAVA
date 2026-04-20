@@ -77,8 +77,8 @@ public class OpenFoodFactsService {
         // Nutri-Score - Essayer TOUS les champs possibles avec débogage
         String nutriScore = "N/A";
         
-        // Debug: afficher les champs disponibles
-        System.out.println("Champs disponibles dans le produit: " + product.keySet());
+        // Debug: afficher les champs disponibles (Désactivé pour ne pas spammer la console)
+        // System.out.println("Champs disponibles dans le produit: " + product.keySet());
         
         if (product.has("nutriscore_grade")) {
             nutriScore = product.getString("nutriscore_grade").toUpperCase();

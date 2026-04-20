@@ -24,8 +24,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -35,12 +34,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.Modality;
 import javafx.scene.control.DialogPane;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import javafx.util.StringConverter;
-import java.util.Optional;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -340,6 +340,7 @@ public class MainController {
     private final RobustBarcodeScannerService barcodeScanner = new RobustBarcodeScannerService();
     private final OpenFoodFactsService openFoodFacts = new OpenFoodFactsService();
     private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
+    private tn.esprit.Pidev3A49.services.BarcodeServer barcodeScannerMobileServer;
     private List<User> allUsers = List.of();
     private List<RegimeAlimentaire> allRegimes = List.of();
     private List<Repas> repasExplorerView = List.of();
@@ -352,6 +353,8 @@ public class MainController {
 
     @FXML
     public void initialize() {
+        barcodeScannerMobileServer = new tn.esprit.Pidev3A49.services.BarcodeServer(this::traiterCodeDepuisTelephone);
+        barcodeScannerMobileServer.startServer();
         initialiserColonnes();
         initialiserCombos();
         initialiserExplorateurRepas();
@@ -364,6 +367,62 @@ public class MainController {
         masquerTousLesFormulaires();
         setupRealTimeValidation();
         setupDynamicFilters();
+    }
+
+    private String lastScannedBarcode = "";
+    private long lastScanTime = 0;
+
+    public void traiterCodeDepuisTelephone(String barcode) {
+        long currentScanTime = System.currentTimeMillis();
+        // Ignore le même code-barres s'il est scanné à moins de 5 secondes d'intervalle
+        if (barcode.equals(lastScannedBarcode) && (currentScanTime - lastScanTime) < 5000) {
+            return;
+        }
+        lastScannedBarcode = barcode;
+        lastScanTime = currentScanTime;
+
+        try {
+            System.out.println("\u001B[32m\u2705 Nouveau Code Scanné : " + barcode + "\u001B[0m");
+            tn.esprit.Pidev3A49.services.OpenFoodFactsService.ProductInfo produit = openFoodFacts.getProductInfo(barcode);
+            RegimeAlimentaire regimeActif = getActualActiveRegime();
+            if (regimeActif == null) {
+                showAlert(Alert.AlertType.WARNING, "Aucun regime actif", "Veuillez activer ou creer un regime d'abord.");
+                return;
+            }
+            String compatibilite = openFoodFacts.getCompatibilityMessage(produit, regimeActif.getTypeSante());
+            boolean estCompatible = openFoodFacts.isCompatibleWithRegime(produit, regimeActif.getTypeSante());
+            String message = String.format("Produit : %s\nCalories : %.2f kcal/100g\nProteines : %.2f g\nGlucides : %.2f g\nLipides : %.2f g\n\n%s",
+                    produit.getName(), produit.getCaloriesPer100g(), produit.getProteinsPer100g(),
+                    produit.getCarbohydratesPer100g(), produit.getLipidesPer100g(), compatibilite);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Scan Mobile Detecte");
+            alert.setHeaderText(produit.getName());
+            alert.setContentText(message);
+            ButtonType btnAjouter = new ButtonType("Ajouter (100g)");
+            ButtonType btnAnnuler = new ButtonType("Fermer", javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
+            alert.getButtonTypes().setAll(btnAjouter, btnAnnuler);
+            alert.showAndWait().ifPresent(button -> {
+                if (button == btnAjouter) {
+                    try {
+                        User refUser = determinerUtilisateurReference();
+                        Repas nouveauRepas = new Repas(refUser.getId(), LocalDateTime.now(), "Collation",
+                            produit.getName(), (int) produit.getCaloriesPer100g(), (int) produit.getProteinsPer100g(),
+                            (int) produit.getCarbohydratesPer100g(), (int) produit.getLipidesPer100g(),
+                            "Scan Mobile - " + compatibilite.split("\\.")[0], regimeActif.getId());
+                        serviceRepas.add(nouveauRepas);
+                        fusionnerRepasSiExiste(nouveauRepas);
+                        rafraichirDonnees();
+                        verifierEtAlerterDepassementCalories();
+                        showInfo("Produit ajoute avec succes !");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        showError("Erreur", "Impossible d'ajouter le produit : " + ex.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Erreur OpenFoodFacts", "Produit introuvable ou erreur réseau pour : " + barcode);
+        }
     }
 
     private void setupDynamicFilters() {
@@ -563,6 +622,7 @@ public class MainController {
             fusionnerRepasSiExiste(nouveau);
             rafraichirDonnees();
             showInfo("Calories ajoutées à votre suivi !");
+            verifierEtAlerterDepassementCalories();
             masquerTousLesFormulaires();
         } catch (Exception exception) {
             showError("Erreur ajout", exception.getMessage());
@@ -576,6 +636,7 @@ public class MainController {
             rafraichirDonnees();
             viderFormulaireRepas();
             showInfo("Données nutritionnelles mises à jour.");
+            verifierEtAlerterDepassementCalories();
             masquerTousLesFormulaires();
         } catch (Exception exception) {
             showError("Erreur repas", exception.getMessage());
@@ -660,6 +721,18 @@ public class MainController {
         }
     }
 
+    private void verifierEtAlerterDepassementCalories() {
+        RegimeAlimentaire activeRegime = getActualActiveRegime();
+        if (activeRegime != null) {
+            List<Repas> repasDuJour = sessionMealsByRegime.getOrDefault(activeRegime.getId(), new java.util.ArrayList<>());
+            int target = activeRegime.getCaloriesCibles() == null ? 2000 : activeRegime.getCaloriesCibles();
+            int curKcal = sommeRepas(repasDuJour, Repas::getCalories);
+            if (curKcal > target) {
+                showAlert(Alert.AlertType.WARNING, "Objectif Calorique Dépassé",
+                        "Attention : Vous avez dépassé votre objectif quotidien de " + target + " kcal ! Total actuel : " + curKcal + " kcal.");
+            }
+        }
+    }
 
     private void fusionnerRepasSiExiste(Repas nouveau) {
         if (nouveau == null || nouveau.getRegimeId() == null) return;
@@ -2652,6 +2725,7 @@ public class MainController {
             actualiserDashboardPlanner();
             
             showInfo("Scan Appliqué", "Génial ! Le repas (" + lastScannedNom + ") a été directement ajouté à votre checklist d'aujourd'hui, et les " + lastScannedCalories + " kcal ont mis à jour votre barre d'avancement !");
+            verifierEtAlerterDepassementCalories();
         } else {
             showInfo("Scan Appliqué", "Les informations ont été copiées dans le formulaire, mais aucun régime n'étant ouvert, le repas n'a pas pu s'ajouter tout seul à la checklist.");
         }
@@ -2734,6 +2808,7 @@ public class MainController {
                 // Synchronisation forcée pour que le prof voie le changement direct
                 actualiserDashboardPlanner();
                 rafraichirDonnees();
+                verifierEtAlerterDepassementCalories();
                 
                 // Feedback visuel : Rouge pour indiquer que c'est mange
                 mealPill.setStyle("-fx-background-color: #fee2e2; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #ef4444; -fx-border-width: 2;");
@@ -3187,91 +3262,11 @@ public class MainController {
             }
             
             // Traiter le code-barres manuel
-            // Le traitement est maintenant géré par le onAction ci-dessus
+            processManualBarcode(manualBarcode, scanStage);
         });
         
         // Permettre l'appui sur Entrée dans le champ de saisie
-        barcodeInput.setOnAction(e -> {
-            String manualBarcode = barcodeInput.getText().trim();
-            if (!manualBarcode.isEmpty()) {
-                // Traiter le code-barres manuel avec la même logique que le scan
-                try {
-                    OpenFoodFactsService.ProductInfo product = openFoodFacts.getProductInfo(manualBarcode);
-                    
-                    // Obtenir le régime actuel
-                    String currentRegimeType = "equilibré";
-                    if (cbRegimeUser.getValue() != null) {
-                        User selectedUser = allUsers.stream()
-                            .filter(u -> u.getDisplayName().equals(cbRegimeUser.getValue().toString()))
-                            .findFirst()
-                            .orElse(null);
-                        if (selectedUser != null) {
-                            RegimeAlimentaire currentRegime = allRegimes.stream()
-                                .filter(r -> r.getUserId() != null && r.getUserId() == selectedUser.getId())
-                                .findFirst()
-                                .orElse(null);
-                            if (currentRegime != null) {
-                                currentRegimeType = currentRegime.getTypeSante();
-                            }
-                        }
-                    }
-                    
-                    // Vérifier la compatibilité
-                    String compatibilityMessage = openFoodFacts.getCompatibilityMessage(product, currentRegimeType);
-                    boolean isCompatible = compatibilityMessage.contains("Compatible");
-                    
-                    // Afficher le résultat
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Produit Scanné - Manuel");
-                    alert.setHeaderText(product.getName());
-                    
-                    String regimeDisplay = currentRegimeType;
-                    if (cbRegimeUser.getValue() != null) {
-                        regimeDisplay = currentRegimeType + " (" + cbRegimeUser.getValue().toString() + ")";
-                    }
-                    
-                    String contentText = String.format(
-                        "Code-barres: %s\nMarque: %s\nNutri-Score: %s\nCalories: %.0f kcal/100g\nProtéines: %.1f g/100g\nGlucides: %.1f g/100g\nLipides: %.1f g/100g\n\nRégime: %s\nCompatibilité: %s",
-                        product.getBarcode(),
-                        product.getBrand() != null ? product.getBrand() : "Non spécifiée",
-                        product.getNutriScore(),
-                        product.getCaloriesPer100g(),
-                        product.getProteinsPer100g(),
-                        product.getCarbohydratesPer100g(),
-                        product.getLipidesPer100g(),
-                        regimeDisplay,
-                        compatibilityMessage
-                    );
-                    
-                    alert.setContentText(contentText);
-                    
-                    // Ajouter le bouton d'ajout si compatible
-                    if (isCompatible) {
-                        ButtonType addButton = new ButtonType("Ajouter aux calories du jour");
-                        ButtonType closeButton = new ButtonType("Fermer");
-                        alert.getButtonTypes().setAll(addButton, closeButton);
-                        
-                        Optional<ButtonType> result = alert.showAndWait();
-                        
-                        if (result.isPresent() && result.get() == addButton) {
-                            addProductToDailyCalories(product, regimeDisplay);
-                        }
-                    } else {
-                        alert.showAndWait();
-                    }
-                    
-                    scanStage.close();
-                    
-                } catch (IOException ex) {
-                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                    errorAlert.setTitle("Erreur");
-                    errorAlert.setHeaderText("Impossible de récupérer les informations du produit");
-                    errorAlert.setContentText("Code-barres: " + manualBarcode + "\nErreur: " + ex.getMessage());
-                    errorAlert.showAndWait();
-                    scanStage.close();
-                }
-            }
-        });
+        barcodeInput.setOnAction(e -> manualScanButton.fire());
         
         // Configurer le callback pour le service robuste SANS OpenCV
         barcodeScanner.setCallback(new RobustBarcodeScannerService.ScannerCallback() {
@@ -3400,22 +3395,7 @@ public class MainController {
                         
                         alert.setContentText(contentText + nutriScoreStyle);
                         
-                        // Ajouter des boutons personnalisés selon compatibilité
-                        if (isCompatible) {
-                            ButtonType addButton = new ButtonType("Ajouter aux calories du jour");
-                            ButtonType cancelButton = new ButtonType("Fermer");
-                            alert.getButtonTypes().setAll(addButton, cancelButton);
-                            
-                            Optional<ButtonType> result = alert.showAndWait();
-                            
-                            if (result.isPresent() && result.get() == addButton) {
-                                // Ajouter le produit au suivi des calories
-                                addProductToDailyCalories(product, regimeDisplay);
-                            }
-                        } else {
-                            // Pour les produits non compatibles, juste un bouton fermer
-                            alert.showAndWait();
-                        }
+                        alert.showAndWait();
                         
                         // Arrêter le scan et fermer la fenêtre
                         barcodeScanner.stopScanning();
@@ -3498,53 +3478,72 @@ public class MainController {
         scanStage.setOnCloseRequest(e -> {
             barcodeScanner.stopScanning();
             barcodeScanner.releaseCamera();
-            scanStage.close();
         });
+        
+        scanStage.showAndWait();
     }
     
-    private void addProductToDailyCalories(OpenFoodFactsService.ProductInfo product, String regimeDisplay) {
+    private void processManualBarcode(String barcode, Stage scanStage) {
         try {
-            // Obtenir l'utilisateur actuel
-            User currentUser = null;
+            // Récupérer les informations du produit
+            OpenFoodFactsService.ProductInfo product = openFoodFacts.getProductInfo(barcode);
+            
+            // Obtenir le régime actuel
+            String currentRegimeType = "equilibré"; // Default
             if (cbRegimeUser.getValue() != null) {
-                currentUser = allUsers.stream()
+                User selectedUser = allUsers.stream()
                     .filter(u -> u.getDisplayName().equals(cbRegimeUser.getValue().toString()))
                     .findFirst()
                     .orElse(null);
+                if (selectedUser != null) {
+                    RegimeAlimentaire currentRegime = allRegimes.stream()
+                        .filter(r -> r.getUserId() != null && r.getUserId() == selectedUser.getId())
+                        .findFirst()
+                        .orElse(null);
+                    if (currentRegime != null) {
+                        currentRegimeType = currentRegime.getTypeSante();
+                    }
+                }
             }
             
-            if (currentUser == null) {
-                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                errorAlert.setTitle("Erreur");
-                errorAlert.setHeaderText("Aucun utilisateur sélectionné");
-                errorAlert.setContentText("Veuillez sélectionner un utilisateur dans la liste déroulante avant d'ajouter des calories.");
-                errorAlert.showAndWait();
-                return;
-            }
+            // Vérifier la compatibilité
+            String compatibilityMessage = openFoodFacts.getCompatibilityMessage(product, currentRegimeType);
             
-            // Afficher une confirmation simple
-            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-            successAlert.setTitle("Ajout Réussi");
-            successAlert.setHeaderText("Produit ajouté à votre suivi");
-            successAlert.setContentText(String.format(
-                "%s (%.0f kcal) a été ajouté à votre suivi du jour.\n\nRégime: %s\nNutri-Score: %s\n\nNote: Le suivi des calories sera mis à jour automatiquement.",
-                product.getName(),
+            // Afficher le résultat
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Produit Scanné (Manuel)");
+            alert.setHeaderText(product.getName());
+            alert.setContentText(String.format(
+                "Code-barres: %s\nNutri-Score: %s\nCalories: %.0f kcal/100g\nProtéines: %.1f g/100g\nGlucides: %.1f g/100g\nLipides: %.1f g/100g\n\n%s",
+                product.getBarcode(),
+                product.getNutriScore(),
                 product.getCaloriesPer100g(),
-                regimeDisplay,
-                product.getNutriScore()
+                product.getProteinsPer100g(),
+                product.getCarbohydratesPer100g(),
+                product.getLipidesPer100g(),
+                compatibilityMessage
             ));
             
-            // Style vert pour le succès
-            DialogPane successDialogPane = successAlert.getDialogPane();
-            successDialogPane.setStyle("-fx-background-color: #f0fff4; -fx-border-color: #22c55e; -fx-border-width: 2;");
+            // Style de l'alerte selon le Nutri-Score
+            DialogPane dialogPane = alert.getDialogPane();
+            if (product.getNutriScore().equals("E")) {
+                dialogPane.setStyle("-fx-background-color: #fff5f5; -fx-border-color: #feb2b2;");
+            } else if (product.getNutriScore().equals("A") || product.getNutriScore().equals("B")) {
+                dialogPane.setStyle("-fx-background-color: #f0fff4; -fx-border-color: #9ae6b4;");
+            }
             
-            successAlert.showAndWait();
+            alert.showAndWait();
             
-        } catch (Exception e) {
+            // Fermer la fenêtre de scan
+            barcodeScanner.stopScanning();
+            barcodeScanner.releaseCamera();
+            scanStage.close();
+            
+        } catch (IOException ex) {
             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
             errorAlert.setTitle("Erreur");
-            errorAlert.setHeaderText("Impossible d'ajouter le produit");
-            errorAlert.setContentText("Erreur lors de l'ajout au suivi des calories: " + e.getMessage());
+            errorAlert.setHeaderText("Impossible de récupérer les informations du produit");
+            errorAlert.setContentText("Code-barres: " + barcode + "\nErreur: " + ex.getMessage());
             errorAlert.showAndWait();
         }
     }
