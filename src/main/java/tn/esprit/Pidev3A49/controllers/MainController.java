@@ -413,8 +413,6 @@ public class MainController {
 
     @FXML
     private void masquerTousLesFormulaires() {
-        // Restore scrolling
-        if (appScrollPane != null) appScrollPane.setMouseTransparent(false);
         if (paneOverlay != null) paneOverlay.setMouseTransparent(true);
         if (paneRegimeCreate != null) { paneRegimeCreate.setVisible(false); paneRegimeCreate.setManaged(false); }
         if (paneRegimeEdit != null) { paneRegimeEdit.setVisible(false); paneRegimeEdit.setManaged(false); }
@@ -2462,8 +2460,6 @@ public class MainController {
     @FXML
     private void afficherPopupScanIA() {
         masquerTousLesFormulaires();
-        // Block background scroll while popup is open
-        if (appScrollPane != null) appScrollPane.setMouseTransparent(true);
         if (paneScanIA != null) {
             paneScanIA.setVisible(true);
             paneScanIA.setManaged(true);
@@ -2983,8 +2979,6 @@ public class MainController {
     @FXML
     private void afficherBarcodeScanner() {
         masquerTousLesFormulaires();
-        // Block background scroll while scanner is open
-        if (appScrollPane != null) appScrollPane.setMouseTransparent(true);
         if (paneBarcodeScanner != null) {
             paneBarcodeScanner.setVisible(true);
             paneBarcodeScanner.setManaged(true);
@@ -3035,6 +3029,7 @@ public class MainController {
                             // Pas de code détecté dans cette frame
                         }
                     }
+                    try { Thread.sleep(50); } catch (InterruptedException ignored) {}
                 }
             } catch (Exception e) {
                 e.printStackTrace();
