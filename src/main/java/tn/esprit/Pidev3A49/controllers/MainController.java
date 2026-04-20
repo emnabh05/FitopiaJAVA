@@ -52,12 +52,7 @@ import tn.esprit.Pidev3A49.Models.User;
 import tn.esprit.Pidev3A49.services.ServiceRepas;
 import tn.esprit.Pidev3A49.services.ServiceRegimeAlimentaire;
 import tn.esprit.Pidev3A49.services.ServiceUser;
-import tn.esprit.Pidev3A49.services.BarcodeScannerService;
-import tn.esprit.Pidev3A49.services.SimulatedBarcodeScannerService;
-import tn.esprit.Pidev3A49.services.RealWebcamScannerService;
-import tn.esprit.Pidev3A49.services.OptimizedBarcodeScannerService;
-import tn.esprit.Pidev3A49.services.SupermarketScannerService;
-import tn.esprit.Pidev3A49.services.RobustBarcodeScannerService;
+
 import tn.esprit.Pidev3A49.services.OpenFoodFactsService;
 
 import java.text.Normalizer;
@@ -337,7 +332,7 @@ public class MainController {
     private final ServiceRepas serviceRepas = new ServiceRepas();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceUser serviceUser = new ServiceUser();
-    private final RobustBarcodeScannerService barcodeScanner = new RobustBarcodeScannerService();
+
     private final OpenFoodFactsService openFoodFacts = new OpenFoodFactsService();
     private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
     private tn.esprit.Pidev3A49.services.BarcodeServer barcodeScannerMobileServer;
@@ -3238,8 +3233,7 @@ public class MainController {
         Button cancelButton = new Button("Annuler");
         cancelButton.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;");
         cancelButton.setOnAction(e -> {
-            barcodeScanner.stopScanning();
-            barcodeScanner.releaseCamera();
+
             scanStage.close();
         });
         
@@ -3289,186 +3283,6 @@ public class MainController {
         // Permettre l'appui sur Entrée dans le champ de saisie
         barcodeInput.setOnAction(e -> manualScanButton.fire());
         
-        // Configurer le callback pour le service robuste SANS OpenCV
-        barcodeScanner.setCallback(new RobustBarcodeScannerService.ScannerCallback() {
-            @Override
-            public void onFrameReady(Image frame, boolean frozen) {
-                // Mettre à jour l'affichage du flux de scan
-                Platform.runLater(() -> {
-                    if (!cameraPane.getChildren().contains(cameraView)) {
-                        cameraPane.getChildren().setAll(cameraView, scanEffect);
-                    }
-                    cameraView.setImage(frame);
-                    
-                    // Effet visuel quand gelé sur un code-barres
-                    if (frozen) {
-                        scanEffect.setVisible(true);
-                        scanEffect.setStroke(Color.GREEN);
-                        scanEffect.setStrokeWidth(5);
-                    } else {
-                        scanEffect.setVisible(false);
-                    }
-                });
-            }
-            
-            @Override
-            public void onBarcodeDetected(String barcode, java.awt.image.BufferedImage capturedImage) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("Code-barres détecté: " + barcode + " - Analyse en cours...");
-                    
-                    // Récupérer les informations du produit
-                    try {
-                        OpenFoodFactsService.ProductInfo product = openFoodFacts.getProductInfo(barcode);
-                        
-                        // Obtenir le régime actuel
-                        String currentRegimeType = "equilibré"; // Default
-                        if (cbRegimeUser.getValue() != null) {
-                            User selectedUser = allUsers.stream()
-                                .filter(u -> u.getDisplayName().equals(cbRegimeUser.getValue().toString()))
-                                .findFirst()
-                                .orElse(null);
-                            if (selectedUser != null) {
-                                RegimeAlimentaire currentRegime = allRegimes.stream()
-                                    .filter(r -> r.getUserId() != null && r.getUserId() == selectedUser.getId())
-                                    .findFirst()
-                                    .orElse(null);
-                                if (currentRegime != null) {
-                                    currentRegimeType = currentRegime.getTypeSante();
-                                }
-                            }
-                        }
-                        
-                        // Vérifier la compatibilité avec affichage TRÈS CLAIR
-                        String compatibilityMessage = openFoodFacts.getCompatibilityMessage(product, currentRegimeType);
-                        boolean isCompatible = compatibilityMessage.contains("Compatible");
-                        
-                        // Afficher le résultat avec indicateurs visuels FORTS
-                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                        
-                        // Titre selon compatibilité
-                        if (isCompatible) {
-                            alert.setTitle("PRODUIT RECOMMANDÉ - Scanner Robuste");
-                        } else {
-                            alert.setTitle("PRODUIT DÉCONSEILLÉ - Scanner Robuste");
-                        }
-                        
-                        alert.setHeaderText(product.getName());
-                        
-                        // Obtenir le régime actuel pour l'affichage DÉTAILLÉ
-                        String regimeDisplay = currentRegimeType;
-                        if (cbRegimeUser.getValue() != null) {
-                            regimeDisplay = currentRegimeType + " (" + cbRegimeUser.getValue().toString() + ")";
-                        }
-                        
-                        // Affichage COMPLET avec indicateurs visuels CLAIRS
-                        String compatibilityStatus = isCompatible ? "BON POUR VOTRE RÉGIME" : "NON RECOMMANDÉ POUR VOTRE RÉGIME";
-                        String compatibilityIcon = isCompatible ? "BON POUR VOTRE RÉGIME" : "NON RECOMMANDÉ POUR VOTRE RÉGIME";
-                        
-                        String contentText = String.format(
-                            "Code-barres: %s\n" +
-                            "Marque: %s\n" +
-                            "Catégories: %s\n" +
-                            "Nutri-Score: %s\n" +
-                            "Calories: %.0f kcal/100g\n" +
-                            "Protéines: %.1f g/100g\n" +
-                            "Glucides: %.1f g/100g\n" +
-                            "Lipides: %.1f g/100g\n\n" +
-                            "Régime actuel: %s\n\n" +
-                            "COMPATIBILITÉ: %s\n" +
-                            "Analyse: %s\n\n" +
-                            "Format international: Reconnu\n" +
-                            "Capture sauvegardée dans barcode_captures/",
-                            product.getBarcode(),
-                            product.getBrand() != null ? product.getBrand() : "Non spécifiée",
-                            product.getCategories() != null ? product.getCategories() : "Non spécifiées",
-                            product.getNutriScore(),
-                            product.getCaloriesPer100g(),
-                            product.getProteinsPer100g(),
-                            product.getCarbohydratesPer100g(),
-                            product.getLipidesPer100g(),
-                            regimeDisplay,
-                            compatibilityStatus,
-                            compatibilityMessage
-                        );
-                        
-                        alert.setContentText(contentText);
-                        
-                        // Style VISUEL FORT selon compatibilité
-                        DialogPane dialogPane = alert.getDialogPane();
-                        
-                        if (isCompatible) {
-                            // VERT pour produits compatibles
-                            dialogPane.setStyle("-fx-background-color: #f0fff4; -fx-border-color: #22c55e; -fx-border-width: 3; -fx-font-weight: bold;");
-                        } else {
-                            // ROUGE pour produits non compatibles
-                            dialogPane.setStyle("-fx-background-color: #fef2f2; -fx-border-color: #ef4444; -fx-border-width: 3; -fx-font-weight: bold;");
-                        }
-                        
-                        // Style supplémentaire selon Nutri-Score
-                        String nutriScoreStyle = "";
-                        if (product.getNutriScore().equals("E")) {
-                            nutriScoreStyle = "\n\nATTENTION: Nutri-Score E (très mauvais)";
-                        } else if (product.getNutriScore().equals("D")) {
-                            nutriScoreStyle = "\n\nATTENTION: Nutri-Score D (mauvais)";
-                        } else if (product.getNutriScore().equals("A") || product.getNutriScore().equals("B")) {
-                            nutriScoreStyle = "\n\nEXCELLENT: Nutri-Score " + product.getNutriScore() + " (bon)";
-                        }
-                        
-                        alert.setContentText(contentText + nutriScoreStyle);
-                        
-                        alert.showAndWait();
-                        
-                        // Arrêter le scan et fermer la fenêtre
-                        barcodeScanner.stopScanning();
-                        barcodeScanner.releaseCamera();
-                        scanStage.close();
-                        
-                    } catch (IOException ex) {
-                        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                        errorAlert.setTitle("Erreur");
-                        errorAlert.setHeaderText("Impossible de récupérer les informations du produit");
-                        errorAlert.setContentText("Code-barres: " + barcode + "\nErreur: " + ex.getMessage());
-                        errorAlert.showAndWait();
-                        barcodeScanner.stopScanning();
-                        barcodeScanner.releaseCamera();
-                        scanStage.close();
-                    }
-                });
-            }
-            
-            @Override
-            public void onError(String message) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("Erreur: " + message);
-                    placeholder.setText("Scanner robuste: " + message + "\n\nCe scanner utilise:\n- Capture d'écran (pas OpenCV)\n- Tous les formats internationaux\n- Pas d'erreurs MSMF\n\nPlacez un code-barres dans la zone centrale");
-                });
-            }
-            
-            @Override
-            public void onStatusUpdate(String status) {
-                Platform.runLater(() -> {
-                    statusLabel.setText(status);
-                });
-            }
-            
-            @Override
-            public void onScanEffect(boolean active) {
-                Platform.runLater(() -> {
-                    if (active) {
-                        statusLabel.setText("FOCUS SUR CODE-BARRES - VALIDATION...");
-                        // Animation de focus plus visible
-                        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(300), scanEffect);
-                        scaleTransition.setFromX(0.98);
-                        scaleTransition.setFromY(0.98);
-                        scaleTransition.setToX(1.02);
-                        scaleTransition.setToY(1.02);
-                        scaleTransition.setAutoReverse(true);
-                        scaleTransition.setCycleCount(3);
-                        scaleTransition.play();
-                    }
-                });
-            }
-        });
         
         // Initialiser le scanner robuste et démarrer le scan
         new Thread(() -> {
@@ -3497,8 +3311,7 @@ public class MainController {
         
         // Gérer la fermeture de la fenêtre
         scanStage.setOnCloseRequest(e -> {
-            barcodeScanner.stopScanning();
-            barcodeScanner.releaseCamera();
+
         });
         
         scanStage.showAndWait();
@@ -3556,8 +3369,7 @@ public class MainController {
             alert.showAndWait();
             
             // Fermer la fenêtre de scan
-            barcodeScanner.stopScanning();
-            barcodeScanner.releaseCamera();
+
             scanStage.close();
             
         } catch (IOException ex) {
