@@ -413,7 +413,10 @@ public class MainController {
 
     @FXML
     private void masquerTousLesFormulaires() {
+        // Force unlock interface
+        if (appScrollPane != null) appScrollPane.setMouseTransparent(false);
         if (paneOverlay != null) paneOverlay.setMouseTransparent(true);
+        
         if (paneRegimeCreate != null) { paneRegimeCreate.setVisible(false); paneRegimeCreate.setManaged(false); }
         if (paneRegimeEdit != null) { paneRegimeEdit.setVisible(false); paneRegimeEdit.setManaged(false); }
         if (paneRegimeDelete != null) { paneRegimeDelete.setVisible(false); paneRegimeDelete.setManaged(false); }
@@ -2990,22 +2993,26 @@ public class MainController {
 
         new Thread(() -> {
             try {
-                if (webcam == null) {
-                    webcam = Webcam.getDefault();
-                    if (webcam != null) {
-                        webcam.setViewSize(WebcamResolution.VGA.getSize());
-                    }
-                }
-
+                // Safety: make sure to release any previous lock
+                for (Webcam w : Webcam.getWebcams()) { if (w.isOpen()) w.close(); }
+                
+                webcam = Webcam.getDefault();
                 if (webcam == null) {
                     Platform.runLater(() -> {
-                        showError("Erreur Webcam", "Aucune webcam détectée sur cet ordinateur.");
+                        showError("Erreur Webcam", "Aucune webcam détectée.");
                         stopperBarcodeScanner();
                     });
                     return;
                 }
-
-                if (!webcam.isOpen()) webcam.open();
+                
+                webcam.setViewSize(WebcamResolution.VGA.getSize());
+                try {
+                    webcam.open();
+                } catch (Exception e) {
+                    System.err.println("Webcam locked, trying to re-open...");
+                    Webcam.getWebcams().forEach(Webcam::close);
+                    webcam.open();
+                }
 
                 Platform.runLater(() -> lblBarcodeStatus.setText("En attente d'un code-barres..."));
 
@@ -3042,9 +3049,26 @@ public class MainController {
     @FXML
     private void stopperBarcodeScanner() {
         isScanning = false;
-        if (webcam != null && webcam.isOpen()) webcam.close();
-        paneBarcodeScanner.setVisible(false);
-        paneBarcodeScanner.setManaged(false);
+        // Hide UI immediately
+        if (paneBarcodeScanner != null) {
+            paneBarcodeScanner.setVisible(false);
+            paneBarcodeScanner.setManaged(false);
+        }
+        // Unlock scroll
+        if (appScrollPane != null) appScrollPane.setMouseTransparent(false);
+        
+        // Release webcam asynchronously
+        new Thread(() -> {
+            try {
+                if (webcam != null && webcam.isOpen()) {
+                    webcam.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
+        masquerTousLesFormulaires();
     }
 
     private void fetchOpenFoodFacts(String barcode) {
