@@ -210,7 +210,10 @@
                                                          <Button text="+ Ajouter un repas" onAction="#afficherCreationRepas" style="-fx-background-color: #f1f5f9; -fx-text-fill: #0c3f44; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-border-color: #e2e8f0; -fx-border-radius: 8;"/>
                                                          <Button text="Planning de 7 jours" onAction="#afficherProgrammeHebdomadaire" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(12, 63, 68, 0.3), 8, 0, 0, 4);"/>
                                                     </HBox>
-                                                    <Button text="Scan Code-Barres (Robuste)" onAction="#handleBarcodeScan" style="-fx-background-color: #667eea; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.4), 10, 0, 0, 5); -fx-border-color: transparent;"/>
+                                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                                         <TextField fx:id="tfCodeManuel" promptText="Saisir code-barres manuellement..." style="-fx-text-fill: #16a34a; -fx-font-weight: 900; -fx-font-size: 14px; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 8 12; -fx-background-color: #f8fafc;" HBox.hgrow="ALWAYS"/>
+                                                         <Button text="Vérifier &amp; Ajouter" onAction="#handleSaisieManuelle" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.4), 10, 0, 0, 4);"/>
+                                                    </HBox>
                                                 </VBox>
                                                 </VBox>
                                             </VBox>

@@ -373,6 +373,16 @@ public class MainController {
     private String lastScannedBarcode = "";
     private long lastScanTime = 0;
 
+    @FXML private TextField tfCodeManuel;
+
+    @FXML
+    private void handleSaisieManuelle() {
+        if (tfCodeManuel != null && !tfCodeManuel.getText().isBlank()) {
+            traiterCodeDepuisTelephone(tfCodeManuel.getText());
+            tfCodeManuel.clear();
+        }
+    }
+
     public void traiterCodeDepuisTelephone(String barcode) {
         if (barcode == null || barcode.trim().isEmpty()) {
             System.err.println("Code-barres ignoré car nul ou vide.");
