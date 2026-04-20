@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/22"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.OrderConfirmationController"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            style="-fx-background: #EEF4F7; -fx-background-color: #EEF4F7;">
+    <content>
+        <VBox spacing="20.0"
+              style="-fx-background-color: linear-gradient(to bottom right, #F5FAFC, #E8F2F7);">
+            <padding>
+                <Insets top="28.0" right="28.0" bottom="32.0" left="28.0"/>
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="12.0"
+                      style="-fx-background-color: linear-gradient(to right, #113747, #1E705A); -fx-background-radius: 20; -fx-padding: 16 20 16 20;">
+                    <children>
+                        <StackPane prefWidth="42.0" prefHeight="42.0"
+                                   style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 12;">
+                            <children>
+                                <Label text="OK"
+                                       style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 900;"/>
+                            </children>
+                        </StackPane>
+                        <VBox spacing="3.0">
+                            <children>
+                                <Label text="COMMANDE CONFIRMEE"
+                                       style="-fx-text-fill: white; -fx-font-size: 30px; -fx-font-weight: 900;"/>
+                                <Label text="Votre commande a ete enregistree avec succes."
+                                       style="-fx-text-fill: rgba(255,255,255,0.82); -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="🔔"
+                                onAction="#openMyOrders"
+                                prefHeight="40.0"
+                                prefWidth="44.0"
+                                style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 900;"/>
+                    </children>
+                </HBox>
+
+                <VBox spacing="14.0"
+                      style="-fx-background-color: white; -fx-background-radius: 22; -fx-border-color: rgba(14, 74, 80, 0.12); -fx-border-radius: 22; -fx-padding: 20 22 20 22;">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <children>
+                                <Label text="Commande confirmee"
+                                       style="-fx-text-fill: #617B8A; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label text="Total:"
+                                       style="-fx-text-fill: #617B8A; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                <Label fx:id="totalAmountLabel"
+                                       style="-fx-text-fill: #0D4464; -fx-font-size: 30px; -fx-font-weight: 900;"/>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="16.0">
+                            <children>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-color: #F7FBFD; -fx-background-radius: 16; -fx-border-color: #D6E5EE; -fx-border-radius: 16; -fx-padding: 14 16 14 16;">
+                                    <children>
+                                        <Label text="DETAILS DE LA COMMANDE"
+                                               style="-fx-text-fill: #0F3244; -fx-font-size: 20px; -fx-font-weight: 900;"/>
+
+                                        <HBox>
+                                            <children>
+                                                <Label text="Date de commande:"
+                                                       style="-fx-text-fill: #4A6475; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label fx:id="orderDateLabel"
+                                                       style="-fx-text-fill: #122E3F; -fx-font-size: 14px; -fx-font-weight: 800;"/>
+                                            </children>
+                                        </HBox>
+                                        <Region prefHeight="1.0" style="-fx-background-color: #E3EDF3;"/>
+
+                                        <HBox>
+                                            <children>
+                                                <Label text="Methode de paiement:"
+                                                       style="-fx-text-fill: #4A6475; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label fx:id="paymentMethodLabel"
+                                                       style="-fx-text-fill: #122E3F; -fx-font-size: 14px; -fx-font-weight: 800;"/>
+                                            </children>
+                                        </HBox>
+                                        <Region prefHeight="1.0" style="-fx-background-color: #E3EDF3;"/>
+
+                                        <HBox>
+                                            <children>
+                                                <Label text="Statut:"
+                                                       style="-fx-text-fill: #4A6475; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label fx:id="orderStatusLabel"
+                                                       style="-fx-text-fill: #122E3F; -fx-font-size: 14px; -fx-font-weight: 800;"/>
+                                            </children>
+                                        </HBox>
+                                        <Region prefHeight="1.0" style="-fx-background-color: #E3EDF3;"/>
+
+                                        <HBox>
+                                            <children>
+                                                <Label text="Livraison estimee:"
+                                                       style="-fx-text-fill: #4A6475; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label fx:id="estimatedDeliveryLabel"
+                                                       style="-fx-text-fill: #122E3F; -fx-font-size: 14px; -fx-font-weight: 800;"/>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS"
+                                      style="-fx-background-color: #F7FBFD; -fx-background-radius: 16; -fx-border-color: #D6E5EE; -fx-border-radius: 16; -fx-padding: 14 16 14 16;">
+                                    <children>
+                                        <Label text="INFORMATIONS DE LIVRAISON"
+                                               style="-fx-text-fill: #0F3244; -fx-font-size: 20px; -fx-font-weight: 900;"/>
+                                        <Label fx:id="customerNameLabel"
+                                               style="-fx-text-fill: #1A3F50; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                                        <Label fx:id="customerEmailLabel"
+                                               style="-fx-text-fill: #4A6475; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                        <Label fx:id="customerPhoneLabel"
+                                               style="-fx-text-fill: #4A6475; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                        <Label fx:id="customerAddressLabel"
+                                               wrapText="true"
+                                               style="-fx-text-fill: #4A6475; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox spacing="12.0"
+                      style="-fx-background-color: white; -fx-background-radius: 22; -fx-border-color: rgba(14, 74, 80, 0.12); -fx-border-radius: 22; -fx-padding: 18 22 18 22;">
+                    <children>
+                        <Label text="ARTICLES COMMANDES"
+                               style="-fx-text-fill: #0F3244; -fx-font-size: 24px; -fx-font-weight: 900;"/>
+                        <VBox fx:id="orderedItemsContainer" spacing="10.0"/>
+
+                        <Region prefHeight="1.0" style="-fx-background-color: #E3EDF3;"/>
+
+                        <HBox>
+                            <children>
+                                <Label text="Sous-total:"
+                                       style="-fx-text-fill: #4A6475; -fx-font-size: 15px; -fx-font-weight: 700;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="subtotalLabel"
+                                       style="-fx-text-fill: #123748; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                            </children>
+                        </HBox>
+                        <HBox>
+                            <children>
+                                <Label text="Livraison:"
+                                       style="-fx-text-fill: #4A6475; -fx-font-size: 15px; -fx-font-weight: 700;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="shippingLabel"
+                                       style="-fx-text-fill: #123748; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                            </children>
+                        </HBox>
+                        <HBox>
+                            <children>
+                                <Label text="Remise:"
+                                       style="-fx-text-fill: #4A6475; -fx-font-size: 15px; -fx-font-weight: 700;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="discountLabel"
+                                       style="-fx-text-fill: #123748; -fx-font-size: 15px; -fx-font-weight: 800;"/>
+                            </children>
+                        </HBox>
+                        <Region prefHeight="1.0" style="-fx-background-color: #E3EDF3;"/>
+                        <HBox>
+                            <children>
+                                <Label text="Total:"
+                                       style="-fx-text-fill: #0F3244; -fx-font-size: 22px; -fx-font-weight: 900;"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="finalTotalLabel"
+                                       style="-fx-text-fill: #0D4464; -fx-font-size: 36px; -fx-font-weight: 900;"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <Label fx:id="confirmationStatusLabel"
+                       wrapText="true"
+                       style="-fx-text-fill: #255D71; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+
+                <HBox spacing="14.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Button fx:id="requestInvoiceButton"
+                                text="Imprimer facture"
+                                onAction="#requestInvoice"
+                                prefHeight="44.0"
+                                style="-fx-background-color: linear-gradient(to right, #0D5E50, #14856A); -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 900; -fx-padding: 0 22 0 22;"/>
+                        <Button fx:id="emailInvoiceButton"
+                                text="Envoyer par email"
+                                onAction="#sendInvoiceByEmail"
+                                prefHeight="44.0"
+                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #8BC3AE; -fx-border-radius: 14; -fx-text-fill: #0D5E50; -fx-font-size: 14px; -fx-font-weight: 900; -fx-padding: 0 22 0 22;"/>
+                        <Button text="Continuer vos achats"
+                                onAction="#continueShopping"
+                                prefHeight="44.0"
+                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #C9D7E1; -fx-border-radius: 14; -fx-text-fill: #17394A; -fx-font-size: 14px; -fx-font-weight: 800; -fx-padding: 0 22 0 22;"/>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>
