@@ -346,7 +346,7 @@
             </ScrollPane>
             
             <!-- OVERLAY FOR FORMS -->
-            <StackPane pickOnBounds="false">
+            <StackPane fx:id="paneOverlay" pickOnBounds="false" mouseTransparent="true">
                 <!-- 1. AJOUTER REGIME -->
                 <VBox fx:id="paneRegimeCreate" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.5);">
                     <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">

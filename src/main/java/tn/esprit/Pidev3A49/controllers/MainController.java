@@ -413,6 +413,7 @@ public class MainController {
 
     @FXML
     private void masquerTousLesFormulaires() {
+        if (paneOverlay != null) paneOverlay.setMouseTransparent(true);
         if (paneRegimeCreate != null) { paneRegimeCreate.setVisible(false); paneRegimeCreate.setManaged(false); }
         if (paneRegimeEdit != null) { paneRegimeEdit.setVisible(false); paneRegimeEdit.setManaged(false); }
         if (paneRegimeDelete != null) { paneRegimeDelete.setVisible(false); paneRegimeDelete.setManaged(false); }
@@ -2378,11 +2379,15 @@ public class MainController {
     }
 
     private void afficherPaneRepas(VBox paneActif, Button boutonActif) {
+        masquerTousLesFormulaires();
+        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
         afficherVue(paneActif, paneRepasCreate, paneRepasEdit, paneRepasDelete, paneRepasExplore);
         activerBoutonAction(boutonActif, btnActionCreerRepas, btnActionModifierRepas, btnActionSupprimerRepas, btnActionExplorerRepas);
     }
 
     private void afficherPaneRegime(VBox paneActif, Button boutonActif) {
+        masquerTousLesFormulaires();
+        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
         afficherVue(paneActif, paneRegimeCreate, paneRegimeEdit, paneRegimeDelete, paneRegimeExplore);
         activerBoutonAction(boutonActif, btnActionCreerRegime, btnActionModifierRegime, btnActionSupprimerRegime, btnActionExplorerRegime);
     }
@@ -2449,11 +2454,13 @@ public class MainController {
     private static final String API_KEY_SPOONACULAR = "02582f34796041079ba6f1943bf1e028"; // Clef Spoonacular IA
     
     @FXML private BorderPane rootPane;
+    @FXML private StackPane paneOverlay;
 
     @FXML
-    void afficherPopupScanIA(javafx.event.ActionEvent event) {
+    private void afficherPopupScanIA() {
         masquerTousLesFormulaires();
-        if(paneScanIA != null) {
+        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
+        if (paneScanIA != null) {
             paneScanIA.setVisible(true);
             paneScanIA.setManaged(true);
             if (boxResultatIA != null) { boxResultatIA.setVisible(false); boxResultatIA.setManaged(false); }
@@ -2970,15 +2977,18 @@ public class MainController {
     }
 
     @FXML
-    void afficherBarcodeScanner(javafx.event.ActionEvent event) {
+    private void afficherBarcodeScanner() {
         masquerTousLesFormulaires();
-        paneBarcodeScanner.setVisible(true);
-        paneBarcodeScanner.setManaged(true);
-        boxBarcodeResult.setVisible(false);
-        boxBarcodeResult.setManaged(false);
-        lblBarcodeStatus.setText("Initialisation de la webcam...");
-        isScanning = true;
-        lastScannedCode = "";
+        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
+        if (paneBarcodeScanner != null) {
+            paneBarcodeScanner.setVisible(true);
+            paneBarcodeScanner.setManaged(true);
+            boxBarcodeResult.setVisible(false);
+            boxBarcodeResult.setManaged(false);
+            lblBarcodeStatus.setText("Initialisation de la webcam...");
+            isScanning = true;
+            lastScannedCode = "";
+        }
 
         new Thread(() -> {
             try {
