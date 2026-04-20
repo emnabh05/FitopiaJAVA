@@ -351,6 +351,7 @@ public class MainController {
         barcodeScannerMobileServer = tn.esprit.Pidev3A49.services.BarcodeServer.getInstance();
         barcodeScannerMobileServer.setOnBarcodeReceived(this::traiterCodeDepuisTelephone);
         barcodeScannerMobileServer.startServer();
+        
         initialiserColonnes();
         initialiserCombos();
         initialiserExplorateurRepas();
@@ -398,27 +399,36 @@ public class MainController {
         lastScanTime = currentScanTime;
 
         try {
-            System.out.println("\u001B[32m\u2705 Demarrage du traitement pour : " + barcode + "\u001B[0m");
             tn.esprit.Pidev3A49.services.OpenFoodFactsService.ProductInfo produit = openFoodFacts.getProductInfo(barcode);
             RegimeAlimentaire regimeActif = getActualActiveRegime();
+            
+            String compatibilite;
             if (regimeActif == null) {
-                showAlert(Alert.AlertType.WARNING, "Aucun regime actif", "Veuillez activer ou creer un regime d'abord.");
-                return;
+                compatibilite = "⚠️ Aucun régime actif trouvé. Activez un régime pour tester la compatibilité.";
+            } else {
+                compatibilite = openFoodFacts.getCompatibilityMessage(produit, regimeActif.getTypeSante());
             }
-            String compatibilite = openFoodFacts.getCompatibilityMessage(produit, regimeActif.getTypeSante());
-            boolean estCompatible = openFoodFacts.isCompatibleWithRegime(produit, regimeActif.getTypeSante());
+
             String message = String.format("Produit : %s\nCalories : %.2f kcal/100g\nProteines : %.2f g\nGlucides : %.2f g\nLipides : %.2f g\n\n%s",
                     produit.getName(), produit.getCaloriesPer100g(), produit.getProteinsPer100g(),
                     produit.getCarbohydratesPer100g(), produit.getLipidesPer100g(), compatibilite);
+            
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Scan Mobile Detecte");
             alert.setHeaderText(produit.getName());
             alert.setContentText(message);
+            
             ButtonType btnAjouter = new ButtonType("Ajouter (100g)");
             ButtonType btnAnnuler = new ButtonType("Fermer", javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
-            alert.getButtonTypes().setAll(btnAjouter, btnAnnuler);
+            
+            if (regimeActif == null) {
+                alert.getButtonTypes().setAll(btnAnnuler);
+            } else {
+                alert.getButtonTypes().setAll(btnAjouter, btnAnnuler);
+            }
+
             alert.showAndWait().ifPresent(button -> {
-                if (button == btnAjouter) {
+                if (button == btnAjouter && regimeActif != null) {
                     try {
                         User refUser = determinerUtilisateurReference();
                         Repas nouveauRepas = new Repas(refUser.getId(), LocalDateTime.now(), "Collation",
