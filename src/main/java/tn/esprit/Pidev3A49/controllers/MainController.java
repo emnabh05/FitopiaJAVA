@@ -3031,7 +3031,6 @@ public class MainController {
                             // Pas de code détecté dans cette frame
                         }
                     }
-                    Thread.sleep(50);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -3042,7 +3041,7 @@ public class MainController {
     }
 
     @FXML
-    void stopperBarcodeScanner() {
+    private void stopperBarcodeScanner() {
         isScanning = false;
         if (webcam != null && webcam.isOpen()) webcam.close();
         paneBarcodeScanner.setVisible(false);
@@ -3116,7 +3115,7 @@ public class MainController {
     }
 
     @FXML
-    void appliquerProduitBarcode(javafx.event.ActionEvent event) {
+    private void appliquerProduitBarcode() {
         // Appliquer les données au formulaire de repas
         if (tfRepasNom != null) tfRepasNom.setText(lastScannedNom);
         if (tfRepasCalories != null) tfRepasCalories.setText(lastScannedCalories);
