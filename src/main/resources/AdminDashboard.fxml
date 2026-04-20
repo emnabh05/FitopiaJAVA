@@ -43,6 +43,7 @@
                             <children>
                                 <TextField fx:id="searchField" onKeyReleased="#handleSearch" promptText="Recherche par id, nom, email, role..." HBox.hgrow="ALWAYS" />
                                 <ComboBox fx:id="sortCombo" onAction="#handleSort" prefWidth="160.0" />
+                                <ComboBox fx:id="archiveFilterCombo" onAction="#handleArchiveFilter" prefWidth="140.0" promptText="Archives" />
                                 <Button mnemonicParsing="false" onAction="#handleSearch" style="-fx-background-color: #eef5f4; -fx-text-fill: #22333b; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Rechercher" />
                             </children>
                         </HBox>
@@ -59,6 +60,7 @@
                                 <TableColumn fx:id="riskCol" prefWidth="90.0" text="Risque" />
                                 <TableColumn fx:id="accountStatusCol" prefWidth="120.0" text="Statut" />
                                 <TableColumn fx:id="securityCol" prefWidth="280.0" text="Alertes" />
+                                <TableColumn fx:id="archivedAtCol" prefWidth="170.0" text="Archive le" />
                             </columns>
                         </TableView>
                         <GridPane hgap="10.0" vgap="10.0">
@@ -79,7 +81,8 @@
                                     <children>
                                         <Button fx:id="modifierButton" mnemonicParsing="false" onAction="#handleUpdateUser" style="-fx-background-color: #2f3540; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Modifier" />
                                         <Button fx:id="enregistrerButton" disable="true" mnemonicParsing="false" onAction="#handleSaveUser" style="-fx-background-color: #1f6a5f; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Enregistrer" />
-                                        <Button mnemonicParsing="false" onAction="#handleDeleteUser" style="-fx-background-color: white; -fx-text-fill: #a02e2e; -fx-border-color: #efc5c5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Supprimer" />
+                                        <Button mnemonicParsing="false" onAction="#handleDeleteUser" style="-fx-background-color: white; -fx-text-fill: #a02e2e; -fx-border-color: #efc5c5; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Archiver" />
+                                        <Button mnemonicParsing="false" onAction="#handleRestoreUser" style="-fx-background-color: white; -fx-text-fill: #1f6a5f; -fx-border-color: #bddfd8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Restaurer" />
                                         <Button mnemonicParsing="false" onAction="#handleClearEditor" style="-fx-background-color: #eef5f4; -fx-text-fill: #22333b; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Vider" />
                                     </children>
                                 </HBox>

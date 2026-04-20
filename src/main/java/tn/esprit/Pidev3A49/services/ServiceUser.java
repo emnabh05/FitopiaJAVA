@@ -58,16 +58,37 @@ public class ServiceUser {
     }
 
     public List<FitopiaUser> getAll() {
+        return getUsersByArchiveState(false);
+    }
+
+    public List<FitopiaUser> getUsersByArchiveState(Boolean archived) {
         ensureConnection();
         List<FitopiaUser> users = new ArrayList<>();
-        String query = "SELECT * FROM `" + TABLE_NAME + "` ORDER BY id DESC";
+        String query = archived == null
+                ? "SELECT * FROM `" + TABLE_NAME + "` ORDER BY id DESC"
+                : "SELECT * FROM `" + TABLE_NAME + "` WHERE is_archived=? ORDER BY id DESC";
 
-        try (Statement statement = cnx.createStatement();
-             ResultSet rs = statement.executeQuery(query)) {
-            while (rs.next()) {
-                FitopiaUser user = mapUser(rs);
-                user.setSecurityAlertSummary(buildSecurityAlertSummary(user));
-                users.add(user);
+        try {
+            if (archived == null) {
+                try (Statement statement = cnx.createStatement();
+                     ResultSet rs = statement.executeQuery(query)) {
+                    while (rs.next()) {
+                        FitopiaUser user = mapUser(rs);
+                        user.setSecurityAlertSummary(buildSecurityAlertSummary(user));
+                        users.add(user);
+                    }
+                }
+            } else {
+                try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+                    pstm.setBoolean(1, archived);
+                    try (ResultSet rs = pstm.executeQuery()) {
+                        while (rs.next()) {
+                            FitopiaUser user = mapUser(rs);
+                            user.setSecurityAlertSummary(buildSecurityAlertSummary(user));
+                            users.add(user);
+                        }
+                    }
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors du chargement des utilisateurs : " + e.getMessage(), e);
@@ -99,12 +120,14 @@ public class ServiceUser {
         user.setLockedUntil("");
         user.setLastLoginAt("");
         user.setLastFailedLoginAt("");
+        user.setArchived(false);
+        user.setArchivedAt("");
 
         String query = "INSERT INTO `" + TABLE_NAME + "` (first_name,last_name,username,email,password,phone,birth_date,gender,role,avatar_path,"
                 + "professional_title,specialization,qualification,years_experience,bio,license_number,height,weight,target_weight,"
                 + "fitness_level,health_conditions,dietary_preferences,fitness_goals,face_id_enabled,face_image_path,password_score,"
                 + "password_strength,compromised_password,compromised_occurrences,failed_login_attempts,risk_score,account_status,password_last_changed_at,"
-                + "locked_until,last_login_at,last_failed_login_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "locked_until,last_login_at,last_failed_login_at,is_archived,archived_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         try (PreparedStatement pstm = cnx.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             fillStatement(pstm, user, false);
@@ -163,11 +186,24 @@ public class ServiceUser {
     }
 
     public Optional<FitopiaUser> findByIdentifier(String identifier) {
+        return findByIdentifier(identifier, false);
+    }
+
+    public Optional<FitopiaUser> findByIdentifierIncludingArchived(String identifier) {
+        return findByIdentifier(identifier, null);
+    }
+
+    private Optional<FitopiaUser> findByIdentifier(String identifier, Boolean archived) {
         ensureConnection();
-        String query = "SELECT * FROM `" + TABLE_NAME + "` WHERE LOWER(email)=LOWER(?) OR LOWER(username)=LOWER(?) LIMIT 1";
+        String query = archived == null
+                ? "SELECT * FROM `" + TABLE_NAME + "` WHERE LOWER(email)=LOWER(?) OR LOWER(username)=LOWER(?) LIMIT 1"
+                : "SELECT * FROM `" + TABLE_NAME + "` WHERE (LOWER(email)=LOWER(?) OR LOWER(username)=LOWER(?)) AND is_archived=? LIMIT 1";
         try (PreparedStatement pstm = cnx.prepareStatement(query)) {
             pstm.setString(1, identifier);
             pstm.setString(2, identifier);
+            if (archived != null) {
+                pstm.setBoolean(3, archived);
+            }
             try (ResultSet rs = pstm.executeQuery()) {
                 if (rs.next()) {
                     FitopiaUser user = mapUser(rs);
@@ -184,7 +220,7 @@ public class ServiceUser {
     public Optional<FitopiaUser> authenticateWithFaceId(String identifier) {
         ensureConnection();
         String query = "SELECT * FROM `" + TABLE_NAME + "` WHERE (LOWER(email)=LOWER(?) OR LOWER(username)=LOWER(?)) "
-                + "AND face_id_enabled=1 AND face_image_path IS NOT NULL AND face_image_path <> '' LIMIT 1";
+                + "AND face_id_enabled=1 AND face_image_path IS NOT NULL AND face_image_path <> '' AND is_archived=0 LIMIT 1";
         try (PreparedStatement pstm = cnx.prepareStatement(query)) {
             pstm.setString(1, identifier);
             pstm.setString(2, identifier);
@@ -286,6 +322,9 @@ public class ServiceUser {
     public PasswordChangeResult changePasswordSecure(int userId, String rawPassword, FitopiaUser contextUser) {
         ensureConnection();
         FitopiaUser persisted = refreshUser(userId).orElseThrow(() -> new RuntimeException("Utilisateur introuvable."));
+        if (persisted.isArchived()) {
+            throw new RuntimeException("Impossible de modifier le mot de passe d'un utilisateur archive.");
+        }
         FitopiaUser evaluationUser = contextUser == null ? persisted : contextUser;
         evaluationUser.setId(userId);
         validatePasswordChangePayload(rawPassword);
@@ -326,7 +365,7 @@ public class ServiceUser {
     public void updateProfile(FitopiaUser user) {
         ensureConnection();
         validateUniqueness(user, user.getId());
-        FitopiaUser persisted = refreshUser(user.getId()).orElseThrow(() -> new RuntimeException("Utilisateur introuvable."));
+        FitopiaUser persisted = getUserById(user.getId()).orElseThrow(() -> new RuntimeException("Utilisateur introuvable."));
         user.setPassword(persisted.getPassword());
         user.setPasswordScore(persisted.getPasswordScore());
         user.setPasswordStrength(persisted.getPasswordStrength());
@@ -339,11 +378,13 @@ public class ServiceUser {
         user.setLockedUntil(persisted.getLockedUntil());
         user.setLastLoginAt(persisted.getLastLoginAt());
         user.setLastFailedLoginAt(persisted.getLastFailedLoginAt());
+        user.setArchived(persisted.isArchived());
+        user.setArchivedAt(persisted.getArchivedAt());
 
         String query = "UPDATE `" + TABLE_NAME + "` SET first_name=?,last_name=?,username=?,email=?,password=?,phone=?,birth_date=?,gender=?,role=?,avatar_path=?,"
                 + "professional_title=?,specialization=?,qualification=?,years_experience=?,bio=?,license_number=?,height=?,weight=?,target_weight=?,"
                 + "fitness_level=?,health_conditions=?,dietary_preferences=?,fitness_goals=?,face_id_enabled=?,face_image_path=?,password_score=?,password_strength=?,"
-                + "compromised_password=?,compromised_occurrences=?,failed_login_attempts=?,risk_score=?,account_status=?,password_last_changed_at=?,locked_until=?,last_login_at=?,last_failed_login_at=? "
+                + "compromised_password=?,compromised_occurrences=?,failed_login_attempts=?,risk_score=?,account_status=?,password_last_changed_at=?,locked_until=?,last_login_at=?,last_failed_login_at=?,is_archived=?,archived_at=? "
                 + "WHERE id=?";
 
         try (PreparedStatement pstm = cnx.prepareStatement(query)) {
@@ -379,15 +420,35 @@ public class ServiceUser {
     }
 
     public void delete(int id) {
+        archiveUser(id);
+    }
+
+    public void archiveUser(int id) {
         ensureConnection();
-        try (PreparedStatement history = cnx.prepareStatement("DELETE FROM `" + PASSWORD_HISTORY_TABLE + "` WHERE user_id=?");
-             PreparedStatement userDelete = cnx.prepareStatement("DELETE FROM `" + TABLE_NAME + "` WHERE id = ?")) {
-            history.setInt(1, id);
-            history.executeUpdate();
-            userDelete.setInt(1, id);
-            userDelete.executeUpdate();
+        String query = "UPDATE `" + TABLE_NAME + "` SET is_archived=1, archived_at=?, account_status='ARCHIVED' WHERE id=? AND is_archived=0";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, now());
+            pstm.setInt(2, id);
+            int updated = pstm.executeUpdate();
+            if (updated == 0) {
+                throw new RuntimeException("Utilisateur introuvable ou deja archive.");
+            }
         } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la suppression de l'utilisateur : " + e.getMessage(), e);
+            throw new RuntimeException("Erreur lors de l'archivage de l'utilisateur : " + e.getMessage(), e);
+        }
+    }
+
+    public void restoreUser(int id) {
+        ensureConnection();
+        String query = "UPDATE `" + TABLE_NAME + "` SET is_archived=0, archived_at=NULL, account_status='ACTIVE', locked_until='', failed_login_attempts=0 WHERE id=? AND is_archived=1";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setInt(1, id);
+            int updated = pstm.executeUpdate();
+            if (updated == 0) {
+                throw new RuntimeException("Utilisateur introuvable ou non archive.");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la restauration de l'utilisateur : " + e.getMessage(), e);
         }
     }
 
@@ -399,6 +460,9 @@ public class ServiceUser {
         }
         if (user.isCompromisedPassword()) {
             alerts.add("Mot de passe compromis detecte.");
+        }
+        if (user.isArchived()) {
+            alerts.add("Compte archive.");
         }
         if (user.getPasswordScore() < 70) {
             alerts.add("Mot de passe trop faible (" + user.getPasswordScore() + "/100).");
@@ -450,6 +514,10 @@ public class ServiceUser {
                         user.getSecurityAlertSummary()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    public Optional<FitopiaUser> getUserById(int userId) {
+        return refreshUser(userId);
     }
 
     private AuthenticationResult handleFailedAuthentication(FitopiaUser user) {
@@ -640,7 +708,9 @@ public class ServiceUser {
                 + "reset_password_expires_at VARCHAR(50),"
                 + "locked_until VARCHAR(50),"
                 + "last_login_at VARCHAR(50),"
-                + "last_failed_login_at VARCHAR(50)"
+                + "last_failed_login_at VARCHAR(50),"
+                + "is_archived BOOLEAN NOT NULL DEFAULT FALSE,"
+                + "archived_at VARCHAR(50)"
                 + ")";
 
         String historyQuery = "CREATE TABLE IF NOT EXISTS `" + PASSWORD_HISTORY_TABLE + "` ("
@@ -669,6 +739,8 @@ public class ServiceUser {
             ensureColumn("locked_until", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN locked_until VARCHAR(50)");
             ensureColumn("last_login_at", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN last_login_at VARCHAR(50)");
             ensureColumn("last_failed_login_at", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN last_failed_login_at VARCHAR(50)");
+            ensureColumn("is_archived", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT FALSE");
+            ensureColumn("archived_at", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN archived_at VARCHAR(50)");
         } catch (SQLException e) {
             throw new RuntimeException("Impossible de preparer la table utilisateur : " + e.getMessage(), e);
         }
@@ -717,8 +789,10 @@ public class ServiceUser {
         pstm.setString(34, user.getLockedUntil());
         pstm.setString(35, user.getLastLoginAt());
         pstm.setString(36, user.getLastFailedLoginAt());
+        pstm.setBoolean(37, user.isArchived());
+        pstm.setString(38, user.getArchivedAt());
         if (includeId) {
-            pstm.setInt(37, user.getId());
+            pstm.setInt(39, user.getId());
         }
     }
 
@@ -761,6 +835,8 @@ public class ServiceUser {
         user.setLockedUntil(rs.getString("locked_until"));
         user.setLastLoginAt(rs.getString("last_login_at"));
         user.setLastFailedLoginAt(rs.getString("last_failed_login_at"));
+        user.setArchived(rs.getBoolean("is_archived"));
+        user.setArchivedAt(rs.getString("archived_at"));
         return user;
     }
 
@@ -793,9 +869,18 @@ public class ServiceUser {
     }
 
     private Optional<FitopiaUser> findByEmail(String email) {
-        String query = "SELECT * FROM `" + TABLE_NAME + "` WHERE LOWER(email)=LOWER(?) LIMIT 1";
+        return findByEmail(email, false);
+    }
+
+    private Optional<FitopiaUser> findByEmail(String email, Boolean archived) {
+        String query = archived == null
+                ? "SELECT * FROM `" + TABLE_NAME + "` WHERE LOWER(email)=LOWER(?) LIMIT 1"
+                : "SELECT * FROM `" + TABLE_NAME + "` WHERE LOWER(email)=LOWER(?) AND is_archived=? LIMIT 1";
         try (PreparedStatement pstm = cnx.prepareStatement(query)) {
             pstm.setString(1, email);
+            if (archived != null) {
+                pstm.setBoolean(2, archived);
+            }
             try (ResultSet rs = pstm.executeQuery()) {
                 if (rs.next()) {
                     FitopiaUser user = mapUser(rs);
@@ -932,6 +1017,27 @@ public class ServiceUser {
             return digits.substring(3);
         }
         return digits;
+    }
+
+    public List<FitopiaUser> findInactiveUsersForArchiving(int inactiveDays) {
+        return getUsersByArchiveState(false).stream()
+                .filter(user -> shouldSuggestArchiving(user, inactiveDays))
+                .collect(Collectors.toList());
+    }
+
+    private boolean shouldSuggestArchiving(FitopiaUser user, int inactiveDays) {
+        if (user == null || user.isArchived()) {
+            return false;
+        }
+        if (safe(user.getLastLoginAt()).isBlank()) {
+            return true;
+        }
+        try {
+            LocalDateTime lastLogin = LocalDateTime.parse(user.getLastLoginAt(), DATE_FORMATTER);
+            return lastLogin.plusDays(inactiveDays).isBefore(LocalDateTime.now());
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private record ResetChallenge(String code, LocalDateTime expiresAt) {

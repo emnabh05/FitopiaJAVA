@@ -30,6 +30,7 @@ public class AdminDashboardController {
     @FXML private Label adminLabel;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> sortCombo;
+    @FXML private ComboBox<String> archiveFilterCombo;
     @FXML private TextField nomField;
     @FXML private TextField prenomField;
     @FXML private TextField usernameField;
@@ -50,6 +51,7 @@ public class AdminDashboardController {
     @FXML private TableColumn<FitopiaUser, Number> riskCol;
     @FXML private TableColumn<FitopiaUser, String> accountStatusCol;
     @FXML private TableColumn<FitopiaUser, String> securityCol;
+    @FXML private TableColumn<FitopiaUser, String> archivedAtCol;
     @FXML private Label securityDetailsLabel;
     @FXML private Label duplicateScoreLabel;
     @FXML private Label duplicateRecommendationLabel;
@@ -70,6 +72,8 @@ public class AdminDashboardController {
         roleCombo.setItems(FXCollections.observableArrayList("Patient", "Coach", "Nutritionist", "Admin"));
         sortCombo.setItems(FXCollections.observableArrayList("ID desc", "ID asc", "Nom A-Z", "Role A-Z"));
         sortCombo.getSelectionModel().select("ID desc");
+        archiveFilterCombo.setItems(FXCollections.observableArrayList("Actifs", "Archives", "Tous"));
+        archiveFilterCombo.getSelectionModel().select("Actifs");
         setupTable();
         loadUsers();
         usersTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> populateEditor(newV));
@@ -97,6 +101,11 @@ public class AdminDashboardController {
 
     @FXML
     private void handleSort() {
+        applyFilters();
+    }
+
+    @FXML
+    private void handleArchiveFilter() {
         applyFilters();
     }
 
@@ -172,17 +181,36 @@ public class AdminDashboardController {
     @FXML
     private void handleDeleteUser() {
         if (selectedUser == null) {
-            statusLabel.setText("Selectionnez un utilisateur a supprimer.");
+            statusLabel.setText("Selectionnez un utilisateur a archiver.");
             return;
         }
         try {
             int id = selectedUser.getId();
-            serviceUser.delete(id);
+            serviceUser.archiveUser(id);
             selectedUser = null;
             setEditingMode(false);
             clearEditor();
             loadUsers();
-            statusLabel.setText("Utilisateur #" + id + " supprime.");
+            statusLabel.setText("Utilisateur #" + id + " archive.");
+        } catch (RuntimeException e) {
+            statusLabel.setText(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleRestoreUser() {
+        if (selectedUser == null) {
+            statusLabel.setText("Selectionnez un utilisateur a restaurer.");
+            return;
+        }
+        try {
+            int id = selectedUser.getId();
+            serviceUser.restoreUser(id);
+            selectedUser = null;
+            setEditingMode(false);
+            clearEditor();
+            loadUsers();
+            statusLabel.setText("Utilisateur #" + id + " restaure.");
         } catch (RuntimeException e) {
             statusLabel.setText(e.getMessage());
         }
@@ -208,6 +236,7 @@ public class AdminDashboardController {
         riskCol.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getRiskScore()));
         accountStatusCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getAccountStatus())));
         securityCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getSecurityAlertSummary())));
+        archivedAtCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getArchivedAt())));
         usersTable.setItems(users);
     }
 
@@ -221,7 +250,7 @@ public class AdminDashboardController {
     }
 
     private void applyFilters() {
-        List<FitopiaUser> list = serviceUser.getAll();
+        List<FitopiaUser> list = serviceUser.getUsersByArchiveState(resolveArchiveFilter());
         List<AdminSecurityAlert> alertEntries = adminSecurityController.listSecurityAlerts(null, null, false);
         String search = safe(searchField.getText()).trim().toLowerCase();
         if (!search.isEmpty()) {
@@ -268,9 +297,9 @@ public class AdminDashboardController {
         newPasswordField.clear();
         roleCombo.setValue(safe(user.getRole()).isBlank() ? "Patient" : user.getRole());
         UserSecuritySnapshot snapshot = userSecurityController.getSecuritySnapshot(user.getId());
-        securityDetailsLabel.setText(buildSecuritySnapshotText(snapshot));
         UserAiInsightService.DuplicateDetectionResult duplicateResult =
                 userAiInsightService.detectPotentialDuplicates(user, serviceUser.getAll());
+        securityDetailsLabel.setText(buildSecuritySnapshotText(snapshot, duplicateResult));
         duplicateScoreLabel.setText(duplicateResult.duplicateScore() + "/100");
         duplicateRecommendationLabel.setText(duplicateResult.recommendation());
         duplicateFindingsLabel.setText(String.join(" | ", duplicateResult.findings()));
@@ -312,12 +341,38 @@ public class AdminDashboardController {
         return value == null ? "" : value;
     }
 
+    private Boolean resolveArchiveFilter() {
+        String filter = safe(archiveFilterCombo.getValue());
+        if ("Archives".equalsIgnoreCase(filter)) {
+            return true;
+        }
+        if ("Tous".equalsIgnoreCase(filter)) {
+            return null;
+        }
+        return false;
+    }
+
     private String buildSecuritySnapshotText(UserSecuritySnapshot snapshot) {
-        return "Score mot de passe: " + snapshot.passwordScore() + "/100 (" + snapshot.passwordStrength() + ")"
-                + " | Risque: " + snapshot.riskScore()
-                + " | Echecs: " + snapshot.failedLoginAttempts()
-                + " | Statut: " + snapshot.accountStatus()
-                + " | Dernier changement: " + safe(snapshot.passwordLastChangedAt())
-                + " | Alertes: " + String.join(" / ", snapshot.alerts());
+        return buildSecuritySnapshotText(snapshot, null);
+    }
+
+    private String buildSecuritySnapshotText(UserSecuritySnapshot snapshot, UserAiInsightService.DuplicateDetectionResult duplicateResult) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Score mot de passe: ").append(snapshot.passwordScore()).append("/100 (").append(snapshot.passwordStrength()).append(")")
+                .append(" | Risque: ").append(snapshot.riskScore())
+                .append(" | Echecs: ").append(snapshot.failedLoginAttempts())
+                .append(" | Statut: ").append(snapshot.accountStatus())
+                .append(" | Dernier changement: ").append(safe(snapshot.passwordLastChangedAt()))
+                .append(" | Alertes: ").append(String.join(" / ", snapshot.alerts()));
+
+        if (duplicateResult != null) {
+            builder.append("\n\nDoublons IA -> Score: ")
+                    .append(duplicateResult.duplicateScore())
+                    .append("/100 | Recommandation: ")
+                    .append(duplicateResult.recommendation())
+                    .append(" | Details: ")
+                    .append(String.join(" / ", duplicateResult.findings()));
+        }
+        return builder.toString();
     }
 }

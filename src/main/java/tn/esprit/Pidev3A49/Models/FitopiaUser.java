@@ -38,6 +38,8 @@ public class FitopiaUser {
     private String lockedUntil;
     private String lastLoginAt;
     private String lastFailedLoginAt;
+    private boolean archived;
+    private String archivedAt;
     private String securityAlertSummary;
 
     public int getId() { return id; }
@@ -114,6 +116,10 @@ public class FitopiaUser {
     public void setLastLoginAt(String lastLoginAt) { this.lastLoginAt = lastLoginAt; }
     public String getLastFailedLoginAt() { return lastFailedLoginAt; }
     public void setLastFailedLoginAt(String lastFailedLoginAt) { this.lastFailedLoginAt = lastFailedLoginAt; }
+    public boolean isArchived() { return archived; }
+    public void setArchived(boolean archived) { this.archived = archived; }
+    public String getArchivedAt() { return archivedAt; }
+    public void setArchivedAt(String archivedAt) { this.archivedAt = archivedAt; }
     public String getSecurityAlertSummary() { return securityAlertSummary; }
     public void setSecurityAlertSummary(String securityAlertSummary) { this.securityAlertSummary = securityAlertSummary; }
 }

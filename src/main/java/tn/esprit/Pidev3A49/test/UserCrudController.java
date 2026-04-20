@@ -67,6 +67,7 @@ public class UserCrudController {
     @FXML private Label aiPhoneLabel;
     @FXML private TextArea aiBioArea;
     @FXML private TextArea aiSummaryArea;
+    @FXML private ComboBox<String> archiveFilterCombo;
     @FXML private TableView<FitopiaUser> userTable;
     @FXML private TableColumn<FitopiaUser, Number> idColumn;
     @FXML private TableColumn<FitopiaUser, String> fullNameColumn;
@@ -74,6 +75,8 @@ public class UserCrudController {
     @FXML private TableColumn<FitopiaUser, String> emailColumn;
     @FXML private TableColumn<FitopiaUser, String> roleColumn;
     @FXML private TableColumn<FitopiaUser, String> phoneColumn;
+    @FXML private TableColumn<FitopiaUser, String> archiveStatusColumn;
+    @FXML private TableColumn<FitopiaUser, String> archivedAtColumn;
 
     private final ServiceUser serviceUser = new ServiceUser();
     private final UserAiInsightService userAiInsightService = new UserAiInsightService();
@@ -86,6 +89,8 @@ public class UserCrudController {
     public void initialize() {
         fitnessLevelCombo.setItems(FXCollections.observableArrayList("None", "Beginner", "Intermediate", "Advanced"));
         fitnessLevelCombo.getSelectionModel().select("Beginner");
+        archiveFilterCombo.setItems(FXCollections.observableArrayList("Actifs", "Archives", "Tous"));
+        archiveFilterCombo.getSelectionModel().select("Actifs");
         birthDatePicker.setValue(LocalDate.now().minusYears(20));
         configureTable();
         applyRole("Patient");
@@ -150,13 +155,34 @@ public class UserCrudController {
 
     @FXML
     private void handleDeleteUser() {
+        handleArchiveUser();
+    }
+
+    @FXML
+    private void handleArchiveUser() {
         if (selectedUser == null) {
-            setStatus("Selectionnez un utilisateur a supprimer.");
+            setStatus("Selectionnez un utilisateur a archiver.");
             return;
         }
         try {
-            serviceUser.delete(selectedUser.getId());
-            setStatus("Utilisateur supprime avec succes.");
+            serviceUser.archiveUser(selectedUser.getId());
+            setStatus("Utilisateur archive avec succes.");
+            clearForm();
+            loadUsers();
+        } catch (RuntimeException e) {
+            setStatus(e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleRestoreUser() {
+        if (selectedUser == null) {
+            setStatus("Selectionnez un utilisateur a restaurer.");
+            return;
+        }
+        try {
+            serviceUser.restoreUser(selectedUser.getId());
+            setStatus("Utilisateur restaure avec succes.");
             clearForm();
             loadUsers();
         } catch (RuntimeException e) {
@@ -168,6 +194,11 @@ public class UserCrudController {
     private void handleRefresh() {
         loadUsers();
         setStatus("Liste actualisee.");
+    }
+
+    @FXML
+    private void handleFilterChanged() {
+        loadUsers();
     }
 
     @FXML
@@ -221,6 +252,16 @@ public class UserCrudController {
     }
 
     @FXML
+    private void handleSuggestArchive() {
+        if (selectedUser == null) {
+            setStatus("Selectionnez un utilisateur pour obtenir une suggestion d'archivage.");
+            return;
+        }
+        UserAiInsightService.ArchiveSuggestion suggestion = userAiInsightService.suggestArchiveCandidate(selectedUser, 90);
+        setStatus("IA archivage: score " + suggestion.score() + "/100. " + suggestion.rationale());
+    }
+
+    @FXML
     private void handleHome() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/User.fxml"));
@@ -245,6 +286,8 @@ public class UserCrudController {
         emailColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getEmail()));
         roleColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getRole()));
         phoneColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(valueOrEmpty(data.getValue().getPhone())));
+        archiveStatusColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().isArchived() ? "Archive" : "Actif"));
+        archivedAtColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(valueOrEmpty(data.getValue().getArchivedAt())));
         userTable.setItems(users);
     }
 
@@ -254,8 +297,9 @@ public class UserCrudController {
             setStatus("Connexion MySQL indisponible. Verifiez fitopiabd.");
             return;
         }
-        users.setAll(serviceUser.getAll());
-        setStatus(users.size() + " utilisateur(s) charges depuis fitopiabd.");
+        users.setAll(serviceUser.getUsersByArchiveState(resolveArchiveFilter()));
+        int inactiveCandidates = serviceUser.findInactiveUsersForArchiving(90).size();
+        setStatus(users.size() + " utilisateur(s) charges depuis fitopiabd. Suggestions IA archivage: " + inactiveCandidates + ".");
     }
 
     private void populateForm(FitopiaUser user) {
@@ -402,6 +446,17 @@ public class UserCrudController {
         aiPhoneLabel.setText("-");
         aiBioArea.clear();
         aiSummaryArea.clear();
+    }
+
+    private Boolean resolveArchiveFilter() {
+        String filter = archiveFilterCombo == null ? "Actifs" : archiveFilterCombo.getValue();
+        if ("Archives".equalsIgnoreCase(filter)) {
+            return true;
+        }
+        if ("Tous".equalsIgnoreCase(filter)) {
+            return null;
+        }
+        return false;
     }
 
     private void applyRole(String role) {

@@ -5,6 +5,7 @@ import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 public class UserAiInsightService {
@@ -135,6 +136,49 @@ public class UserAiInsightService {
 
         score = Math.min(score, 100);
         return new DuplicateDetectionResult(score, findings, buildDuplicateRecommendation(score));
+    }
+
+    public ArchiveSuggestion suggestArchiveCandidate(FitopiaUser user, int inactiveDaysThreshold) {
+        if (user == null) {
+            return new ArchiveSuggestion(false, 0, "Aucun utilisateur a analyser.");
+        }
+        if (user.isArchived()) {
+            return new ArchiveSuggestion(false, 0, "Le compte est deja archive.");
+        }
+
+        int score = 0;
+        List<String> reasons = new ArrayList<>();
+        if (safe(user.getLastLoginAt()).isBlank()) {
+            score += 45;
+            reasons.add("aucune connexion recente tracee");
+        } else {
+            try {
+                LocalDateTime lastLogin = LocalDateTime.parse(user.getLastLoginAt());
+                long inactiveDays = java.time.Duration.between(lastLogin, LocalDateTime.now()).toDays();
+                if (inactiveDays >= inactiveDaysThreshold) {
+                    score += 55;
+                    reasons.add("inactivite de " + inactiveDays + " jours");
+                }
+            } catch (Exception ignored) {
+                score += 20;
+                reasons.add("date de derniere connexion inexploitable");
+            }
+        }
+        if (safe(user.getSecurityAlertSummary()).contains("Aucune alerte critique")) {
+            score += 10;
+            reasons.add("pas d'alerte critique bloquante");
+        }
+        if ("Patient".equalsIgnoreCase(user.getRole())) {
+            score += 10;
+            reasons.add("profil standard facilement archivable");
+        }
+
+        score = Math.min(score, 100);
+        boolean recommended = score >= 60;
+        String reason = reasons.isEmpty()
+                ? "Le comportement ne justifie pas un archivage automatique."
+                : "Suggestion IA: " + String.join(", ", reasons) + ".";
+        return new ArchiveSuggestion(recommended, score, reason);
     }
 
     private int computeCompleteness(FitopiaUser user) {
@@ -471,6 +515,13 @@ public class UserAiInsightService {
             int duplicateScore,
             List<String> findings,
             String recommendation
+    ) {
+    }
+
+    public record ArchiveSuggestion(
+            boolean recommended,
+            int score,
+            String rationale
     ) {
     }
 }
