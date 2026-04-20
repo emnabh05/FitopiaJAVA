@@ -57,6 +57,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -2788,7 +2790,9 @@ public class MainController {
                        .readTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                        .build();
     
-                    HttpUrl.Builder urlBuilder = HttpUrl.parse("https://api.spoonacular.com/mealplanner/generate").newBuilder();
+                    HttpUrl parsedUrl = HttpUrl.parse("https://api.spoonacular.com/mealplanner/generate");
+                    if (parsedUrl == null) throw new IOException("URL API Invalide");
+                    HttpUrl.Builder urlBuilder = parsedUrl.newBuilder();
                     urlBuilder.addQueryParameter("timeFrame", "week");
                     urlBuilder.addQueryParameter("targetCalories", String.valueOf(cibles));
                     String dietParam = diet.toLowerCase().trim();
@@ -2932,9 +2936,6 @@ public class MainController {
         dict.put("mushroom", "Champignons");
         dict.put("shrimp", "Crevettes");
         dict.put("tuna", "Thon");
-        dict.put("pasta", "Pâtes");
-        dict.put("noodle", "Nouilles");
-        dict.put("rice", "Riz");
         dict.put("brown", "Complet");
         dict.put("white", "Blanc");
         dict.put("sweet", "Doux");
