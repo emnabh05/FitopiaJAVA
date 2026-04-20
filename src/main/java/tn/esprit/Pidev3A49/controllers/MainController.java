@@ -3186,8 +3186,7 @@ public class MainController {
                 return;
             }
             
-            // Traiter le code-barres manuel
-            // Le traitement est maintenant géré par le onAction ci-dessus
+            // Le traitement du code-barres manuel est géré par le onAction ci-dessus
         });
         
         // Permettre l'appui sur Entrée dans le champ de saisie
@@ -3403,8 +3402,8 @@ public class MainController {
                         // Ajouter des boutons personnalisés selon compatibilité
                         if (isCompatible) {
                             ButtonType addButton = new ButtonType("Ajouter aux calories du jour");
-                            ButtonType cancelButton = new ButtonType("Fermer");
-                            alert.getButtonTypes().setAll(addButton, cancelButton);
+                            ButtonType closeButton = new ButtonType("Fermer");
+                            alert.getButtonTypes().setAll(addButton, closeButton);
                             
                             Optional<ButtonType> result = alert.showAndWait();
                             
