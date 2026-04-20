@@ -444,8 +444,8 @@ public class MainController {
         if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
 
         if (cbRegimeSort != null && cbRegimeSort.getItems().isEmpty()) {
-            cbRegimeSort.setItems(FXCollections.observableArrayList("Calories \u2193", "Calories \u2191", "Recent"));
-            cbRegimeSort.setValue("Calories \u2193");
+            cbRegimeSort.setItems(FXCollections.observableArrayList("Calories ↓", "Calories ↑", "Recent"));
+            cbRegimeSort.setValue("Calories ↓");
         }
         if (cbRegimeTypeSearch != null && cbRegimeTypeSearch.getItems().isEmpty()) {
             List<String> types = new java.util.ArrayList<>(List.of("Tous les types"));
@@ -473,9 +473,9 @@ public class MainController {
                 .filter(r -> typeFilter == null || typeFilter.equals("Tous les types") || typeFilter.equals(r.getTypeSante()))
                 .toList());
 
-            if ("Calories \u2193".equals(sortValue)) {
+            if ("Calories ↓".equals(sortValue)) {
                 filtered.sort((a,b) -> Integer.compare(b.getCaloriesCibles()==null?0:b.getCaloriesCibles(), a.getCaloriesCibles()==null?0:a.getCaloriesCibles()));
-            } else if ("Calories \u2191".equals(sortValue)) {
+            } else if ("Calories ↑".equals(sortValue)) {
                 filtered.sort((a,b) -> Integer.compare(a.getCaloriesCibles()==null?0:a.getCaloriesCibles(), b.getCaloriesCibles()==null?0:b.getCaloriesCibles()));
             } else {
                 filtered.sort((a,b) -> Integer.compare(b.getId(), a.getId()));
@@ -869,7 +869,7 @@ public class MainController {
     private void configurerValidationRepas(TextField nomField, TextArea descField, TextField protField, TextField glucField, TextField lipField, TextField calField) {
         if (nomField == null || descField == null || protField == null || glucField == null || lipField == null || calField == null) return;
         
-        calField.setEditable(false); // Calcul automatique, donc on l'empeche d'editer manuellement
+        calField.setEditable(false);
 
         nomField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() < 5) {
@@ -899,7 +899,7 @@ public class MainController {
 
         protField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                protField.setText(newValue.replaceAll("[^\\d]", ""));
+                protField.setText(newValue.replaceAll("\\D", ""));
             } else {
                 calculCalories.run();
                 protField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
@@ -908,7 +908,7 @@ public class MainController {
 
         glucField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                glucField.setText(newValue.replaceAll("[^\\d]", ""));
+                glucField.setText(newValue.replaceAll("\\D", ""));
             } else {
                 calculCalories.run();
                 glucField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
@@ -917,7 +917,7 @@ public class MainController {
 
         lipField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*")) {
-                lipField.setText(newValue.replaceAll("[^\\d]", ""));
+                lipField.setText(newValue.replaceAll("\\D", ""));
             } else {
                 calculCalories.run();
                 lipField.setStyle(newValue.isEmpty() ? "-fx-border-color: #bb2d22; -fx-font-weight: 900;" : "-fx-border-color: #168163; -fx-font-weight: 900;");
@@ -1007,24 +1007,6 @@ public class MainController {
         }
         if (comboBox.getValue() == null && !filtered.isEmpty()) {
             comboBox.setValue(filtered.get(0));
-        }
-    }
-
-    private void appliquerSelectionsFrontParDefaut() {
-        User referenceUser = determinerUtilisateurReference();
-        if (referenceUser != null) {
-            if (cbRegimeUser != null && cbRegimeUser.getValue() == null) {
-                cbRegimeUser.setValue(referenceUser);
-            }
-            if (cbRepasUser != null && cbRepasUser.getValue() == null) {
-                cbRepasUser.setValue(referenceUser);
-            }
-        }
-        if (dpDateRepas != null && dpDateRepas.getValue() == null) {
-            dpDateRepas.setValue(LocalDate.now());
-        }
-        if (cbTypeRepas != null && cbTypeRepas.getValue() == null) {
-            cbTypeRepas.setValue(TYPE_PETIT_DEJEUNER);
         }
     }
 
@@ -1133,7 +1115,7 @@ public class MainController {
                 lblBadgeHydrationDesc.setText("Objectif : 1L par jour (" + verresEau + "/5 verres)");
             }
 
-            boolean semaineParfaite = curKcal > 0 && Math.abs(curKcal - target) <= (target * 0.05); // within 5%
+            boolean semaineParfaite = curKcal > 0 && Math.abs(curKcal - target) <= (target * 0.05);
             
             styleBadge(paneBadgeWinStreak, lblBadgeWinStreakIcon, lblBadgeWinStreakTitle, lblBadgeWinStreakDesc, semaineParfaite);
             styleBadge(paneBadgeHydration, lblBadgeHydrationIcon, lblBadgeHydrationTitle, lblBadgeHydrationDesc, hydratationOk);
@@ -1150,7 +1132,6 @@ public class MainController {
                     : repasAffiches.stream().map(this::creerCarteMiniRepas).toList());
         }
 
-        // Logic for refreshing current view lists
         rafraichirListesDashboard();
         actualiserSelectionRepasJointure();
     }
@@ -1361,28 +1342,6 @@ public class MainController {
         return null;
     }
 
-    private RegimeAlimentaire determinerRegimeReference(User user) {
-        return allRegimes.stream()
-                .filter(regime -> user == null || (regime.getUserId() != null && regime.getUserId() == user.getId()))
-                .max(Comparator.comparingInt(RegimeAlimentaire::getId))
-                .orElse(allRegimes.isEmpty() ? null : allRegimes.get(Math.max(0, allRegimes.size() - 1)));
-    }
-
-    private List<Repas> filtrerRepasDuJour(User user) {
-        LocalDate today = LocalDate.now();
-        return allRepas.stream()
-                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
-                .filter(repas -> repas.getDateRepas() != null && repas.getDateRepas().toLocalDate().equals(today))
-                .toList();
-    }
-
-    private List<Repas> derniersRepas(User user, int limit) {
-        return allRepas.stream()
-                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
-                .limit(limit)
-                .toList();
-    }
-
     private int sommeRepas(List<Repas> repas, Function<Repas, Integer> extractor) {
         return repas.stream()
                 .map(extractor)
@@ -1405,25 +1364,22 @@ public class MainController {
     }
 
     private int calculerCaloriesCibles(double poids, double taille, Integer age, double bmi) {
-        int valAge = (age != null && age > 0) ? age : 30; // 30 ans par defaut
-        // Formule de Mifflin-St Jeor (Moyenne homme/femme)
+        int valAge = (age != null && age > 0) ? age : 30;
         double bmr = (10.0 * poids) + (6.25 * taille) - (5.0 * valAge) + 5;
         
-        // Calories de maintenance (Sédentaire/Légèrement actif)
         double maintenance = bmr * 1.375;
         int calories = (int) Math.round(maintenance);
 
-        // Ajustement clinique selon l'IMC
         if (bmi < 18.5) {
-            calories += 400; // Prise de masse
+            calories += 400;
         } else if (bmi >= 30) {
-            calories -= 800; // Déficit agressif
+            calories -= 800;
         } else if (bmi >= 25) {
-            calories -= 400; // Déficit modéré
+            calories -= 400;
         }
 
-        int caloriesFinales = Math.max(calories, 1200); // Minimum vital
-        return Math.min(caloriesFinales, 4000); // Plafond de sécurité pour régime cohérent
+        int caloriesFinales = Math.max(calories, 1200);
+        return Math.min(caloriesFinales, 4000);
     }
 
     private String genererRepasAdequats(String typeSante, Integer age) {
@@ -1445,16 +1401,6 @@ public class MainController {
         }
         String normalized = value.replace('_', ' ');
         return normalized.substring(0, 1).toUpperCase(Locale.ROOT) + normalized.substring(1);
-    }
-
-    private int compterElementsRepas(String value) {
-        if (value == null || value.isBlank()) {
-            return 0;
-        }
-        return (int) java.util.Arrays.stream(value.split("[,;\\n]"))
-                .map(String::trim)
-                .filter(item -> !item.isBlank())
-                .count();
     }
 
     private double ratio(int value, int target) {
@@ -1479,7 +1425,7 @@ public class MainController {
         if (icon != null) {
             icon.getStyleClass().removeAll("badge-icon-locked", "badge-icon-unlocked");
             icon.getStyleClass().add(active ? "badge-icon-unlocked" : "badge-icon-locked");
-            icon.setText(active ? "\u2714" : "\uD83D\uDD12"); 
+            icon.setText(active ? "✔" : "🔒"); 
         }
         
         if (title != null) {
@@ -1508,13 +1454,12 @@ public class MainController {
 
         Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
         calories.getStyleClass().add("planner-meal-kcal");
-        calories.setStyle("-fx-text-fill: #059669;"); // Un peu de vert sur les calories
+        calories.setStyle("-fx-text-fill: #059669;");
 
-        // Barre de calories verte
         ProgressBar pb = new ProgressBar(1.0);
         pb.setMaxWidth(Double.MAX_VALUE);
         pb.setPrefHeight(6);
-        pb.setStyle("-fx-accent: #10b981;"); // Green
+        pb.setStyle("-fx-accent: #10b981;");
         
         VBox box = new VBox(6, title, meta, calories, pb);
         box.getStyleClass().add("planner-meal-card");
@@ -1527,7 +1472,7 @@ public class MainController {
         container.getStyleClass().add("regime-list-card");
         container.setStyle("-fx-background-color: white; -fx-padding: 12; -fx-background-radius: 12; -fx-border-color: #f1f5f9; -fx-alignment: CENTER_LEFT;");
         
-        StackPane iconBox = new StackPane(new Label("&#128153;"));
+        StackPane iconBox = new StackPane(new Label("💖"));
         iconBox.setStyle("-fx-background-color: #f1f5f9; -fx-background-radius: 8; -fx-padding: 10;");
         
         VBox texts = new VBox(2);
@@ -1574,9 +1519,8 @@ public class MainController {
             String desktop = System.getProperty("user.home") + java.io.File.separator + "Desktop";
             String fileName = desktop + java.io.File.separator + "Regime_" + regime.getId() + ".pdf";
 
-            // ── Colors ─────────────────────────────
-            float[] darkGreen  = {0.04f, 0.36f, 0.29f};  // #0a5c4a
-            float[] lightGreen = {0.88f, 0.97f, 0.93f};  // #e1f7ee
+            float[] darkGreen  = {0.04f, 0.36f, 0.29f};
+            float[] lightGreen = {0.88f, 0.97f, 0.93f};
             float[] white      = {1f, 1f, 1f};
             float[] darkText   = {0.07f, 0.13f, 0.20f};
 
@@ -1585,8 +1529,8 @@ public class MainController {
                         org.apache.pdfbox.pdmodel.common.PDRectangle.A4);
                 doc.addPage(page);
 
-                float W = page.getMediaBox().getWidth();   // 595
-                float H = page.getMediaBox().getHeight();  // 842
+                float W = page.getMediaBox().getWidth();
+                float H = page.getMediaBox().getHeight();
 
                 org.apache.pdfbox.pdmodel.PDPageContentStream cs =
                         new org.apache.pdfbox.pdmodel.PDPageContentStream(doc, page);
@@ -1594,12 +1538,10 @@ public class MainController {
                 org.apache.pdfbox.pdmodel.font.PDType1Font bold    = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA_BOLD;
                 org.apache.pdfbox.pdmodel.font.PDType1Font regular = org.apache.pdfbox.pdmodel.font.PDType1Font.HELVETICA;
 
-                // ── Header Banner ───────────────────
                 cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
                 cs.addRect(0, H - 110, W, 110);
                 cs.fill();
 
-                // Header text
                 cs.beginText();
                 cs.setFont(bold, 26);
                 cs.setNonStrokingColor(white[0], white[1], white[2]);
@@ -1615,12 +1557,10 @@ public class MainController {
                 cs.showText("Regime #" + regime.getId() + "   Type : " + typeSante + "   Genere le : " + java.time.LocalDate.now());
                 cs.endText();
 
-                // ── Light green divider ──────────────
                 cs.setNonStrokingColor(lightGreen[0], lightGreen[1], lightGreen[2]);
                 cs.addRect(0, H - 116, W, 6);
                 cs.fill();
 
-                // ── Section : Données du régime ────
                 float y = H - 160;
                 cs.beginText();
                 cs.setFont(bold, 14);
@@ -1629,14 +1569,12 @@ public class MainController {
                 cs.showText("Donnees du regime");
                 cs.endText();
 
-                // Underline
                 cs.setStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
                 cs.setLineWidth(1.5f);
                 cs.moveTo(40, y - 4);
                 cs.lineTo(W - 40, y - 4);
                 cs.stroke();
 
-                // ── Table rows ──────────────────────
                 String[][] rows = {
                     {"Utilisateur",      valeurOuDefaut(determinerUtilisateurReference() == null ? null : determinerUtilisateurReference().getEmail(), "N/A")},
                     {"Type de sante",    valeurOuDefaut(regime.getTypeSante(), "N/A")},
@@ -1650,7 +1588,6 @@ public class MainController {
 
                 float rowH = 30, rowY = y - 24;
                 for (int i = 0; i < rows.length; i++) {
-                    // Alternating row background
                     if (i % 2 == 0) {
                         cs.setNonStrokingColor(lightGreen[0], lightGreen[1], lightGreen[2]);
                     } else {
@@ -1659,7 +1596,6 @@ public class MainController {
                     cs.addRect(40, rowY - rowH + 8, W - 80, rowH);
                     cs.fill();
 
-                    // Label
                     cs.beginText();
                     cs.setFont(bold, 11);
                     cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
@@ -1667,7 +1603,6 @@ public class MainController {
                     cs.showText(rows[i][0]);
                     cs.endText();
 
-                    // Value
                     cs.beginText();
                     cs.setFont(regular, 11);
                     cs.setNonStrokingColor(darkText[0], darkText[1], darkText[2]);
@@ -1680,7 +1615,6 @@ public class MainController {
                     rowY -= rowH;
                 }
 
-                // ── Footer ──────────────────────────
                 cs.setNonStrokingColor(darkGreen[0], darkGreen[1], darkGreen[2]);
                 cs.addRect(0, 0, W, 40);
                 cs.fill();
@@ -2058,37 +1992,6 @@ public class MainController {
             boxRepasDeleteEmpty.setManaged(empty);
             boxRepasDeleteEmpty.setVisible(empty);
         }
-    }
-
-    private HBox creerCarteSuppressionRepas(Repas repas) {
-        Label title = new Label(valeurOuDefaut(repas.getNomRepas(), "Repas sans nom"));
-        title.getStyleClass().add("repas-delete-title");
-
-        Label meta = new Label(valeurOuDefaut(repas.getDateDisplay(), "--") + " · " + valeurOuDefaut(repas.getUserEmail(), "Utilisateur inconnu"));
-        meta.getStyleClass().add("repas-delete-meta");
-
-        Label type = new Label(normaliserTypeRepas(repas.getTypeRepas()));
-        type.getStyleClass().addAll("repas-type-pill", "repas-type-pill-" + slugTypeRepas(repas.getTypeRepas()));
-
-        Label calories = new Label(toMetricValue(repas.getCalories(), "kcal"));
-        calories.getStyleClass().add("repas-delete-calories-pill");
-
-        HBox badges = new HBox(10, type, calories);
-        badges.setAlignment(Pos.CENTER_LEFT);
-
-        VBox content = new VBox(10, title, meta, badges);
-        content.setAlignment(Pos.CENTER_LEFT);
-        HBox.setHgrow(content, javafx.scene.layout.Priority.ALWAYS);
-
-        Button deleteButton = new Button("Supprimer");
-        deleteButton.getStyleClass().add("repas-delete-button");
-        deleteButton.setOnAction(event -> confirmerSuppressionDepuisCarte(repas));
-
-        HBox card = new HBox(16, content, deleteButton);
-        card.setAlignment(Pos.CENTER_LEFT);
-        card.getStyleClass().add("repas-delete-card");
-        card.setMaxWidth(Double.MAX_VALUE);
-        return card;
     }
 
     private void confirmerSuppressionDepuisCarte(Repas repas) {
@@ -2531,8 +2434,9 @@ public class MainController {
         alert.showAndWait();
     }
 
-    private static final String API_KEY_SPOONACULAR = "30a9a10cfa384b50bdc269ec539acdbe";
-    private static final String API_KEY_LOGMEAL = "0bd3f6e3a12c39aa3543f0839869df408c112f66";
+    private static final String API_KEY_SPOONACULAR = "02582f34796041079ba6f1943bf1e028"; // Clef Spoonacular IA
+    
+    @FXML private BorderPane rootPane;
 
     @FXML
     void afficherPopupScanIA(javafx.event.ActionEvent event) {
@@ -2572,7 +2476,7 @@ public class MainController {
 
             new Thread(() -> {
                 try {
-                    // 1. Détection de l'aliment avec Spoonacular Vision (Remplace LogMeal)
+                    // 1. Détection de l'aliment avec Spoonacular Vision
                     String detectedCategory = detecterFoodSpoonacular(file);
                     
                     if (detectedCategory == null || detectedCategory.equalsIgnoreCase("Plat inconnu")) {
@@ -2664,7 +2568,7 @@ public class MainController {
     }
 
     @FXML
-    void afficherProgrammeHebdomadaire(javafx.event.ActionEvent event) {
+    private void afficherProgrammeHebdomadaire() {
         masquerTousLesFormulaires();
         RegimeAlimentaire regime = getActualActiveRegime();
         if (regime == null) {
@@ -2741,7 +2645,7 @@ public class MainController {
                 // Feedback visuel : Rouge pour indiquer que c'est mange
                 mealPill.setStyle("-fx-background-color: #fee2e2; -fx-background-radius: 10; -fx-padding: 12; -fx-border-color: #ef4444; -fx-border-width: 2;");
                 lblNom.setStyle("-fx-font-weight: 700; -fx-text-fill: #b91c1c;");
-                btnAdd.setText("✓");
+                btnAdd.setText("✔");
                 btnAdd.setDisable(true); // Eviter les doubles clics accidentels
                 btnAdd.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-font-weight: 900;");
             });
@@ -2869,7 +2773,7 @@ public class MainController {
                             alertLoading.hide();
                             actualiserDashboardPlanner();
                             rafraichirDonnees();
-                            afficherProgrammeHebdomadaire(null);
+                            afficherProgrammeHebdomadaire();
                             showInfo("✨ Magie IA Réussie ✨", "L'IA Spoonacular vient de générer et insérer exactement " + finalCount + " repas structurés sur 7 jours ! Ils complètent parfaitement vos " + cibles + " kcal quotidiennes.");
                         });
                     }
@@ -3076,7 +2980,7 @@ public class MainController {
                 if (webcam == null) {
                     Platform.runLater(() -> {
                         showError("Erreur Webcam", "Aucune webcam détectée sur cet ordinateur.");
-                        stopperBarcodeScanner(null);
+                        stopperBarcodeScanner();
                     });
                     return;
                 }
@@ -3116,7 +3020,7 @@ public class MainController {
     }
 
     @FXML
-    void stopperBarcodeScanner(javafx.event.ActionEvent event) {
+    void stopperBarcodeScanner() {
         isScanning = false;
         if (webcam != null && webcam.isOpen()) webcam.close();
         paneBarcodeScanner.setVisible(false);
@@ -3195,8 +3099,8 @@ public class MainController {
         if (tfRepasNom != null) tfRepasNom.setText(lastScannedNom);
         if (tfRepasCalories != null) tfRepasCalories.setText(lastScannedCalories);
         
-        stopperBarcodeScanner(null);
-        afficherCreationRepas(null); // Ouvre le formulaire pour finir la saisie
+        stopperBarcodeScanner();
+        afficherCreationRepas(); // Ouvre le formulaire pour finir la saisie
     }
 
     @FXML
