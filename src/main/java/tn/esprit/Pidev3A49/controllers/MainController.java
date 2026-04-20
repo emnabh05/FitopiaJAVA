@@ -373,16 +373,26 @@ public class MainController {
     private long lastScanTime = 0;
 
     public void traiterCodeDepuisTelephone(String barcode) {
-        long currentScanTime = System.currentTimeMillis();
-        // Ignore le même code-barres s'il est scanné à moins de 5 secondes d'intervalle
-        if (barcode.equals(lastScannedBarcode) && (currentScanTime - lastScanTime) < 5000) {
+        if (barcode == null || barcode.trim().isEmpty()) {
+            System.err.println("Code-barres ignoré car nul ou vide.");
             return;
         }
+        barcode = barcode.trim();
+
+        long currentScanTime = System.currentTimeMillis();
+        System.out.println("[\u23F1\uFE0F Debug] Code recu: '" + barcode + "', Dernier: '" + lastScannedBarcode + "', Delai: " + (currentScanTime - lastScanTime) + "ms");
+
+        // Ignore le même code-barres s'il est scanné à moins de 3 secondes d'intervalle
+        if (barcode.equals(lastScannedBarcode) && (currentScanTime - lastScanTime) < 3000) {
+            System.out.println("[\u26A0\uFE0F] Scan ignore (meme code en moins de 3s)");
+            return;
+        }
+        
         lastScannedBarcode = barcode;
         lastScanTime = currentScanTime;
 
         try {
-            System.out.println("\u001B[32m\u2705 Nouveau Code Scanné : " + barcode + "\u001B[0m");
+            System.out.println("\u001B[32m\u2705 Demarrage du traitement pour : " + barcode + "\u001B[0m");
             tn.esprit.Pidev3A49.services.OpenFoodFactsService.ProductInfo produit = openFoodFacts.getProductInfo(barcode);
             RegimeAlimentaire regimeActif = getActualActiveRegime();
             if (regimeActif == null) {
