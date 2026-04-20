@@ -67,6 +67,12 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamResolution;
+import com.google.zxing.*;
+import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
+import javafx.embed.swing.SwingFXUtils;
 
 public class MainController {
 
@@ -96,6 +102,19 @@ public class MainController {
             TYPE_DINER, "#1f8d6a",
             TYPE_COLLATION, "#39b77d"
     );
+
+    @FXML private VBox paneBarcodeScanner;
+    @FXML private ImageView ivBarcodeWebcam;
+    @FXML private Label lblBarcodeStatus;
+    @FXML private Label lblBarcodeNutriScore;
+    @FXML private Label lblBarcodeProductName;
+    @FXML private Label lblBarcodeBrand;
+    @FXML private Label lblBarcodeCompatibility;
+    @FXML private VBox boxBarcodeResult;
+
+    private Webcam webcam = null;
+    private boolean isScanning = false;
+    private String lastScannedCode = "";
 
     @FXML private VBox viewRepas;
     @FXML private VBox viewRegimes;
@@ -3034,9 +3053,154 @@ public class MainController {
     }
 
     @FXML
+    void afficherBarcodeScanner(javafx.event.ActionEvent event) {
+        masquerTousLesFormulaires();
+        paneBarcodeScanner.setVisible(true);
+        paneBarcodeScanner.setManaged(true);
+        boxBarcodeResult.setVisible(false);
+        boxBarcodeResult.setManaged(false);
+        lblBarcodeStatus.setText("Initialisation de la webcam...");
+        isScanning = true;
+        lastScannedCode = "";
+
+        new Thread(() -> {
+            try {
+                if (webcam == null) {
+                    webcam = Webcam.getDefault();
+                    if (webcam != null) {
+                        webcam.setViewSize(WebcamResolution.VGA.getSize());
+                    }
+                }
+
+                if (webcam == null) {
+                    Platform.runLater(() -> {
+                        showError("Erreur Webcam", "Aucune webcam détectée sur cet ordinateur.");
+                        stopperBarcodeScanner(null);
+                    });
+                    return;
+                }
+
+                if (!webcam.isOpen()) webcam.open();
+
+                Platform.runLater(() -> lblBarcodeStatus.setText("En attente d'un code-barres..."));
+
+                while (isScanning) {
+                    BufferedImage image = webcam.getImage();
+                    if (image != null) {
+                        Platform.runLater(() -> ivBarcodeWebcam.setImage(SwingFXUtils.toFXImage(image, null)));
+                        
+                        try {
+                            LuminanceSource source = new BufferedImageLuminanceSource(image);
+                            BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
+                            Result result = new MultiFormatReader().decode(bitmap);
+                            
+                            String code = result.getText();
+                            if (!code.equals(lastScannedCode)) {
+                                lastScannedCode = code;
+                                Platform.runLater(() -> lblBarcodeStatus.setText("Code détecté : " + code));
+                                fetchOpenFoodFacts(code);
+                            }
+                        } catch (NotFoundException e) {
+                            // Pas de code détecté dans cette frame
+                        }
+                    }
+                    Thread.sleep(150);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (webcam != null && webcam.isOpen()) webcam.close();
+            }
+        }).start();
+    }
+
+    @FXML
+    void stopperBarcodeScanner(javafx.event.ActionEvent event) {
+        isScanning = false;
+        if (webcam != null && webcam.isOpen()) webcam.close();
+        paneBarcodeScanner.setVisible(false);
+        paneBarcodeScanner.setManaged(false);
+    }
+
+    private void fetchOpenFoodFacts(String barcode) {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url("https://world.openfoodfacts.org/api/v0/product/" + barcode + ".json")
+                .header("User-Agent", "Fitopia - Windows - Version 1.0")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Platform.runLater(() -> lblBarcodeStatus.setText("Erreur réseau OpenFoodFacts"));
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String json = response.body().string();
+                    JSONObject root = new JSONObject(json);
+                    
+                    if (root.getInt("status") == 1) {
+                        JSONObject product = root.getJSONObject("product");
+                        String name = product.optString("product_name", "Produit inconnu");
+                        String brand = product.optString("brands", "Marque inconnue");
+                        String nutriScore = product.optString("nutriscore_grade", "?").toUpperCase();
+                        
+                        double caloriesPer100 = product.optJSONObject("nutriments") != null ? 
+                                product.optJSONObject("nutriments").optDouble("energy-kcal_100g", 0.0) : 0.0;
+
+                        Platform.runLater(() -> {
+                            lblBarcodeProductName.setText(name);
+                            lblBarcodeBrand.setText(brand);
+                            lblBarcodeNutriScore.setText(nutriScore);
+                            
+                            // Style Nutri-Score
+                            String color = "#9ca3af"; // Gris par défaut
+                            if (nutriScore.equals("A")) color = "#166534"; // Vert foncé
+                            if (nutriScore.equals("B")) color = "#22c55e"; // Vert
+                            if (nutriScore.equals("C")) color = "#eab308"; // Jaune
+                            if (nutriScore.equals("D")) color = "#f97316"; // Orange
+                            if (nutriScore.equals("E")) color = "#ef4444"; // Rouge
+                            lblBarcodeNutriScore.setStyle("-fx-background-color: " + color + "; -fx-text-fill: white; -fx-padding: 10 20; -fx-background-radius: 8;");
+                            
+                            // Vérification compatibilité (Demo simple)
+                            if (nutriScore.equals("D") || nutriScore.equals("E")) {
+                                lblBarcodeCompatibility.setText("⚠️ Attention : Nutri-Score élevé !");
+                                lblBarcodeCompatibility.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold;");
+                            } else {
+                                lblBarcodeCompatibility.setText("✅ Produit sain et compatible.");
+                                lblBarcodeCompatibility.setStyle("-fx-text-fill: #166534; -fx-font-weight: bold;");
+                            }
+
+                            boxBarcodeResult.setVisible(true);
+                            boxBarcodeResult.setManaged(true);
+                            
+                            // On stocke pour l'application finale
+                            lastScannedNom = name;
+                            lastScannedCalories = String.valueOf(Math.round(caloriesPer100)); // On prend pour 100g par défaut
+                        });
+                    } else {
+                        Platform.runLater(() -> lblBarcodeStatus.setText("Produit non trouvé : " + barcode));
+                    }
+                }
+            }
+        });
+    }
+
+    @FXML
+    void appliquerProduitBarcode(javafx.event.ActionEvent event) {
+        // Appliquer les données au formulaire de repas
+        if (tfRepasNom != null) tfRepasNom.setText(lastScannedNom);
+        if (tfRepasCalories != null) tfRepasCalories.setText(lastScannedCalories);
+        
+        stopperBarcodeScanner(null);
+        afficherCreationRepas(null); // Ouvre le formulaire pour finir la saisie
+    }
+
+    @FXML
     void hoverScannerOn(javafx.scene.input.MouseEvent event) {
         javafx.scene.Node btn = (javafx.scene.Node) event.getSource();
-        btn.setStyle("-fx-background-color: #1a7177; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.6), 15, 0, 0, 5); -fx-cursor: hand;");
         btn.setScaleX(1.05);
         btn.setScaleY(1.05);
     }
@@ -3044,7 +3208,6 @@ public class MainController {
     @FXML
     void hoverScannerOff(javafx.scene.input.MouseEvent event) {
         javafx.scene.Node btn = (javafx.scene.Node) event.getSource();
-        btn.setStyle("-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.4), 10, 0, 0, 5); -fx-cursor: hand;");
         btn.setScaleX(1.0);
         btn.setScaleY(1.0);
     }

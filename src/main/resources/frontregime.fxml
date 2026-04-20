@@ -669,36 +669,47 @@
                     </VBox>
                 </VBox>
 
-                <!-- 10. WEEKLY PROGRAM POPUP -->
-                <VBox fx:id="paneWeeklyProgram" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
-                    <VBox maxWidth="1100" maxHeight="750" spacing="0" style="-fx-background-color: #ffffff; -fx-background-radius: 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 40, 0, 0, 20); -fx-overflow: hidden;">
-                        
-                        <!-- Header Premium Vert Sombre -->
-                        <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-background-color: linear-gradient(to right, #0c3f44, #1a7177); -fx-padding: 30; -fx-background-radius: 20 20 0 0;">
-                            <VBox spacing="5" HBox.hgrow="ALWAYS">
-                                <Label text="📅 Mon Programme de Nutrition" style="-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: white;"/>
-                                <Label text="Planning hebdomadaire personnalisé selon vos besoins caloriques." style="-fx-font-size: 14px; -fx-text-fill: #ecfdf5;"/>
+                <!-- 11. BARCODE SCANNER POPUP (OpenFoodFacts) -->
+                <VBox fx:id="paneBarcodeScanner" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.7);">
+                    <VBox maxWidth="600" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 30, 0, 0, 15);">
+                        <HBox alignment="CENTER_LEFT">
+                            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                <Label text="🔳 Scanner de Produits (Live)" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #0c3f44;"/>
+                                <Label text="Pointez le code-barres vers la webcam." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
                             </VBox>
-                            <Button text="Re-générer la semaine" onAction="#genererSemaineIARegimeActif" style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 10 20; -fx-cursor: hand;"/>
-                            <Button onAction="#masquerTousLesFormulaires" text="✕" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 18px; -fx-background-radius: 10; -fx-min-width: 45; -fx-min-height: 45; -fx-cursor: hand;"/>
+                            <Button onAction="#stopperBarcodeScanner" text="✖" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 900; -fx-background-radius: 8; -fx-min-width: 35; -fx-min-height: 35; -fx-cursor: hand;"/>
                         </HBox>
+                        
+                        <StackPane style="-fx-background-color: black; -fx-background-radius: 10; -fx-overflow: hidden; -fx-min-height: 350;">
+                            <ImageView fx:id="ivBarcodeWebcam" fitWidth="550" preserveRatio="true"/>
+                        </StackPane>
 
-                        <ScrollPane fitToWidth="true" style="-fx-background-color: white; -fx-background: white; -fx-padding: 20;">
-                            <VBox fx:id="boxWeeklyDaysContainer" spacing="25" style="-fx-padding: 10;" />
-                        </ScrollPane>
+                        <VBox fx:id="boxBarcodeResult" spacing="10" visible="false" managed="false" style="-fx-background-color: #f0fdf4; -fx-border-color: #22c55e; -fx-border-radius: 10; -fx-padding: 15; -fx-background-radius: 10;">
+                             <HBox spacing="15" alignment="CENTER_LEFT">
+                                 <Label fx:id="lblBarcodeNutriScore" text="?" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900; -fx-padding: 10 20; -fx-background-radius: 8;"/>
+                                 <VBox spacing="2">
+                                     <Label fx:id="lblBarcodeProductName" text="Nom du produit" style="-fx-font-weight: 800; -fx-font-size: 15px; -fx-text-fill: #065f46;"/>
+                                     <Label fx:id="lblBarcodeBrand" text="Marque" style="-fx-font-size: 12px; -fx-text-fill: #166534;"/>
+                                     <Label fx:id="lblBarcodeCompatibility" text="Compatible avec votre régime" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                                 </VBox>
+                             </HBox>
+                             <Button text="➕ Ajouter ce produit à mon suivi" onAction="#appliquerProduitBarcode" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10;" maxWidth="Infinity"/>
+                        </VBox>
 
-                        <HBox alignment="CENTER" style="-fx-padding: 15; -fx-background-color: #f8fafc; -fx-background-radius: 0 0 20 20; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
-                            <Label text="Cliquez sur le 'plus' pour ajouter un plat à votre suivi d'aujourd'hui." style="-fx-text-fill: #64748b; -fx-font-style: italic;"/>
-                        </HBox>
+                        <Label fx:id="lblBarcodeStatus" text="En attente d'un code-barres..." style="-fx-text-fill: #64748b; -fx-font-style: italic;" alignment="CENTER" maxWidth="Infinity"/>
                     </VBox>
                 </VBox>
             </StackPane>
             
             <!-- Floating Buttons -->
-            <Button text="📷 Scanner un plat" onAction="#afficherPopupScanIA" 
-                    onMouseEntered="#hoverScannerOn" onMouseExited="#hoverScannerOff"
-                    style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.4), 10, 0, 0, 5); -fx-cursor: hand;"
-                    StackPane.alignment="BOTTOM_RIGHT" translateX="-24" translateY="-24" />
+            <VBox StackPane.alignment="BOTTOM_RIGHT" spacing="12" translateX="-24" translateY="-24">
+                <Button text="🔳 Scanner Code-Barres" onAction="#afficherBarcodeScanner" 
+                        onMouseEntered="#hoverScannerOn" onMouseExited="#hoverScannerOff"
+                        style="-fx-background-color: #1a7177; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.4), 10, 0, 0, 5); -fx-cursor: hand;" />
+                <Button text="📷 Scanner un plat (IA)" onAction="#afficherPopupScanIA" 
+                        onMouseEntered="#hoverScannerOn" onMouseExited="#hoverScannerOff"
+                        style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-background-radius: 999; -fx-padding: 14 24; -fx-font-weight: 800; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(15,23,42,0.4), 10, 0, 0, 5); -fx-cursor: hand;" />
+            </VBox>
         </StackPane>
     </center>
 </BorderPane>
