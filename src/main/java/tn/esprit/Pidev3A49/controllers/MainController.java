@@ -3284,30 +3284,7 @@ public class MainController {
         barcodeInput.setOnAction(e -> manualScanButton.fire());
         
         
-        // Initialiser le scanner robuste et démarrer le scan
-        new Thread(() -> {
-            try {
-                if (barcodeScanner.initializeCamera()) {
-                    Platform.runLater(() -> {
-                        statusLabel.setText("Scanner robuste prêt! Placez un code-barres dans la zone centrale...");
-                    });
-                    
-                    // Démarrer le scan
-                    barcodeScanner.startScanning();
-                    
-                } else {
-                    Platform.runLater(() -> {
-                        statusLabel.setText("Erreur: Impossible d'initialiser le scanner robuste");
-                        placeholder.setText("Scanner robuste non disponible\n\nCe scanner utilise:\n- Capture d'écran (pas OpenCV)\n- Tous les formats internationaux\n- Pas d'erreurs MSMF\n\nPlacez un code-barres dans la zone centrale de l'écran");
-                    });
-                }
-            } catch (Exception e) {
-                Platform.runLater(() -> {
-                    statusLabel.setText("Erreur: " + e.getMessage());
-                    placeholder.setText("Erreur du scanner robuste: " + e.getMessage() + "\n\nCe scanner utilise capture d'écran\nsans dépendance OpenCV");
-                });
-            }
-        }).start();
+
         
         // Gérer la fermeture de la fenêtre
         scanStage.setOnCloseRequest(e -> {
