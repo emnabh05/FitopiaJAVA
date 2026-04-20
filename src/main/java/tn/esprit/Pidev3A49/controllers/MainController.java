@@ -388,7 +388,7 @@ public class MainController {
     }
 
     public void ouvrirFrontRegimes() {
-        afficherModuleRegimes();
+        afficherModuleRegimes(null);
         masquerTousLesFormulaires();
     }
 
