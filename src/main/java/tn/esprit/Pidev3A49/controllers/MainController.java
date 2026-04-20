@@ -356,18 +356,25 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        initialiserColonnes();
-        initialiserCombos();
-        initialiserExplorateurRepas();
-        initialiserCalculsRegimeAutomatiques();
-        initialiserValidationRepas();
-        initialiserInteractionsRepasRegime();
-        initialiserSelections();
-        initialiserSelectionRepasJointure();
-        rafraichirDonnees();
-        masquerTousLesFormulaires();
-        setupRealTimeValidation();
-        setupDynamicFilters();
+        System.out.println("🚀 [DEBUG] Initialisation du MainController...");
+        try {
+            initialiserColonnes();
+            initialiserCombos();
+            initialiserExplorateurRepas();
+            initialiserCalculsRegimeAutomatiques();
+            initialiserValidationRepas();
+            initialiserInteractionsRepasRegime();
+            initialiserSelections();
+            initialiserSelectionRepasJointure();
+            rafraichirDonnees();
+            masquerTousLesFormulaires();
+            setupRealTimeValidation();
+            setupDynamicFilters();
+            System.out.println("✅ [DEBUG] Initialisation terminée avec succès.");
+        } catch (Exception e) {
+            System.err.println("❌ [ERROR] Échec de l'initialisation : " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void setupDynamicFilters() {
@@ -420,29 +427,33 @@ public class MainController {
 
     @FXML
     private void rafraichirDonnees() {
+        System.out.println("🔄 [DEBUG] Rafraîchissement des données...");
         List<User> users = serviceUser.getAll();
         List<RegimeAlimentaire> regimes = serviceRegime.getAll();
         List<Repas> repas = serviceRepas.getAll();
-        allUsers = List.copyOf(users);
-        allRegimes = List.copyOf(regimes);
+        
+        allUsers = (users != null) ? List.copyOf(users) : List.of();
+        allRegimes = (regimes != null) ? List.copyOf(regimes) : List.of();
 
-        if (cbRepasUser != null) cbRepasUser.setItems(FXCollections.observableArrayList(users));
-        if (cbRepasUserEdit != null) cbRepasUserEdit.setItems(FXCollections.observableArrayList(users));
-        if (cbRegimeUser != null) cbRegimeUser.setItems(FXCollections.observableArrayList(users));
-        if (cbRegimeUserEdit != null) cbRegimeUserEdit.setItems(FXCollections.observableArrayList(users));
+        if (cbRepasUser != null) cbRepasUser.setItems(FXCollections.observableArrayList(allUsers));
+        if (cbRepasUserEdit != null) cbRepasUserEdit.setItems(FXCollections.observableArrayList(allUsers));
+        if (cbRegimeUser != null) cbRegimeUser.setItems(FXCollections.observableArrayList(allUsers));
+        if (cbRegimeUserEdit != null) cbRegimeUserEdit.setItems(FXCollections.observableArrayList(allUsers));
 
-        if (cbRepasRegime != null) cbRepasRegime.setItems(FXCollections.observableArrayList(regimes));
-        if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
+        if (cbRepasRegime != null) cbRepasRegime.setItems(FXCollections.observableArrayList(allRegimes));
+        if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(allRegimes));
 
-        allRepas.setAll(repas);
-        if (tableRepas != null) tableRepas.setItems(FXCollections.observableArrayList(repas));
-        if (tableRepasEdit != null) tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
-        if (tableRepasDelete != null) tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
-        restaurerSelectionRepasEdit(repas);
+        allRepas.setAll(repas != null ? repas : List.of());
+        if (tableRepas != null) tableRepas.setItems(FXCollections.observableArrayList(allRepas));
+        if (tableRepasEdit != null) tableRepasEdit.setItems(FXCollections.observableArrayList(allRepas));
+        if (tableRepasDelete != null) tableRepasDelete.setItems(FXCollections.observableArrayList(allRepas));
+        restaurerSelectionRepasEdit(allRepas);
 
-        if (tableRegimes != null) tableRegimes.setItems(FXCollections.observableArrayList(regimes));
-        if (tableRegimesEdit != null) tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
-        if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
+        if (tableRegimes != null) tableRegimes.setItems(FXCollections.observableArrayList(allRegimes));
+        if (tableRegimesEdit != null) tableRegimesEdit.setItems(FXCollections.observableArrayList(allRegimes));
+        if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(allRegimes));
+        
+        System.out.println("✨ [DEBUG] Données rafraîchies : " + allUsers.size() + " users, " + allRegimes.size() + " régimes, " + allRepas.size() + " repas.");
 
         if (cbRegimeSort != null && cbRegimeSort.getItems().isEmpty()) {
             cbRegimeSort.setItems(FXCollections.observableArrayList("Calories ↓", "Calories ↑", "Recent"));
