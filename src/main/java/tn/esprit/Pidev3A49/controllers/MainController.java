@@ -2531,7 +2531,9 @@ public class MainController {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choisir l'image du repas");
         fileChooser.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Toutes les Images", "*.jpg", "*.png", "*.jpeg", "*.webp", "*.bmp", "*.gif", "*.heic", "*.tiff", "*.jfif", "*.avif"),
+            new FileChooser.ExtensionFilter("Images (JPG, PNG, WebP, HEIC, etc.)", 
+                "*.jpg", "*.jpeg", "*.png", "*.webp", "*.heic", "*.heif", "*.jfif", "*.bmp", "*.gif", "*.tiff", "*.avif",
+                "*.JPG", "*.JPEG", "*.PNG", "*.WEBP", "*.HEIC", "*.HEIF", "*.JFIF", "*.BMP", "*.GIF", "*.TIFF", "*.AVIF"),
             new FileChooser.ExtensionFilter("Tous les fichiers", "*.*")
         );
         
@@ -2943,22 +2945,42 @@ public class MainController {
                 .writeTimeout(60, java.util.concurrent.TimeUnit.SECONDS)
                 .build();
         
-        // --- Compression & Redimensionnement ---
-        BufferedImage originalImage = ImageIO.read(file);
-        if (originalImage == null) throw new IOException("Image invalide. Utilisez JPG ou PNG.");
+        // --- Lecture via JavaFX Image (supporte plus de formats : WebP, etc.) ---
+        javafx.scene.image.Image fxImage = new javafx.scene.image.Image(file.toURI().toString());
+        if (fxImage.isError() || fxImage.getWidth() <= 0) {
+            throw new IOException("Impossible de lire l'image. Assurez-vous qu'il s'agit d'un JPG, PNG ou WebP valide.");
+        }
         
-        int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-        double scale = Math.min(1.0, 600.0 / Math.max(originalImage.getWidth(), originalImage.getHeight()));
-        int targetWidth = (int) (originalImage.getWidth() * scale);
-        int targetHeight = (int) (originalImage.getHeight() * scale);
+        // --- Conversion JavaFX -> BufferedImage ---
+        int width = (int) fxImage.getWidth();
+        int height = (int) fxImage.getHeight();
         
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, type);
-        Graphics2D g = resizedImage.createGraphics();
-        g.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
-        g.dispose();
+        // Calcul du redimensionnement (max 600px)
+        double scale = Math.min(1.0, 600.0 / Math.max(width, height));
+        int targetWidth = (int) (width * scale);
+        int targetHeight = (int) (height * scale);
+        
+        BufferedImage bufferedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        javafx.scene.image.PixelReader pr = fxImage.getPixelReader();
+        
+        // On dessine l'image avec redimensionnement
+        for (int y = 0; y < targetHeight; y++) {
+            for (int x = 0; x < targetWidth; x++) {
+                int srcX = (int) (x / scale);
+                int srcY = (int) (y / scale);
+                if (srcX < width && srcY < height) {
+                    javafx.scene.paint.Color col = pr.getColor(srcX, srcY);
+                    int argb = ((int) (col.getOpacity() * 255) << 24) |
+                               ((int) (col.getRed() * 255) << 16) |
+                               ((int) (col.getGreen() * 255) << 8) |
+                               ((int) (col.getBlue() * 255));
+                    bufferedImage.setRGB(x, y, argb);
+                }
+            }
+        }
         
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "jpg", baos);
+        ImageIO.write(bufferedImage, "jpg", baos);
         byte[] imageBytes = baos.toByteArray();
 
         RequestBody requestBody = new MultipartBody.Builder()
@@ -2967,7 +2989,6 @@ public class MainController {
                         RequestBody.create(imageBytes, MediaType.parse("image/jpeg")))
                 .build();
 
-        // --- Appel Unique Spoonacular Vision ---
         Request request = new Request.Builder()
                 .url("https://api.spoonacular.com/food/images/classify?apiKey=" + API_KEY_SPOONACULAR.trim())
                 .addHeader("x-api-key", API_KEY_SPOONACULAR.trim())
