@@ -3105,7 +3105,7 @@ public class MainController {
                             // Pas de code détecté dans cette frame
                         }
                     }
-                    Thread.sleep(150);
+                    Thread.sleep(50);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

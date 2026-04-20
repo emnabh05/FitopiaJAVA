@@ -639,66 +639,63 @@
                     </ScrollPane>
                 </VBox>
 
-                <!-- 9. SCAN IMAGE POPUP -->
-                <VBox fx:id="paneScanIA" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
-                    <VBox maxWidth="550" spacing="18.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
-                        <HBox alignment="CENTER_RIGHT">
-                            <Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 6 12; -fx-cursor: hand;"/>
-                        </HBox>
-                        
-                        <Label text="Reconnaissance Visuelle de Repas" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #065f46;"/>
-                        <Label text="Téléchargez l'image de votre plat, nous estimerons les calories." style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
-                        
-                        <!-- Cadre Vert de Résultat avec Nom Modifiable -->
-                        <VBox fx:id="boxResultatIA" spacing="10" style="-fx-background-color: #d1fae5; -fx-border-color: #10b981; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;" managed="false" visible="false">
-                             <Label text="Repas détecté (vous pouvez corriger) :" style="-fx-font-weight: 700; -fx-text-fill: #065f46; -fx-font-size: 12px;"/>
-                             <TextField fx:id="tfIARepasNomParticulier" style="-fx-background-color: white; -fx-border-color: #10b981; -fx-border-radius: 5; -fx-font-weight: 800; -fx-text-fill: #065f46;"/>
-                             <Label fx:id="lblIACalories" text="Calories estimées : - kcal" style="-fx-font-weight: 800; -fx-text-fill: #065f46; -fx-font-size: 14px;"/>
-                             <Button fx:id="btnAppliquerCalories" text="💾 Sauvegarder dans mon formulaire" onAction="#appliquerCaloriesScan" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;" maxWidth="Infinity" managed="false" visible="false"/>
-                        </VBox>
+                    </StackPane>
+                </content>
+            </ScrollPane>
 
-                        <!-- Zone d'Importation Image -->
-                        <VBox alignment="CENTER" spacing="20" style="-fx-border-color: #cbd5e1; -fx-border-width: 2; -fx-border-style: dashed; -fx-border-radius: 8; -fx-padding: 30; -fx-background-color: #f8fafc;">
-                             <ImageView fx:id="ivScanImagePreview" fitWidth="300" fitHeight="200" preserveRatio="true"/>
-                             <Button text="📁 Importer la photo" onAction="#chargerImagePourScan" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 12 24; -fx-cursor: hand;"/>
-                        </VBox>
-                        
-                        <VBox alignment="CENTER" spacing="10">
-                             <ProgressBar fx:id="pbScanProgress" prefWidth="300" visible="false"/>
-                        </VBox>
+            <!-- 9. SCAN IMAGE POPUP (FIXED) -->
+            <VBox fx:id="paneScanIA" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
+                <VBox maxWidth="550" spacing="18.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 6 12; -fx-cursor: hand;"/>
+                    </HBox>
+                    <Label text="Reconnaissance Visuelle de Repas" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #065f46;"/>
+                    <Label text="Téléchargez l'image de votre plat, nous estimerons les calories." style="-fx-font-size: 12px; -fx-text-fill: #64748b;"/>
+                    <VBox fx:id="boxResultatIA" spacing="10" style="-fx-background-color: #d1fae5; -fx-border-color: #10b981; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 15;" managed="false" visible="false">
+                         <Label text="Repas détecté (vous pouvez corriger) :" style="-fx-font-weight: 700; -fx-text-fill: #065f46; -fx-font-size: 12px;"/>
+                         <TextField fx:id="tfIARepasNomParticulier" style="-fx-background-color: white; -fx-border-color: #10b981; -fx-border-radius: 5; -fx-font-weight: 800; -fx-text-fill: #065f46;"/>
+                         <Label fx:id="lblIACalories" text="Calories estimées : - kcal" style="-fx-font-weight: 800; -fx-text-fill: #065f46; -fx-font-size: 14px;"/>
+                         <Button fx:id="btnAppliquerCalories" text="💾 Sauvegarder dans mon formulaire" onAction="#appliquerCaloriesScan" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10; -fx-cursor: hand;" maxWidth="Infinity" managed="false" visible="false"/>
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="20" style="-fx-border-color: #cbd5e1; -fx-border-width: 2; -fx-border-style: dashed; -fx-border-radius: 8; -fx-padding: 30; -fx-background-color: #f8fafc;">
+                         <ImageView fx:id="ivScanImagePreview" fitWidth="300" fitHeight="200" preserveRatio="true"/>
+                         <Button text="📁 Importer la photo" onAction="#chargerImagePourScan" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 12 24; -fx-cursor: hand;"/>
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="10">
+                         <ProgressBar fx:id="pbScanProgress" prefWidth="300" visible="false"/>
                     </VBox>
                 </VBox>
+            </VBox>
 
-                <!-- 11. BARCODE SCANNER POPUP (OpenFoodFacts) -->
-                <VBox fx:id="paneBarcodeScanner" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.7);">
-                    <VBox maxWidth="600" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 30, 0, 0, 15);">
-                        <HBox alignment="CENTER_LEFT">
-                            <VBox spacing="2" HBox.hgrow="ALWAYS">
-                                <Label text="🔳 Scanner de Produits (Live)" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #0c3f44;"/>
-                                <Label text="Pointez le code-barres vers la webcam." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
-                            </VBox>
-                            <Button onAction="#stopperBarcodeScanner" text="✖" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 900; -fx-background-radius: 8; -fx-min-width: 35; -fx-min-height: 35; -fx-cursor: hand;"/>
-                        </HBox>
-                        
-                        <StackPane style="-fx-background-color: black; -fx-background-radius: 10; -fx-overflow: hidden; -fx-min-height: 350;">
-                            <ImageView fx:id="ivBarcodeWebcam" fitWidth="550" preserveRatio="true"/>
-                        </StackPane>
-
-                        <VBox fx:id="boxBarcodeResult" spacing="10" visible="false" managed="false" style="-fx-background-color: #f0fdf4; -fx-border-color: #22c55e; -fx-border-radius: 10; -fx-padding: 15; -fx-background-radius: 10;">
-                             <HBox spacing="15" alignment="CENTER_LEFT">
-                                 <Label fx:id="lblBarcodeNutriScore" text="?" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900; -fx-padding: 10 20; -fx-background-radius: 8;"/>
-                                 <VBox spacing="2">
-                                     <Label fx:id="lblBarcodeProductName" text="Nom du produit" style="-fx-font-weight: 800; -fx-font-size: 15px; -fx-text-fill: #065f46;"/>
-                                     <Label fx:id="lblBarcodeBrand" text="Marque" style="-fx-font-size: 12px; -fx-text-fill: #166534;"/>
-                                     <Label fx:id="lblBarcodeCompatibility" text="Compatible avec votre régime" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
-                                 </VBox>
-                             </HBox>
-                             <Button text="➕ Ajouter ce produit à mon suivi" onAction="#appliquerProduitBarcode" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10;" maxWidth="Infinity"/>
+            <!-- 11. BARCODE SCANNER POPUP (FIXED) -->
+            <VBox fx:id="paneBarcodeScanner" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.7);">
+                <VBox maxWidth="600" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 30, 0, 0, 15);">
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="2" HBox.hgrow="ALWAYS">
+                            <Label text="🔳 Scanner de Produits (Live)" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #0c3f44;"/>
+                            <Label text="Pointez le code-barres vers la webcam." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
                         </VBox>
-
-                        <Label fx:id="lblBarcodeStatus" text="En attente d'un code-barres..." style="-fx-text-fill: #64748b; -fx-font-style: italic;" alignment="CENTER" maxWidth="Infinity"/>
+                        <Button onAction="#stopperBarcodeScanner" text="✖" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 900; -fx-background-radius: 8; -fx-min-width: 35; -fx-min-height: 35; -fx-cursor: hand;"/>
+                    </HBox>
+                    <StackPane style="-fx-background-color: black; -fx-background-radius: 10; -fx-overflow: hidden; -fx-min-height: 350;">
+                        <ImageView fx:id="ivBarcodeWebcam" fitWidth="550" preserveRatio="true"/>
+                    </StackPane>
+                    <VBox fx:id="boxBarcodeResult" spacing="12" visible="false" managed="false" style="-fx-background-color: #f0fdf4; -fx-border-color: #22c55e; -fx-border-radius: 10; -fx-padding: 15; -fx-background-radius: 10;">
+                         <HBox spacing="15" alignment="CENTER_LEFT">
+                             <Label fx:id="lblBarcodeNutriScore" text="?" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900; -fx-padding: 10 20; -fx-background-radius: 8;"/>
+                             <VBox spacing="2" HBox.hgrow="ALWAYS">
+                                 <Label fx:id="lblBarcodeProductName" text="Nom du produit" style="-fx-font-weight: 800; -fx-font-size: 15px; -fx-text-fill: #065f46;"/>
+                                 <Label fx:id="lblBarcodeBrand" text="Marque" style="-fx-font-size: 12px; -fx-text-fill: #166534;"/>
+                                 <Label fx:id="lblBarcodeCompatibility" text="Compatible avec votre régime" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
+                             </VBox>
+                         </HBox>
+                         <HBox alignment="CENTER_RIGHT">
+                             <Button text="➕ Ajouter au suivi" onAction="#appliquerProduitBarcode" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
+                         </HBox>
                     </VBox>
+                    <Label fx:id="lblBarcodeStatus" text="En attente d'un code-barres..." style="-fx-text-fill: #64748b; -fx-font-style: italic;" alignment="CENTER" maxWidth="Infinity"/>
                 </VBox>
+            </VBox>
             </StackPane>
             
             <!-- Floating Buttons -->
