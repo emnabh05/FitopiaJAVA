@@ -13,6 +13,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import tn.esprit.Pidev3A49.api.AdminSecurityController;
+import tn.esprit.Pidev3A49.api.UserArchiveController;
 import tn.esprit.Pidev3A49.api.UserSecurityController;
 import tn.esprit.Pidev3A49.api.dto.ChangePasswordRequest;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
@@ -40,6 +41,7 @@ public class AdminDashboardController {
     @FXML private ComboBox<String> roleCombo;
     @FXML private Button modifierButton;
     @FXML private Button enregistrerButton;
+    @FXML private Button archiveViewButton;
     @FXML private TableView<FitopiaUser> usersTable;
     @FXML private TableColumn<FitopiaUser, Number> idCol;
     @FXML private TableColumn<FitopiaUser, String> nomCol;
@@ -61,6 +63,7 @@ public class AdminDashboardController {
     private final UserSecurityController userSecurityController = new UserSecurityController(serviceUser);
     private final AdminSecurityController adminSecurityController = new AdminSecurityController(serviceUser);
     private final UserAiInsightService userAiInsightService = new UserAiInsightService();
+    private final UserArchiveController userArchiveController = new UserArchiveController(serviceUser, userAiInsightService);
     private final ObservableList<FitopiaUser> users = FXCollections.observableArrayList();
     private FitopiaUser selectedUser;
     private boolean editingMode;
@@ -74,6 +77,7 @@ public class AdminDashboardController {
         sortCombo.getSelectionModel().select("ID desc");
         archiveFilterCombo.setItems(FXCollections.observableArrayList("Actifs", "Archives", "Tous"));
         archiveFilterCombo.getSelectionModel().select("Actifs");
+        archiveViewButton.setText("Voir archives");
         setupTable();
         loadUsers();
         usersTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> populateEditor(newV));
@@ -181,17 +185,19 @@ public class AdminDashboardController {
     @FXML
     private void handleDeleteUser() {
         if (selectedUser == null) {
-            statusLabel.setText("Selectionnez un utilisateur a archiver.");
+            statusLabel.setText("Selectionnez un utilisateur a supprimer.");
             return;
         }
         try {
             int id = selectedUser.getId();
-            serviceUser.archiveUser(id);
+            UserAiInsightService.ArchiveSuggestion suggestion = userArchiveController.suggestArchive(id, 90);
+            userArchiveController.archiveUser(id);
             selectedUser = null;
             setEditingMode(false);
             clearEditor();
             loadUsers();
-            statusLabel.setText("Utilisateur #" + id + " archive.");
+            statusLabel.setText("Utilisateur #" + id + " archive via suppression logique. IA: "
+                    + suggestion.score() + "/100.");
         } catch (RuntimeException e) {
             statusLabel.setText(e.getMessage());
         }
@@ -205,7 +211,7 @@ public class AdminDashboardController {
         }
         try {
             int id = selectedUser.getId();
-            serviceUser.restoreUser(id);
+            userArchiveController.restoreUser(id);
             selectedUser = null;
             setEditingMode(false);
             clearEditor();
@@ -214,6 +220,14 @@ public class AdminDashboardController {
         } catch (RuntimeException e) {
             statusLabel.setText(e.getMessage());
         }
+    }
+
+    @FXML
+    private void handleShowArchivedUsers() {
+        boolean showingArchives = Boolean.TRUE.equals(resolveArchiveFilter());
+        archiveFilterCombo.setValue(showingArchives ? "Actifs" : "Archives");
+        archiveViewButton.setText(showingArchives ? "Voir archives" : "Voir actifs");
+        applyFilters();
     }
 
     @FXML
@@ -250,7 +264,7 @@ public class AdminDashboardController {
     }
 
     private void applyFilters() {
-        List<FitopiaUser> list = serviceUser.getUsersByArchiveState(resolveArchiveFilter());
+        List<FitopiaUser> list = userArchiveController.listUsers(resolveArchiveFilter());
         List<AdminSecurityAlert> alertEntries = adminSecurityController.listSecurityAlerts(null, null, false);
         String search = safe(searchField.getText()).trim().toLowerCase();
         if (!search.isEmpty()) {
@@ -281,7 +295,8 @@ public class AdminDashboardController {
                 .ifPresent(alert -> user.setSecurityAlertSummary(alert.securityAlertSummary())));
 
         users.setAll(list);
-        statusLabel.setText("Total utilisateurs: " + users.size());
+        String mode = Boolean.TRUE.equals(resolveArchiveFilter()) ? "archives" : Boolean.FALSE.equals(resolveArchiveFilter()) ? "actifs" : "tous";
+        statusLabel.setText("Total utilisateurs " + mode + ": " + users.size());
     }
 
     private void populateEditor(FitopiaUser user) {
@@ -344,11 +359,14 @@ public class AdminDashboardController {
     private Boolean resolveArchiveFilter() {
         String filter = safe(archiveFilterCombo.getValue());
         if ("Archives".equalsIgnoreCase(filter)) {
+            archiveViewButton.setText("Voir actifs");
             return true;
         }
         if ("Tous".equalsIgnoreCase(filter)) {
+            archiveViewButton.setText("Voir archives");
             return null;
         }
+        archiveViewButton.setText("Voir archives");
         return false;
     }
 
