@@ -10,14 +10,25 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 public class BarcodeServer {
+    private static BarcodeServer instance;
     private HttpServer server;
     private java.util.function.Consumer<String> onBarcodeReceived;
 
-    public BarcodeServer(java.util.function.Consumer<String> onBarcodeReceived) {
+    private BarcodeServer() {}
+
+    public static BarcodeServer getInstance() {
+        if (instance == null) {
+            instance = new BarcodeServer();
+        }
+        return instance;
+    }
+
+    public void setOnBarcodeReceived(java.util.function.Consumer<String> onBarcodeReceived) {
         this.onBarcodeReceived = onBarcodeReceived;
     }
 
     public void startServer() {
+        if (server != null) return; // Déjà démarré
         try {
             server = HttpServer.create(new InetSocketAddress(8085), 0);
             server.createContext("/api/barcode", new HttpHandler() {
@@ -36,7 +47,9 @@ public class BarcodeServer {
                         String barcode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
                         
                         javafx.application.Platform.runLater(() -> {
-                            onBarcodeReceived.accept(barcode);
+                            if (onBarcodeReceived != null) {
+                                onBarcodeReceived.accept(barcode);
+                            }
                         });
 
                         String response = "OK";

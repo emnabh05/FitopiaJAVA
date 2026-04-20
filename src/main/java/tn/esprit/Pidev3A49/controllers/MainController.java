@@ -353,7 +353,8 @@ public class MainController {
 
     @FXML
     public void initialize() {
-        barcodeScannerMobileServer = new tn.esprit.Pidev3A49.services.BarcodeServer(this::traiterCodeDepuisTelephone);
+        barcodeScannerMobileServer = tn.esprit.Pidev3A49.services.BarcodeServer.getInstance();
+        barcodeScannerMobileServer.setOnBarcodeReceived(this::traiterCodeDepuisTelephone);
         barcodeScannerMobileServer.startServer();
         initialiserColonnes();
         initialiserCombos();
