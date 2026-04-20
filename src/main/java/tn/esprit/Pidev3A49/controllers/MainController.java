@@ -413,6 +413,8 @@ public class MainController {
 
     @FXML
     private void masquerTousLesFormulaires() {
+        // Restore scrolling
+        if (appScrollPane != null) appScrollPane.setMouseTransparent(false);
         if (paneOverlay != null) paneOverlay.setMouseTransparent(true);
         if (paneRegimeCreate != null) { paneRegimeCreate.setVisible(false); paneRegimeCreate.setManaged(false); }
         if (paneRegimeEdit != null) { paneRegimeEdit.setVisible(false); paneRegimeEdit.setManaged(false); }
@@ -423,6 +425,7 @@ public class MainController {
         if (paneRepasDelete != null) { paneRepasDelete.setVisible(false); paneRepasDelete.setManaged(false); }
         if (paneRepasExplore != null) { paneRepasExplore.setVisible(false); paneRepasExplore.setManaged(false); }
         if (paneScanIA != null) { paneScanIA.setVisible(false); paneScanIA.setManaged(false); }
+        if (paneBarcodeScanner != null) { paneBarcodeScanner.setVisible(false); paneBarcodeScanner.setManaged(false); }
         if (paneWeeklyProgram != null) { paneWeeklyProgram.setVisible(false); paneWeeklyProgram.setManaged(false); }
     }
 
@@ -2459,7 +2462,8 @@ public class MainController {
     @FXML
     private void afficherPopupScanIA() {
         masquerTousLesFormulaires();
-        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
+        // Block background scroll while popup is open
+        if (appScrollPane != null) appScrollPane.setMouseTransparent(true);
         if (paneScanIA != null) {
             paneScanIA.setVisible(true);
             paneScanIA.setManaged(true);
@@ -2979,13 +2983,13 @@ public class MainController {
     @FXML
     private void afficherBarcodeScanner() {
         masquerTousLesFormulaires();
-        if (paneOverlay != null) paneOverlay.setMouseTransparent(false);
+        // Block background scroll while scanner is open
+        if (appScrollPane != null) appScrollPane.setMouseTransparent(true);
         if (paneBarcodeScanner != null) {
             paneBarcodeScanner.setVisible(true);
             paneBarcodeScanner.setManaged(true);
-            boxBarcodeResult.setVisible(false);
-            boxBarcodeResult.setManaged(false);
-            lblBarcodeStatus.setText("Initialisation de la webcam...");
+            if (boxBarcodeResult != null) { boxBarcodeResult.setVisible(false); boxBarcodeResult.setManaged(false); }
+            if (lblBarcodeStatus != null) lblBarcodeStatus.setText("Initialisation de la webcam...");
             isScanning = true;
             lastScannedCode = "";
         }

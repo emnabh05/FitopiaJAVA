@@ -639,9 +639,10 @@
                     </ScrollPane>
                 </VBox>
 
+            </StackPane>
 
-            <!-- 9. SCAN IMAGE POPUP (FIXED) -->
-            <VBox fx:id="paneScanIA" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
+            <!-- 9. SCAN IMAGE POPUP - outside paneOverlay so clicks always work -->
+            <VBox fx:id="paneScanIA" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);" maxWidth="Infinity" maxHeight="Infinity" VBox.vgrow="ALWAYS">
                 <VBox maxWidth="550" spacing="18.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
                     <HBox alignment="CENTER_RIGHT">
                         <Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #bb2d22; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 6 12; -fx-cursor: hand;"/>
@@ -664,18 +665,22 @@
                 </VBox>
             </VBox>
 
-            <!-- 11. BARCODE SCANNER POPUP (FIXED) -->
-            <VBox fx:id="paneBarcodeScanner" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.7);">
+            <!-- 11. BARCODE SCANNER POPUP - outside paneOverlay so clicks always work -->
+            <VBox fx:id="paneBarcodeScanner" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.7);" maxWidth="Infinity" maxHeight="Infinity">
                 <VBox maxWidth="600" spacing="15.0" style="-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 30, 0, 0, 15);">
+                    <!-- Header with close button always visible top-right -->
                     <HBox alignment="CENTER_LEFT">
                         <VBox spacing="2" HBox.hgrow="ALWAYS">
                             <Label text="🔳 Scanner de Produits (Live)" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #0c3f44;"/>
                             <Label text="Pointez le code-barres vers la webcam." style="-fx-font-size: 11px; -fx-text-fill: #64748b;"/>
                         </VBox>
+                        <Button onAction="#stopperBarcodeScanner" text="✖" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 900; -fx-background-radius: 8; -fx-min-width: 36; -fx-min-height: 36; -fx-cursor: hand;"/>
                     </HBox>
-                    <StackPane style="-fx-background-color: black; -fx-background-radius: 10; -fx-overflow: hidden; -fx-min-height: 350;">
+                    <!-- Camera feed -->
+                    <StackPane style="-fx-background-color: black; -fx-background-radius: 10; -fx-min-height: 350;">
                         <ImageView fx:id="ivBarcodeWebcam" fitWidth="550" preserveRatio="true"/>
                     </StackPane>
+                    <!-- Product result card -->
                     <VBox fx:id="boxBarcodeResult" spacing="12" visible="false" managed="false" style="-fx-background-color: #f0fdf4; -fx-border-color: #22c55e; -fx-border-radius: 10; -fx-padding: 15; -fx-background-radius: 10;">
                          <HBox spacing="15" alignment="CENTER_LEFT">
                              <Label fx:id="lblBarcodeNutriScore" text="?" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: 900; -fx-padding: 10 20; -fx-background-radius: 8;"/>
@@ -685,15 +690,15 @@
                                  <Label fx:id="lblBarcodeCompatibility" text="Compatible avec votre régime" style="-fx-font-weight: bold; -fx-font-size: 12px;"/>
                              </VBox>
                          </HBox>
-                         <HBox alignment="CENTER_RIGHT" spacing="12">
-                             <Button text="✖ Fermer" onAction="#stopperBarcodeScanner" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
-                             <Button text="➕ Ajouter au suivi" onAction="#appliquerProduitBarcode" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
-                         </HBox>
                     </VBox>
                     <Label fx:id="lblBarcodeStatus" text="En attente d'un code-barres..." style="-fx-text-fill: #64748b; -fx-font-style: italic;" alignment="CENTER" maxWidth="Infinity"/>
+                    <!-- Bottom-right action buttons - always visible -->
+                    <HBox alignment="CENTER_RIGHT" spacing="12">
+                        <Button text="✖ Fermer" onAction="#stopperBarcodeScanner" style="-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
+                        <Button text="➕ Ajouter au suivi" onAction="#appliquerProduitBarcode" style="-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;"/>
+                    </HBox>
                 </VBox>
             </VBox>
-            </StackPane>
             
             <!-- Floating Buttons -->
             <VBox StackPane.alignment="BOTTOM_RIGHT" spacing="12" translateX="-24" translateY="-24">
