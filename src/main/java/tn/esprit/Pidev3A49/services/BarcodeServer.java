@@ -64,7 +64,7 @@ public class BarcodeServer {
             server.start();
             System.out.println("✅ Serveur Barcode pret sur le port 8085");
         } catch (java.net.BindException e) {
-            System.out.println("⚠️ Information : Un serveur local sur le port 8085 est déjà actif en arrière-plan. (Ce n'est pas grave pour la saisie manuelle !)");
+            // Le port est déjà utilisé, on ignore l'erreur silencieusement (le singleton continuera)
         } catch (IOException e) {
             System.out.println("⚠️ Information : Impossible de lancer le serveur réseau (" + e.getMessage() + "). La saisie manuelle fonctionne toujours !");
         }
