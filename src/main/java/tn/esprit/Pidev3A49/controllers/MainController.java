@@ -383,25 +383,25 @@ public class MainController {
 
 
     public void ouvrirBackRepas() {
-        afficherModuleRepas(null);
-        afficherCreationRepas(null);
+        afficherModuleRepas();
+        afficherCreationRepas();
     }
 
     public void ouvrirFrontRegimes() {
-        afficherModuleRegimes(null);
+        afficherModuleRegimes();
         masquerTousLesFormulaires();
     }
 
-    @FXML private void afficherModuleRepas(javafx.event.ActionEvent event) { afficherVue(viewRepas, viewRegimes); activerBoutonModule(btnModuleRepas, btnModuleRegimes); }
-    @FXML private void afficherModuleRegimes(javafx.event.ActionEvent event) { afficherVue(viewRegimes, viewRepas); activerBoutonModule(btnModuleRegimes, btnModuleRepas); }
-    @FXML private void afficherCreationRepas(javafx.event.ActionEvent event) { afficherPaneRepas(paneRepasCreate, btnActionCreerRepas); }
-    @FXML private void afficherModificationRepas(javafx.event.ActionEvent event) { afficherPaneRepas(paneRepasEdit, btnActionModifierRepas); }
-    @FXML private void afficherSuppressionRepas(javafx.event.ActionEvent event) { afficherPaneRepas(paneRepasDelete, btnActionSupprimerRepas); }
-    @FXML private void afficherExplorationRepas(javafx.event.ActionEvent event) { afficherPaneRepas(paneRepasExplore, btnActionExplorerRepas); }
-    @FXML private void afficherCreationRegime(javafx.event.ActionEvent event) { afficherPaneRegime(paneRegimeCreate, btnActionCreerRegime); }
-    @FXML private void afficherModificationRegime(javafx.event.ActionEvent event) { afficherPaneRegime(paneRegimeEdit, btnActionModifierRegime); }
-    @FXML private void afficherSuppressionRegime(javafx.event.ActionEvent event) { afficherPaneRegime(paneRegimeDelete, btnActionSupprimerRegime); }
-    @FXML private void afficherExplorationRegime(javafx.event.ActionEvent event) { afficherPaneRegime(paneRegimeExplore, btnActionExplorerRegime); }
+    @FXML private void afficherModuleRepas() { afficherVue(viewRepas, viewRegimes); activerBoutonModule(btnModuleRepas, btnModuleRegimes); }
+    @FXML private void afficherModuleRegimes() { afficherVue(viewRegimes, viewRepas); activerBoutonModule(btnModuleRegimes, btnModuleRepas); }
+    @FXML private void afficherCreationRepas() { afficherPaneRepas(paneRepasCreate, btnActionCreerRepas); }
+    @FXML private void afficherModificationRepas() { afficherPaneRepas(paneRepasEdit, btnActionModifierRepas); }
+    @FXML private void afficherSuppressionRepas() { afficherPaneRepas(paneRepasDelete, btnActionSupprimerRepas); }
+    @FXML private void afficherExplorationRepas() { afficherPaneRepas(paneRepasExplore, btnActionExplorerRepas); }
+    @FXML private void afficherCreationRegime() { afficherPaneRegime(paneRegimeCreate, btnActionCreerRegime); }
+    @FXML private void afficherModificationRegime() { afficherPaneRegime(paneRegimeEdit, btnActionModifierRegime); }
+    @FXML private void afficherSuppressionRegime() { afficherPaneRegime(paneRegimeDelete, btnActionSupprimerRegime); }
+    @FXML private void afficherExplorationRegime() { afficherPaneRegime(paneRegimeExplore, btnActionExplorerRegime); }
 
     @FXML
     private void masquerTousLesFormulaires() {
@@ -1974,7 +1974,7 @@ public class MainController {
     }
 
     private void selectionnerRepasPourModification(Repas repas) {
-        afficherModificationRepas(null);
+        afficherModificationRepas();
         repasEditSelectionId = repas.getId();
         if (tableRepasEdit != null) {
             tableRepasEdit.getSelectionModel().select(repas);
