@@ -39,6 +39,8 @@
                 <VBox spacing="10.0" style="-fx-padding: 18 28 22 28;" VBox.vgrow="ALWAYS">
                     <children>
                         <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #1b2e35;" text="Tableau des Utilisateurs" />
+                        <Label fx:id="jwtSummaryLabel" style="-fx-text-fill: #1f4b52; -fx-font-size: 12px; -fx-font-weight: bold;" text="JWT status" wrapText="true" />
+                        <Label fx:id="jwtTokenMaskedLabel" style="-fx-text-fill: #5d6b77; -fx-font-size: 11px;" text="token masque" wrapText="true" />
                         <HBox spacing="10.0">
                             <children>
                                 <TextField fx:id="searchField" onKeyReleased="#handleSearch" promptText="Recherche par id, nom, email, role..." HBox.hgrow="ALWAYS" />

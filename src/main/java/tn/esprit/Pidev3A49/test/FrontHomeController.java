@@ -69,7 +69,7 @@ public class FrontHomeController {
                     Instant.ofEpochSecond(claims.expiresAtEpochSeconds()),
                     ZoneId.systemDefault()
             );
-            jwtSummaryLabel.setText("JWT valide | userId=" + claims.userId()
+            jwtSummaryLabel.setText("JWT valide | subject=" + claims.subject()
                     + " | role=" + claims.role()
                     + " | expire le " + expiresAt);
             jwtTokenMaskedLabel.setText(maskToken(token));

@@ -20,8 +20,13 @@ import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.services.ServiceUser;
 import tn.esprit.Pidev3A49.services.UserAiInsightService;
 import tn.esprit.Pidev3A49.services.security.AdminSecurityAlert;
+import tn.esprit.Pidev3A49.services.security.JwtClaims;
+import tn.esprit.Pidev3A49.services.security.JwtService;
 import tn.esprit.Pidev3A49.services.security.UserSecuritySnapshot;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,12 +63,15 @@ public class AdminDashboardController {
     @FXML private Label duplicateScoreLabel;
     @FXML private Label duplicateRecommendationLabel;
     @FXML private Label duplicateFindingsLabel;
+    @FXML private Label jwtSummaryLabel;
+    @FXML private Label jwtTokenMaskedLabel;
 
     private final ServiceUser serviceUser = new ServiceUser();
     private final UserSecurityController userSecurityController = new UserSecurityController(serviceUser);
     private final AdminSecurityController adminSecurityController = new AdminSecurityController(serviceUser);
     private final UserAiInsightService userAiInsightService = new UserAiInsightService();
     private final UserArchiveController userArchiveController = new UserArchiveController(serviceUser, userAiInsightService);
+    private final JwtService jwtService = new JwtService();
     private final ObservableList<FitopiaUser> users = FXCollections.observableArrayList();
     private FitopiaUser selectedUser;
     private boolean editingMode;
@@ -78,6 +86,7 @@ public class AdminDashboardController {
         archiveFilterCombo.setItems(FXCollections.observableArrayList("Actifs", "Archives", "Tous"));
         archiveFilterCombo.getSelectionModel().select("Actifs");
         archiveViewButton.setText("Voir archives");
+        renderJwtDebug();
         setupTable();
         loadUsers();
         usersTable.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> populateEditor(newV));
@@ -397,5 +406,37 @@ public class AdminDashboardController {
                     .append(String.join(" / ", duplicateResult.findings()));
         }
         return builder.toString();
+    }
+
+    private void renderJwtDebug() {
+        String token = safe(UserSession.getAccessToken()).trim();
+        if (token.isBlank()) {
+            jwtSummaryLabel.setText("JWT absent dans la session.");
+            jwtTokenMaskedLabel.setText("-");
+            return;
+        }
+
+        try {
+            JwtClaims claims = jwtService.validate(token);
+            LocalDateTime expiresAt = LocalDateTime.ofInstant(
+                    Instant.ofEpochSecond(claims.expiresAtEpochSeconds()),
+                    ZoneId.systemDefault()
+            );
+            jwtSummaryLabel.setText("JWT valide | subject=" + claims.subject()
+                    + " | role=" + claims.role()
+                    + " | expire le " + expiresAt);
+            jwtTokenMaskedLabel.setText(maskToken(token));
+        } catch (RuntimeException e) {
+            jwtSummaryLabel.setText("JWT present mais invalide: " + e.getMessage());
+            jwtTokenMaskedLabel.setText(maskToken(token));
+        }
+    }
+
+    private String maskToken(String token) {
+        String value = safe(token);
+        if (value.length() <= 24) {
+            return value;
+        }
+        return value.substring(0, 16) + " ... " + value.substring(value.length() - 16);
     }
 }
