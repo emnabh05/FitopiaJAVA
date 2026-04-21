@@ -3,26 +3,23 @@ package tn.esprit.Pidev3A49.test;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.api.AuthController;
 import tn.esprit.Pidev3A49.api.dto.LoginRequest;
 import tn.esprit.Pidev3A49.api.dto.LoginResponse;
-import tn.esprit.Pidev3A49.api.dto.ResetPasswordRequest;
 import tn.esprit.Pidev3A49.services.ServiceUser;
 import tn.esprit.Pidev3A49.services.security.AuthenticationResult;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.net.URI;
 import java.security.SecureRandom;
 import java.util.Optional;
 
@@ -143,34 +140,18 @@ public class SignInController {
             }
 
             ServiceUser.PasswordResetOtpInfo otpInfo = serviceUser.requestPasswordResetBySmsDemo(identifier);
+            String resetUrl = PasswordResetWebServer.getInstance().buildResetUrl(otpInfo.email(), otpInfo.code());
             Alert smsAlert = new Alert(Alert.AlertType.INFORMATION);
-            smsAlert.setTitle("Code SMS demo");
-            smsAlert.setHeaderText("Code de reinitialisation genere");
+            smsAlert.setTitle("Lien de reinitialisation");
+            smsAlert.setHeaderText("Reinitialisation hors application");
             smsAlert.setContentText("Compte concerne: " + otpInfo.email()
-                    + "\nNumero cible: " + otpInfo.phone()
-                    + "\n\nSMS demo envoye au numero " + otpInfo.phone()
-                    + ".\nToken securise: " + otpInfo.code()
                     + "\nExpiration: " + otpInfo.expiresAt()
-                    + "\n\nUtilisez ce token dans la fenetre suivante.");
+                    + "\n\nLien securise:\n" + resetUrl
+                    + "\n\nLe formulaire web s'ouvrira automatiquement.");
             smsAlert.showAndWait();
 
-            String code = askResetCode();
-            if (code == null) {
-                return;
-            }
-
-            String newPassword = askNewPassword();
-            if (newPassword == null) {
-                return;
-            }
-
-            authController.resetPassword(new ResetPasswordRequest(otpInfo.email(), code, newPassword));
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Mot de passe mis a jour");
-            alert.setHeaderText("Reinitialisation terminee");
-            alert.setContentText("Votre mot de passe a ete mis a jour. Vous pouvez maintenant vous connecter.");
-            alert.showAndWait();
-            statusLabel.setText("Mot de passe reinitialise avec succes.");
+            openResetLink(resetUrl);
+            statusLabel.setText("Lien de reinitialisation ouvert. Finalisez le formulaire web.");
         } catch (RuntimeException e) {
             statusLabel.setText(e.getMessage());
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -253,58 +234,14 @@ public class SignInController {
         return dialog.showAndWait().map(String::trim).filter(value -> !value.isBlank()).orElse(null);
     }
 
-    private String askResetCode() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Token de reinitialisation");
-        dialog.setHeaderText("Verification par token signe");
-        dialog.setContentText("Entrez le token recu :");
-        return dialog.showAndWait().map(String::trim).filter(value -> !value.isBlank()).orElse(null);
-    }
-
-    private String askNewPassword() {
-        Dialog<String> dialog = new Dialog<>();
-        dialog.setTitle("Nouveau mot de passe");
-        dialog.setHeaderText("Choisissez un nouveau mot de passe");
-
-        ButtonType confirmButton = new ButtonType("Valider", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
-
-        PasswordField password = new PasswordField();
-        password.setPromptText("Nouveau mot de passe");
-        PasswordField confirm = new PasswordField();
-        confirm.setPromptText("Confirmer le mot de passe");
-
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.add(new Label("Nouveau mot de passe"), 0, 0);
-        grid.add(password, 0, 1);
-        grid.add(new Label("Confirmation"), 0, 2);
-        grid.add(confirm, 0, 3);
-        dialog.getDialogPane().setContent(grid);
-
-        dialog.setResultConverter(buttonType -> {
-            if (buttonType != confirmButton) {
-                return null;
+    private void openResetLink(String url) {
+        try {
+            if (!Desktop.isDesktopSupported()) {
+                throw new RuntimeException("Ouverture navigateur non supportee. Copiez le lien manuellement.");
             }
-            return (password.getText() == null ? "" : password.getText().trim())
-                    + "\n"
-                    + (confirm.getText() == null ? "" : confirm.getText().trim());
-        });
-
-        Optional<String> result = dialog.showAndWait();
-        if (result.isEmpty()) {
-            return null;
+            Desktop.getDesktop().browse(new URI(url));
+        } catch (Exception e) {
+            throw new RuntimeException("Impossible d'ouvrir le lien de reinitialisation: " + e.getMessage(), e);
         }
-        String[] values = result.get().split("\\n", -1);
-        String first = values.length > 0 ? values[0].trim() : "";
-        String second = values.length > 1 ? values[1].trim() : "";
-        if (first.isBlank()) {
-            throw new RuntimeException("Le nouveau mot de passe est obligatoire.");
-        }
-        if (!first.equals(second)) {
-            throw new RuntimeException("La confirmation du mot de passe ne correspond pas.");
-        }
-        return first;
     }
 }
