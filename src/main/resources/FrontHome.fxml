@@ -65,6 +65,9 @@
                                 <Label fx:id="apiIdeasLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
                                 <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="IA recommandees" />
                                 <Label fx:id="aiIdeasLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
+                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="JWT Debug (preuve)" />
+                                <Label fx:id="jwtSummaryLabel" style="-fx-text-fill: #1f4b52; -fx-font-size: 11px;" wrapText="true" text="JWT status" />
+                                <Label fx:id="jwtTokenMaskedLabel" style="-fx-text-fill: #476168; -fx-font-size: 10px;" wrapText="true" text="token masque" />
                             </children>
                         </VBox>
                     </children>
