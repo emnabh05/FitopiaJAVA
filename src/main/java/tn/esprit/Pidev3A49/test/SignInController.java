@@ -99,6 +99,8 @@ public class SignInController {
 
         FitopiaUser connected = connectedOpt.get();
         UserSession.setCurrentUser(connected);
+        UserSession.setAccessToken(response.accessToken());
+        UserSession.setAccessTokenExpiresInSeconds(response.expiresInSeconds() == null ? 0L : response.expiresInSeconds());
         openHomeFor(connected);
     }
 

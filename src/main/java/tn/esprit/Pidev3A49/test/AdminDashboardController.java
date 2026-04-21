@@ -170,7 +170,7 @@ public class AdminDashboardController {
                         selectedUser.getUsername(),
                         selectedUser.getEmail(),
                         selectedUser.getBirthDate()
-                ));
+                ), UserSession.getAuthorizationHeader());
                 statusLabel.setText("Utilisateur modifie. Nouveau mot de passe: " + response.passwordScore() + "/100.");
             } else {
                 statusLabel.setText("Utilisateur modifie avec succes.");
@@ -265,7 +265,12 @@ public class AdminDashboardController {
 
     private void applyFilters() {
         List<FitopiaUser> list = userArchiveController.listUsers(resolveArchiveFilter());
-        List<AdminSecurityAlert> alertEntries = adminSecurityController.listSecurityAlerts(null, null, false);
+        List<AdminSecurityAlert> alertEntries = adminSecurityController.listSecurityAlerts(
+                UserSession.getAuthorizationHeader(),
+                null,
+                null,
+                false
+        );
         String search = safe(searchField.getText()).trim().toLowerCase();
         if (!search.isEmpty()) {
             list = list.stream().filter(u ->
@@ -311,7 +316,7 @@ public class AdminDashboardController {
         phoneField.setText(safe(user.getPhone()));
         newPasswordField.clear();
         roleCombo.setValue(safe(user.getRole()).isBlank() ? "Patient" : user.getRole());
-        UserSecuritySnapshot snapshot = userSecurityController.getSecuritySnapshot(user.getId());
+        UserSecuritySnapshot snapshot = userSecurityController.getSecuritySnapshot(user.getId(), UserSession.getAuthorizationHeader());
         UserAiInsightService.DuplicateDetectionResult duplicateResult =
                 userAiInsightService.detectPotentialDuplicates(user, serviceUser.getAll());
         securityDetailsLabel.setText(buildSecuritySnapshotText(snapshot, duplicateResult));

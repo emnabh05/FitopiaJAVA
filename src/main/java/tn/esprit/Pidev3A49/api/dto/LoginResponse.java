@@ -8,7 +8,11 @@ public record LoginResponse(
         Integer userId,
         String username,
         String email,
+        String role,
         Integer riskScore,
-        String accountStatus
+        String accountStatus,
+        String tokenType,
+        String accessToken,
+        Long expiresInSeconds
 ) {
 }

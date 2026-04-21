@@ -9,18 +9,28 @@ import tn.esprit.Pidev3A49.api.dto.RegisterRequest;
 import tn.esprit.Pidev3A49.api.dto.RegisterResponse;
 import tn.esprit.Pidev3A49.api.dto.ResetPasswordRequest;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.services.security.ApiAuthorizationService;
 import tn.esprit.Pidev3A49.services.security.AuthenticationResult;
+import tn.esprit.Pidev3A49.services.security.JwtService;
 import tn.esprit.Pidev3A49.services.security.PasswordPolicyReport;
 
 public class AuthController {
     private final ServiceUser serviceUser;
+    private final JwtService jwtService;
+    private final ApiAuthorizationService apiAuthorizationService;
 
     public AuthController() {
-        this(new ServiceUser());
+        this(new ServiceUser(), new JwtService(), new ApiAuthorizationService());
     }
 
     public AuthController(ServiceUser serviceUser) {
+        this(serviceUser, new JwtService(), new ApiAuthorizationService());
+    }
+
+    public AuthController(ServiceUser serviceUser, JwtService jwtService, ApiAuthorizationService apiAuthorizationService) {
         this.serviceUser = serviceUser;
+        this.jwtService = jwtService;
+        this.apiAuthorizationService = apiAuthorizationService;
     }
 
     public RegisterResponse register(RegisterRequest request) {
@@ -65,14 +75,22 @@ public class AuthController {
     public LoginResponse login(LoginRequest request) {
         AuthenticationResult result = serviceUser.authenticateSecure(safe(request.identifier()), safe(request.password()));
         FitopiaUser user = result.user();
+        String token = null;
+        if (result.status() == AuthenticationResult.Status.SUCCESS && user != null) {
+            token = jwtService.generateAccessToken(user);
+        }
         return new LoginResponse(
                 result.status(),
                 result.message(),
                 user == null ? null : user.getId(),
                 user == null ? null : user.getUsername(),
                 user == null ? null : user.getEmail(),
+                user == null ? null : user.getRole(),
                 user == null ? null : user.getRiskScore(),
-                user == null ? null : user.getAccountStatus()
+                user == null ? null : user.getAccountStatus(),
+                token == null ? null : "Bearer",
+                token,
+                token == null ? null : apiAuthorizationService.getAccessTokenExpirySeconds()
         );
     }
 

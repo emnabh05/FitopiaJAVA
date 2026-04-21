@@ -42,12 +42,28 @@
 }
 ```
 - Responses:
-  - `200 SUCCESS`
+  - `200 SUCCESS` + JWT access token
   - `401 INVALID_CREDENTIALS`
   - `423 LOCKED`
 
+Success payload extension:
+```json
+{
+  "status": "SUCCESS",
+  "message": "Authentification reussie.",
+  "userId": 7,
+  "username": "ahmedb",
+  "email": "ahmed@gmail.com",
+  "role": "Admin",
+  "tokenType": "Bearer",
+  "accessToken": "<jwt>",
+  "expiresInSeconds": 3600
+}
+```
+
 ### POST `/api/users/{id}/password/change`
 - Purpose: change password with advanced validation and history check.
+- Security: `Authorization: Bearer <JWT>` required (owner or admin).
 - Request:
 ```json
 {
@@ -73,6 +89,7 @@
 
 ### GET `/api/users/{id}/security`
 - Purpose: admin/user security snapshot.
+- Security: `Authorization: Bearer <JWT>` required (owner or admin).
 - Response:
 ```json
 {
@@ -95,6 +112,7 @@
 
 ### GET `/api/admin/users/security-alerts`
 - Purpose: admin dashboard security monitoring.
+- Security: `Authorization: Bearer <JWT>` required (admin role only).
 - Query params:
   - `minRiskScore`
   - `status`
@@ -126,6 +144,8 @@
 ## Backend Rules
 
 - Passwords are always stored as BCrypt hashes.
+- Authentication is stateless: no server session storage is used.
+- JWT is signed with HS256 and contains `uid`, `role`, `sub`, `iat`, `exp`, `jti`.
 - Password history keeps the last 3 hashes.
 - 5 failed logins lock the account for 15 minutes.
 - Risk score increases on failed logins and lock events.
