@@ -48,14 +48,27 @@ public final class PasswordResetWebServer {
             return;
         }
         try {
-            server = HttpServer.create(new InetSocketAddress("127.0.0.1", DEFAULT_PORT), 0);
+            server = createServerOnPort(DEFAULT_PORT);
+        } catch (IOException bindError) {
+            try {
+                // Fallback to an ephemeral free port when the default one is already in use.
+                server = createServerOnPort(0);
+            } catch (IOException fallbackError) {
+                throw new RuntimeException("Impossible de demarrer le serveur web de reinitialisation: " + fallbackError.getMessage(), fallbackError);
+            }
+        }
+        try {
             server.createContext(RESET_PATH, new ResetPasswordHandler());
             server.setExecutor(Executors.newCachedThreadPool());
             server.start();
             port = server.getAddress().getPort();
-        } catch (IOException e) {
-            throw new RuntimeException("Impossible de demarrer le serveur web de reinitialisation: " + e.getMessage(), e);
+        } catch (RuntimeException e) {
+            throw e;
         }
+    }
+
+    private HttpServer createServerOnPort(int requestedPort) throws IOException {
+        return HttpServer.create(new InetSocketAddress("127.0.0.1", requestedPort), 0);
     }
 
     public String buildResetUrl(String email, String token) {
