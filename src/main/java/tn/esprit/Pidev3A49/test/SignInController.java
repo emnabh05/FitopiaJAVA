@@ -138,6 +138,7 @@ public class SignInController {
         try {
             String identifier = askEmailForReset();
             if (identifier == null) {
+                statusLabel.setText("Reinitialisation annulee.");
                 return;
             }
 
@@ -148,9 +149,9 @@ public class SignInController {
             smsAlert.setContentText("Compte concerne: " + otpInfo.email()
                     + "\nNumero cible: " + otpInfo.phone()
                     + "\n\nSMS demo envoye au numero " + otpInfo.phone()
-                    + ".\nCode OTP: " + otpInfo.code()
+                    + ".\nToken securise: " + otpInfo.code()
                     + "\nExpiration: " + otpInfo.expiresAt()
-                    + "\n\nUtilisez ce code dans la fenetre suivante.");
+                    + "\n\nUtilisez ce token dans la fenetre suivante.");
             smsAlert.showAndWait();
 
             String code = askResetCode();
@@ -172,6 +173,11 @@ public class SignInController {
             statusLabel.setText("Mot de passe reinitialise avec succes.");
         } catch (RuntimeException e) {
             statusLabel.setText(e.getMessage());
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur de reinitialisation");
+            alert.setHeaderText("Mot de passe oublie");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
         }
     }
 
@@ -249,9 +255,9 @@ public class SignInController {
 
     private String askResetCode() {
         TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Code de reinitialisation");
-        dialog.setHeaderText("Verification par email");
-        dialog.setContentText("Entrez le code recu par email :");
+        dialog.setTitle("Token de reinitialisation");
+        dialog.setHeaderText("Verification par token signe");
+        dialog.setContentText("Entrez le token recu :");
         return dialog.showAndWait().map(String::trim).filter(value -> !value.isBlank()).orElse(null);
     }
 

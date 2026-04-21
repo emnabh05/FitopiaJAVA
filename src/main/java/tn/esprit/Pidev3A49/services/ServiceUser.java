@@ -11,6 +11,7 @@ import tn.esprit.Pidev3A49.services.security.PasswordSecurityService;
 import tn.esprit.Pidev3A49.services.security.PwnedPasswordClient;
 import tn.esprit.Pidev3A49.services.security.UserSecuritySnapshot;
 import tn.esprit.Pidev3A49.services.security.EmailOtpService;
+import tn.esprit.Pidev3A49.services.security.PasswordResetTokenService;
 import tn.esprit.Pidev3A49.utils.MyDataBase;
 
 import java.sql.Connection;
@@ -44,6 +45,7 @@ public class ServiceUser {
     private final PasswordHasher passwordHasher = new BCryptPasswordHasher();
     private final PasswordSecurityService passwordSecurityService = new PasswordSecurityService(new PwnedPasswordClient());
     private final EmailOtpService emailOtpService = new EmailOtpService();
+    private final PasswordResetTokenService passwordResetTokenService = new PasswordResetTokenService();
     private final SecureRandom secureRandom = new SecureRandom();
 
     public ServiceUser() {
@@ -256,21 +258,11 @@ public class ServiceUser {
         if (isLocked(user)) {
             throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
         }
-        String code = emailOtpService.generateOtpCode();
-        String expiresAt = LocalDateTime.now().plus(RESET_OTP_DURATION).truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER);
-        String query = "UPDATE `" + TABLE_NAME + "` SET reset_password_code=?, reset_password_expires_at=? WHERE id=?";
-
-        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
-            pstm.setString(1, code);
-            pstm.setString(2, expiresAt);
-            pstm.setInt(3, user.getId());
-            pstm.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Impossible de preparer la reinitialisation du mot de passe : " + e.getMessage(), e);
-        }
+        PasswordResetTokenService.IssuedResetToken issued = passwordResetTokenService.issue(user, RESET_OTP_DURATION);
+        persistResetChallenge(user.getId(), issued.nonce(), issued.expiresAt().format(DATE_FORMATTER));
 
         try {
-            emailOtpService.sendPasswordResetOtp(user.getEmail(), user.getEmail(), code, LocalDateTime.parse(expiresAt, DATE_FORMATTER));
+            emailOtpService.sendPasswordResetOtp(user.getEmail(), user.getEmail(), issued.token(), issued.expiresAt());
         } catch (RuntimeException e) {
             clearPasswordResetChallenge(user.getId());
             throw e;
@@ -286,20 +278,10 @@ public class ServiceUser {
         }
 
         String phone = safe(user.getPhone()).isBlank() ? DEFAULT_RESET_PHONE : normalizePhoneForSms(user.getPhone());
-        String code = String.format("%06d", secureRandom.nextInt(1_000_000));
-        String expiresAt = LocalDateTime.now().plus(RESET_OTP_DURATION).truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER);
-        String query = "UPDATE `" + TABLE_NAME + "` SET reset_password_code=?, reset_password_expires_at=? WHERE id=?";
-
-        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
-            pstm.setString(1, code);
-            pstm.setString(2, expiresAt);
-            pstm.setInt(3, user.getId());
-            pstm.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Impossible de preparer la reinitialisation du mot de passe : " + e.getMessage(), e);
-        }
-
-        return new PasswordResetOtpInfo(user.getEmail(), phone, code, expiresAt);
+        PasswordResetTokenService.IssuedResetToken issued = passwordResetTokenService.issue(user, RESET_OTP_DURATION);
+        String expiresAt = issued.expiresAt().format(DATE_FORMATTER);
+        persistResetChallenge(user.getId(), issued.nonce(), expiresAt);
+        return new PasswordResetOtpInfo(user.getEmail(), phone, issued.token(), expiresAt);
     }
 
     public PasswordPolicyReport resetPasswordWithOtp(String email, String otpCode, String newPassword) {
@@ -313,10 +295,14 @@ public class ServiceUser {
 
         if (challenge.isExpired()) {
             clearPasswordResetChallenge(user.getId());
-            throw new RuntimeException("Le code de reinitialisation a expire.");
+            throw new RuntimeException("Le token de reinitialisation a expire.");
         }
-        if (!challenge.code().equals(safe(otpCode).trim())) {
-            throw new RuntimeException("Code de reinitialisation invalide.");
+        PasswordResetTokenService.ResetTokenClaims claims = passwordResetTokenService.verify(safe(otpCode).trim());
+        if (claims.userId() != user.getId()) {
+            throw new RuntimeException("Token de reinitialisation invalide pour ce compte.");
+        }
+        if (!claims.nonce().equals(challenge.code())) {
+            throw new RuntimeException("Token de reinitialisation invalide.");
         }
 
         PasswordPolicyReport report = changePassword(user.getId(), newPassword, user);
@@ -921,6 +907,18 @@ public class ServiceUser {
             throw new RuntimeException("Erreur lors du chargement du code de reinitialisation : " + e.getMessage(), e);
         }
         return Optional.empty();
+    }
+
+    private void persistResetChallenge(int userId, String nonce, String expiresAt) {
+        String query = "UPDATE `" + TABLE_NAME + "` SET reset_password_code=?, reset_password_expires_at=? WHERE id=?";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setString(1, nonce);
+            pstm.setString(2, expiresAt);
+            pstm.setInt(3, userId);
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Impossible de preparer la reinitialisation du mot de passe : " + e.getMessage(), e);
+        }
     }
 
     private void clearPasswordResetChallenge(int userId) {
