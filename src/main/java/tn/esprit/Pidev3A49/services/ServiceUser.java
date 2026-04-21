@@ -253,6 +253,9 @@ public class ServiceUser {
     public void requestPasswordReset(String email) {
         ensureConnection();
         FitopiaUser user = findByEmail(email).orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet email."));
+        if (isLocked(user)) {
+            throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
+        }
         String code = emailOtpService.generateOtpCode();
         String expiresAt = LocalDateTime.now().plus(RESET_OTP_DURATION).truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER);
         String query = "UPDATE `" + TABLE_NAME + "` SET reset_password_code=?, reset_password_expires_at=? WHERE id=?";
@@ -278,6 +281,9 @@ public class ServiceUser {
         ensureConnection();
         FitopiaUser user = findByIdentifier(identifier)
                 .orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet identifiant."));
+        if (isLocked(user)) {
+            throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
+        }
 
         String phone = safe(user.getPhone()).isBlank() ? DEFAULT_RESET_PHONE : normalizePhoneForSms(user.getPhone());
         String code = String.format("%06d", secureRandom.nextInt(1_000_000));
@@ -299,6 +305,9 @@ public class ServiceUser {
     public PasswordPolicyReport resetPasswordWithOtp(String email, String otpCode, String newPassword) {
         ensureConnection();
         FitopiaUser user = findByEmail(email).orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet email."));
+        if (isLocked(user)) {
+            throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
+        }
         ResetChallenge challenge = getResetChallenge(user.getId())
                 .orElseThrow(() -> new RuntimeException("Aucune demande de reinitialisation en attente pour cet email."));
 
