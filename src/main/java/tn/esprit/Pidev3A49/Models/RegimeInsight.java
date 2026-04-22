@@ -32,10 +32,15 @@ public class RegimeInsight {
     public String getLabel() { return label; }
     public int getTargetCalories() { return targetCalories; }
     public int getTotalMeals() { return totalMeals; }
+    public void setTotalMeals(int totalMeals) { this.totalMeals = totalMeals; }
     public double getAvgCaloriesPerMeal() { return avgCaloriesPerMeal; }
+    public void setAvgCaloriesPerMeal(double avgCaloriesPerMeal) { this.avgCaloriesPerMeal = avgCaloriesPerMeal; }
     public double getTotalProt() { return totalProt; }
+    public void setTotalProt(double totalProt) { this.totalProt = totalProt; }
     public double getTotalGluc() { return totalGluc; }
+    public void setTotalGluc(double totalGluc) { this.totalGluc = totalGluc; }
     public double getTotalLip() { return totalLip; }
+    public void setTotalLip(double totalLip) { this.totalLip = totalLip; }
     public String getFavoriteMealType() { return favoriteMealType; }
     public String getMacroDominant() { return macroDominant; }
     public void setMacroDominant(String macroDominant) { this.macroDominant = macroDominant; }
