@@ -44,11 +44,19 @@ public class BarcodeServer {
 
                     if ("POST".equals(t.getRequestMethod())) {
                         InputStream is = t.getRequestBody();
-                        String barcode = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                        byte[] bodyBytes = is.readAllBytes();
+                        String barcode = new String(bodyBytes, StandardCharsets.UTF_8).trim();
+                        
+                        System.out.println("[🛰️ Serveur] Données reçues du téléphone : " + barcode);
                         
                         javafx.application.Platform.runLater(() -> {
-                            if (onBarcodeReceived != null) {
-                                onBarcodeReceived.accept(barcode);
+                            try {
+                                if (onBarcodeReceived != null) {
+                                    onBarcodeReceived.accept(barcode);
+                                }
+                            } catch (Exception e) {
+                                System.err.println("[❌] Erreur pendant le traitement du barcode: " + e.getMessage());
+                                e.printStackTrace();
                             }
                         });
 
@@ -57,6 +65,14 @@ public class BarcodeServer {
                         OutputStream os = t.getResponseBody();
                         os.write(response.getBytes());
                         os.close();
+                    } else if ("GET".equals(t.getRequestMethod())) {
+                        String response = "Le serveur de scan est en ligne ! Tapez un code-barres via POST pour l'envoyer à l'app.";
+                        t.sendResponseHeaders(200, response.length());
+                        OutputStream os = t.getResponseBody();
+                        os.write(response.getBytes());
+                        os.close();
+                    } else {
+                         t.sendResponseHeaders(204, -1);
                     }
                 }
             });
@@ -64,9 +80,10 @@ public class BarcodeServer {
             server.start();
             System.out.println("✅ Serveur Barcode pret sur le port 8085");
         } catch (java.net.BindException e) {
-            // Port déjà utilisé, on ignore silencieusement
+            System.err.println("[❌] ERREUR : Le port 8085 est déjà utilisé. Une autre instance de l'application tourne probablement en arrière-plan.");
+            System.err.println("[💡] CONSEIL : Fermez toutes les fenêtres de l'application et vérifiez le gestionnaire des tâches pour arrêter les processus Java.");
         } catch (IOException e) {
-            System.out.println("⚠️ Information : Impossible de lancer le serveur réseau (" + e.getMessage() + "). La saisie manuelle fonctionne toujours !");
+            System.err.println("⚠️ Information : Impossible de lancer le serveur réseau (" + e.getMessage() + ").");
         }
     }
 

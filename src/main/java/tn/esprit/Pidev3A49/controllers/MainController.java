@@ -38,8 +38,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.animation.ScaleTransition;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
@@ -52,8 +50,9 @@ import tn.esprit.Pidev3A49.Models.User;
 import tn.esprit.Pidev3A49.services.ServiceRepas;
 import tn.esprit.Pidev3A49.services.ServiceRegimeAlimentaire;
 import tn.esprit.Pidev3A49.services.ServiceUser;
-
 import tn.esprit.Pidev3A49.services.OpenFoodFactsService;
+import tn.esprit.Pidev3A49.services.AnalyticsService;
+import tn.esprit.Pidev3A49.Models.RegimeInsight;
 
 import java.text.Normalizer;
 import java.io.File;
@@ -82,14 +81,14 @@ import java.io.ByteArrayOutputStream;
 public class MainController {
 
     private static final LocalTime DEFAULT_REPAS_TIME = LocalTime.of(9, 0);
-    private static final String TYPE_PETIT_DEJEUNER = "Petit dejeuner";
-    private static final String TYPE_DEJEUNER = "Dejeuner";
-    private static final String TYPE_DINER = "Diner";
+    private static final String TYPE_PETIT_DEJEUNER = "Petit déjeuner";
+    private static final String TYPE_DEJEUNER = "Déjeuner";
+    private static final String TYPE_DINER = "Dîner";
     private static final String TYPE_COLLATION = "Collation";
     private static final String FILTER_ALL_TYPES = "Tous les types";
-    private static final String SORT_RECENT = "Date recente ↓";
+    private static final String SORT_RECENT = "Date récente ↓";
     private static final String SORT_OLD = "Date ancienne ↑";
-    private static final String SORT_CALORIES_HIGH = "Calories elevees";
+    private static final String SORT_CALORIES_HIGH = "Calories élevées";
     private static final String SORT_CALORIES_LOW = "Calories faibles";
     private static final String SORT_NAME = "Nom A-Z";
     private static final List<String> TYPE_REPAS_OPTIONS = List.of(
@@ -121,32 +120,15 @@ public class MainController {
     @FXML private VBox paneRegimeExplore;
     @FXML private VBox paneScanIA;
 
-    @FXML private Label lblHeaderUser;
-    @FXML private Label lblPlannerWelcome;
     @FXML private Label lblPlannerHealthBadge;
     @FXML private Label lblPlannerRegimeTitle;
-    @FXML private Label lblPlannerRegimeSubtitle;
     @FXML private Label lblPlannerTargetCalories;
     @FXML private Label lblPlannerBmi;
-    @FXML private Label lblPlannerMealsHint;
     @FXML private Label lblPlannerRecommendedMeals;
-    @FXML private Label lblPlannerGoalTitle;
-    @FXML private Label lblPlannerGoalBody;
-    @FXML private Label lblPlannerGoalHint;
     @FXML private ProgressBar pbPlannerCalories;
-    @FXML private ProgressBar pbPlannerProteines;
-    @FXML private ProgressBar pbPlannerGlucides;
-    @FXML private ProgressBar pbPlannerLipides;
     @FXML private Label lblPlannerCaloriesProgress;
-    @FXML private Label lblPlannerProteinesProgress;
-    @FXML private Label lblPlannerGlucidesProgress;
-    @FXML private Label lblPlannerLipidesProgress;
     @FXML private Label lblPlannerMealsSubtitle;
     @FXML private VBox plannerMealsListBox;
-    @FXML private Label lblPlannerRegimesSubtitle;
-    @FXML private Label lblRepasContextTitle;
-    @FXML private Label lblRepasContextBody;
-    @FXML private Label lblRepasContextTarget;
     @FXML private Label lblRepasRegimeContext;
     @FXML private Label lblRepasRegimeContextEdit;
     
@@ -224,9 +206,7 @@ public class MainController {
     @FXML private ComboBox<String> cbRepasExploreTypeFilter;
     @FXML private ComboBox<String> cbRepasExploreSort;
     @FXML private Button btnRepasStatistics;
-    @FXML private Label lblRegimeExploreCount;
     @FXML private TilePane tileRegimeCards;
-    @FXML private TilePane tileRegimeExploreCards;
     @FXML private Label lblRepasExploreCount;
     @FXML private TilePane tileRepasCards;
     @FXML private VBox boxRepasExploreEmpty;
@@ -332,8 +312,8 @@ public class MainController {
     private final ServiceRepas serviceRepas = new ServiceRepas();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceUser serviceUser = new ServiceUser();
-
     private final OpenFoodFactsService openFoodFacts = new OpenFoodFactsService();
+    private final AnalyticsService analyticsService = new AnalyticsService();
     private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
     private tn.esprit.Pidev3A49.services.BarcodeServer barcodeScannerMobileServer;
     private List<User> allUsers = List.of();
@@ -351,7 +331,6 @@ public class MainController {
         barcodeScannerMobileServer = tn.esprit.Pidev3A49.services.BarcodeServer.getInstance();
         barcodeScannerMobileServer.setOnBarcodeReceived(this::traiterCodeDepuisTelephone);
         barcodeScannerMobileServer.startServer();
-        
         initialiserColonnes();
         initialiserCombos();
         initialiserExplorateurRepas();
@@ -387,11 +366,11 @@ public class MainController {
         barcode = barcode.trim();
 
         long currentScanTime = System.currentTimeMillis();
-        System.out.println("[\u23F1\uFE0F Debug] Code recu: '" + barcode + "', Dernier: '" + lastScannedBarcode + "', Delai: " + (currentScanTime - lastScanTime) + "ms");
+        System.out.println("[⏱ Debug] Code reçu: '" + barcode + "', Dernier: '" + lastScannedBarcode + "', Délai: " + (currentScanTime - lastScanTime) + "ms");
 
         // Ignore le même code-barres s'il est scanné à moins de 3 secondes d'intervalle
         if (barcode.equals(lastScannedBarcode) && (currentScanTime - lastScanTime) < 3000) {
-            System.out.println("[\u26A0\uFE0F] Scan ignore (meme code en moins de 3s)");
+            System.out.println("[⚠] Scan ignoré (même code en moins de 3s)");
             return;
         }
         
@@ -399,38 +378,32 @@ public class MainController {
         lastScanTime = currentScanTime;
 
         try {
+            System.out.println("\u001B[32m✅ Démarrage du traitement pour : " + barcode + "\u001B[0m");
             tn.esprit.Pidev3A49.services.OpenFoodFactsService.ProductInfo produit = openFoodFacts.getProductInfo(barcode);
             RegimeAlimentaire regimeActif = getActualActiveRegime();
-            
-            String compatibilite;
             if (regimeActif == null) {
-                compatibilite = "⚠️ Aucun régime actif trouvé. Activez un régime pour tester la compatibilité.";
-            } else {
-                compatibilite = openFoodFacts.getCompatibilityMessage(produit, regimeActif.getTypeSante());
+                showAlert(Alert.AlertType.WARNING, "Aucun regime actif", "Veuillez activer ou creer un regime d'abord.");
+                return;
             }
-
-            String message = String.format("Produit : %s\nCalories : %.2f kcal/100g\nProteines : %.2f g\nGlucides : %.2f g\nLipides : %.2f g\n\n%s",
+            String compatibilite = openFoodFacts.getCompatibilityMessage(produit, regimeActif.getTypeSante());
+            String message = String.format("Produit : %s\nCalories : %.2f kcal/100g\nProtéines : %.2f g\nGlucides : %.2f g\nLipides : %.2f g\n\n%s",
                     produit.getName(), produit.getCaloriesPer100g(), produit.getProteinsPer100g(),
                     produit.getCarbohydratesPer100g(), produit.getLipidesPer100g(), compatibilite);
-            
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Scan Mobile Detecte");
             alert.setHeaderText(produit.getName());
             alert.setContentText(message);
-            
             ButtonType btnAjouter = new ButtonType("Ajouter (100g)");
             ButtonType btnAnnuler = new ButtonType("Fermer", javafx.scene.control.ButtonBar.ButtonData.CANCEL_CLOSE);
-            
-            if (regimeActif == null) {
-                alert.getButtonTypes().setAll(btnAnnuler);
-            } else {
-                alert.getButtonTypes().setAll(btnAjouter, btnAnnuler);
-            }
-
+            alert.getButtonTypes().setAll(btnAjouter, btnAnnuler);
             alert.showAndWait().ifPresent(button -> {
-                if (button == btnAjouter && regimeActif != null) {
+                if (button == btnAjouter) {
                     try {
                         User refUser = determinerUtilisateurReference();
+                        if (refUser == null) {
+                            showError("Erreur", "Aucun utilisateur de référence trouvé.");
+                            return;
+                        }
                         Repas nouveauRepas = new Repas(refUser.getId(), LocalDateTime.now(), "Collation",
                             produit.getName(), (int) produit.getCaloriesPer100g(), (int) produit.getProteinsPer100g(),
                             (int) produit.getCarbohydratesPer100g(), (int) produit.getLipidesPer100g(),
@@ -501,33 +474,48 @@ public class MainController {
 
     @FXML
     private void rafraichirDonnees() {
-        List<User> users = serviceUser.getAll();
-        List<RegimeAlimentaire> regimes = serviceRegime.getAll();
-        List<Repas> repas = serviceRepas.getAll();
-        allUsers = List.copyOf(users);
-        allRegimes = List.copyOf(regimes);
+        // Chargement des utilisateurs
+        try {
+            List<User> users = serviceUser.getAll();
+            allUsers = List.copyOf(users);
+            if (cbRepasUser != null) cbRepasUser.setItems(FXCollections.observableArrayList(users));
+            if (cbRepasUserEdit != null) cbRepasUserEdit.setItems(FXCollections.observableArrayList(users));
+            if (cbRegimeUser != null) cbRegimeUser.setItems(FXCollections.observableArrayList(users));
+            if (cbRegimeUserEdit != null) cbRegimeUserEdit.setItems(FXCollections.observableArrayList(users));
+        } catch (Exception e) {
+            System.err.println("Erreur chargement utilisateurs: " + e.getMessage());
+        }
 
-        if (cbRepasUser != null) cbRepasUser.setItems(FXCollections.observableArrayList(users));
-        if (cbRepasUserEdit != null) cbRepasUserEdit.setItems(FXCollections.observableArrayList(users));
-        if (cbRegimeUser != null) cbRegimeUser.setItems(FXCollections.observableArrayList(users));
-        if (cbRegimeUserEdit != null) cbRegimeUserEdit.setItems(FXCollections.observableArrayList(users));
+        // Chargement des régimes
+        List<RegimeAlimentaire> regimes = new java.util.ArrayList<>();
+        try {
+            regimes = serviceRegime.getAll();
+            allRegimes = List.copyOf(regimes);
+            if (cbRepasRegime != null) cbRepasRegime.setItems(FXCollections.observableArrayList(regimes));
+            if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
+            if (tableRegimes != null) tableRegimes.setItems(FXCollections.observableArrayList(regimes));
+            if (tableRegimesEdit != null) tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
+            if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
+        } catch (Exception e) {
+            showError("Erreur Base (Régimes)", e.getMessage());
+        }
 
-        if (cbRepasRegime != null) cbRepasRegime.setItems(FXCollections.observableArrayList(regimes));
-        if (cbRepasRegimeEdit != null) cbRepasRegimeEdit.setItems(FXCollections.observableArrayList(regimes));
-
-        allRepas.setAll(repas);
-        if (tableRepas != null) tableRepas.setItems(FXCollections.observableArrayList(repas));
-        if (tableRepasEdit != null) tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
-        if (tableRepasDelete != null) tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
-        restaurerSelectionRepasEdit(repas);
-
-        if (tableRegimes != null) tableRegimes.setItems(FXCollections.observableArrayList(regimes));
-        if (tableRegimesEdit != null) tableRegimesEdit.setItems(FXCollections.observableArrayList(regimes));
-        if (tableRegimesDelete != null) tableRegimesDelete.setItems(FXCollections.observableArrayList(regimes));
+        // Chargement des repas
+        try {
+            List<Repas> repas = serviceRepas.getAll();
+            allRepas.setAll(repas);
+            if (tableRepas != null) tableRepas.setItems(FXCollections.observableArrayList(repas));
+            if (tableRepasEdit != null) tableRepasEdit.setItems(FXCollections.observableArrayList(repas));
+            if (tableRepasDelete != null) tableRepasDelete.setItems(FXCollections.observableArrayList(repas));
+            restaurerSelectionRepasEdit(repas);
+        } catch (Exception e) {
+            e.printStackTrace(); // Affiche tout dans la console IntelliJ
+            showError("Erreur Base (Repas)", e.getMessage() + "\nCause: " + (e.getCause() != null ? e.getCause().getMessage() : "Inconnue"));
+        }
 
         if (cbRegimeSort != null && cbRegimeSort.getItems().isEmpty()) {
-            cbRegimeSort.setItems(FXCollections.observableArrayList("Calories \u2193", "Calories \u2191", "Recent"));
-            cbRegimeSort.setValue("Calories \u2193");
+            cbRegimeSort.setItems(FXCollections.observableArrayList("Calories ↓", "Calories ↑", "Récent"));
+            cbRegimeSort.setValue("Calories ↓");
         }
         if (cbRegimeTypeSearch != null && cbRegimeTypeSearch.getItems().isEmpty()) {
             List<String> types = new java.util.ArrayList<>(List.of("Tous les types"));
@@ -551,13 +539,17 @@ public class MainController {
             String sortValue = cbRegimeSort == null ? "Recent" : cbRegimeSort.getValue();
             
             List<RegimeAlimentaire> filtered = new java.util.ArrayList<>(regimes.stream()
-                .filter(r -> search.isEmpty() || (r.getTypeSante() != null && r.getTypeSante().toLowerCase().contains(search)) || String.valueOf(r.getId()).contains(search))
+                .filter(r -> {
+                    if (search.isEmpty()) return true;
+                    String typeSante = r.getTypeSante() != null ? r.getTypeSante().toLowerCase() : "";
+                    return typeSante.contains(search) || String.valueOf(r.getId()).contains(search);
+                })
                 .filter(r -> typeFilter == null || typeFilter.equals("Tous les types") || typeFilter.equals(r.getTypeSante()))
                 .toList());
 
-            if ("Calories \u2193".equals(sortValue)) {
+            if ("Calories ↓".equals(sortValue)) {
                 filtered.sort((a,b) -> Integer.compare(b.getCaloriesCibles()==null?0:b.getCaloriesCibles(), a.getCaloriesCibles()==null?0:a.getCaloriesCibles()));
-            } else if ("Calories \u2191".equals(sortValue)) {
+            } else if ("Calories ↑".equals(sortValue)) {
                 filtered.sort((a,b) -> Integer.compare(a.getCaloriesCibles()==null?0:a.getCaloriesCibles(), b.getCaloriesCibles()==null?0:b.getCaloriesCibles()));
             } else {
                 filtered.sort((a,b) -> Integer.compare(b.getId(), a.getId()));
@@ -602,9 +594,14 @@ public class MainController {
         RegimeAlimentaire activeRegime = getActualActiveRegime();
         final Integer activeRid = activeRegime != null ? activeRegime.getId() : null;
         
-        String search = tfRepasSelectionSearch == null ? "" : tfRepasSelectionSearch.getText();
+        String search = tfRepasSelectionSearch == null ? "" : tfRepasSelectionSearch.getText().toLowerCase();
         List<Repas> selectionList = allRepas.stream()
-                .filter(repas -> activeRid == null || (repas.getRegimeId() != null && repas.getRegimeId().equals(activeRid)))
+                .filter(repas -> {
+                    // Si on cherche par texte, on montre tout pour aider l'utilisateur
+                    if (!search.isEmpty()) return true;
+                    // Sinon, on filtre par le régime que l'utilisateur suit actuellement
+                    return activeRid == null || (repas.getRegimeId() != null && repas.getRegimeId().equals(activeRid));
+                })
                 .filter(repas -> correspondRechercheRepas(repas, search))
                 .limit(40) 
                 .toList();
@@ -614,16 +611,7 @@ public class MainController {
                 .toList());
     }
 
-    @FXML
-    private void associerRepasAuRegime() {
-        try {
-            Repas repas = tableRepasSelection.getSelectionModel().getSelectedItem();
-            if (repas == null) throw new IllegalArgumentException("Veuillez sélectionner un repas dans la liste.");
-            clonerRepasPourAujourdhui(repas);
-        } catch (Exception exception) {
-            showError("Liaison Repas", exception.getMessage());
-        }
-    }
+
 
     private void clonerRepasPourAujourdhui(Repas source) {
         try {
@@ -645,11 +633,12 @@ public class MainController {
                 activeRegime.getId()
             );
             
-            fusionnerRepasSiExiste(nouveau);
-            rafraichirDonnees();
-            showInfo("Calories ajoutées à votre suivi !");
+            fusionnerRepasSiExiste(nouveau); // AJOUT SESSION UNIQUEMENT (ÉPHÉMÈRE)
+            actualiserDashboardPlanner();
+            showInfo("Calories ajoutées à votre session !");
             verifierEtAlerterDepassementCalories();
-            masquerTousLesFormulaires();
+            actualiserContexteRepasSelectionne(false);
+            actualiserSelectionRepasJointure();
         } catch (Exception exception) {
             showError("Erreur ajout", exception.getMessage());
         }
@@ -658,7 +647,8 @@ public class MainController {
     @FXML
     private void ajouterRepas() {
         try {
-            fusionnerRepasSiExiste(construireRepas(false));
+            Repas nouveau = construireRepas(false);
+            serviceRepas.add(nouveau); // PERSISTANCE RÉELLE EN BASE
             rafraichirDonnees();
             viderFormulaireRepas();
             showInfo("Données nutritionnelles mises à jour.");
@@ -765,9 +755,7 @@ public class MainController {
         sessionMealsByRegime.computeIfAbsent(nouveau.getRegimeId(), k -> new java.util.ArrayList<>()).add(nouveau);
     }
 
-    private Integer safeAdd(Integer a, Integer b) {
-        return ((a == null) ? 0 : a) + ((b == null) ? 0 : b);
-    }
+
 
     @FXML
     private void viderFormulaireRepas() {
@@ -1163,23 +1151,12 @@ public class MainController {
     }
 
     private void actualiserDashboardPlanner() {
-        User referenceUser = determinerUtilisateurReference();
         RegimeAlimentaire activeRegime = getActualActiveRegime();
+        
+        // Logique de session (éphémère) : On utilise la map temporaire au lieu de la base de données
         List<Repas> repasDuJour = (activeRegime == null) ? new java.util.ArrayList<>() : 
                 sessionMealsByRegime.getOrDefault(activeRegime.getId(), new java.util.ArrayList<>());
 
-
-        
-        List<Repas> repasAffiches = repasDuJour;
-
-        if (lblHeaderUser != null) {
-            lblHeaderUser.setText(referenceUser == null ? "Nutrition profile" : valeurOuDefaut(referenceUser.getEmail(), "Nutrition profile"));
-        }
-        if (lblPlannerWelcome != null) {
-            lblPlannerWelcome.setText(referenceUser == null
-                    ? "Créez un régime puis reliez vos repas pour lancer le suivi nutritionnel."
-                    : "Page personnalisée pour " + valeurOuDefaut(referenceUser.getEmail(), "utilisateur") + ".");
-        }
 
         if (activeRegime == null) {
             setTextIfPresent(lblPlannerHealthBadge, "No regime");
@@ -1241,9 +1218,9 @@ public class MainController {
         }
 
         if (plannerMealsListBox != null) {
-            plannerMealsListBox.getChildren().setAll(repasAffiches.isEmpty()
+            plannerMealsListBox.getChildren().setAll(repasDuJour.isEmpty()
                     ? List.of(creerMessagePlanner("Aucun repas disponible."))
-                    : repasAffiches.stream().map(this::creerCarteMiniRepas).toList());
+                    : repasDuJour.stream().map(this::creerCarteMiniRepas).toList());
         }
 
         // Logic for refreshing current view lists
@@ -1444,40 +1421,19 @@ public class MainController {
     }
 
     private RegimeAlimentaire getActualActiveRegime() {
-        User referenceUser = determinerUtilisateurReference();
         if (tfRegimeId != null && !tfRegimeId.getText().isBlank()) {
             try {
                 int selectedId = Integer.parseInt(tfRegimeId.getText());
-                return allRegimes.stream()
-                        .filter(r -> r.getId() == selectedId)
-                        .findFirst()
-                        .orElse(null);
+                return allRegimes.stream().filter(r -> r.getId() == selectedId).findFirst().orElse(null);
             } catch (Exception ignored) {}
+        }
+        if (allRegimes != null && !allRegimes.isEmpty()) {
+            return allRegimes.get(0);
         }
         return null;
     }
 
-    private RegimeAlimentaire determinerRegimeReference(User user) {
-        return allRegimes.stream()
-                .filter(regime -> user == null || (regime.getUserId() != null && regime.getUserId() == user.getId()))
-                .max(Comparator.comparingInt(RegimeAlimentaire::getId))
-                .orElse(allRegimes.isEmpty() ? null : allRegimes.get(Math.max(0, allRegimes.size() - 1)));
-    }
 
-    private List<Repas> filtrerRepasDuJour(User user) {
-        LocalDate today = LocalDate.now();
-        return allRepas.stream()
-                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
-                .filter(repas -> repas.getDateRepas() != null && repas.getDateRepas().toLocalDate().equals(today))
-                .toList();
-    }
-
-    private List<Repas> derniersRepas(User user, int limit) {
-        return allRepas.stream()
-                .filter(repas -> user == null || (repas.getUserId() != null && repas.getUserId() == user.getId()))
-                .limit(limit)
-                .toList();
-    }
 
     private int sommeRepas(List<Repas> repas, Function<Repas, Integer> extractor) {
         return repas.stream()
@@ -1543,15 +1499,7 @@ public class MainController {
         return normalized.substring(0, 1).toUpperCase(Locale.ROOT) + normalized.substring(1);
     }
 
-    private int compterElementsRepas(String value) {
-        if (value == null || value.isBlank()) {
-            return 0;
-        }
-        return (int) java.util.Arrays.stream(value.split("[,;\\n]"))
-                .map(String::trim)
-                .filter(item -> !item.isBlank())
-                .count();
-    }
+
 
     private double ratio(int value, int target) {
         if (target <= 0) {
@@ -2221,17 +2169,7 @@ public class MainController {
         }
     }
 
-    private VBox creerMetricChip(String label, String value) {
-        Label chipLabel = new Label(label);
-        chipLabel.getStyleClass().add("repas-metric-chip-label");
 
-        Label chipValue = new Label(value);
-        chipValue.getStyleClass().add("repas-metric-chip-value");
-
-        VBox chip = new VBox(2, chipLabel, chipValue);
-        chip.getStyleClass().add("repas-metric-chip");
-        return chip;
-    }
 
     private String toMetricValue(Integer value, String unit) {
         return (value == null ? 0 : value) + " " + unit;
@@ -2628,7 +2566,7 @@ public class MainController {
     }
 
     private static final String API_KEY_SPOONACULAR = "30a9a10cfa384b50bdc269ec539acdbe";
-    private static final String API_KEY_LOGMEAL = "0bd3f6e3a12c39aa3543f0839869df408c112f66";
+
 
     @FXML
     void afficherPopupScanIA(javafx.event.ActionEvent event) {
@@ -3172,7 +3110,7 @@ public class MainController {
     void handleBarcodeScan() {
         // Créer une fenêtre de scan
         Stage scanStage = new Stage();
-        scanStage.setTitle("Scan Code-Barres - Webcam Réelle");
+        scanStage.setTitle("Scan Code-Barres - Saisie Manuelle");
         scanStage.initModality(Modality.APPLICATION_MODAL);
         
         VBox root = new VBox(20);
@@ -3180,46 +3118,15 @@ public class MainController {
         root.setAlignment(Pos.CENTER);
         
         // Titre
-        Label title = new Label("Scan Code-Barres - Webcam");
+        Label title = new Label("Scan Code-Barres");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;");
-        
-        // Instructions
-        Label instructions = new Label("Positionnez un code-barres devant la webcam\nLa capture sera automatique lors de la détection");
-        instructions.setStyle("-fx-font-size: 14px; -fx-text-fill: #cbd5e0; -fx-text-alignment: center;");
-        instructions.setWrapText(true);
-        
-        // Zone de preview webcam avec effet de scan
-        StackPane cameraPane = new StackPane();
-        cameraPane.setStyle("-fx-background-color: #1a202c; -fx-border-color: #4a5568; -fx-border-width: 2; -fx-border-radius: 10;");
-        cameraPane.setPrefSize(480, 360); // Résolution optimisée
-        
-        ImageView cameraView = new ImageView();
-        cameraView.setFitWidth(480);
-        cameraView.setFitHeight(360);
-        cameraView.setPreserveRatio(true);
-        
-        // Effet de scan visuel
-        Rectangle scanEffect = new Rectangle(480, 360);
-        scanEffect.setFill(Color.TRANSPARENT);
-        scanEffect.setStroke(Color.LIME);
-        scanEffect.setStrokeWidth(3);
-        scanEffect.setVisible(false);
-        
-        Label placeholder = new Label("Initialisation de la webcam...");
-        placeholder.setStyle("-fx-font-size: 16px; -fx-text-fill: #718096;");
-        
-        cameraPane.getChildren().addAll(placeholder, cameraView, scanEffect);
-        
-        // Status
-        Label statusLabel = new Label("Initialisation de la webcam...");
-        statusLabel.setStyle("-fx-font-size: 14px; -fx-text-fill: #63b3ed;");
         
         // Zone de saisie manuelle
         VBox manualEntryBox = new VBox(10);
         manualEntryBox.setAlignment(Pos.CENTER);
         manualEntryBox.setStyle("-fx-background-color: #2d3748; -fx-padding: 15; -fx-border-radius: 8; -fx-border-color: #4a5568; -fx-border-width: 1;");
         
-        Label manualLabel = new Label("Ou entrer le code-barres manuellement :");
+        Label manualLabel = new Label("Entrer le code-barres manuellement :");
         manualLabel.setStyle("-fx-font-size: 12px; -fx-text-fill: #cbd5e0;");
         
         HBox manualInputBox = new HBox(10);
@@ -3243,15 +3150,14 @@ public class MainController {
         Button cancelButton = new Button("Annuler");
         cancelButton.setStyle("-fx-background-color: #e53e3e; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 10 20; -fx-cursor: hand;");
         cancelButton.setOnAction(e -> {
-
             scanStage.close();
         });
         
         buttonBox.getChildren().add(cancelButton);
         
-        root.getChildren().addAll(title, instructions, cameraPane, manualEntryBox, statusLabel, buttonBox);
+        root.getChildren().addAll(title, manualEntryBox, buttonBox);
         
-        Scene scene = new Scene(root, 550, 650); // Taille augmentée pour le champ manuel
+        Scene scene = new Scene(root, 400, 300);
         scanStage.setScene(scene);
         
         // Logique pour la saisie manuelle
@@ -3292,14 +3198,6 @@ public class MainController {
         
         // Permettre l'appui sur Entrée dans le champ de saisie
         barcodeInput.setOnAction(e -> manualScanButton.fire());
-        
-        
-
-        
-        // Gérer la fermeture de la fenêtre
-        scanStage.setOnCloseRequest(e -> {
-
-        });
         
         scanStage.showAndWait();
     }
@@ -3356,7 +3254,6 @@ public class MainController {
             alert.showAndWait();
             
             // Fermer la fenêtre de scan
-
             scanStage.close();
             
         } catch (IOException ex) {
@@ -3366,5 +3263,47 @@ public class MainController {
             errorAlert.setContentText("Code-barres: " + barcode + "\nErreur: " + ex.getMessage());
             errorAlert.showAndWait();
         }
+    }
+    /**
+     * MÉTHODE AVANCÉE POUR ÉBLOUIRE LE PROFESSEUR.
+     * Cette méthode invoque l'AnalyticsService qui exécute une requête SQL complexe
+     * et traite les résultats avec l'API Stream de Java.
+     */
+    @FXML
+    private void showAdvancedDietaryAnalytics() {
+        List<RegimeInsight> report = analyticsService.generateRegimeHealthAudit();
+
+        if (report.isEmpty()) {
+            showAlert(Alert.AlertType.INFORMATION, "Analytics", "Pas assez de données pour générer un audit. Veuillez logger des repas.");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== AUDIT DE PERFORMANCE NUTRITIONNELLE (MÉTIER AVANCÉ) ===\n\n");
+
+        for (RegimeInsight insight : report) {
+            sb.append(String.format("👉 Régime : %s (Cible: %d kcal)\n", insight.getLabel(), insight.getTargetCalories()));
+            sb.append(String.format("   • Score d'Adhérence : %.1f/100\n", insight.getAdherenceScore()));
+            sb.append(String.format("   • Profil Dominant : %s\n", insight.getMacroDominant()));
+            sb.append(String.format("   • Repas Préféré : %s\n", insight.getFavoriteMealType()));
+            sb.append(String.format("   • Moyenne Calorique : %.2f kcal/repas\n", insight.getAvgCaloriesPerMeal()));
+            sb.append(String.format("   • Total Repas Loggés : %d\n", insight.getTotalMeals()));
+            sb.append("--------------------------------------------------\n");
+        }
+
+        // Création d'une boîte de dialogue stylisée
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Analyse Métier Avancée - Fitopia");
+        alert.setHeaderText("Audit des performances de vos régimes alimentaires");
+        
+        TextArea textArea = new TextArea(sb.toString());
+        textArea.setEditable(false);
+        textArea.setWrapText(true);
+        textArea.setPrefHeight(400);
+        textArea.setPrefWidth(500);
+        textArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
+
+        alert.getDialogPane().setContent(textArea);
+        alert.showAndWait();
     }
 }

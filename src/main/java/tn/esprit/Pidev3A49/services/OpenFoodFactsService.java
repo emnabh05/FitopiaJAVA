@@ -3,6 +3,7 @@ package tn.esprit.Pidev3A49.services;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -35,7 +36,11 @@ public class OpenFoodFactsService {
                 throw new IOException("Code HTTP: " + response.code());
             }
 
-            String responseBody = response.body().string();
+            ResponseBody body = response.body();
+            if (body == null) {
+                throw new IOException("Corps de la réponse vide");
+            }
+            String responseBody = body.string();
             JSONObject json = new JSONObject(responseBody);
             
             if (json.getInt("status") != 1) {

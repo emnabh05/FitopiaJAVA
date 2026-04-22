@@ -42,7 +42,7 @@ public class ServiceRepas implements IServices<Repas> {
                 }
             }
         } catch (SQLException exception) {
-            throw new IllegalStateException("Impossible d'ajouter le repas.", exception);
+            throw new IllegalStateException("Impossible d'ajouter le repas. Cause SQL: " + exception.getMessage(), exception);
         }
     }
 
@@ -65,7 +65,7 @@ public class ServiceRepas implements IServices<Repas> {
                 repasList.add(mapResultSet(rs));
             }
         } catch (SQLException exception) {
-            throw new IllegalStateException("Impossible de recuperer les repas.", exception);
+            throw new IllegalStateException("Impossible de recuperer les repas. Cause SQL: " + exception.getMessage(), exception);
         }
 
         return repasList;
@@ -111,7 +111,7 @@ public class ServiceRepas implements IServices<Repas> {
             remplirPreparedStatementRepas(pstm, repas, true);
             pstm.executeUpdate();
         } catch (SQLException exception) {
-            throw new IllegalStateException("Impossible de modifier le repas.", exception);
+            throw new IllegalStateException("Impossible de modifier le repas. Cause SQL: " + exception.getMessage(), exception);
         }
     }
 
