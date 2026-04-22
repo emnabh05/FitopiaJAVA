@@ -3271,7 +3271,7 @@ public class MainController {
      */
     @FXML
     private void showAdvancedDietaryAnalytics() {
-        List<RegimeInsight> report = analyticsService.generateRegimeHealthAudit();
+        List<RegimeInsight> report = analyticsService.generateRegimeHealthAudit(sessionMealsByRegime);
 
         if (report.isEmpty()) {
             showAlert(Alert.AlertType.INFORMATION, "Analytics", "Pas assez de données pour générer un audit. Veuillez logger des repas.");

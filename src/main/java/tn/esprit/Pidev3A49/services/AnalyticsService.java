@@ -31,19 +31,21 @@ public class AnalyticsService {
      * 
      * @return Une liste de RegimeInsight triée par score de performance.
      */
-    public List<RegimeInsight> generateRegimeHealthAudit() {
+    /**
+     * Méthode MÉTIER AVANCÉE : Audit de performance et d'adhérence nutritionnelle.
+     * Fusionne les données de la base de données avec les repas de la session actuelle.
+     */
+    public List<RegimeInsight> generateRegimeHealthAudit(Map<Integer, List<tn.esprit.Pidev3A49.Models.Repas>> sessionMeals) {
         List<RegimeInsight> insights = new ArrayList<>();
 
-        // REQUETE SQL COMPLEXE :
-        // Elle récupère les statistiques globales par régime tout en utilisant une sous-requête corrélée
-        // pour déterminer dynamiquement le type de repas le plus fréquent (favorite_meal) pour chaque régime.
+        // REQUETE SQL : On part du régime pour être sûr de tout voir (LEFT JOIN)
         String query = """
             SELECT 
                 r.id as regime_id,
                 r.type_sante as label,
                 r.calories_cibles as target,
-                COUNT(rep.id) as total_meals,
-                COALESCE(AVG(rep.calories), 0) as avg_calories_per_meal,
+                COUNT(rep.id_repas) as total_meals,
+                COALESCE(SUM(rep.calories), 0) as sum_cal,
                 COALESCE(SUM(rep.proteines), 0) as total_prot,
                 COALESCE(SUM(rep.glucides), 0) as total_gluc,
                 COALESCE(SUM(rep.lipides), 0) as total_lip,
@@ -54,38 +56,49 @@ public class AnalyticsService {
                  ORDER BY COUNT(*) DESC 
                  LIMIT 1) as favorite_meal
             FROM %s r
-            INNER JOIN %s rep ON r.id = rep.regime_id
+            LEFT JOIN %s rep ON r.id = rep.regime_id
             GROUP BY r.id, r.type_sante, r.calories_cibles
-            HAVING total_meals > 0
-            ORDER BY total_meals DESC
         """.formatted(SchemaInitializer.REPAS_TABLE, SchemaInitializer.REGIME_TABLE, SchemaInitializer.REPAS_TABLE);
 
         try (Statement st = cnx.createStatement();
              ResultSet rs = st.executeQuery(query)) {
 
             while (rs.next()) {
+                int rid = rs.getInt("regime_id");
                 RegimeInsight insight = new RegimeInsight(
-                        rs.getInt("regime_id"),
+                        rid,
                         rs.getString("label"),
                         rs.getInt("target"),
                         rs.getInt("total_meals"),
-                        rs.getDouble("avg_calories_per_meal"),
+                        0.0, // On calculera la moyenne après fusion
                         rs.getDouble("total_prot"),
                         rs.getDouble("total_gluc"),
                         rs.getDouble("total_lip"),
                         rs.getString("favorite_meal")
                 );
-                insights.add(insight);
+                
+                // --- FUSION AVEC LES DONNÉES DE SESSION ---
+                List<tn.esprit.Pidev3A49.Models.Repas> sMeals = sessionMeals.getOrDefault(rid, new ArrayList<>());
+                double totalCal = rs.getDouble("sum_cal");
+                
+                for (tn.esprit.Pidev3A49.Models.Repas s : sMeals) {
+                    insight.setTotalMeals(insight.getTotalMeals() + 1);
+                    totalCal += (s.getCalories() == null ? 0 : s.getCalories());
+                    insight.setTotalProt(insight.getTotalProt() + (s.getProteines() == null ? 0 : s.getProteines()));
+                    insight.setTotalGluc(insight.getTotalGluc() + (s.getGlucides() == null ? 0 : s.getGlucides()));
+                    insight.setTotalLip(insight.getTotalLip() + (s.getLipides() == null ? 0 : s.getLipides()));
+                }
+                
+                if (insight.getTotalMeals() > 0) {
+                    insight.setAvgCaloriesPerMeal(totalCal / insight.getTotalMeals());
+                    insights.add(insight);
+                }
             }
 
         } catch (SQLException e) {
-            System.err.println("Erreur lors de l'exécution de l'audit analytique : " + e.getMessage());
-            // Dans un vrai projet, on utiliserait un logger
+            System.err.println("Erreur audit analytique : " + e.getMessage());
         }
 
-        // LOGIQUE JAVA COMPLEXE :
-        // On utilise l'API Stream pour enrichir les objets DTO avec des calculs algorithmiques
-        // et on effectue un tri personnalisé final.
         return insights.stream()
                 .map(this::enrichWithIntelligence)
                 .sorted(Comparator.comparingDouble(RegimeInsight::getAdherenceScore).reversed())
