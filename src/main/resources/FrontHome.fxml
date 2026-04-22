@@ -55,16 +55,94 @@
                         </VBox>
                         <VBox spacing="10.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 16; -fx-padding: 22;" AnchorPane.rightAnchor="130.0" AnchorPane.topAnchor="80.0" AnchorPane.bottomAnchor="80.0" prefWidth="430.0">
                             <children>
-                                <Label style="-fx-text-fill: #17363b; -fx-font-size: 22px; -fx-font-weight: bold;" text="API / IA Insights" />
-                                <Label style="-fx-text-fill: #476168; -fx-font-size: 11px;" text="Bloc avance pour la gestion utilisateur, la securite et les integrations intelligentes." wrapText="true" />
-                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Analyse profil" />
-                                <Label fx:id="profileSummaryLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
-                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Securite" />
-                                <Label fx:id="securitySummaryLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
-                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="APIs recommandees" />
-                                <Label fx:id="apiIdeasLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
-                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="IA recommandees" />
-                                <Label fx:id="aiIdeasLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" wrapText="true" />
+                                <Label style="-fx-text-fill: #17363b; -fx-font-size: 22px; -fx-font-weight: bold;" text="User Digital Twin Analysis" />
+                                <Label fx:id="digitalTwinSummaryLabel" style="-fx-text-fill: #476168; -fx-font-size: 11px;" text="Le jumeau numerique compare le plan nutritionnel theorique et le comportement reel." wrapText="true" />
+                                <HBox spacing="16.0">
+                                    <children>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Objectif" />
+                                                <Label fx:id="goalValueLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Regime actif" />
+                                                <Label fx:id="regimeValueLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <HBox spacing="16.0">
+                                    <children>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Calories cibles" />
+                                                <Label fx:id="targetCaloriesValueLabel" style="-fx-text-fill: #1f4b52; -fx-font-size: 12px; -fx-font-weight: bold;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Moyenne reelle" />
+                                                <Label fx:id="avgRealCaloriesValueLabel" style="-fx-text-fill: #1f4b52; -fx-font-size: 12px; -fx-font-weight: bold;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <HBox spacing="16.0">
+                                    <children>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Total calories" />
+                                                <Label fx:id="totalRealCaloriesValueLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Nombre de repas" />
+                                                <Label fx:id="mealsCountValueLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Derniere activite alimentaire" />
+                                        <Label fx:id="lastMealDateValueLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" text="-" wrapText="true" />
+                                    </children>
+                                </VBox>
+                                <HBox spacing="16.0">
+                                    <children>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Ecart calorique" />
+                                                <Label fx:id="calorieGapValueLabel" style="-fx-text-fill: #1f4b52; -fx-font-size: 12px; -fx-font-weight: bold;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Twin score" />
+                                                <Label fx:id="twinScoreValueLabel" style="-fx-text-fill: #1f4b52; -fx-font-size: 12px; -fx-font-weight: bold;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                                <HBox spacing="16.0">
+                                    <children>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Statut d'alignement" />
+                                                <Label fx:id="alignmentStatusValueLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                        <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                            <children>
+                                                <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="Niveau d'alerte" />
+                                                <Label fx:id="alertLevelValueLabel" style="-fx-text-fill: #476168; -fx-font-size: 12px;" text="-" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
                                 <Label style="-fx-text-fill: #15363a; -fx-font-size: 12px; -fx-font-weight: bold;" text="JWT Debug (preuve)" />
                                 <Label fx:id="jwtSummaryLabel" style="-fx-text-fill: #1f4b52; -fx-font-size: 11px;" wrapText="true" text="JWT status" />
                                 <Label fx:id="jwtTokenMaskedLabel" style="-fx-text-fill: #476168; -fx-font-size: 10px;" wrapText="true" text="token masque" />
