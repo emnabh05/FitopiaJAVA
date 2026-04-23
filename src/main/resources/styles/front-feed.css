@@ -208,6 +208,7 @@
     -fx-background-color: linear-gradient(to bottom, rgba(255, 255, 255, 0.99), rgba(246, 251, 248, 0.96));
     -fx-border-color: #d8e5ef;
     -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.07), 18, 0.16, 0, 6);
+    -fx-spacing: 12;
 }
 
 .composer-header {
@@ -248,6 +249,14 @@
     -fx-text-fill: #314760;
 }
 
+.composer-field-card {
+    -fx-background-color: rgba(255, 255, 255, 0.92);
+    -fx-background-radius: 18;
+    -fx-border-color: #e1e9f1;
+    -fx-border-radius: 18;
+    -fx-padding: 12 12 10 12;
+}
+
 .composer-microcopy {
     -fx-font-size: 11px;
     -fx-text-fill: #8a9aae;
@@ -284,6 +293,7 @@
     -fx-background-color: linear-gradient(to bottom, #fbfdff, #f6fbff);
     -fx-border-color: #dbe8f2;
     -fx-padding: 12 12;
+    -fx-effect: dropshadow(gaussian, rgba(148, 163, 184, 0.08), 8, 0.08, 0, 1);
 }
 
 .image-path-input {
@@ -305,6 +315,11 @@
 
 .composer-footer-row {
     -fx-padding: 4 0 0 0;
+    -fx-background-color: rgba(255, 255, 255, 0.75);
+    -fx-background-radius: 16;
+    -fx-border-color: #e4ebf2;
+    -fx-border-radius: 16;
+    -fx-padding: 10 10 10 10;
 }
 
 .composer-delete {

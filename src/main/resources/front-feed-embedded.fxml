@@ -50,11 +50,11 @@
                             <Label fx:id="lblForumComposerHint" styleClass="panel-note composer-subtitle" text="You are posting as the connected user." wrapText="true"/>
                         </VBox>
                     </HBox>
-                    <VBox spacing="6.0">
+                    <VBox spacing="6.0" styleClass="composer-field-card">
                         <Label styleClass="composer-section-label" text="Post title"/>
                         <TextField fx:id="tfForumTitle" promptText="Give your post a short headline" styleClass="text-input compact-input composer-input"/>
                     </VBox>
-                    <VBox spacing="6.0">
+                    <VBox spacing="6.0" styleClass="composer-field-card">
                         <Label styleClass="composer-section-label" text="Share with the community"/>
                         <TextArea fx:id="taForumContent" prefRowCount="5" promptText="Share your story, advice, or question..." styleClass="text-area-input compact-area composer-input composer-textarea"/>
                     </VBox>
@@ -76,7 +76,6 @@
                         <Button onAction="#saveForum" styleClass="primary-pill primary-pill-compact" text="Publish"/>
                         <Button onAction="#clearForumEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
                     </HBox>
-                    <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill compact-danger composer-delete" text="Delete selected post"/>
                 </VBox>
                 <VBox managed="false" visible="false">
                     <Label fx:id="lblCommentComposerHint" text="Your comment will be linked to your account." />
