@@ -22,54 +22,61 @@
                 <Insets bottom="28.0" left="28.0" right="28.0" top="20.0"/>
             </padding>
             <VBox prefWidth="900.0" spacing="18.0">
-                <VBox spacing="10.0" styleClass="hero-card">
-                    <Label styleClass="hero-title" text="Fitopia Community: Learn Faster, Grow Together"/>
-                    <Label styleClass="hero-subtitle" text="A frontend feed inspired by social apps. Scroll all forums, react, read comments, and publish new posts from one place." wrapText="true"/>
-                    <Label fx:id="lblWelcomeUser" styleClass="hero-stats" text="Connected user experience"/>
-                    <HBox spacing="10.0">
-                        <Button onAction="#refreshData" styleClass="primary-pill" text="View feed"/>
-                        <Label fx:id="lblFeedStats" styleClass="hero-stats" text="0 forums visibles"/>
+                <VBox spacing="12.0" styleClass="hero-card hero-card-compact">
+                    <HBox alignment="CENTER_LEFT" spacing="14.0">
+                        <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                            <Label styleClass="hero-title hero-title-compact" text="Fitopia Community"/>
+                            <Label styleClass="hero-subtitle hero-subtitle-compact" text="A clean desktop social feed for posts, reactions, comments, and quick publishing." wrapText="true"/>
+                        </VBox>
+                        <Label fx:id="lblWelcomeUser" styleClass="hero-stats hero-chip" text="Connected user experience"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="hero-toolbar">
+                        <TextField fx:id="tfSearch" onAction="#refreshData" promptText="Search by title, author, or content" styleClass="search-input hero-search"/>
+                        <Button onAction="#refreshData" styleClass="primary-pill primary-pill-compact" text="Refresh"/>
+                        <Label fx:id="lblFeedStats" styleClass="hero-stats hero-chip" text="0 forums visibles"/>
                     </HBox>
                 </VBox>
                 <VBox fx:id="feedContainer" spacing="16.0"/>
             </VBox>
             <VBox prefWidth="360.0" spacing="18.0">
-                <VBox spacing="14.0" styleClass="sidebar-card">
-                    <Label styleClass="panel-title" text="Create or edit forum"/>
+                <VBox spacing="12.0" styleClass="sidebar-card composer-card">
+                    <Label styleClass="panel-title" text="Create your post"/>
                     <Label fx:id="lblForumComposerHint" styleClass="panel-note" text="You are posting as the connected user." wrapText="true"/>
-                    <TextField fx:id="tfForumTitle" promptText="Forum title" styleClass="text-input"/>
-                    <TextArea fx:id="taForumContent" prefRowCount="5" promptText="Share your story, advice, or question..." styleClass="text-area-input"/>
-                    <TextField fx:id="tfForumImagePath" editable="false" promptText="No image selected yet" styleClass="text-input"/>
-                    <HBox spacing="10.0">
-                        <Button onAction="#chooseForumImage" styleClass="ghost-pill" text="Choose photo"/>
-                        <Button onAction="#clearForumImage" styleClass="ghost-pill" text="Remove photo"/>
+                    <TextField fx:id="tfForumTitle" promptText="Post title" styleClass="text-input compact-input"/>
+                    <TextArea fx:id="taForumContent" prefRowCount="4" promptText="Share your story, advice, or question..." styleClass="text-area-input compact-area"/>
+                    <VBox spacing="8.0" styleClass="media-picker-box">
+                        <TextField fx:id="tfForumImagePath" editable="false" promptText="No image selected yet" styleClass="text-input compact-input"/>
+                        <HBox spacing="8.0">
+                            <Button onAction="#chooseForumImage" styleClass="ghost-pill compact-pill" text="Choose photo"/>
+                            <Button onAction="#clearForumImage" styleClass="ghost-pill compact-pill" text="Remove"/>
+                        </HBox>
                     </HBox>
-                    <ImageView fx:id="ivForumPreview" fitHeight="150.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" visible="false"/>
-                    <HBox spacing="10.0">
-                        <Button onAction="#saveForum" styleClass="primary-pill" text="Save forum"/>
-                        <Button onAction="#clearForumEditor" styleClass="ghost-pill" text="Clear"/>
+                    <ImageView fx:id="ivForumPreview" fitHeight="126.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" styleClass="composer-preview" visible="false"/>
+                    <HBox spacing="8.0">
+                        <Button onAction="#saveForum" styleClass="primary-pill primary-pill-compact" text="Publish"/>
+                        <Button onAction="#clearForumEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
                     </HBox>
-                    <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill" text="Delete selected forum"/>
+                    <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill compact-danger" text="Delete selected post"/>
                 </VBox>
-                <VBox spacing="14.0" styleClass="sidebar-card">
-                    <Label styleClass="panel-title" text="Create or edit comment"/>
+                <VBox spacing="12.0" styleClass="sidebar-card composer-card">
+                    <Label styleClass="panel-title" text="Comment editor"/>
                     <Label fx:id="lblCommentComposerHint" styleClass="panel-note" text="Your comment will be linked to your account." wrapText="true"/>
                     <Label fx:id="lblCommentContext" styleClass="panel-note" text="Aucun commentaire selectionne" wrapText="true"/>
-                    <ComboBox fx:id="cbCommentForum" maxWidth="1.7976931348623157E308" promptText="Choose forum" styleClass="combo-input"/>
-                    <TextArea fx:id="taCommentContent" prefRowCount="4" promptText="Write your comment..." styleClass="text-area-input"/>
-                    <HBox spacing="10.0">
-                        <Button onAction="#saveComment" styleClass="primary-pill" text="Save comment"/>
-                        <Button onAction="#clearCommentEditor" styleClass="ghost-pill" text="Clear"/>
+                    <ComboBox fx:id="cbCommentForum" maxWidth="1.7976931348623157E308" promptText="Choose forum" styleClass="combo-input compact-input"/>
+                    <TextArea fx:id="taCommentContent" prefRowCount="3" promptText="Write your comment..." styleClass="text-area-input compact-area"/>
+                    <HBox spacing="8.0">
+                        <Button onAction="#saveComment" styleClass="primary-pill primary-pill-compact" text="Save comment"/>
+                        <Button onAction="#clearCommentEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
                     </HBox>
-                    <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedComment" styleClass="danger-pill" text="Delete selected comment"/>
+                    <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedComment" styleClass="danger-pill compact-danger" text="Delete selected comment"/>
                 </VBox>
-                <VBox spacing="12.0" styleClass="sidebar-card">
-                    <Label styleClass="panel-title" text="Interaction ideas"/>
-                    <Label styleClass="mini-metric" text="Like, Comment, Share and Reply buttons are exposed on each forum card." wrapText="true"/>
+                <VBox spacing="10.0" styleClass="sidebar-card info-card">
+                    <Label styleClass="panel-title" text="Posting tips"/>
+                    <Label styleClass="mini-metric" text="Every post is linked to the connected user and appears in the shared community feed." wrapText="true"/>
                     <Separator/>
-                    <Label styleClass="mini-metric" text="Use Edit/Delete on any card to load it into the editor." wrapText="true"/>
+                    <Label styleClass="mini-metric" text="Use Edit/Delete from your own card to load it back into the editor instantly." wrapText="true"/>
                     <Separator/>
-                    <Label styleClass="mini-metric" text="Quick comment boxes under each forum let users reply directly from the feed." wrapText="true"/>
+                    <Label styleClass="mini-metric" text="Quick comments stay available under each card for lightweight social interaction." wrapText="true"/>
                 </VBox>
             </VBox>
         </HBox>
