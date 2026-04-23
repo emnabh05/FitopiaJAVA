@@ -482,7 +482,9 @@ public class FrontFeedController {
     private VBox buildMessagingSidebar() {
         VBox shell = new VBox(12);
         shell.getStyleClass().addAll("sidebar-card", "messaging-shell");
-        VBox.setVgrow(shell, Priority.ALWAYS);
+        shell.setPrefHeight(610);
+        shell.setMaxHeight(610);
+        VBox.setVgrow(shell, Priority.NEVER);
 
         if (activeMessagingUser == null) {
             shell.getChildren().addAll(buildMessagingDirectoryHeader(), buildUserDirectory());
