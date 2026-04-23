@@ -80,36 +80,41 @@
                         <VBox fx:id="feedContainer" spacing="16.0"/>
                     </VBox>
                     <VBox prefWidth="360.0" spacing="18.0">
-                        <VBox spacing="12.0" styleClass="sidebar-card composer-card">
-                            <Label styleClass="panel-title" text="Create your post"/>
-                            <Label fx:id="lblForumComposerHint" styleClass="panel-note" text="You are posting as the connected user." wrapText="true"/>
-                            <TextField fx:id="tfForumTitle" promptText="Post title" styleClass="text-input compact-input"/>
-                            <TextArea fx:id="taForumContent" prefRowCount="4" promptText="Share your story, advice, or question..." styleClass="text-area-input compact-area"/>
-                            <VBox spacing="8.0" styleClass="media-picker-box">
-                                <TextField fx:id="tfForumImagePath" editable="false" promptText="No image selected yet" styleClass="text-input compact-input"/>
-                                <HBox spacing="8.0" styleClass="composer-actions-row">
+                        <VBox spacing="14.0" styleClass="sidebar-card composer-card composer-card-social">
+                            <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="composer-header">
+                                <Label styleClass="composer-badge" text="+" />
+                                <VBox spacing="3.0">
+                                    <Label styleClass="panel-title" text="Create your post"/>
+                                    <Label fx:id="lblForumComposerHint" styleClass="panel-note composer-subtitle" text="You are posting as the connected user." wrapText="true"/>
+                                </VBox>
+                            </HBox>
+                            <VBox spacing="6.0">
+                                <Label styleClass="composer-section-label" text="Post title"/>
+                                <TextField fx:id="tfForumTitle" promptText="Give your post a short headline" styleClass="text-input compact-input composer-input"/>
+                            </VBox>
+                            <VBox spacing="6.0">
+                                <Label styleClass="composer-section-label" text="Share with the community"/>
+                                <TextArea fx:id="taForumContent" prefRowCount="5" promptText="Share your story, advice, or question..." styleClass="text-area-input compact-area composer-input composer-textarea"/>
+                            </VBox>
+                            <VBox spacing="10.0" styleClass="media-picker-box media-picker-box-compact">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="composer-section-label" text="Add a photo"/>
+                                        <Label styleClass="composer-microcopy" text="Optional image for your post preview." wrapText="true"/>
+                                    </VBox>
+                                </HBox>
+                                <TextField fx:id="tfForumImagePath" editable="false" promptText="No image selected yet" styleClass="text-input compact-input composer-input image-path-input"/>
+                                <HBox spacing="8.0" styleClass="composer-actions-row media-picker-actions">
                                     <Button onAction="#chooseForumImage" styleClass="ghost-pill compact-pill" text="Add photo"/>
                                     <Button onAction="#clearForumImage" styleClass="ghost-pill compact-pill" text="Remove"/>
                                 </HBox>
                             </VBox>
-                            <ImageView fx:id="ivForumPreview" fitHeight="126.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" styleClass="composer-preview" visible="false"/>
-                            <HBox spacing="8.0" styleClass="composer-actions-row">
+                            <ImageView fx:id="ivForumPreview" fitHeight="116.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" styleClass="composer-preview" visible="false"/>
+                            <HBox spacing="10.0" styleClass="composer-actions-row composer-footer-row">
                                 <Button onAction="#saveForum" styleClass="primary-pill primary-pill-compact" text="Publish"/>
                                 <Button onAction="#clearForumEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
                             </HBox>
-                            <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill compact-danger" text="Delete selected post"/>
-                        </VBox>
-                        <VBox spacing="12.0" styleClass="sidebar-card composer-card">
-                            <Label styleClass="panel-title" text="Comment editor"/>
-                            <Label fx:id="lblCommentComposerHint" styleClass="panel-note" text="Your comment will be linked to your account." wrapText="true"/>
-                            <Label fx:id="lblCommentContext" styleClass="panel-note" text="Aucun commentaire selectionne" wrapText="true"/>
-                            <ComboBox fx:id="cbCommentForum" maxWidth="1.7976931348623157E308" promptText="Choose forum" styleClass="combo-input compact-input"/>
-                            <TextArea fx:id="taCommentContent" prefRowCount="3" promptText="Write your comment..." styleClass="text-area-input compact-area"/>
-                            <HBox spacing="8.0" styleClass="composer-actions-row">
-                                <Button onAction="#saveComment" styleClass="primary-pill primary-pill-compact" text="Save comment"/>
-                                <Button onAction="#clearCommentEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
-                            </HBox>
-                            <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedComment" styleClass="danger-pill compact-danger" text="Delete selected comment"/>
+                            <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill compact-danger composer-delete" text="Delete selected post"/>
                         </VBox>
                         <VBox spacing="10.0" styleClass="sidebar-card info-card">
                             <Label styleClass="panel-title" text="Posting tips"/>
@@ -118,6 +123,12 @@
                             <Label styleClass="mini-metric" text="Use Edit/Delete from your own card to load it back into the editor instantly." wrapText="true"/>
                             <Separator/>
                             <Label styleClass="mini-metric" text="Quick comments stay available under each card for lightweight social interaction." wrapText="true"/>
+                        </VBox>
+                        <VBox managed="false" visible="false">
+                            <Label fx:id="lblCommentComposerHint" text="Your comment will be linked to your account." />
+                            <Label fx:id="lblCommentContext" text="No comment selected. Your reply will be linked to your connected account." />
+                            <ComboBox fx:id="cbCommentForum" promptText="Choose forum" />
+                            <TextArea fx:id="taCommentContent" promptText="Write your comment..." />
                         </VBox>
                     </VBox>
                 </HBox>
