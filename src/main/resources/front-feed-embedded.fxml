@@ -29,7 +29,7 @@
                             <Label styleClass="hero-subtitle hero-subtitle-compact" text="A clean desktop social feed for posts, reactions, comments, and quick publishing." wrapText="true"/>
                         </VBox>
                         <Label fx:id="lblWelcomeUser" styleClass="hero-stats hero-chip" text="Connected user experience"/>
-                    </VBox>
+                    </HBox>
                     <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="hero-toolbar">
                         <TextField fx:id="tfSearch" onAction="#refreshData" promptText="Search by title, author, or content" styleClass="search-input hero-search"/>
                         <Button onAction="#refreshData" styleClass="primary-pill primary-pill-compact" text="Refresh"/>
