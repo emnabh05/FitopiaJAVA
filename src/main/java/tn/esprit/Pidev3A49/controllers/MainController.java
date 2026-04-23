@@ -367,22 +367,10 @@ public class MainController {
 
     @FXML
     private void ouvrirAdminInterface() {
-        if (viewRepas == null || viewRepas.getScene() == null || !SessionRouter.ensureAdmin(viewRepas)) {
+        if (viewRepas == null || viewRepas.getScene() == null) {
             return;
         }
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/backrepas.fxml"));
-            Scene scene = new Scene(loader.load());
-            MainController controller = loader.getController();
-            controller.ouvrirBackRepas();
-
-            Stage stage = (Stage) viewRepas.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException exception) {
-            showError("Navigation", "Impossible d'ouvrir l'interface admin : " + exception.getMessage());
-        }
+        SessionRouter.logoutToSignIn(viewRepas);
     }
 
     @FXML
