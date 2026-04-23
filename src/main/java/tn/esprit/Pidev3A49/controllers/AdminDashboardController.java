@@ -18,6 +18,7 @@ import javafx.stage.Window;
 import tn.esprit.Pidev3A49.Models.Supplement;
 import tn.esprit.Pidev3A49.services.ServiceSupplement;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
+import tn.esprit.Pidev3A49.utils.SessionRouter;
 import tn.esprit.Pidev3A49.utils.SupplementImageStorage;
 
 import java.io.File;
@@ -105,6 +106,9 @@ public class AdminDashboardController {
 
     @FXML
     private void initialize() {
+        if (!SessionRouter.ensureAdmin(adminContentRoot)) {
+            return;
+        }
         categoryComboBox.getItems().setAll(SUPPLEMENT_CATEGORIES);
         brandComboBox.getItems().setAll(SUPPLEMENT_BRANDS);
         resetAddForm();
@@ -158,11 +162,7 @@ public class AdminDashboardController {
 
     @FXML
     public void openChangeSessions(ActionEvent event) {
-        try {
-            SceneNavigator.navigate(event, SceneNavigator.BACK_END_VIEW, SceneNavigator.FITNESS_FRONT_VIEW);
-        } catch (IOException exception) {
-            setErrorMessage("Impossible d'ouvrir frontregime.fxml.");
-        }
+        SessionRouter.logoutToSignIn((Node) event.getSource());
     }
 
     @FXML

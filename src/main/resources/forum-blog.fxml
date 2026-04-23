@@ -70,8 +70,9 @@
                 <TableView fx:id="tableForumsEdit" prefHeight="300.0" styleClass="data-table">
                     <columns>
                         <TableColumn fx:id="colForumIdEdit" prefWidth="90.0" text="ID"/>
-                        <TableColumn fx:id="colForumTitleEdit" prefWidth="240.0" text="Titre"/>
-                        <TableColumn fx:id="colForumContentEdit" prefWidth="620.0" text="Contenu"/>
+                        <TableColumn fx:id="colForumAuthorEdit" prefWidth="180.0" text="Auteur"/>
+                        <TableColumn fx:id="colForumTitleEdit" prefWidth="220.0" text="Titre"/>
+                        <TableColumn fx:id="colForumContentEdit" prefWidth="440.0" text="Contenu"/>
                     </columns>
                 </TableView>
                 <GridPane hgap="16.0" vgap="16.0">
@@ -99,8 +100,9 @@
                 <TableView fx:id="tableForumsDelete" prefHeight="470.0" styleClass="data-table">
                     <columns>
                         <TableColumn fx:id="colForumIdDelete" prefWidth="90.0" text="ID"/>
-                        <TableColumn fx:id="colForumTitleDelete" prefWidth="240.0" text="Titre"/>
-                        <TableColumn fx:id="colForumContentDelete" prefWidth="620.0" text="Contenu"/>
+                        <TableColumn fx:id="colForumAuthorDelete" prefWidth="180.0" text="Auteur"/>
+                        <TableColumn fx:id="colForumTitleDelete" prefWidth="220.0" text="Titre"/>
+                        <TableColumn fx:id="colForumContentDelete" prefWidth="440.0" text="Contenu"/>
                     </columns>
                 </TableView>
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
@@ -114,8 +116,9 @@
                 <TableView fx:id="tableForums" prefHeight="560.0" styleClass="data-table">
                     <columns>
                         <TableColumn fx:id="colForumId" prefWidth="90.0" text="ID"/>
-                        <TableColumn fx:id="colForumTitle" prefWidth="240.0" text="Titre"/>
-                        <TableColumn fx:id="colForumContent" prefWidth="620.0" text="Contenu"/>
+                        <TableColumn fx:id="colForumAuthor" prefWidth="180.0" text="Auteur"/>
+                        <TableColumn fx:id="colForumTitle" prefWidth="220.0" text="Titre"/>
+                        <TableColumn fx:id="colForumContent" prefWidth="440.0" text="Contenu"/>
                     </columns>
                 </TableView>
             </VBox>
@@ -145,8 +148,9 @@
                 <TableView fx:id="tableForumsForComment" prefHeight="260.0" styleClass="data-table">
                     <columns>
                         <TableColumn fx:id="colCommentForumSelectId" prefWidth="90.0" text="ID"/>
-                        <TableColumn fx:id="colCommentForumSelectTitle" prefWidth="240.0" text="Titre"/>
-                        <TableColumn fx:id="colCommentForumSelectContent" prefWidth="520.0" text="Contenu"/>
+                        <TableColumn fx:id="colCommentForumSelectAuthor" prefWidth="180.0" text="Auteur"/>
+                        <TableColumn fx:id="colCommentForumSelectTitle" prefWidth="220.0" text="Titre"/>
+                        <TableColumn fx:id="colCommentForumSelectContent" prefWidth="360.0" text="Contenu"/>
                     </columns>
                 </TableView>
                 <Label fx:id="lblSelectedForum" styleClass="hint-label" text="Aucun forum selectionne"/>
@@ -176,8 +180,9 @@
                 <TableView fx:id="tableCommentsEdit" prefHeight="300.0" styleClass="data-table">
                     <columns>
                         <TableColumn fx:id="colCommentIdEdit" prefWidth="90.0" text="ID"/>
-                        <TableColumn fx:id="colCommentContentEdit" prefWidth="500.0" text="Contenu"/>
-                        <TableColumn fx:id="colCommentForumEdit" prefWidth="280.0" text="Forum"/>
+                        <TableColumn fx:id="colCommentAuthorEdit" prefWidth="180.0" text="Auteur"/>
+                        <TableColumn fx:id="colCommentContentEdit" prefWidth="360.0" text="Contenu"/>
+                        <TableColumn fx:id="colCommentForumEdit" prefWidth="240.0" text="Forum"/>
                     </columns>
                 </TableView>
                 <GridPane hgap="16.0" vgap="16.0">
@@ -205,8 +210,9 @@
                 <TableView fx:id="tableCommentsDelete" prefHeight="470.0" styleClass="data-table">
                     <columns>
                         <TableColumn fx:id="colCommentIdDelete" prefWidth="90.0" text="ID"/>
-                        <TableColumn fx:id="colCommentContentDelete" prefWidth="500.0" text="Contenu"/>
-                        <TableColumn fx:id="colCommentForumDelete" prefWidth="280.0" text="Forum"/>
+                        <TableColumn fx:id="colCommentAuthorDelete" prefWidth="180.0" text="Auteur"/>
+                        <TableColumn fx:id="colCommentContentDelete" prefWidth="360.0" text="Contenu"/>
+                        <TableColumn fx:id="colCommentForumDelete" prefWidth="240.0" text="Forum"/>
                     </columns>
                 </TableView>
                 <HBox alignment="CENTER_RIGHT" spacing="12.0">
@@ -220,8 +226,9 @@
                 <TableView fx:id="tableComments" prefHeight="560.0" styleClass="data-table">
                     <columns>
                         <TableColumn fx:id="colCommentId" prefWidth="90.0" text="ID"/>
-                        <TableColumn fx:id="colCommentContent" prefWidth="500.0" text="Contenu"/>
-                        <TableColumn fx:id="colCommentForum" prefWidth="280.0" text="Forum"/>
+                        <TableColumn fx:id="colCommentAuthor" prefWidth="180.0" text="Auteur"/>
+                        <TableColumn fx:id="colCommentContent" prefWidth="360.0" text="Contenu"/>
+                        <TableColumn fx:id="colCommentForum" prefWidth="240.0" text="Forum"/>
                     </columns>
                 </TableView>
             </VBox>

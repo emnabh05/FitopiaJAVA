@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="860.0" prefWidth="1460.0" style="-fx-background-color: linear-gradient(to bottom, #fafcfc, #f1f5f5);" xmlns="http://javafx.com/javafx/22.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.Pidev3A49.test.SignUpController">
+    <children>
+        <VBox spacing="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="20.0" style="-fx-background-color: #072938; -fx-padding: 0 20 0 20;">
+                    <children>
+                        <Label style="-fx-text-fill: #dbe7ec; -fx-font-size: 9px;" text="Phone no:+216 58 936 689 or email us: customerservice@fitopia.com" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label style="-fx-text-fill: #dbe7ec; -fx-font-size: 9px;" text="f    t    ig" />
+                    </children>
+                </HBox>
+                <AnchorPane VBox.vgrow="ALWAYS">
+                    <children>
+                        <HBox AnchorPane.bottomAnchor="26.0" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="250.0" AnchorPane.topAnchor="24.0">
+                            <children>
+                                <VBox prefWidth="430.0" style="-fx-background-color: linear-gradient(to bottom right, #0c4a50, #138664); -fx-background-radius: 12 0 0 12; -fx-padding: 24;">
+                                    <children>
+                                        <Region VBox.vgrow="ALWAYS" />
+                                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                            <children>
+                                                <Label style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 8; -fx-padding: 7 9 7 9; -fx-text-fill: #0f6664; -fx-font-weight: bold;" text="fitopia" />
+                                                <Label style="-fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold;" text="Fitopia" />
+                                            </children>
+                                        </HBox>
+                                        <Label style="-fx-padding: 14 0 0 0; -fx-text-fill: #091f24; -fx-font-size: 36px; -fx-font-weight: bold;" text="Welcome to Fitopia" />
+                                        <Label style="-fx-padding: 8 0 0 0; -fx-text-fill: rgba(255,255,255,0.83); -fx-font-size: 13px;" text="Join our community and start your transformation." wrapText="true" />
+                                        <VBox spacing="10.0" style="-fx-background-color: rgba(255,255,255,0.11); -fx-background-radius: 10; -fx-padding: 14;">
+                                            <children>
+                                                <Label style="-fx-text-fill: rgba(255,255,255,0.78); -fx-font-size: 12px; -fx-font-weight: bold;" text="U will join as?" />
+                                                <GridPane hgap="10.0" vgap="10.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints percentWidth="50.0" />
+                                                        <ColumnConstraints percentWidth="50.0" />
+                                                    </columnConstraints>
+                                                    <children>
+                                                        <HBox fx:id="patientRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectPatientRole" GridPane.columnIndex="0" GridPane.rowIndex="0"><children><Label style="-fx-text-fill: #0b4649; -fx-font-weight: bold;" text="Patient" /></children></HBox>
+                                                        <HBox fx:id="coachRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectCoachRole" GridPane.columnIndex="1" GridPane.rowIndex="0"><children><Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Coach" /></children></HBox>
+                                                        <HBox fx:id="nutritionistRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectNutritionistRole" GridPane.columnIndex="0" GridPane.rowIndex="1"><children><Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Nutritionist" /></children></HBox>
+                                                        <HBox fx:id="adminRoleCard" alignment="CENTER_LEFT" onMouseClicked="#selectAdminRole" GridPane.columnIndex="1" GridPane.rowIndex="1"><children><Label style="-fx-text-fill: white; -fx-font-weight: bold;" text="Admin" /></children></HBox>
+                                                    </children>
+                                                </GridPane>
+                                            </children>
+                                        </VBox>
+                                        <Label fx:id="selectedRoleBadge" style="-fx-padding: 10 0 0 0; -fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 11px; -fx-font-weight: bold;" text="PATIENT" />
+                                    </children>
+                                </VBox>
+                                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" prefWidth="590.0" style="-fx-background-color: transparent; -fx-background: transparent;">
+                                    <content>
+                                        <VBox prefWidth="590.0" spacing="8.0" style="-fx-background-color: white; -fx-background-radius: 0 12 12 0; -fx-effect: dropshadow(gaussian, rgba(16,46,56,0.12), 24, 0.2, 0, 8); -fx-padding: 18;">
+                                            <children>
+                                                <Label style="-fx-text-fill: #1b2e35; -fx-font-size: 24px; -fx-font-weight: bold;" text="Account Information" />
+                                                <Label style="-fx-text-fill: #8b98a6; -fx-font-size: 11px;" text="Complete your profile details to create your account." />
+                                                <GridPane hgap="12.0" vgap="10.0">
+                                                    <columnConstraints>
+                                                        <ColumnConstraints percentWidth="50.0" />
+                                                        <ColumnConstraints percentWidth="50.0" />
+                                                    </columnConstraints>
+                                                    <children>
+                                                        <TextField fx:id="prenomField" promptText="First name" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                                        <TextField fx:id="nomField" promptText="Last name" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                                        <TextField fx:id="usernameField" promptText="Username" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                                                        <TextField fx:id="emailField" promptText="Email" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                                                        <TextField fx:id="phoneField" promptText="Phone" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                                                        <DatePicker fx:id="birthDatePicker" promptText="Birth date" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                                        <PasswordField fx:id="passwordField" promptText="Plain password" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="5" />
+                                                    </children>
+                                                </GridPane>
+                                                <TextArea fx:id="bioArea" prefRowCount="3" promptText="Short bio or profile description" wrapText="true" />
+                                                <VBox spacing="10.0" style="-fx-background-color: #f7fafb; -fx-background-radius: 10; -fx-border-color: #d9e5e7; -fx-border-radius: 10; -fx-padding: 12;">
+                                                    <children>
+                                                        <Label style="-fx-text-fill: #1b2e35; -fx-font-size: 13px; -fx-font-weight: bold;" text="AI SignUp Assistant" />
+                                                        <Label style="-fx-text-fill: #7a8791; -fx-font-size: 11px;" text="L'IA peut corriger vos noms, normaliser le telephone, suggerer un username et reformuler votre bio." wrapText="true" />
+                                                        <HBox spacing="10.0">
+                                                            <children>
+                                                                <Button mnemonicParsing="false" onAction="#handleGenerateAiSuggestions" style="-fx-background-color: #244c5a; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold;" text="Generer les suggestions IA" />
+                                                                <Button mnemonicParsing="false" onAction="#handleApplyAiSuggestions" style="-fx-background-color: white; -fx-text-fill: #244c5a; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Appliquer au formulaire" />
+                                                            </children>
+                                                        </HBox>
+                                                        <Label fx:id="aiImprovementsLabel" style="-fx-text-fill: #5e6f78; -fx-font-size: 11px;" text="Les suggestions IA apparaitront ici." wrapText="true" />
+                                                        <GridPane hgap="12.0" vgap="8.0">
+                                                            <columnConstraints>
+                                                                <ColumnConstraints percentWidth="50.0" />
+                                                                <ColumnConstraints percentWidth="50.0" />
+                                                            </columnConstraints>
+                                                            <children>
+                                                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                                                    <children>
+                                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 10px; -fx-font-weight: bold;" text="Username suggere" />
+                                                                        <Label fx:id="aiUsernameLabel" style="-fx-text-fill: #22333b;" text="-" wrapText="true" />
+                                                                    </children>
+                                                                </VBox>
+                                                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                                                    <children>
+                                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 10px; -fx-font-weight: bold;" text="Telephone normalise" />
+                                                                        <Label fx:id="aiPhoneLabel" style="-fx-text-fill: #22333b;" text="-" wrapText="true" />
+                                                                    </children>
+                                                                </VBox>
+                                                            </children>
+                                                        </GridPane>
+                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 10px; -fx-font-weight: bold;" text="Bio amelioree" />
+                                                        <TextArea fx:id="aiBioArea" editable="false" prefRowCount="3" promptText="La bio reformulee apparaitra ici" wrapText="true" />
+                                                        <Label style="-fx-text-fill: #5d6b77; -fx-font-size: 10px; -fx-font-weight: bold;" text="Resume du profil" />
+                                                        <TextArea fx:id="aiSummaryArea" editable="false" prefRowCount="3" promptText="Le resume du profil apparaitra ici" wrapText="true" />
+                                                    </children>
+                                                </VBox>
+                                                <Separator />
+                                                <Label fx:id="passwordGuidanceLabel" style="-fx-text-fill: #8b98a6; -fx-font-size: 11px;" text="Concernant votre demande: seul nom, prenom, email et password sont obligatoires." wrapText="true" />
+                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleCreateAccount" style="-fx-background-color: #2f3540; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="CREATE ACCOUNT">
+                                                    <VBox.margin>
+                                                        <Insets top="8.0" />
+                                                    </VBox.margin>
+                                                </Button>
+                                                <Label alignment="CENTER" maxWidth="1.7976931348623157E308" style="-fx-text-fill: #8b949a; -fx-font-size: 11px;" text="Already have an account?" />
+                                                <Button alignment="CENTER" maxWidth="120.0" mnemonicParsing="false" onAction="#handleBackToSignIn" style="-fx-background-color: white; -fx-text-fill: #67767c; -fx-border-color: #d6dde1; -fx-border-radius: 3; -fx-background-radius: 3; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 7 12 7 12;" text="LOGIN" />
+                                                <Label fx:id="statusLabel" style="-fx-text-fill: #63717d; -fx-font-size: 12px;" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </content>
+                                </ScrollPane>
+                            </children>
+                        </HBox>
+                    </children>
+                </AnchorPane>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

@@ -14,9 +14,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 import tn.esprit.Pidev3A49.Models.Comment;
+import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.Models.Forum;
 import tn.esprit.Pidev3A49.services.ServiceComment;
 import tn.esprit.Pidev3A49.services.ServiceForum;
+import tn.esprit.Pidev3A49.test.UserSession;
 
 import java.util.List;
 
@@ -50,12 +52,15 @@ public class ForumBlogController {
     @FXML private TableView<Forum> tableForumsEdit;
     @FXML private TableView<Forum> tableForumsDelete;
     @FXML private TableColumn<Forum, Integer> colForumId;
+    @FXML private TableColumn<Forum, String> colForumAuthor;
     @FXML private TableColumn<Forum, String> colForumTitle;
     @FXML private TableColumn<Forum, String> colForumContent;
     @FXML private TableColumn<Forum, Integer> colForumIdEdit;
+    @FXML private TableColumn<Forum, String> colForumAuthorEdit;
     @FXML private TableColumn<Forum, String> colForumTitleEdit;
     @FXML private TableColumn<Forum, String> colForumContentEdit;
     @FXML private TableColumn<Forum, Integer> colForumIdDelete;
+    @FXML private TableColumn<Forum, String> colForumAuthorDelete;
     @FXML private TableColumn<Forum, String> colForumTitleDelete;
     @FXML private TableColumn<Forum, String> colForumContentDelete;
 
@@ -64,6 +69,7 @@ public class ForumBlogController {
     @FXML private Label lblSelectedForum;
     @FXML private TableView<Forum> tableForumsForComment;
     @FXML private TableColumn<Forum, Integer> colCommentForumSelectId;
+    @FXML private TableColumn<Forum, String> colCommentForumSelectAuthor;
     @FXML private TableColumn<Forum, String> colCommentForumSelectTitle;
     @FXML private TableColumn<Forum, String> colCommentForumSelectContent;
     @FXML private TextArea taCommentContent;
@@ -75,20 +81,25 @@ public class ForumBlogController {
     @FXML private TableView<Comment> tableCommentsEdit;
     @FXML private TableView<Comment> tableCommentsDelete;
     @FXML private TableColumn<Comment, Integer> colCommentId;
+    @FXML private TableColumn<Comment, String> colCommentAuthor;
     @FXML private TableColumn<Comment, String> colCommentContent;
     @FXML private TableColumn<Comment, String> colCommentForum;
     @FXML private TableColumn<Comment, Integer> colCommentIdEdit;
+    @FXML private TableColumn<Comment, String> colCommentAuthorEdit;
     @FXML private TableColumn<Comment, String> colCommentContentEdit;
     @FXML private TableColumn<Comment, String> colCommentForumEdit;
     @FXML private TableColumn<Comment, Integer> colCommentIdDelete;
+    @FXML private TableColumn<Comment, String> colCommentAuthorDelete;
     @FXML private TableColumn<Comment, String> colCommentContentDelete;
     @FXML private TableColumn<Comment, String> colCommentForumDelete;
 
     private final ServiceForum serviceForum = new ServiceForum();
     private final ServiceComment serviceComment = new ServiceComment();
+    private FitopiaUser currentUser;
 
     @FXML
     public void initialize() {
+        currentUser = UserSession.getCurrentUser();
         initialiserTableForums();
         initialiserTableComments();
         initialiserComboBoxes();
@@ -101,6 +112,7 @@ public class ForumBlogController {
 
     @FXML
     private void rafraichirDonneesForum() {
+        currentUser = UserSession.getCurrentUser();
         chargerForums();
         chargerComments();
     }
@@ -117,10 +129,13 @@ public class ForumBlogController {
     @FXML
     private void ajouterForum() {
         try {
-            serviceForum.add(new Forum(tfForumTitle.getText(), taForumContent.getText()));
+            ensureCurrentUser();
+            Forum forum = new Forum(tfForumTitle.getText(), taForumContent.getText());
+            forum.setUserId(currentUser.getId());
+            serviceForum.add(forum);
             chargerForums();
             viderFormulaireForum();
-            showAlert(Alert.AlertType.INFORMATION, "Succes", "Forum ajoute avec succes.");
+            showAlert(Alert.AlertType.INFORMATION, "Succes", "Forum ajoute avec succes pour " + displayName(currentUser) + ".");
         } catch (Exception exception) {
             showAlert(Alert.AlertType.ERROR, "Erreur forum", exception.getMessage());
         }
@@ -132,8 +147,13 @@ public class ForumBlogController {
             if (tfForumId.getText().isBlank()) {
                 throw new IllegalArgumentException("Selectionne un forum a modifier.");
             }
+            Forum selected = tableForumsEdit.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                throw new IllegalArgumentException("Selectionne un forum a modifier.");
+            }
             Forum forum = new Forum(
                     Integer.parseInt(tfForumId.getText()),
+                    selected.getUserId(),
                     tfForumTitleEdit.getText(),
                     taForumContentEdit.getText()
             );
@@ -182,10 +202,13 @@ public class ForumBlogController {
     @FXML
     private void ajouterComment() {
         try {
+            ensureCurrentUser();
             if (cbCommentForum.getValue() == null) {
                 throw new IllegalArgumentException("Selectionne d'abord un forum dans la liste.");
             }
-            serviceComment.add(new Comment(taCommentContent.getText(), cbCommentForum.getValue()));
+            Comment comment = new Comment(taCommentContent.getText(), cbCommentForum.getValue());
+            comment.setUserId(currentUser.getId());
+            serviceComment.add(comment);
             chargerComments();
             viderFormulaireComment();
             showAlert(Alert.AlertType.INFORMATION, "Succes", "Commentaire ajoute avec succes.");
@@ -200,8 +223,13 @@ public class ForumBlogController {
             if (tfCommentId.getText().isBlank()) {
                 throw new IllegalArgumentException("Selectionne un commentaire a modifier.");
             }
+            Comment selected = tableCommentsEdit.getSelectionModel().getSelectedItem();
+            if (selected == null) {
+                throw new IllegalArgumentException("Selectionne un commentaire a modifier.");
+            }
             Comment comment = new Comment(
                     Integer.parseInt(tfCommentId.getText()),
+                    selected.getUserId(),
                     taCommentContentEdit.getText(),
                     cbCommentForumEdit.getValue()
             );
@@ -248,30 +276,34 @@ public class ForumBlogController {
     }
 
     private void initialiserTableForums() {
-        initialiserColonnesForum(colForumId, colForumTitle, colForumContent);
-        initialiserColonnesForum(colForumIdEdit, colForumTitleEdit, colForumContentEdit);
-        initialiserColonnesForum(colForumIdDelete, colForumTitleDelete, colForumContentDelete);
+        initialiserColonnesForum(colForumId, colForumAuthor, colForumTitle, colForumContent);
+        initialiserColonnesForum(colForumIdEdit, colForumAuthorEdit, colForumTitleEdit, colForumContentEdit);
+        initialiserColonnesForum(colForumIdDelete, colForumAuthorDelete, colForumTitleDelete, colForumContentDelete);
     }
 
     private void initialiserTableComments() {
-        initialiserColonnesForum(colCommentForumSelectId, colCommentForumSelectTitle, colCommentForumSelectContent);
-        initialiserColonnesComment(colCommentId, colCommentContent, colCommentForum);
-        initialiserColonnesComment(colCommentIdEdit, colCommentContentEdit, colCommentForumEdit);
-        initialiserColonnesComment(colCommentIdDelete, colCommentContentDelete, colCommentForumDelete);
+        initialiserColonnesForum(colCommentForumSelectId, colCommentForumSelectAuthor, colCommentForumSelectTitle, colCommentForumSelectContent);
+        initialiserColonnesComment(colCommentId, colCommentAuthor, colCommentContent, colCommentForum);
+        initialiserColonnesComment(colCommentIdEdit, colCommentAuthorEdit, colCommentContentEdit, colCommentForumEdit);
+        initialiserColonnesComment(colCommentIdDelete, colCommentAuthorDelete, colCommentContentDelete, colCommentForumDelete);
     }
 
     private void initialiserColonnesForum(TableColumn<Forum, Integer> id,
+                                          TableColumn<Forum, String> author,
                                           TableColumn<Forum, String> title,
                                           TableColumn<Forum, String> content) {
         id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        author.setCellValueFactory(new PropertyValueFactory<>("authorDisplayName"));
         title.setCellValueFactory(new PropertyValueFactory<>("title"));
         content.setCellValueFactory(new PropertyValueFactory<>("content"));
     }
 
     private void initialiserColonnesComment(TableColumn<Comment, Integer> id,
+                                            TableColumn<Comment, String> author,
                                             TableColumn<Comment, String> content,
                                             TableColumn<Comment, String> forumTitle) {
         id.setCellValueFactory(new PropertyValueFactory<>("id"));
+        author.setCellValueFactory(new PropertyValueFactory<>("authorDisplayName"));
         content.setCellValueFactory(new PropertyValueFactory<>("content"));
         forumTitle.setCellValueFactory(new PropertyValueFactory<>("forumTitle"));
     }
@@ -280,7 +312,7 @@ public class ForumBlogController {
         StringConverter<Forum> converter = new StringConverter<>() {
             @Override
             public String toString(Forum forum) {
-                return forum == null ? "" : forum.getId() + " - " + forum.getTitle();
+                return forum == null ? "" : forum.getId() + " - " + forum.getTitle() + " (" + forum.getAuthorDisplayName() + ")";
             }
 
             @Override
@@ -302,7 +334,9 @@ public class ForumBlogController {
         });
 
         tableForumsDelete.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                lblForumSelectionDelete.setText(newValue == null ? "Aucun forum selectionne" : "Forum selectionne: " + newValue.getTitle()));
+                lblForumSelectionDelete.setText(newValue == null
+                        ? "Aucun forum selectionne"
+                        : "Forum selectionne: " + newValue.getTitle() + " par " + newValue.getAuthorDisplayName()));
 
         tableCommentsEdit.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -314,11 +348,13 @@ public class ForumBlogController {
             cbCommentForum.setValue(newValue);
             lblSelectedForum.setText(newValue == null
                     ? "Aucun forum selectionne"
-                    : "Forum choisi: " + newValue.getTitle());
+                    : "Forum choisi: " + newValue.getTitle() + " par " + newValue.getAuthorDisplayName());
         });
 
         tableCommentsDelete.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) ->
-                lblCommentSelectionDelete.setText(newValue == null ? "Aucun commentaire selectionne" : "Commentaire selectionne: #" + newValue.getId()));
+                lblCommentSelectionDelete.setText(newValue == null
+                        ? "Aucun commentaire selectionne"
+                        : "Commentaire selectionne: #" + newValue.getId() + " par " + newValue.getAuthorDisplayName()));
     }
 
     private void chargerForums() {
@@ -408,6 +444,30 @@ public class ForumBlogController {
                 button.getStyleClass().setAll("action-card");
             }
         }
+    }
+
+    private void ensureCurrentUser() {
+        if (currentUser == null) {
+            throw new IllegalStateException("Aucun utilisateur connecte.");
+        }
+    }
+
+    private String displayName(FitopiaUser user) {
+        if (user == null) {
+            return "Utilisateur inconnu";
+        }
+        String fullName = ((user.getFirstName() == null ? "" : user.getFirstName()) + " "
+                + (user.getLastName() == null ? "" : user.getLastName())).trim();
+        if (!fullName.isBlank()) {
+            return fullName;
+        }
+        if (user.getUsername() != null && !user.getUsername().isBlank()) {
+            return user.getUsername();
+        }
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+            return user.getEmail();
+        }
+        return "Utilisateur inconnu";
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

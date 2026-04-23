@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.Node;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -22,6 +23,7 @@ import tn.esprit.Pidev3A49.Models.Supplement;
 import tn.esprit.Pidev3A49.services.ServiceSupplement;
 import tn.esprit.Pidev3A49.utils.CartStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
+import tn.esprit.Pidev3A49.utils.SessionRouter;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -84,6 +86,9 @@ public class SupplementShowcaseController {
 
     @FXML
     private void initialize() {
+        if (!SessionRouter.ensureAuthenticated(rootScrollPane)) {
+            return;
+        }
         loadProducts();
         renderCart();
     }
@@ -97,7 +102,7 @@ public class SupplementShowcaseController {
     }
 
     public void openBackEnd(ActionEvent event) throws IOException {
-        SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.BACK_END_VIEW);
+        SessionRouter.logoutToSignIn((Node) event.getSource());
     }
 
     public void openFitnessFront(ActionEvent event) throws IOException {

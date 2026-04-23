@@ -43,6 +43,7 @@ import tn.esprit.Pidev3A49.Models.User;
 import tn.esprit.Pidev3A49.services.ServiceRepas;
 import tn.esprit.Pidev3A49.services.ServiceRegimeAlimentaire;
 import tn.esprit.Pidev3A49.services.ServiceUser;
+import tn.esprit.Pidev3A49.utils.SessionRouter;
 
 import java.text.Normalizer;
 import java.io.File;
@@ -315,6 +316,9 @@ public class MainController {
 
     @FXML
     public void initialize() {
+        if (!SessionRouter.ensureAuthenticated(appScrollPane)) {
+            return;
+        }
         initialiserColonnes();
         initialiserCombos();
         initialiserExplorateurRepas();
@@ -355,28 +359,15 @@ public class MainController {
     @FXML
     private void changerSession() {
         if (viewRepas == null || viewRepas.getScene() == null) {
-            showError("Navigation", "Impossible d'ouvrir frontregime.fxml.");
+            showError("Navigation", "Impossible de se deconnecter.");
             return;
         }
-
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/frontregime.fxml"));
-            Scene scene = new Scene(loader.load());
-            MainController controller = loader.getController();
-            controller.ouvrirFrontRegimes();
-
-            Stage stage = (Stage) viewRepas.getScene().getWindow();
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException exception) {
-            showError("Navigation", "Impossible d'ouvrir frontregime.fxml : " + exception.getMessage());
-        }
+        SessionRouter.logoutToSignIn(viewRepas);
     }
 
     @FXML
     private void ouvrirAdminInterface() {
-        if (viewRepas == null || viewRepas.getScene() == null) {
-            showError("Navigation", "Impossible d'ouvrir l'interface admin.");
+        if (viewRepas == null || viewRepas.getScene() == null || !SessionRouter.ensureAdmin(viewRepas)) {
             return;
         }
 

@@ -1,6 +1,7 @@
 package tn.esprit.Pidev3A49.utils;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,13 +14,18 @@ public final class SchemaInitializer {
     public static final String REPAS_TABLE = "repas";
     public static final String FORUM_TABLE = "forum";
     public static final String COMMENT_TABLE = "forum_comment";
+    public static final String FORUM_LIKE_TABLE = "forum_like";
+    public static final String FORUM_REPOST_TABLE = "forum_repost";
     public static final String SUPPLEMENT_TABLE = "crud_supplement";
     public static final String SUPPLEMENT_ORDER_TABLE = "crud_supplement_order";
     public static final String SUPPLEMENT_ORDER_ITEM_TABLE = "crud_supplement_order_item";
+    private static final String APP_METADATA_TABLE = "app_metadata";
+    private static final String FORUM_SOCIAL_RESET_KEY = "forum_social_reset_v1";
 
     private static final String CREATE_FORUM_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
                 id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NOT NULL,
                 title VARCHAR(255) NOT NULL,
                 content TEXT NOT NULL
             )
@@ -80,6 +86,7 @@ public final class SchemaInitializer {
     private static final String CREATE_COMMENT_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
                 id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NOT NULL,
                 content TEXT NOT NULL,
                 forum_id INT NOT NULL,
                 CONSTRAINT fk_forum_comment_forum
@@ -88,6 +95,33 @@ public final class SchemaInitializer {
                     ON DELETE CASCADE
             )
             """.formatted(COMMENT_TABLE, FORUM_TABLE);
+
+    private static final String CREATE_FORUM_LIKE_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                forum_id INT NOT NULL,
+                user_id INT NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uk_forum_like_forum_user (forum_id, user_id)
+            )
+            """.formatted(FORUM_LIKE_TABLE);
+
+    private static final String CREATE_FORUM_REPOST_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                forum_id INT NOT NULL,
+                user_id INT NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uk_forum_repost_forum_user (forum_id, user_id)
+            )
+            """.formatted(FORUM_REPOST_TABLE);
+
+    private static final String CREATE_APP_METADATA_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                meta_key VARCHAR(100) PRIMARY KEY,
+                applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """.formatted(APP_METADATA_TABLE);
 
     private static final String CREATE_SUPPLEMENT_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
@@ -153,10 +187,14 @@ public final class SchemaInitializer {
             statement.executeUpdate(CREATE_REPAS_TABLE);
             statement.executeUpdate(CREATE_FORUM_TABLE);
             statement.executeUpdate(CREATE_COMMENT_TABLE);
+            statement.executeUpdate(CREATE_FORUM_LIKE_TABLE);
+            statement.executeUpdate(CREATE_FORUM_REPOST_TABLE);
+            statement.executeUpdate(CREATE_APP_METADATA_TABLE);
             statement.executeUpdate(CREATE_SUPPLEMENT_TABLE);
             statement.executeUpdate(CREATE_SUPPLEMENT_ORDER_TABLE);
             statement.executeUpdate(CREATE_SUPPLEMENT_ORDER_ITEM_TABLE);
         }
+        migrateForumSocialSchema(connection);
         seedDefaultUserIfNeeded(connection);
     }
 
@@ -177,6 +215,54 @@ public final class SchemaInitializer {
             preparedStatement.setString(1, "demo@fitopia.local");
             preparedStatement.setString(2, "Demo");
             preparedStatement.setString(3, "User");
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    private static void migrateForumSocialSchema(Connection connection) throws SQLException {
+        ensureColumn(connection, FORUM_TABLE, "user_id",
+                "ALTER TABLE `" + FORUM_TABLE + "` ADD COLUMN user_id INT NULL AFTER id");
+        ensureColumn(connection, FORUM_TABLE, "image_path",
+                "ALTER TABLE `" + FORUM_TABLE + "` ADD COLUMN image_path VARCHAR(500) NULL AFTER content");
+        ensureColumn(connection, COMMENT_TABLE, "user_id",
+                "ALTER TABLE `" + COMMENT_TABLE + "` ADD COLUMN user_id INT NULL AFTER id");
+
+        if (!metadataFlagExists(connection, FORUM_SOCIAL_RESET_KEY)) {
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate("DELETE FROM `" + FORUM_LIKE_TABLE + "`");
+                statement.executeUpdate("DELETE FROM `" + FORUM_REPOST_TABLE + "`");
+                statement.executeUpdate("DELETE FROM `" + COMMENT_TABLE + "`");
+                statement.executeUpdate("DELETE FROM `" + FORUM_TABLE + "`");
+            }
+            insertMetadataFlag(connection, FORUM_SOCIAL_RESET_KEY);
+        }
+    }
+
+    private static void ensureColumn(Connection connection, String tableName, String columnName, String alterQuery) throws SQLException {
+        DatabaseMetaData metaData = connection.getMetaData();
+        try (ResultSet rs = metaData.getColumns(null, null, tableName, columnName)) {
+            if (!rs.next()) {
+                try (Statement statement = connection.createStatement()) {
+                    statement.executeUpdate(alterQuery);
+                }
+            }
+        }
+    }
+
+    private static boolean metadataFlagExists(Connection connection, String key) throws SQLException {
+        String query = "SELECT 1 FROM `" + APP_METADATA_TABLE + "` WHERE meta_key = ? LIMIT 1";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, key);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+    }
+
+    private static void insertMetadataFlag(Connection connection, String key) throws SQLException {
+        String query = "INSERT INTO `" + APP_METADATA_TABLE + "` (meta_key) VALUES (?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, key);
             preparedStatement.executeUpdate();
         }
     }

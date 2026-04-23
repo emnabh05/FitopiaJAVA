@@ -17,6 +17,7 @@ import java.util.List;
 public class ServiceComment implements IServices<Comment> {
 
     private static final String TABLE_NAME = SchemaInitializer.COMMENT_TABLE;
+    private static final String USER_TABLE = "fitopia_users";
 
     private final Connection cnx;
 
@@ -28,13 +29,14 @@ public class ServiceComment implements IServices<Comment> {
     public void add(Comment comment) {
         validate(comment);
         String qry = """
-                INSERT INTO %s (content, forum_id)
-                VALUES (?, ?)
+                INSERT INTO %s (user_id, content, forum_id)
+                VALUES (?, ?, ?)
                 """.formatted(TABLE_NAME);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry, Statement.RETURN_GENERATED_KEYS)) {
-            pstm.setString(1, comment.getContent());
-            pstm.setInt(2, comment.getForum().getId());
+            pstm.setInt(1, comment.getUserId());
+            pstm.setString(2, comment.getContent());
+            pstm.setInt(3, comment.getForum().getId());
             pstm.executeUpdate();
 
             try (ResultSet generatedKeys = pstm.getGeneratedKeys()) {
@@ -51,11 +53,23 @@ public class ServiceComment implements IServices<Comment> {
     public List<Comment> getAll() {
         List<Comment> comments = new ArrayList<>();
         String qry = """
-                SELECT c.id, c.content, f.id AS forum_id, f.title, f.content AS forum_content
+                SELECT c.id,
+                       c.user_id,
+                       c.content,
+                       f.id AS forum_id,
+                       f.user_id AS forum_user_id,
+                       f.title,
+                       f.content AS forum_content,
+                       cu.email AS author_email,
+                       COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''),
+                                NULLIF(cu.username, ''),
+                                NULLIF(cu.email, ''),
+                                'Utilisateur inconnu') AS author_name
                 FROM %s c
                 INNER JOIN %s f ON c.forum_id = f.id
+                LEFT JOIN %s cu ON cu.id = c.user_id
                 ORDER BY c.id DESC
-                """.formatted(TABLE_NAME, SchemaInitializer.FORUM_TABLE);
+                """.formatted(TABLE_NAME, SchemaInitializer.FORUM_TABLE, USER_TABLE);
 
         try (Statement stm = cnx.createStatement();
              ResultSet rs = stm.executeQuery(qry)) {
@@ -72,12 +86,24 @@ public class ServiceComment implements IServices<Comment> {
     public List<Comment> getByForumId(int forumId) {
         List<Comment> comments = new ArrayList<>();
         String qry = """
-                SELECT c.id, c.content, f.id AS forum_id, f.title, f.content AS forum_content
+                SELECT c.id,
+                       c.user_id,
+                       c.content,
+                       f.id AS forum_id,
+                       f.user_id AS forum_user_id,
+                       f.title,
+                       f.content AS forum_content,
+                       cu.email AS author_email,
+                       COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''),
+                                NULLIF(cu.username, ''),
+                                NULLIF(cu.email, ''),
+                                'Utilisateur inconnu') AS author_name
                 FROM %s c
                 INNER JOIN %s f ON c.forum_id = f.id
+                LEFT JOIN %s cu ON cu.id = c.user_id
                 WHERE f.id = ?
                 ORDER BY c.id DESC
-                """.formatted(TABLE_NAME, SchemaInitializer.FORUM_TABLE);
+                """.formatted(TABLE_NAME, SchemaInitializer.FORUM_TABLE, USER_TABLE);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setInt(1, forumId);
@@ -97,11 +123,23 @@ public class ServiceComment implements IServices<Comment> {
     @Override
     public Comment getById(int id) {
         String qry = """
-                SELECT c.id, c.content, f.id AS forum_id, f.title, f.content AS forum_content
+                SELECT c.id,
+                       c.user_id,
+                       c.content,
+                       f.id AS forum_id,
+                       f.user_id AS forum_user_id,
+                       f.title,
+                       f.content AS forum_content,
+                       cu.email AS author_email,
+                       COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''),
+                                NULLIF(cu.username, ''),
+                                NULLIF(cu.email, ''),
+                                'Utilisateur inconnu') AS author_name
                 FROM %s c
                 INNER JOIN %s f ON c.forum_id = f.id
+                LEFT JOIN %s cu ON cu.id = c.user_id
                 WHERE c.id = ?
-                """.formatted(TABLE_NAME, SchemaInitializer.FORUM_TABLE);
+                """.formatted(TABLE_NAME, SchemaInitializer.FORUM_TABLE, USER_TABLE);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setInt(1, id);
@@ -123,14 +161,15 @@ public class ServiceComment implements IServices<Comment> {
         validate(comment);
         String qry = """
                 UPDATE %s
-                SET content = ?, forum_id = ?
+                SET user_id = ?, content = ?, forum_id = ?
                 WHERE id = ?
                 """.formatted(TABLE_NAME);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
-            pstm.setString(1, comment.getContent());
-            pstm.setInt(2, comment.getForum().getId());
-            pstm.setInt(3, comment.getId());
+            pstm.setInt(1, comment.getUserId());
+            pstm.setString(2, comment.getContent());
+            pstm.setInt(3, comment.getForum().getId());
+            pstm.setInt(4, comment.getId());
             pstm.executeUpdate();
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de modifier le commentaire.", exception);
@@ -152,19 +191,27 @@ public class ServiceComment implements IServices<Comment> {
     private Comment mapResultSet(ResultSet rs) throws SQLException {
         Forum forum = new Forum(
                 rs.getInt("forum_id"),
+                readNullableInt(rs, "forum_user_id"),
                 rs.getString("title"),
                 rs.getString("forum_content")
         );
-        return new Comment(
+        Comment comment = new Comment(
                 rs.getInt("id"),
+                readNullableInt(rs, "user_id"),
                 rs.getString("content"),
                 forum
         );
+        comment.setAuthorName(rs.getString("author_name"));
+        comment.setAuthorEmail(rs.getString("author_email"));
+        return comment;
     }
 
     private void validate(Comment comment) {
         if (comment == null) {
             throw new IllegalArgumentException("Le commentaire est obligatoire.");
+        }
+        if (comment.getUserId() == null || comment.getUserId() <= 0) {
+            throw new IllegalArgumentException("Le proprietaire du commentaire est obligatoire.");
         }
         if (comment.getContent() == null || comment.getContent().isBlank()) {
             throw new IllegalArgumentException("Le contenu du commentaire est obligatoire.");
@@ -172,5 +219,10 @@ public class ServiceComment implements IServices<Comment> {
         if (comment.getForum() == null || comment.getForum().getId() <= 0) {
             throw new IllegalArgumentException("Le forum du commentaire est obligatoire.");
         }
+    }
+
+    private Integer readNullableInt(ResultSet rs, String columnName) throws SQLException {
+        int value = rs.getInt(columnName);
+        return rs.wasNull() ? null : value;
     }
 }

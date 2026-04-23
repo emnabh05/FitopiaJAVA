@@ -62,7 +62,7 @@
                         <Region HBox.hgrow="ALWAYS" />
 
                         <Button onAction="#refreshStore" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
-                        <Button onAction="#openBackEnd" text="CHANGE&#10;SESSIONS" textAlignment="CENTER" styleClass="navbar-btn-red" />
+                        <Button onAction="#openBackEnd" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
                     </HBox>
                 </VBox>
 

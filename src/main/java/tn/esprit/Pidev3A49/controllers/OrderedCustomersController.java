@@ -12,6 +12,7 @@ import javafx.scene.control.cell.ComboBoxTableCell;
 import tn.esprit.Pidev3A49.Models.SupplementOrder;
 import tn.esprit.Pidev3A49.services.ServiceSupplementOrder;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
+import tn.esprit.Pidev3A49.utils.SessionRouter;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -113,11 +114,7 @@ public class OrderedCustomersController {
 
     @FXML
     public void openChangeSessions(ActionEvent event) {
-        try {
-            SceneNavigator.navigate(event, SceneNavigator.ORDERD_VIEW, SceneNavigator.FITNESS_FRONT_VIEW);
-        } catch (IOException exception) {
-            setErrorMessage("Impossible d'ouvrir frontregime.fxml.");
-        }
+        SessionRouter.logoutToSignIn(statusLabel);
     }
 
     private void configureColumns() {

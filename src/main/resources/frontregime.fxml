@@ -49,7 +49,7 @@
                 
                 <!-- Right Actions -->
                 <Button onAction="#rafraichirDonnees" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
-                <Button onAction="#ouvrirAdminInterface" text="CHANGE&#10;SESSIONS" textAlignment="CENTER" styleClass="navbar-btn-red" />
+                <Button onAction="#ouvrirAdminInterface" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
             </HBox>
         </VBox>
     </top>
@@ -342,7 +342,7 @@
                          </VBox>
 
                          <VBox fx:id="viewForumComment" fillWidth="true" managed="false" visible="false">
-                             <fx:include source="front-feed.fxml" />
+                             <fx:include source="front-feed-embedded.fxml" />
                          </VBox>
                     </StackPane>
                 </content>
