@@ -34,10 +34,16 @@ import java.util.stream.Collectors;
 public class ServiceUser {
     private static final String TABLE_NAME = "fitopia_users";
     private static final String PASSWORD_HISTORY_TABLE = "fitopia_user_password_history";
+    private static final String PASSWORD_RESET_AUDIT_TABLE = "fitopia_user_password_reset_audit";
     private static final int MAX_FAILED_ATTEMPTS = 3;
     private static final Duration LOCK_DURATION = Duration.ofMinutes(15);
     private static final Duration RESET_OTP_DURATION = Duration.ofMinutes(10);
     private static final int PASSWORD_HISTORY_LIMIT = 3;
+    private static final Duration RESET_ATTEMPT_WINDOW = Duration.ofHours(24);
+    private static final Duration RESET_REQUEST_WINDOW = Duration.ofHours(1);
+    private static final int MAX_RESET_REQUESTS_PER_HOUR = 3;
+    private static final int MAX_RESET_ATTEMPTS_PER_24H = 6;
+    private static final int MAX_RESET_FAILURES_PER_24H = 4;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
     private static final String DEFAULT_RESET_PHONE = "58860916";
 
@@ -258,13 +264,24 @@ public class ServiceUser {
         if (isLocked(user)) {
             throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
         }
+        PasswordRecoveryRiskSnapshot riskSnapshot = evaluateRecoveryRisk(user.getId());
+        if (riskSnapshot.recentRequestCount() >= MAX_RESET_REQUESTS_PER_HOUR) {
+            increaseRiskScore(user.getId(), 10);
+            recordPasswordRecoveryEvent(user.getId(), "REQUEST_BLOCKED", "BLOCKED",
+                    "Trop de demandes recentes de reinitialisation.", riskSnapshot.riskLevel(), "", "");
+            throw new RuntimeException("Trop de demandes recentes de reinitialisation. Reessayez plus tard.");
+        }
         PasswordResetTokenService.IssuedResetToken issued = passwordResetTokenService.issue(user, RESET_OTP_DURATION);
         persistResetChallenge(user.getId(), issued.nonce(), issued.expiresAt().format(DATE_FORMATTER));
+        recordPasswordRecoveryEvent(user.getId(), "REQUEST_ISSUED", "SUCCESS",
+                "Lien de reinitialisation emis pour l'utilisateur.", riskSnapshot.riskLevel(), "", "");
 
         try {
             emailOtpService.sendPasswordResetOtp(user.getEmail(), user.getEmail(), issued.token(), issued.expiresAt());
         } catch (RuntimeException e) {
             clearPasswordResetChallenge(user.getId());
+            recordPasswordRecoveryEvent(user.getId(), "REQUEST_DELIVERY_FAILED", "FAILED",
+                    e.getMessage(), "HIGH", "", "");
             throw e;
         }
     }
@@ -276,38 +293,137 @@ public class ServiceUser {
         if (isLocked(user)) {
             throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
         }
+        PasswordRecoveryRiskSnapshot riskSnapshot = evaluateRecoveryRisk(user.getId());
+        if (riskSnapshot.recentRequestCount() >= MAX_RESET_REQUESTS_PER_HOUR) {
+            increaseRiskScore(user.getId(), 10);
+            recordPasswordRecoveryEvent(user.getId(), "REQUEST_BLOCKED", "BLOCKED",
+                    "Trop de demandes recentes de reinitialisation.", riskSnapshot.riskLevel(), "", "");
+            throw new RuntimeException("Trop de demandes recentes de reinitialisation. Reessayez plus tard.");
+        }
 
         String phone = safe(user.getPhone()).isBlank() ? DEFAULT_RESET_PHONE : normalizePhoneForSms(user.getPhone());
         PasswordResetTokenService.IssuedResetToken issued = passwordResetTokenService.issue(user, RESET_OTP_DURATION);
         String expiresAt = issued.expiresAt().format(DATE_FORMATTER);
         persistResetChallenge(user.getId(), issued.nonce(), expiresAt);
+        recordPasswordRecoveryEvent(user.getId(), "REQUEST_ISSUED", "SUCCESS",
+                "Lien web de reinitialisation genere.", riskSnapshot.riskLevel(), "", "JavaFX-Demo");
         return new PasswordResetOtpInfo(user.getEmail(), phone, issued.token(), expiresAt);
     }
 
     public PasswordPolicyReport resetPasswordWithOtp(String email, String otpCode, String newPassword) {
+        return resetPasswordWithRiskVerification(email, otpCode, newPassword, "", "").report();
+    }
+
+    public PasswordRecoveryPreview previewPasswordRecovery(String email, String token, String ipAddress, String userAgent) {
         ensureConnection();
         FitopiaUser user = findByEmail(email).orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet email."));
-        if (isLocked(user)) {
-            throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
-        }
         ResetChallenge challenge = getResetChallenge(user.getId())
                 .orElseThrow(() -> new RuntimeException("Aucune demande de reinitialisation en attente pour cet email."));
 
-        if (challenge.isExpired()) {
-            clearPasswordResetChallenge(user.getId());
-            throw new RuntimeException("Le token de reinitialisation a expire.");
-        }
-        PasswordResetTokenService.ResetTokenClaims claims = passwordResetTokenService.verify(safe(otpCode).trim());
-        if (claims.userId() != user.getId()) {
-            throw new RuntimeException("Token de reinitialisation invalide pour ce compte.");
-        }
-        if (!claims.nonce().equals(challenge.code())) {
-            throw new RuntimeException("Token de reinitialisation invalide.");
+        PasswordResetTokenService.ResetTokenClaims claims = passwordResetTokenService.verify(safe(token).trim());
+        if (claims.userId() != user.getId() || !claims.nonce().equals(challenge.code())) {
+            recordPasswordRecoveryEvent(user.getId(), "LINK_VALIDATION", "FAILED",
+                    "Token de reinitialisation invalide pour la pre-validation.", "HIGH", ipAddress, userAgent);
+            throw new RuntimeException("Le lien de reinitialisation est invalide pour ce compte.");
         }
 
-        PasswordPolicyReport report = changePassword(user.getId(), newPassword, user);
-        clearPasswordResetChallenge(user.getId());
-        return report;
+        if (challenge.isExpired()) {
+            clearPasswordResetChallenge(user.getId());
+            recordPasswordRecoveryEvent(user.getId(), "LINK_VALIDATION", "FAILED",
+                    "Le token de reinitialisation a expire.", "MEDIUM", ipAddress, userAgent);
+            throw new RuntimeException("Le token de reinitialisation a expire.");
+        }
+
+        PasswordRecoveryRiskSnapshot riskSnapshot = evaluateRecoveryRisk(user.getId());
+        recordPasswordRecoveryEvent(user.getId(), "LINK_VALIDATION", "SUCCESS",
+                "Lien de reinitialisation consulte.", riskSnapshot.riskLevel(), ipAddress, userAgent);
+        return new PasswordRecoveryPreview(
+                user.getId(),
+                user.getEmail(),
+                challenge.expiresAt().format(DATE_FORMATTER),
+                riskSnapshot.recentAttemptCount(),
+                riskSnapshot.recentFailureCount(),
+                riskSnapshot.riskLevel(),
+                riskSnapshot.suspicious(),
+                riskSnapshot.message()
+        );
+    }
+
+    public SmartPasswordRecoveryResult resetPasswordWithRiskVerification(
+            String email,
+            String otpCode,
+            String newPassword,
+            String ipAddress,
+            String userAgent
+    ) {
+        ensureConnection();
+        FitopiaUser user = findByEmail(email).orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet email."));
+        PasswordRecoveryRiskSnapshot riskSnapshot = evaluateRecoveryRisk(user.getId());
+
+        if (isLocked(user)) {
+            recordPasswordRecoveryEvent(user.getId(), "PASSWORD_RESET", "FAILED",
+                    "Compte temporairement bloque lors de la reinitialisation.", "HIGH", ipAddress, userAgent);
+            throw new RuntimeException("Compte temporairement bloque jusqu'au " + safe(user.getLockedUntil()) + ".");
+        }
+        if (riskSnapshot.recentAttemptCount() >= MAX_RESET_ATTEMPTS_PER_24H
+                || riskSnapshot.recentFailureCount() >= MAX_RESET_FAILURES_PER_24H) {
+            increaseRiskScore(user.getId(), 15);
+            recordPasswordRecoveryEvent(user.getId(), "PASSWORD_RESET", "BLOCKED",
+                    "Comportement suspect detecte sur les tentatives recentes de reinitialisation.",
+                    "CRITICAL", ipAddress, userAgent);
+            throw new RuntimeException("Comportement suspect detecte. La reinitialisation est temporairement bloquee.");
+        }
+
+        ResetChallenge challenge = getResetChallenge(user.getId())
+                .orElseThrow(() -> new RuntimeException("Aucune demande de reinitialisation en attente pour cet email."));
+
+        try {
+            if (challenge.isExpired()) {
+                clearPasswordResetChallenge(user.getId());
+                recordPasswordRecoveryEvent(user.getId(), "PASSWORD_RESET", "FAILED",
+                        "Le token de reinitialisation a expire.", "MEDIUM", ipAddress, userAgent);
+                throw new RuntimeException("Le token de reinitialisation a expire.");
+            }
+
+            PasswordResetTokenService.ResetTokenClaims claims = passwordResetTokenService.verify(safe(otpCode).trim());
+            if (claims.userId() != user.getId()) {
+                recordPasswordRecoveryEvent(user.getId(), "PASSWORD_RESET", "FAILED",
+                        "Token de reinitialisation invalide pour ce compte.", "HIGH", ipAddress, userAgent);
+                increaseRiskScore(user.getId(), 10);
+                throw new RuntimeException("Token de reinitialisation invalide pour ce compte.");
+            }
+            if (!claims.nonce().equals(challenge.code())) {
+                recordPasswordRecoveryEvent(user.getId(), "PASSWORD_RESET", "FAILED",
+                        "Nonce de reinitialisation invalide.", "HIGH", ipAddress, userAgent);
+                increaseRiskScore(user.getId(), 10);
+                throw new RuntimeException("Token de reinitialisation invalide.");
+            }
+
+            PasswordChangeResult passwordChangeResult = changePasswordSecure(user.getId(), newPassword, user);
+            clearPasswordResetChallenge(user.getId());
+            recordPasswordRecoveryEvent(user.getId(), "PASSWORD_RESET", "SUCCESS",
+                    "Mot de passe modifie avec succes. Force=" + passwordChangeResult.report().strengthLabel()
+                            + ", score=" + passwordChangeResult.report().score(),
+                    riskSnapshot.riskLevel(), ipAddress, userAgent);
+
+            return new SmartPasswordRecoveryResult(
+                    true,
+                    user.getId(),
+                    user.getEmail(),
+                    passwordChangeResult.report(),
+                    riskSnapshot.recentAttemptCount(),
+                    riskSnapshot.recentFailureCount(),
+                    riskSnapshot.riskLevel(),
+                    "Le mot de passe a ete modifie et l'evenement a ete historise.",
+                    now()
+            );
+        } catch (RuntimeException e) {
+            if (!e.getMessage().contains("Comportement suspect")) {
+                recordPasswordRecoveryEvent(user.getId(), "PASSWORD_RESET", "FAILED",
+                        e.getMessage(), riskSnapshot.riskLevel(), ipAddress, userAgent);
+            }
+            throw e;
+        }
     }
 
     public PasswordPolicyReport changePassword(int userId, String rawPassword, FitopiaUser contextUser) {
@@ -487,6 +603,34 @@ public class ServiceUser {
     public String formatPasswordPolicyMessage(PasswordPolicyReport report) {
         return "Mot de passe refuse (" + report.score() + "/100 - " + report.strengthLabel() + ") : "
                 + String.join(" ", report.feedback());
+    }
+
+    public PasswordResetValidationPreview previewRecoveryPasswordValidation(String email, String rawPassword) {
+        ensureConnection();
+        FitopiaUser user = findByEmail(email).orElseThrow(() -> new RuntimeException("Aucun compte n'est associe a cet email."));
+        PasswordPolicyReport report = passwordSecurityService.evaluate(user, rawPassword);
+        boolean reused = false;
+        if (!safe(rawPassword).isBlank()) {
+            reused = isPasswordReused(user.getId(), rawPassword, user.getPassword());
+        }
+        boolean accepted = report.accepted() && !reused;
+        String summary;
+        if (safe(rawPassword).isBlank()) {
+            summary = "Saisissez un nouveau mot de passe pour lancer la validation.";
+        } else if (reused) {
+            summary = "Le mot de passe ne peut pas reutiliser les 3 derniers mots de passe.";
+        } else if (accepted) {
+            summary = "Mot de passe conforme pour la recuperation intelligente.";
+        } else {
+            summary = formatPasswordPolicyMessage(report);
+        }
+
+        return new PasswordResetValidationPreview(
+                report,
+                reused,
+                accepted,
+                summary
+        );
     }
 
     public UserSecuritySnapshot getSecuritySnapshot(int userId) {
@@ -715,10 +859,23 @@ public class ServiceUser {
                 + "created_at VARCHAR(50) NOT NULL,"
                 + "INDEX idx_password_history_user (user_id)"
                 + ")";
+        String auditQuery = "CREATE TABLE IF NOT EXISTS `" + PASSWORD_RESET_AUDIT_TABLE + "` ("
+                + "id INT PRIMARY KEY AUTO_INCREMENT,"
+                + "user_id INT NOT NULL,"
+                + "event_type VARCHAR(80) NOT NULL,"
+                + "event_status VARCHAR(40) NOT NULL,"
+                + "risk_level VARCHAR(40) NOT NULL,"
+                + "event_details TEXT,"
+                + "ip_address VARCHAR(100),"
+                + "user_agent VARCHAR(255),"
+                + "created_at VARCHAR(50) NOT NULL,"
+                + "INDEX idx_reset_audit_user_created (user_id, created_at)"
+                + ")";
 
         try (Statement statement = cnx.createStatement()) {
             statement.executeUpdate(query);
             statement.executeUpdate(historyQuery);
+            statement.executeUpdate(auditQuery);
             ensureColumn("face_id_enabled", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN face_id_enabled BOOLEAN NOT NULL DEFAULT FALSE");
             ensureColumn("face_image_path", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN face_image_path VARCHAR(255)");
             ensureColumn("password_score", "ALTER TABLE `" + TABLE_NAME + "` ADD COLUMN password_score INT NOT NULL DEFAULT 0");
@@ -970,6 +1127,99 @@ public class ServiceUser {
         return LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER);
     }
 
+    private PasswordRecoveryRiskSnapshot evaluateRecoveryRisk(int userId) {
+        int recentRequests = countRecentRecoveryEvents(userId, RESET_REQUEST_WINDOW, "REQUEST_ISSUED", "REQUEST_DELIVERY_FAILED", "REQUEST_BLOCKED");
+        int recentAttempts = countRecentRecoveryEvents(userId, RESET_ATTEMPT_WINDOW, "PASSWORD_RESET", "LINK_VALIDATION");
+        int recentFailures = countRecentRecoveryEventsByStatus(userId, RESET_ATTEMPT_WINDOW, "FAILED", "BLOCKED");
+
+        String riskLevel = "NORMAL";
+        String message = "Aucun signal de risque significatif sur la recuperation.";
+        boolean suspicious = false;
+
+        if (recentFailures >= MAX_RESET_FAILURES_PER_24H || recentAttempts >= MAX_RESET_ATTEMPTS_PER_24H) {
+            riskLevel = "CRITICAL";
+            message = "Volume eleve de tentatives ou d'echecs de recuperation detecte.";
+            suspicious = true;
+        } else if (recentRequests >= MAX_RESET_REQUESTS_PER_HOUR || recentFailures >= 2) {
+            riskLevel = "HIGH";
+            message = "Activite de recuperation a surveiller de pres.";
+        } else if (recentAttempts >= 2) {
+            riskLevel = "MEDIUM";
+            message = "Quelques tentatives recentes ont ete detectees.";
+        }
+
+        return new PasswordRecoveryRiskSnapshot(recentRequests, recentAttempts, recentFailures, riskLevel, suspicious, message);
+    }
+
+    private int countRecentRecoveryEvents(int userId, Duration window, String... eventTypes) {
+        if (eventTypes == null || eventTypes.length == 0) {
+            return 0;
+        }
+        String placeholders = String.join(",", java.util.Collections.nCopies(eventTypes.length, "?"));
+        String query = "SELECT COUNT(*) FROM `" + PASSWORD_RESET_AUDIT_TABLE + "` WHERE user_id=? AND created_at>=? "
+                + "AND event_type IN (" + placeholders + ")";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setInt(1, userId);
+            pstm.setString(2, LocalDateTime.now().minus(window).truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER));
+            for (int i = 0; i < eventTypes.length; i++) {
+                pstm.setString(i + 3, eventTypes[i]);
+            }
+            try (ResultSet rs = pstm.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors du comptage des evenements de reinitialisation : " + e.getMessage(), e);
+        }
+    }
+
+    private int countRecentRecoveryEventsByStatus(int userId, Duration window, String... statuses) {
+        if (statuses == null || statuses.length == 0) {
+            return 0;
+        }
+        String placeholders = String.join(",", java.util.Collections.nCopies(statuses.length, "?"));
+        String query = "SELECT COUNT(*) FROM `" + PASSWORD_RESET_AUDIT_TABLE + "` WHERE user_id=? AND created_at>=? "
+                + "AND event_status IN (" + placeholders + ")";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setInt(1, userId);
+            pstm.setString(2, LocalDateTime.now().minus(window).truncatedTo(ChronoUnit.SECONDS).format(DATE_FORMATTER));
+            for (int i = 0; i < statuses.length; i++) {
+                pstm.setString(i + 3, statuses[i]);
+            }
+            try (ResultSet rs = pstm.executeQuery()) {
+                return rs.next() ? rs.getInt(1) : 0;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors du comptage des statuts de reinitialisation : " + e.getMessage(), e);
+        }
+    }
+
+    private void recordPasswordRecoveryEvent(
+            int userId,
+            String eventType,
+            String eventStatus,
+            String details,
+            String riskLevel,
+            String ipAddress,
+            String userAgent
+    ) {
+        String query = "INSERT INTO `" + PASSWORD_RESET_AUDIT_TABLE + "` "
+                + "(user_id,event_type,event_status,risk_level,event_details,ip_address,user_agent,created_at) "
+                + "VALUES (?,?,?,?,?,?,?,?)";
+        try (PreparedStatement pstm = cnx.prepareStatement(query)) {
+            pstm.setInt(1, userId);
+            pstm.setString(2, safe(eventType));
+            pstm.setString(3, safe(eventStatus));
+            pstm.setString(4, safe(riskLevel).isBlank() ? "NORMAL" : safe(riskLevel));
+            pstm.setString(5, safe(details));
+            pstm.setString(6, safe(ipAddress));
+            pstm.setString(7, safe(userAgent));
+            pstm.setString(8, now());
+            pstm.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de l'historisation de la recuperation de mot de passe : " + e.getMessage(), e);
+        }
+    }
+
     private UserSecuritySnapshot toSecuritySnapshot(FitopiaUser user) {
         return new UserSecuritySnapshot(
                 user.getId(),
@@ -1054,5 +1304,48 @@ public class ServiceUser {
     }
 
     public record PasswordResetOtpInfo(String email, String phone, String code, String expiresAt) {
+    }
+
+    public record PasswordRecoveryPreview(
+            int userId,
+            String email,
+            String expiresAt,
+            int recentAttempts,
+            int recentFailures,
+            String riskLevel,
+            boolean suspicious,
+            String message
+    ) {
+    }
+
+    public record SmartPasswordRecoveryResult(
+            boolean passwordUpdated,
+            int userId,
+            String email,
+            PasswordPolicyReport report,
+            int recentAttempts,
+            int recentFailures,
+            String riskLevel,
+            String confirmationMessage,
+            String changedAt
+    ) {
+    }
+
+    public record PasswordResetValidationPreview(
+            PasswordPolicyReport report,
+            boolean passwordReused,
+            boolean accepted,
+            String summary
+    ) {
+    }
+
+    private record PasswordRecoveryRiskSnapshot(
+            int recentRequestCount,
+            int recentAttemptCount,
+            int recentFailureCount,
+            String riskLevel,
+            boolean suspicious,
+            String message
+    ) {
     }
 }

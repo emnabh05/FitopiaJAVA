@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
@@ -55,7 +56,9 @@
                             </children>
                         </VBox>
 
-                        <VBox maxWidth="430.0" prefHeight="640.0" prefWidth="430.0" style="-fx-background-color: white; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.14), 28, 0.2, 0, 10); -fx-padding: 28;">
+                        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" maxWidth="430.0" pannable="true" prefHeight="640.0" prefWidth="430.0" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+                            <content>
+                        <VBox maxWidth="430.0" prefWidth="430.0" style="-fx-background-color: white; -fx-background-radius: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.14), 28, 0.2, 0, 10); -fx-padding: 28;">
                             <children>
                                 <Label style="-fx-text-fill: #1c2f35; -fx-font-size: 26px; -fx-font-weight: bold;" text="Sign In" />
                                 <Label style="-fx-text-fill: #6f7e84;" text="Email / Username + Password" />
@@ -104,6 +107,82 @@
 
                                 <Button mnemonicParsing="false" onAction="#handleForgot" style="-fx-background-color: transparent; -fx-text-fill: #567177;" text="Mot de passe oublie ?" />
 
+                                <VBox fx:id="recoveryPanel" managed="false" spacing="10.0" style="-fx-background-color: linear-gradient(to bottom, #f6faf9, #eef5f4); -fx-background-radius: 14; -fx-border-color: #d8e4e1; -fx-border-radius: 14; -fx-padding: 16;" visible="false">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT">
+                                            <children>
+                                                <VBox HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label style="-fx-text-fill: #17363b; -fx-font-size: 16px; -fx-font-weight: bold;" text="Smart Password Recovery" />
+                                                        <Label style="-fx-text-fill: #60757b; -fx-font-size: 11px;" text="Workflow intelligent en 4 etapes dans la meme interface." wrapText="true" />
+                                                    </children>
+                                                </VBox>
+                                                <Button mnemonicParsing="false" onAction="#handleCancelRecovery" style="-fx-background-color: transparent; -fx-text-fill: #5c6f75; -fx-font-weight: bold;" text="FERMER" />
+                                            </children>
+                                        </HBox>
+
+                                        <HBox spacing="8.0">
+                                            <children>
+                                                <Label fx:id="recoveryStep1Label" maxWidth="1.7976931348623157E308" style="-fx-background-color: #dfeceb; -fx-background-radius: 16; -fx-text-fill: #315057; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 6 10 6 10;" text="1. COMPTE" HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="recoveryStep2Label" maxWidth="1.7976931348623157E308" style="-fx-background-color: #edf3f2; -fx-background-radius: 16; -fx-text-fill: #7a8e93; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 6 10 6 10;" text="2. VERIFICATION" HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="recoveryStep3Label" maxWidth="1.7976931348623157E308" style="-fx-background-color: #edf3f2; -fx-background-radius: 16; -fx-text-fill: #7a8e93; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 6 10 6 10;" text="3. RISQUE" HBox.hgrow="ALWAYS" />
+                                                <Label fx:id="recoveryStep4Label" maxWidth="1.7976931348623157E308" style="-fx-background-color: #edf3f2; -fx-background-radius: 16; -fx-text-fill: #7a8e93; -fx-font-size: 10px; -fx-font-weight: bold; -fx-padding: 6 10 6 10;" text="4. NOUVEAU MDP" HBox.hgrow="ALWAYS" />
+                                            </children>
+                                        </HBox>
+
+                                        <Label fx:id="recoveryStatusLabel" style="-fx-text-fill: #4c6770; -fx-font-size: 11px;" text="Selectionnez un compte pour commencer la recuperation." wrapText="true" />
+
+                                        <VBox fx:id="recoveryStep1Box" spacing="8.0">
+                                            <children>
+                                                <Label style="-fx-text-fill: #17363b; -fx-font-size: 12px; -fx-font-weight: bold;" text="Etape 1. Verification du compte" />
+                                                <TextField fx:id="recoveryIdentifierField" promptText="Email ou username" />
+                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRecoveryVerifyAccount" style="-fx-background-color: #1f6a6d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="VERIFIER LE COMPTE" />
+                                            </children>
+                                        </VBox>
+
+                                        <VBox fx:id="recoveryStep2Box" managed="false" spacing="8.0" visible="false">
+                                            <children>
+                                                <Label style="-fx-text-fill: #17363b; -fx-font-size: 12px; -fx-font-weight: bold;" text="Etape 2. Verification de securite" />
+                                                <Label fx:id="recoveryAccountSummaryLabel" style="-fx-text-fill: #4c6770; -fx-font-size: 11px;" text="Compte selectionne" wrapText="true" />
+                                                <Label fx:id="recoveryChallengeLabel" style="-fx-text-fill: #4c6770; -fx-font-size: 11px;" text="Challenge de verification..." wrapText="true" />
+                                                <TextField fx:id="recoveryChallengeAnswerField" promptText="Reponse au challenge" />
+                                                <HBox spacing="8.0">
+                                                    <children>
+                                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRecoveryRefreshChallenge" style="-fx-background-color: white; -fx-border-color: #d3dde0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #314850; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="NOUVEAU CHALLENGE" HBox.hgrow="ALWAYS" />
+                                                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRecoverySecurityCheck" style="-fx-background-color: #1f6a6d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="VALIDER" HBox.hgrow="ALWAYS" />
+                                                    </children>
+                                                </HBox>
+                                            </children>
+                                        </VBox>
+
+                                        <VBox fx:id="recoveryStep3Box" managed="false" spacing="8.0" visible="false">
+                                            <children>
+                                                <Label style="-fx-text-fill: #17363b; -fx-font-size: 12px; -fx-font-weight: bold;" text="Etape 3. Analyse de risque" />
+                                                <Label fx:id="recoveryRiskLevelLabel" style="-fx-text-fill: #17363b; -fx-font-size: 12px; -fx-font-weight: bold;" text="Niveau de risque: -" />
+                                                <Label fx:id="recoveryRiskDetailsLabel" style="-fx-text-fill: #4c6770; -fx-font-size: 11px;" text="Les metriques de risque apparaitront ici." wrapText="true" />
+                                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRecoveryProceedToPassword" style="-fx-background-color: #1f6a6d; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="CONTINUER VERS LE NOUVEAU MOT DE PASSE" />
+                                            </children>
+                                        </VBox>
+
+                                        <VBox fx:id="recoveryStep4Box" managed="false" spacing="8.0" visible="false">
+                                            <children>
+                                                <Label style="-fx-text-fill: #17363b; -fx-font-size: 12px; -fx-font-weight: bold;" text="Etape 4. Nouveau mot de passe" />
+                                                <Label style="-fx-text-fill: #5c7178; -fx-font-size: 11px;" text="Nouveau mot de passe" />
+                                                <PasswordField fx:id="recoveryNewPasswordField" promptText="Nouveau mot de passe" />
+                                                <Label fx:id="recoveryPasswordStrengthLabel" style="-fx-text-fill: #17363b; -fx-font-size: 11px; -fx-font-weight: bold;" text="Force: -" />
+                                                <Label fx:id="recoveryPasswordRulesLabel" style="-fx-text-fill: #4c6770; -fx-font-size: 11px;" text="Les regles de validation apparaitront ici." wrapText="true" />
+                                                <Label style="-fx-text-fill: #5c7178; -fx-font-size: 11px;" text="Confirmation" />
+                                                <PasswordField fx:id="recoveryConfirmPasswordField" promptText="Confirmer le mot de passe" />
+                                                <Label fx:id="recoveryPasswordFeedbackLabel" style="-fx-text-fill: #4c6770; -fx-font-size: 11px;" text="Le systeme verifiera la force du mot de passe et la non-reutilisation." wrapText="true" />
+                                                <Button fx:id="recoverySubmitButton" disable="true" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleRecoverySubmitPassword" style="-fx-background-color: #243943; -fx-text-fill: white; -fx-background-radius: 8; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="FINALISER LA RECUPERATION" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                    <VBox.margin>
+                                        <Insets top="10.0" />
+                                    </VBox.margin>
+                                </VBox>
+
                                 <Label fx:id="statusLabel" style="-fx-text-fill: #5f6c72; -fx-font-size: 12px;" wrapText="true">
                                     <VBox.margin>
                                         <Insets top="6.0" />
@@ -120,6 +199,8 @@
                                 <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleGoSignUp" style="-fx-background-color: white; -fx-border-color: #d3dde0; -fx-border-radius: 8; -fx-background-radius: 8; -fx-text-fill: #314850; -fx-font-weight: bold; -fx-padding: 10 0 10 0;" text="SIGN UP" />
                             </children>
                         </VBox>
+                            </content>
+                        </ScrollPane>
                     </children>
                 </HBox>
             </children>

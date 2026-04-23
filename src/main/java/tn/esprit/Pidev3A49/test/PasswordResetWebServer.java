@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 public final class PasswordResetWebServer {
@@ -32,6 +33,7 @@ public final class PasswordResetWebServer {
     private final ServiceUser serviceUser = new ServiceUser();
     private final SecureRandom random = new SecureRandom();
     private final byte[] challengeSecret = resolveChallengeSecret().getBytes(StandardCharsets.UTF_8);
+    private final Map<String, RecoveryCompletionStatus> recoveryStatuses = new ConcurrentHashMap<>();
 
     private HttpServer server;
     private int port = DEFAULT_PORT;
@@ -78,6 +80,14 @@ public final class PasswordResetWebServer {
                 + "&token=" + urlEncode(token);
     }
 
+    public RecoveryCompletionStatus consumeRecoveryStatus(String email) {
+        String normalizedEmail = safe(email).trim().toLowerCase();
+        if (normalizedEmail.isBlank()) {
+            return null;
+        }
+        return recoveryStatuses.remove(normalizedEmail);
+    }
+
     private final class ResetPasswordHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -101,10 +111,24 @@ public final class PasswordResetWebServer {
                 return;
             }
 
+            ServiceUser.PasswordRecoveryPreview preview;
+            try {
+                preview = serviceUser.previewPasswordRecovery(email, token, clientIp(exchange), clientUserAgent(exchange));
+            } catch (RuntimeException e) {
+                sendHtml(exchange, 400, htmlLayout("Lien invalide", "<p>" + escapeHtml(e.getMessage()) + "</p>"));
+                return;
+            }
+
             HumanChallenge challenge = issueChallenge(token, email);
-            String body = "<h2>Reinitialisation du mot de passe</h2>"
+            String body = "<h2>Smart Password Recovery with Risk Verification</h2>"
                     + "<p>Compte: <b>" + escapeHtml(email) + "</b></p>"
                     + "<p>Confirmez que vous etes legitime puis definissez un nouveau mot de passe.</p>"
+                    + "<div class=\"risk-box\">"
+                    + "<p><b>Expiration du token:</b> " + escapeHtml(preview.expiresAt()) + "</p>"
+                    + "<p><b>Tentatives recentes:</b> " + preview.recentAttempts() + " | <b>Echecs:</b> " + preview.recentFailures() + "</p>"
+                    + "<p><b>Niveau de risque:</b> " + escapeHtml(preview.riskLevel()) + "</p>"
+                    + "<p>" + escapeHtml(preview.message()) + "</p>"
+                    + "</div>"
                     + "<form method=\"post\" action=\"" + RESET_PATH + "\">"
                     + "<input type=\"hidden\" name=\"email\" value=\"" + escapeHtml(email) + "\"/>"
                     + "<input type=\"hidden\" name=\"token\" value=\"" + escapeHtml(token) + "\"/>"
@@ -156,12 +180,36 @@ public final class PasswordResetWebServer {
             }
 
             try {
-                serviceUser.resetPasswordWithOtp(email, token, newPassword);
+                ServiceUser.SmartPasswordRecoveryResult result = serviceUser.resetPasswordWithRiskVerification(
+                        email,
+                        token,
+                        newPassword,
+                        clientIp(exchange),
+                        clientUserAgent(exchange)
+                );
+                recoveryStatuses.put(email.toLowerCase(), new RecoveryCompletionStatus(
+                        result.email(),
+                        result.passwordUpdated(),
+                        result.confirmationMessage(),
+                        result.riskLevel(),
+                        result.changedAt()
+                ));
                 String success = "<h2>Mot de passe mis a jour</h2>"
-                        + "<p>La reinitialisation est terminee. Vous pouvez revenir a l'application et vous connecter.</p>"
+                        + "<p>La reinitialisation intelligente est terminee. Vous pouvez revenir a l'application et vous connecter.</p>"
+                        + "<p><b>Score du mot de passe:</b> " + result.report().score() + "/100"
+                        + " | <b>Force:</b> " + escapeHtml(result.report().strengthLabel()) + "</p>"
+                        + "<p><b>Niveau de risque:</b> " + escapeHtml(result.riskLevel()) + "</p>"
+                        + "<p><b>Historisation securite:</b> evenement enregistre avec succes.</p>"
                         + "<p><small>Heure: " + LocalDateTime.now().format(DATE_FORMATTER) + "</small></p>";
                 sendHtml(exchange, 200, htmlLayout("Succes", success));
             } catch (RuntimeException e) {
+                recoveryStatuses.put(email.toLowerCase(), new RecoveryCompletionStatus(
+                        email,
+                        false,
+                        e.getMessage(),
+                        "FAILED",
+                        LocalDateTime.now().format(DATE_FORMATTER)
+                ));
                 sendHtml(exchange, 400, htmlLayout("Erreur", "<p>" + escapeHtml(e.getMessage()) + "</p>"));
             }
         }
@@ -205,6 +253,7 @@ public final class PasswordResetWebServer {
                 + "<style>"
                 + "body{font-family:Segoe UI,Arial,sans-serif;background:#f4f7f8;margin:0;padding:32px;color:#1f2e33;}"
                 + ".card{max-width:560px;margin:0 auto;background:white;border:1px solid #d9e4e7;border-radius:12px;padding:24px;}"
+                + ".risk-box{background:#f2f7f8;border:1px solid #d9e4e7;border-radius:10px;padding:14px;margin:16px 0;}"
                 + "h2{margin-top:0;color:#12343b;}label{display:block;margin:12px 0 6px;font-weight:600;}"
                 + "input[type=password],input[type=text]{width:100%;padding:10px;border:1px solid #c8d6db;border-radius:8px;}"
                 + "button{margin-top:16px;background:#1f6a5f;color:white;border:none;padding:10px 16px;border-radius:8px;font-weight:700;cursor:pointer;}"
@@ -266,6 +315,18 @@ public final class PasswordResetWebServer {
                 .replace("'", "&#39;");
     }
 
+    private String clientIp(HttpExchange exchange) {
+        return exchange == null || exchange.getRemoteAddress() == null
+                ? ""
+                : safe(exchange.getRemoteAddress().getAddress() == null
+                ? exchange.getRemoteAddress().toString()
+                : exchange.getRemoteAddress().getAddress().getHostAddress());
+    }
+
+    private String clientUserAgent(HttpExchange exchange) {
+        return exchange == null ? "" : safe(exchange.getRequestHeaders().getFirst("User-Agent"));
+    }
+
     private static String resolveChallengeSecret() {
         String fromEnv = System.getenv("RESET_HUMAN_SECRET");
         if (fromEnv != null && !fromEnv.trim().isBlank()) {
@@ -275,5 +336,14 @@ public final class PasswordResetWebServer {
     }
 
     private record HumanChallenge(int a, int b, String proof) {
+    }
+
+    public record RecoveryCompletionStatus(
+            String email,
+            boolean passwordUpdated,
+            String message,
+            String riskLevel,
+            String changedAt
+    ) {
     }
 }

@@ -15,8 +15,10 @@ import javafx.scene.control.TextField;
 import tn.esprit.Pidev3A49.api.AdminSecurityController;
 import tn.esprit.Pidev3A49.api.UserArchiveController;
 import tn.esprit.Pidev3A49.api.UserSecurityController;
+import tn.esprit.Pidev3A49.api.dto.AdaptiveAccountTrustReport;
 import tn.esprit.Pidev3A49.api.dto.ChangePasswordRequest;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
+import tn.esprit.Pidev3A49.services.AdaptiveAccountTrustEngineService;
 import tn.esprit.Pidev3A49.services.ServiceUser;
 import tn.esprit.Pidev3A49.services.UserAiInsightService;
 import tn.esprit.Pidev3A49.services.security.AdminSecurityAlert;
@@ -37,6 +39,7 @@ public class AdminDashboardController {
     @FXML private TextField searchField;
     @FXML private ComboBox<String> sortCombo;
     @FXML private ComboBox<String> archiveFilterCombo;
+    @FXML private ComboBox<String> trustActionCombo;
     @FXML private TextField nomField;
     @FXML private TextField prenomField;
     @FXML private TextField usernameField;
@@ -56,10 +59,16 @@ public class AdminDashboardController {
     @FXML private TableColumn<FitopiaUser, String> roleCol;
     @FXML private TableColumn<FitopiaUser, String> phoneCol;
     @FXML private TableColumn<FitopiaUser, Number> riskCol;
+    @FXML private TableColumn<FitopiaUser, Number> trustScoreCol;
+    @FXML private TableColumn<FitopiaUser, String> trustDecisionCol;
     @FXML private TableColumn<FitopiaUser, String> accountStatusCol;
     @FXML private TableColumn<FitopiaUser, String> securityCol;
     @FXML private TableColumn<FitopiaUser, String> archivedAtCol;
     @FXML private Label securityDetailsLabel;
+    @FXML private Label trustScoreLabel;
+    @FXML private Label trustRiskLabel;
+    @FXML private Label trustDecisionLabel;
+    @FXML private Label trustSummaryLabel;
     @FXML private Label duplicateScoreLabel;
     @FXML private Label duplicateRecommendationLabel;
     @FXML private Label duplicateFindingsLabel;
@@ -71,6 +80,7 @@ public class AdminDashboardController {
     private final AdminSecurityController adminSecurityController = new AdminSecurityController(serviceUser);
     private final UserAiInsightService userAiInsightService = new UserAiInsightService();
     private final UserArchiveController userArchiveController = new UserArchiveController(serviceUser, userAiInsightService);
+    private final AdaptiveAccountTrustEngineService trustEngineService = new AdaptiveAccountTrustEngineService();
     private final JwtService jwtService = new JwtService();
     private final ObservableList<FitopiaUser> users = FXCollections.observableArrayList();
     private FitopiaUser selectedUser;
@@ -85,6 +95,10 @@ public class AdminDashboardController {
         sortCombo.getSelectionModel().select("ID desc");
         archiveFilterCombo.setItems(FXCollections.observableArrayList("Actifs", "Archives", "Tous"));
         archiveFilterCombo.getSelectionModel().select("Actifs");
+        trustActionCombo.setItems(FXCollections.observableArrayList(
+                "ADMIN_REVIEW", "LOGIN", "PASSWORD_RECOVERY", "PASSWORD_CHANGE", "FACE_ID_ENABLE", "EMAIL_UPDATE"
+        ));
+        trustActionCombo.getSelectionModel().select("ADMIN_REVIEW");
         archiveViewButton.setText("Voir archives");
         renderJwtDebug();
         setupTable();
@@ -94,6 +108,10 @@ public class AdminDashboardController {
         duplicateScoreLabel.setText("-");
         duplicateRecommendationLabel.setText("Selectionnez un utilisateur pour analyser les doublons.");
         duplicateFindingsLabel.setText("Aucune analyse en cours.");
+        trustScoreLabel.setText("-");
+        trustRiskLabel.setText("-");
+        trustDecisionLabel.setText("-");
+        trustSummaryLabel.setText("Selectionnez un utilisateur pour analyser la confiance du compte.");
     }
 
     @FXML
@@ -120,6 +138,12 @@ public class AdminDashboardController {
     @FXML
     private void handleArchiveFilter() {
         applyFilters();
+    }
+
+    @FXML
+    private void handleTrustActionChange() {
+        applyFilters();
+        populateEditor(usersTable.getSelectionModel().getSelectedItem());
     }
 
     @FXML
@@ -257,6 +281,8 @@ public class AdminDashboardController {
         roleCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getRole())));
         phoneCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getPhone())));
         riskCol.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getRiskScore()));
+        trustScoreCol.setCellValueFactory(c -> new ReadOnlyObjectWrapper<>(c.getValue().getTrustScore()));
+        trustDecisionCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getTrustDecision())));
         accountStatusCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getAccountStatus())));
         securityCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getSecurityAlertSummary())));
         archivedAtCol.setCellValueFactory(c -> new ReadOnlyStringWrapper(safe(c.getValue().getArchivedAt())));
@@ -279,6 +305,10 @@ public class AdminDashboardController {
                 null,
                 null,
                 false
+        );
+        List<AdaptiveAccountTrustReport> trustReports = trustEngineService.generateTrustAnalysis(
+                safe(trustActionCombo.getValue()),
+                UserSession.getAuthorizationHeader()
         );
         String search = safe(searchField.getText()).trim().toLowerCase();
         if (!search.isEmpty()) {
@@ -307,6 +337,14 @@ public class AdminDashboardController {
                 .filter(alert -> alert.userId() == user.getId())
                 .findFirst()
                 .ifPresent(alert -> user.setSecurityAlertSummary(alert.securityAlertSummary())));
+        list.forEach(user -> trustReports.stream()
+                .filter(report -> report.getUserId() == user.getId())
+                .findFirst()
+                .ifPresent(report -> {
+                    user.setTrustScore(report.getTrustScore());
+                    user.setTrustRiskLevel(report.getRiskLevel());
+                    user.setTrustDecision(report.getDecision());
+                }));
 
         users.setAll(list);
         String mode = Boolean.TRUE.equals(resolveArchiveFilter()) ? "archives" : Boolean.FALSE.equals(resolveArchiveFilter()) ? "actifs" : "tous";
@@ -326,9 +364,18 @@ public class AdminDashboardController {
         newPasswordField.clear();
         roleCombo.setValue(safe(user.getRole()).isBlank() ? "Patient" : user.getRole());
         UserSecuritySnapshot snapshot = userSecurityController.getSecuritySnapshot(user.getId(), UserSession.getAuthorizationHeader());
+        AdaptiveAccountTrustReport trustReport = trustEngineService.evaluateTrustForAction(
+                user.getId(),
+                safe(trustActionCombo.getValue()),
+                UserSession.getAuthorizationHeader()
+        );
         UserAiInsightService.DuplicateDetectionResult duplicateResult =
                 userAiInsightService.detectPotentialDuplicates(user, serviceUser.getAll());
         securityDetailsLabel.setText(buildSecuritySnapshotText(snapshot, duplicateResult));
+        trustScoreLabel.setText(trustReport.getTrustScore() + "/100");
+        trustRiskLabel.setText(trustReport.getRiskLevel());
+        trustDecisionLabel.setText(trustReport.getDecision());
+        trustSummaryLabel.setText(trustReport.getTrustSummary());
         duplicateScoreLabel.setText(duplicateResult.duplicateScore() + "/100");
         duplicateRecommendationLabel.setText(duplicateResult.recommendation());
         duplicateFindingsLabel.setText(String.join(" | ", duplicateResult.findings()));
@@ -344,6 +391,10 @@ public class AdminDashboardController {
         newPasswordField.clear();
         roleCombo.setValue("Patient");
         securityDetailsLabel.setText("Selectionnez un utilisateur pour afficher les alertes de securite.");
+        trustScoreLabel.setText("-");
+        trustRiskLabel.setText("-");
+        trustDecisionLabel.setText("-");
+        trustSummaryLabel.setText("Selectionnez un utilisateur pour analyser la confiance du compte.");
         duplicateScoreLabel.setText("-");
         duplicateRecommendationLabel.setText("Selectionnez un utilisateur pour analyser les doublons.");
         duplicateFindingsLabel.setText("Aucune analyse en cours.");

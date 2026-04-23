@@ -46,6 +46,7 @@
                                 <TextField fx:id="searchField" onKeyReleased="#handleSearch" promptText="Recherche par id, nom, email, role..." HBox.hgrow="ALWAYS" />
                                 <ComboBox fx:id="sortCombo" onAction="#handleSort" prefWidth="160.0" />
                                 <ComboBox fx:id="archiveFilterCombo" onAction="#handleArchiveFilter" prefWidth="140.0" promptText="Archives" />
+                                <ComboBox fx:id="trustActionCombo" onAction="#handleTrustActionChange" prefWidth="180.0" promptText="Trust context" />
                                 <Button fx:id="archiveViewButton" mnemonicParsing="false" onAction="#handleShowArchivedUsers" style="-fx-background-color: white; -fx-text-fill: #1f6a5f; -fx-border-color: #bddfd8; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Voir archives" />
                                 <Button mnemonicParsing="false" onAction="#handleSearch" style="-fx-background-color: #eef5f4; -fx-text-fill: #22333b; -fx-border-color: #cad7dc; -fx-border-radius: 8; -fx-background-radius: 8; -fx-font-weight: bold;" text="Rechercher" />
                             </children>
@@ -61,6 +62,8 @@
                                 <TableColumn fx:id="roleCol" prefWidth="130.0" text="Role" />
                                 <TableColumn fx:id="phoneCol" prefWidth="170.0" text="Telephone" />
                                 <TableColumn fx:id="riskCol" prefWidth="90.0" text="Risque" />
+                                <TableColumn fx:id="trustScoreCol" prefWidth="90.0" text="Trust" />
+                                <TableColumn fx:id="trustDecisionCol" prefWidth="120.0" text="Decision" />
                                 <TableColumn fx:id="accountStatusCol" prefWidth="120.0" text="Statut" />
                                 <TableColumn fx:id="securityCol" prefWidth="280.0" text="Alertes" />
                                 <TableColumn fx:id="archivedAtCol" prefWidth="170.0" text="Archive le" />
@@ -90,11 +93,19 @@
                                     </children>
                                 </HBox>
                                 <Label fx:id="securityDetailsLabel" style="-fx-text-fill: #56706b;" text="Selectionnez un utilisateur pour afficher les alertes de securite." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="4" />
-                                <Label style="-fx-text-fill: #1b2e35; -fx-font-weight: bold;" text="Detection IA des doublons" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" />
-                                <Label style="-fx-text-fill: #5d6b77;" text="Score doublon" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-                                <Label fx:id="duplicateScoreLabel" style="-fx-text-fill: #173f44; -fx-font-weight: bold;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                <Label fx:id="duplicateRecommendationLabel" style="-fx-text-fill: #56706b;" text="Selectionnez un utilisateur pour analyser les doublons." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="7" />
-                                <Label fx:id="duplicateFindingsLabel" style="-fx-text-fill: #56706b;" text="Aucune analyse en cours." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="8" />
+                                <Label style="-fx-text-fill: #1b2e35; -fx-font-weight: bold;" text="Adaptive Account Trust Engine" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="5" />
+                                <Label style="-fx-text-fill: #5d6b77;" text="Trust score" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                <Label fx:id="trustScoreLabel" style="-fx-text-fill: #173f44; -fx-font-weight: bold;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                <Label style="-fx-text-fill: #5d6b77;" text="Risk level" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                                <Label fx:id="trustRiskLabel" style="-fx-text-fill: #173f44; -fx-font-weight: bold;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                <Label style="-fx-text-fill: #5d6b77;" text="Decision" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                                <Label fx:id="trustDecisionLabel" style="-fx-text-fill: #173f44; -fx-font-weight: bold;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                                <Label fx:id="trustSummaryLabel" style="-fx-text-fill: #56706b;" text="Selectionnez un utilisateur pour analyser la confiance du compte." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="9" />
+                                <Label style="-fx-text-fill: #1b2e35; -fx-font-weight: bold;" text="Detection IA des doublons" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="10" />
+                                <Label style="-fx-text-fill: #5d6b77;" text="Score doublon" GridPane.columnIndex="0" GridPane.rowIndex="11" />
+                                <Label fx:id="duplicateScoreLabel" style="-fx-text-fill: #173f44; -fx-font-weight: bold;" text="-" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                                <Label fx:id="duplicateRecommendationLabel" style="-fx-text-fill: #56706b;" text="Selectionnez un utilisateur pour analyser les doublons." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="12" />
+                                <Label fx:id="duplicateFindingsLabel" style="-fx-text-fill: #56706b;" text="Aucune analyse en cours." wrapText="true" GridPane.columnIndex="0" GridPane.columnSpan="3" GridPane.rowIndex="13" />
                             </children>
                         </GridPane>
                     </children>

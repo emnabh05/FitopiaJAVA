@@ -43,6 +43,29 @@ public class PasswordResetTokenService {
         long now = Instant.now().getEpochSecond();
         long exp = now + Math.max(60L, normalizedValidity.getSeconds());
         String nonce = generateNonce();
+        return issueWithClaims(user, nonce, now, exp);
+    }
+
+    public IssuedResetToken issueWithExistingChallenge(FitopiaUser user, String nonce, LocalDateTime expiresAt) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is required.");
+        }
+        String normalizedNonce = nonce == null ? "" : nonce.trim();
+        if (normalizedNonce.isBlank()) {
+            throw new IllegalArgumentException("Nonce is required.");
+        }
+        if (expiresAt == null) {
+            throw new IllegalArgumentException("Expiration date is required.");
+        }
+        long now = Instant.now().getEpochSecond();
+        long exp = expiresAt.atZone(ZoneId.systemDefault()).toEpochSecond();
+        if (exp <= now) {
+            throw new IllegalArgumentException("Existing reset challenge is expired.");
+        }
+        return issueWithClaims(user, normalizedNonce, now, exp);
+    }
+
+    private IssuedResetToken issueWithClaims(FitopiaUser user, String nonce, long now, long exp) {
         String subject = safe(user.getEmail()).isBlank() ? safe(user.getUsername()) : safe(user.getEmail());
 
         String payload = "{"

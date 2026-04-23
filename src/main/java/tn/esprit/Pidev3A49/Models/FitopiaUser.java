@@ -41,6 +41,9 @@ public class FitopiaUser {
     private boolean archived;
     private String archivedAt;
     private String securityAlertSummary;
+    private int trustScore;
+    private String trustRiskLevel;
+    private String trustDecision;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -122,4 +125,10 @@ public class FitopiaUser {
     public void setArchivedAt(String archivedAt) { this.archivedAt = archivedAt; }
     public String getSecurityAlertSummary() { return securityAlertSummary; }
     public void setSecurityAlertSummary(String securityAlertSummary) { this.securityAlertSummary = securityAlertSummary; }
+    public int getTrustScore() { return trustScore; }
+    public void setTrustScore(int trustScore) { this.trustScore = trustScore; }
+    public String getTrustRiskLevel() { return trustRiskLevel; }
+    public void setTrustRiskLevel(String trustRiskLevel) { this.trustRiskLevel = trustRiskLevel; }
+    public String getTrustDecision() { return trustDecision; }
+    public void setTrustDecision(String trustDecision) { this.trustDecision = trustDecision; }
 }
