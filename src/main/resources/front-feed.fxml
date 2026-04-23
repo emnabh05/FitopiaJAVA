@@ -74,7 +74,7 @@
                                 </VBox>
                                 <Label fx:id="lblWelcomeUser" styleClass="hero-stats hero-chip" text="Connected user experience"/>
                             </HBox>
-                            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="hero-toolbar">
+                            <HBox alignment="CENTER" spacing="10.0" styleClass="hero-toolbar hero-toolbar-centered">
                                 <TextField fx:id="tfSearch" onAction="#refreshData" promptText="Search by title, author, or content" styleClass="search-input hero-search"/>
                                 <Button onAction="#refreshData" styleClass="primary-pill primary-pill-compact" text="Refresh"/>
                                 <Label fx:id="lblFeedStats" styleClass="hero-stats hero-chip" text="0 forums visibles"/>

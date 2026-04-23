@@ -168,6 +168,10 @@
     -fx-padding: 2 0 0 0;
 }
 
+.hero-toolbar-centered {
+    -fx-alignment: center;
+}
+
 .hero-search {
     -fx-pref-width: 360;
     -fx-background-color: rgba(255, 255, 255, 0.96);
