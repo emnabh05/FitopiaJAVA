@@ -62,6 +62,9 @@
                     <padding>
                         <Insets bottom="28.0" left="28.0" right="28.0" top="20.0"/>
                     </padding>
+                    <VBox prefWidth="340.0" spacing="18.0">
+                        <VBox fx:id="messagingSidebarHost" spacing="0.0" VBox.vgrow="ALWAYS"/>
+                    </VBox>
                     <VBox prefWidth="900.0" spacing="18.0">
                         <VBox spacing="12.0" styleClass="hero-card hero-card-compact">
                             <HBox alignment="CENTER_LEFT" spacing="14.0">
@@ -116,7 +119,6 @@
                             </HBox>
                             <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill compact-danger composer-delete" text="Delete selected post"/>
                         </VBox>
-                        <VBox fx:id="messagingSidebarHost" spacing="0.0" VBox.vgrow="ALWAYS"/>
                         <VBox managed="false" visible="false">
                             <Label fx:id="lblCommentComposerHint" text="Your comment will be linked to your account." />
                             <Label fx:id="lblCommentContext" text="No comment selected. Your reply will be linked to your connected account." />
