@@ -87,13 +87,13 @@
                             <TextArea fx:id="taForumContent" prefRowCount="4" promptText="Share your story, advice, or question..." styleClass="text-area-input compact-area"/>
                             <VBox spacing="8.0" styleClass="media-picker-box">
                                 <TextField fx:id="tfForumImagePath" editable="false" promptText="No image selected yet" styleClass="text-input compact-input"/>
-                                <HBox spacing="8.0">
-                                    <Button onAction="#chooseForumImage" styleClass="ghost-pill compact-pill" text="Choose photo"/>
+                                <HBox spacing="8.0" styleClass="composer-actions-row">
+                                    <Button onAction="#chooseForumImage" styleClass="ghost-pill compact-pill" text="Add photo"/>
                                     <Button onAction="#clearForumImage" styleClass="ghost-pill compact-pill" text="Remove"/>
                                 </HBox>
                             </VBox>
                             <ImageView fx:id="ivForumPreview" fitHeight="126.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" styleClass="composer-preview" visible="false"/>
-                            <HBox spacing="8.0">
+                            <HBox spacing="8.0" styleClass="composer-actions-row">
                                 <Button onAction="#saveForum" styleClass="primary-pill primary-pill-compact" text="Publish"/>
                                 <Button onAction="#clearForumEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
                             </HBox>
@@ -105,7 +105,7 @@
                             <Label fx:id="lblCommentContext" styleClass="panel-note" text="Aucun commentaire selectionne" wrapText="true"/>
                             <ComboBox fx:id="cbCommentForum" maxWidth="1.7976931348623157E308" promptText="Choose forum" styleClass="combo-input compact-input"/>
                             <TextArea fx:id="taCommentContent" prefRowCount="3" promptText="Write your comment..." styleClass="text-area-input compact-area"/>
-                            <HBox spacing="8.0">
+                            <HBox spacing="8.0" styleClass="composer-actions-row">
                                 <Button onAction="#saveComment" styleClass="primary-pill primary-pill-compact" text="Save comment"/>
                                 <Button onAction="#clearCommentEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
                             </HBox>
