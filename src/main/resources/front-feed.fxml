@@ -70,7 +70,7 @@
                                     <Label styleClass="hero-subtitle hero-subtitle-compact" text="A clean desktop social feed for posts, reactions, comments, and quick publishing." wrapText="true"/>
                                 </VBox>
                                 <Label fx:id="lblWelcomeUser" styleClass="hero-stats hero-chip" text="Connected user experience"/>
-                            </HBox>
+                            </VBox>
                             <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="hero-toolbar">
                                 <TextField fx:id="tfSearch" onAction="#refreshData" promptText="Search by title, author, or content" styleClass="search-input hero-search"/>
                                 <Button onAction="#refreshData" styleClass="primary-pill primary-pill-compact" text="Refresh"/>
@@ -91,7 +91,7 @@
                                     <Button onAction="#chooseForumImage" styleClass="ghost-pill compact-pill" text="Choose photo"/>
                                     <Button onAction="#clearForumImage" styleClass="ghost-pill compact-pill" text="Remove"/>
                                 </HBox>
-                            </HBox>
+                            </VBox>
                             <ImageView fx:id="ivForumPreview" fitHeight="126.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" styleClass="composer-preview" visible="false"/>
                             <HBox spacing="8.0">
                                 <Button onAction="#saveForum" styleClass="primary-pill primary-pill-compact" text="Publish"/>
