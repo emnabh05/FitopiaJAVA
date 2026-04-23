@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.CardPaymentController"
+            prefWidth="1200.0"
+            prefHeight="850.0"
+            style="-fx-background-color: linear-gradient(to bottom right, #F3F7FA, #EAF4F7);">
+
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12.0"
+              style="-fx-background-color: linear-gradient(to right, #123C47, #206A57); -fx-background-radius: 0 0 20 20;">
+            <padding>
+                <Insets top="16.0" right="20.0" bottom="16.0" left="20.0"/>
+            </padding>
+            <children>
+                <StackPane prefWidth="40.0" prefHeight="40.0"
+                           style="-fx-background-color: rgba(255,255,255,0.16); -fx-background-radius: 12;">
+                    <children>
+                        <Label text="CARD" style="-fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: 900;"/>
+                    </children>
+                </StackPane>
+                <Label text="Card Payment"
+                       style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 900;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Checkout" onAction="#openCheckout"
+                        style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+            </children>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="16.0" maxWidth="620.0"
+              style="-fx-background-color: white; -fx-background-radius: 24; -fx-border-color: rgba(17, 76, 70, 0.09); -fx-border-radius: 24; -fx-effect: dropshadow(gaussian, rgba(9, 44, 42, 0.10), 18, 0.16, 0, 8);">
+            <padding>
+                <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+            </padding>
+            <BorderPane.margin>
+                <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+            </BorderPane.margin>
+            <children>
+                <Label text="Enter card details to complete your order"
+                       style="-fx-text-fill: #0E3040; -fx-font-size: 24px; -fx-font-weight: 900;"/>
+                <Label fx:id="paymentMethodLabel"
+                       style="-fx-text-fill: #6B7D88; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+
+                <TextField fx:id="cardholderNameField"
+                           promptText="Cardholder name"
+                           prefHeight="48.0"
+                           style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px;"/>
+
+                <TextField fx:id="cardNumberField"
+                           promptText="Card number (16 digits)"
+                           prefHeight="48.0"
+                           style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px;"/>
+
+                <HBox spacing="12.0">
+                    <children>
+                        <TextField fx:id="expiryField"
+                                   promptText="MM/YY"
+                                   prefHeight="48.0"
+                                   HBox.hgrow="ALWAYS"
+                                   style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px;"/>
+                        <TextField fx:id="cvvField"
+                                   promptText="CVV"
+                                   prefHeight="48.0"
+                                   HBox.hgrow="ALWAYS"
+                                   style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px;"/>
+                    </children>
+                </HBox>
+
+                <Label fx:id="paymentStatusLabel"
+                       wrapText="true"
+                       style="-fx-text-fill: #255D71; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+
+                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                    <children>
+                        <Button text="Return"
+                                onAction="#goBackOrExit"
+                                prefWidth="120.0"
+                                prefHeight="44.0"
+                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #CBD8E0; -fx-border-radius: 14; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 800;"/>
+                        <Button text="Pay &amp; Confirm Order"
+                                onAction="#confirmCardPayment"
+                                prefWidth="220.0"
+                                prefHeight="44.0"
+                                style="-fx-background-color: linear-gradient(to right, #0E5D4E, #13846A); -fx-background-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 900;"/>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

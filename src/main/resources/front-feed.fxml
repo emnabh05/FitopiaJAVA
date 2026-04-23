@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="920.0" prefWidth="1550.0" styleClass="app-root" stylesheets="@styles/front-feed.css,@styles/admin-theme.css"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.FrontFeedController">
+    <top>
+        <VBox styleClass="navbar-container">
+            <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10">
+                    <Label text="ï‚š" styleClass="social-icon" />
+                    <Label text="ï‚™" styleClass="social-icon" />
+                    <Label text="ï…­" styleClass="social-icon" />
+                </HBox>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
+                <VBox alignment="CENTER" spacing="0">
+                    <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                    <Label text="FITOPIA" styleClass="navbar-logo-text" />
+                </VBox>
+
+                <Region prefWidth="20" />
+
+                <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+
+                <Region prefWidth="10" />
+
+                <Button onAction="#openDietPlanner" text="EXPLORE&#10;OUR&#10;DIET&amp;EATING&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button onAction="#openSupplementStore" text="EXPLORE&#10;OUR&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button text="EXPLORE&#10;OUR&#10;FITNESS&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button text="EXPLORE&#10;OUR&#10;EVENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button onAction="#refreshData" text="EXPLORE&#10;FORUMS&amp;BLOGS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button onAction="#refreshData" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                <Button onAction="#ouvrirAdminInterface" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fx:id="feedScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="feed-scroll" vbarPolicy="AS_NEEDED">
+            <content>
+                <HBox alignment="TOP_CENTER" spacing="24.0" styleClass="layout-shell">
+                    <padding>
+                        <Insets bottom="28.0" left="28.0" right="28.0" top="20.0"/>
+                    </padding>
+                    <VBox prefWidth="900.0" spacing="18.0">
+                        <VBox spacing="10.0" styleClass="hero-card">
+                            <Label styleClass="hero-title" text="Fitopia Community: Learn Faster, Grow Together"/>
+                            <Label styleClass="hero-subtitle" text="A frontend feed inspired by social apps. Scroll all forums, react, read comments, and publish new posts from one place." wrapText="true"/>
+                            <Label fx:id="lblWelcomeUser" styleClass="hero-stats" text="Connected user experience"/>
+                            <HBox spacing="10.0">
+                                <Button onAction="#refreshData" styleClass="primary-pill" text="View feed"/>
+                                <Label fx:id="lblFeedStats" styleClass="hero-stats" text="0 forums visibles"/>
+                            </HBox>
+                        </VBox>
+                        <VBox fx:id="feedContainer" spacing="16.0"/>
+                    </VBox>
+                    <VBox prefWidth="360.0" spacing="18.0">
+                        <VBox spacing="14.0" styleClass="sidebar-card">
+                            <Label styleClass="panel-title" text="Create or edit forum"/>
+                            <Label fx:id="lblForumComposerHint" styleClass="panel-note" text="You are posting as the connected user." wrapText="true"/>
+                            <TextField fx:id="tfForumTitle" promptText="Forum title" styleClass="text-input"/>
+                            <TextArea fx:id="taForumContent" prefRowCount="5" promptText="Share your story, advice, or question..." styleClass="text-area-input"/>
+                            <TextField fx:id="tfForumImagePath" editable="false" promptText="No image selected yet" styleClass="text-input"/>
+                            <HBox spacing="10.0">
+                                <Button onAction="#chooseForumImage" styleClass="ghost-pill" text="Choose photo"/>
+                                <Button onAction="#clearForumImage" styleClass="ghost-pill" text="Remove photo"/>
+                            </HBox>
+                            <ImageView fx:id="ivForumPreview" fitHeight="150.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" visible="false"/>
+                            <HBox spacing="10.0">
+                                <Button onAction="#saveForum" styleClass="primary-pill" text="Save forum"/>
+                                <Button onAction="#clearForumEditor" styleClass="ghost-pill" text="Clear"/>
+                            </HBox>
+                            <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill" text="Delete selected forum"/>
+                        </VBox>
+                        <VBox spacing="14.0" styleClass="sidebar-card">
+                            <Label styleClass="panel-title" text="Create or edit comment"/>
+                            <Label fx:id="lblCommentComposerHint" styleClass="panel-note" text="Your comment will be linked to your account." wrapText="true"/>
+                            <Label fx:id="lblCommentContext" styleClass="panel-note" text="Aucun commentaire selectionne" wrapText="true"/>
+                            <ComboBox fx:id="cbCommentForum" maxWidth="1.7976931348623157E308" promptText="Choose forum" styleClass="combo-input"/>
+                            <TextArea fx:id="taCommentContent" prefRowCount="4" promptText="Write your comment..." styleClass="text-area-input"/>
+                            <HBox spacing="10.0">
+                                <Button onAction="#saveComment" styleClass="primary-pill" text="Save comment"/>
+                                <Button onAction="#clearCommentEditor" styleClass="ghost-pill" text="Clear"/>
+                            </HBox>
+                            <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedComment" styleClass="danger-pill" text="Delete selected comment"/>
+                        </VBox>
+                        <VBox spacing="12.0" styleClass="sidebar-card">
+                            <Label styleClass="panel-title" text="Interaction ideas"/>
+                            <Label styleClass="mini-metric" text="Like, Comment, Share and Reply buttons are exposed on each forum card." wrapText="true"/>
+                            <Separator/>
+                            <Label styleClass="mini-metric" text="Use Edit/Delete on any card to load it into the editor." wrapText="true"/>
+                            <Separator/>
+                            <Label styleClass="mini-metric" text="Quick comment boxes under each forum let users reply directly from the feed." wrapText="true"/>
+                        </VBox>
+                    </VBox>
+                </HBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>
