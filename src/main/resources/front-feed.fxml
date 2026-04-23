@@ -116,14 +116,7 @@
                             </HBox>
                             <Button maxWidth="1.7976931348623157E308" onAction="#deleteSelectedForum" styleClass="danger-pill compact-danger composer-delete" text="Delete selected post"/>
                         </VBox>
-                        <VBox spacing="10.0" styleClass="sidebar-card info-card">
-                            <Label styleClass="panel-title" text="Posting tips"/>
-                            <Label styleClass="mini-metric" text="Every post is linked to the connected user and appears in the shared community feed." wrapText="true"/>
-                            <Separator/>
-                            <Label styleClass="mini-metric" text="Use Edit/Delete from your own card to load it back into the editor instantly." wrapText="true"/>
-                            <Separator/>
-                            <Label styleClass="mini-metric" text="Quick comments stay available under each card for lightweight social interaction." wrapText="true"/>
-                        </VBox>
+                        <VBox fx:id="messagingSidebarHost" spacing="0.0" VBox.vgrow="ALWAYS"/>
                         <VBox managed="false" visible="false">
                             <Label fx:id="lblCommentComposerHint" text="Your comment will be linked to your account." />
                             <Label fx:id="lblCommentContext" text="No comment selected. Your reply will be linked to your connected account." />

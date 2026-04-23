@@ -1,8 +1,10 @@
 package tn.esprit.Pidev3A49.controllers;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -14,6 +16,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -25,18 +28,31 @@ import javafx.util.StringConverter;
 import tn.esprit.Pidev3A49.Models.Comment;
 import tn.esprit.Pidev3A49.Models.FitopiaUser;
 import tn.esprit.Pidev3A49.Models.Forum;
+import tn.esprit.Pidev3A49.Models.PrivateConversation;
+import tn.esprit.Pidev3A49.Models.PrivateMessage;
+import tn.esprit.Pidev3A49.services.FitopiaUserService;
 import tn.esprit.Pidev3A49.services.ServiceComment;
 import tn.esprit.Pidev3A49.services.ServiceForum;
+import tn.esprit.Pidev3A49.services.ServicePrivateMessaging;
 import tn.esprit.Pidev3A49.test.UserSession;
 import tn.esprit.Pidev3A49.utils.SessionRouter;
 
-import java.io.IOException;
 import java.io.File;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class FrontFeedController {
 
+    private static final DateTimeFormatter MESSAGE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
+    private static final DateTimeFormatter MESSAGE_DAY_FORMATTER = DateTimeFormatter.ofPattern("dd MMM", Locale.ENGLISH);
+
     @FXML private VBox feedContainer;
+    @FXML private VBox messagingSidebarHost;
     @FXML private ComboBox<Forum> cbCommentForum;
     @FXML private TextField tfForumTitle;
     @FXML private TextArea taForumContent;
@@ -53,28 +69,43 @@ public class FrontFeedController {
 
     private final ServiceForum serviceForum = new ServiceForum();
     private final ServiceComment serviceComment = new ServiceComment();
+    private final FitopiaUserService fitopiaUserService = new FitopiaUserService();
+    private final ServicePrivateMessaging servicePrivateMessaging = new ServicePrivateMessaging();
+
+    private final Map<Integer, FitopiaUser> messagingUsersById = new LinkedHashMap<>();
+    private final Map<Integer, PrivateConversation> conversationIndexByOtherUserId = new LinkedHashMap<>();
 
     private Integer selectedForumId;
     private Integer selectedCommentId;
     private FitopiaUser currentUser;
+    private FitopiaUser activeMessagingUser;
+    private PrivateConversation activeConversation;
+    private String messagingSearchTerm = "";
+
+    private VBox messageThreadContainer;
+    private ScrollPane messageThreadScrollPane;
+    private TextArea taChatInput;
 
     @FXML
     public void initialize() {
         if (!SessionRouter.ensureAuthenticated(feedContainer)) {
             return;
         }
-        currentUser = UserSession.getCurrentUser();
-        cbCommentForum.setConverter(new StringConverter<>() {
-            @Override
-            public String toString(Forum forum) {
-                return forum == null ? "" : forum.getTitle();
-            }
 
-            @Override
-            public Forum fromString(String string) {
-                return null;
-            }
-        });
+        currentUser = UserSession.getCurrentUser();
+        if (cbCommentForum != null) {
+            cbCommentForum.setConverter(new StringConverter<>() {
+                @Override
+                public String toString(Forum forum) {
+                    return forum == null ? "" : forum.getTitle();
+                }
+
+                @Override
+                public Forum fromString(String string) {
+                    return null;
+                }
+            });
+        }
 
         personalizeFeed();
         refreshData();
@@ -89,6 +120,8 @@ public class FrontFeedController {
         personalizeFeed();
         loadForumsIntoFeed();
         loadForumChoices();
+        loadMessagingUsers();
+        refreshMessagingSidebar();
         clearForumEditor();
         clearCommentEditor();
     }
@@ -139,12 +172,12 @@ public class FrontFeedController {
     private void saveComment() {
         try {
             ensureCurrentUser();
-            Forum forum = cbCommentForum.getValue();
+            Forum forum = cbCommentForum == null ? null : cbCommentForum.getValue();
             if (forum == null) {
                 throw new IllegalArgumentException("Choisis un forum pour le commentaire.");
             }
 
-            Comment comment = new Comment(taCommentContent.getText(), forum);
+            Comment comment = new Comment(taCommentContent == null ? "" : taCommentContent.getText(), forum);
             comment.setUserId(currentUser.getId());
             if (selectedCommentId == null) {
                 serviceComment.add(comment);
@@ -221,7 +254,7 @@ public class FrontFeedController {
             return;
         }
         if (lblWelcomeUser != null) {
-            lblWelcomeUser.setText("Connected as " + displayName(currentUser) + " | you can post, comment, like and repost.");
+            lblWelcomeUser.setText("Connected as " + displayName(currentUser) + " | you can post, comment, like, repost, and message.");
         }
         if (lblForumComposerHint != null) {
             lblForumComposerHint.setText("You are posting as " + displayName(currentUser) + ".");
@@ -239,7 +272,7 @@ public class FrontFeedController {
         List<Forum> forums = serviceForum.getAll();
         String normalized = tfSearch == null || tfSearch.getText() == null
                 ? ""
-                : tfSearch.getText().trim().toLowerCase();
+                : tfSearch.getText().trim().toLowerCase(Locale.ROOT);
 
         feedContainer.getChildren().clear();
 
@@ -248,9 +281,9 @@ public class FrontFeedController {
 
         for (Forum forum : forums) {
             if (!normalized.isBlank()
-                    && !forum.getTitle().toLowerCase().contains(normalized)
-                    && !forum.getContent().toLowerCase().contains(normalized)
-                    && !forum.getAuthorDisplayName().toLowerCase().contains(normalized)) {
+                    && !forum.getTitle().toLowerCase(Locale.ROOT).contains(normalized)
+                    && !forum.getContent().toLowerCase(Locale.ROOT).contains(normalized)
+                    && !forum.getAuthorDisplayName().toLowerCase(Locale.ROOT).contains(normalized)) {
                 continue;
             }
 
@@ -408,6 +441,342 @@ public class FrontFeedController {
         return box;
     }
 
+    private void loadMessagingUsers() {
+        messagingUsersById.clear();
+        conversationIndexByOtherUserId.clear();
+
+        if (currentUser == null) {
+            activeMessagingUser = null;
+            activeConversation = null;
+            return;
+        }
+
+        for (FitopiaUser user : fitopiaUserService.getAll()) {
+            if (user == null || user.getId() == currentUser.getId()) {
+                continue;
+            }
+            messagingUsersById.put(user.getId(), user);
+        }
+
+        for (PrivateConversation conversation : servicePrivateMessaging.getUserConversations(currentUser.getId())) {
+            conversationIndexByOtherUserId.put(conversation.getOtherUserId(currentUser.getId()), conversation);
+        }
+
+        if (activeMessagingUser != null) {
+            activeMessagingUser = messagingUsersById.get(activeMessagingUser.getId());
+            if (activeMessagingUser == null) {
+                activeConversation = null;
+            } else if (conversationIndexByOtherUserId.containsKey(activeMessagingUser.getId())) {
+                activeConversation = conversationIndexByOtherUserId.get(activeMessagingUser.getId());
+            }
+        }
+    }
+
+    private void refreshMessagingSidebar() {
+        if (messagingSidebarHost == null) {
+            return;
+        }
+        messagingSidebarHost.getChildren().setAll(buildMessagingSidebar());
+    }
+
+    private VBox buildMessagingSidebar() {
+        VBox shell = new VBox(12);
+        shell.getStyleClass().addAll("sidebar-card", "messaging-shell");
+        VBox.setVgrow(shell, Priority.ALWAYS);
+
+        if (activeMessagingUser == null) {
+            shell.getChildren().addAll(buildMessagingDirectoryHeader(), buildUserDirectory());
+        } else {
+            shell.getChildren().add(buildConversationView(activeMessagingUser));
+        }
+        return shell;
+    }
+
+    private VBox buildMessagingDirectoryHeader() {
+        VBox header = new VBox(6);
+        header.getStyleClass().add("messaging-directory-header");
+
+        HBox titleRow = new HBox(10);
+        titleRow.setAlignment(Pos.CENTER_LEFT);
+        Label title = new Label("Private messages");
+        title.getStyleClass().add("panel-title");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label countChip = new Label(messagingUsersById.size() + " users");
+        countChip.getStyleClass().addAll("hero-stats", "hero-chip", "messaging-count-chip");
+        titleRow.getChildren().addAll(title, spacer, countChip);
+
+        Label subtitle = new Label("Browse users, open a conversation, and stay inside the forum feed.");
+        subtitle.getStyleClass().add("panel-note");
+        subtitle.setWrapText(true);
+
+        TextField searchField = new TextField(messagingSearchTerm);
+        searchField.setPromptText("Search people by name or email");
+        searchField.getStyleClass().addAll("search-input", "messaging-search-input");
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            messagingSearchTerm = newValue == null ? "" : newValue;
+            if (activeMessagingUser == null) {
+                refreshMessagingSidebar();
+            }
+        });
+
+        header.getChildren().addAll(titleRow, subtitle, searchField);
+        return header;
+    }
+
+    private ScrollPane buildUserDirectory() {
+        VBox list = new VBox(10);
+        list.getStyleClass().add("messaging-user-list");
+
+        String normalized = messagingSearchTerm == null ? "" : messagingSearchTerm.trim().toLowerCase(Locale.ROOT);
+        int visibleUsers = 0;
+        for (FitopiaUser user : messagingUsersById.values()) {
+            String searchable = (displayName(user) + " " + safe(user.getEmail())).toLowerCase(Locale.ROOT);
+            if (!normalized.isBlank() && !searchable.contains(normalized)) {
+                continue;
+            }
+            list.getChildren().add(buildUserCard(user));
+            visibleUsers++;
+        }
+
+        if (visibleUsers == 0) {
+            Label empty = new Label("No matching users yet. Try another name or email.");
+            empty.getStyleClass().add("messaging-empty");
+            empty.setWrapText(true);
+            list.getChildren().add(empty);
+        }
+
+        ScrollPane scrollPane = new ScrollPane(list);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.getStyleClass().add("messaging-scroll");
+        VBox.setVgrow(scrollPane, Priority.ALWAYS);
+        return scrollPane;
+    }
+
+    private VBox buildUserCard(FitopiaUser user) {
+        VBox card = new VBox(10);
+        card.getStyleClass().add("messaging-user-card");
+        card.setOnMouseClicked(event -> openConversation(user));
+
+        PrivateConversation conversation = conversationIndexByOtherUserId.get(user.getId());
+
+        HBox topRow = new HBox(10);
+        topRow.setAlignment(Pos.CENTER_LEFT);
+
+        Label avatar = new Label(initialsOf(displayName(user)));
+        avatar.getStyleClass().add("messaging-avatar");
+
+        VBox textBlock = new VBox(2);
+        Label name = new Label(displayName(user));
+        name.getStyleClass().add("messaging-user-name");
+        Label email = new Label(safe(user.getEmail()));
+        email.getStyleClass().add("messaging-user-email");
+        textBlock.getChildren().addAll(name, email);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        if (conversation != null && conversation.getUnreadCount() > 0) {
+            Label unreadBadge = new Label(String.valueOf(conversation.getUnreadCount()));
+            unreadBadge.getStyleClass().add("messaging-unread-badge");
+            topRow.getChildren().addAll(avatar, textBlock, spacer, unreadBadge);
+        } else {
+            topRow.getChildren().addAll(avatar, textBlock, spacer);
+        }
+
+        Label preview = new Label(conversation == null || conversation.getLastMessagePreview() == null
+                ? "Start a private conversation from the forum sidebar."
+                : trimPreview(conversation.getLastMessagePreview(), 70));
+        preview.getStyleClass().add("messaging-preview");
+        preview.setWrapText(true);
+
+        HBox footer = new HBox(8);
+        footer.setAlignment(Pos.CENTER_LEFT);
+        Label time = new Label(conversation == null ? "New chat" : formatConversationTimestamp(conversation.getLastMessageAt()));
+        time.getStyleClass().add("messaging-meta");
+
+        Region footerSpacer = new Region();
+        HBox.setHgrow(footerSpacer, Priority.ALWAYS);
+
+        Button messageButton = new Button("Message");
+        messageButton.getStyleClass().addAll("primary-pill", "primary-pill-compact");
+        messageButton.setOnAction(event -> openConversation(user));
+
+        footer.getChildren().addAll(time, footerSpacer, messageButton);
+        card.getChildren().addAll(topRow, preview, footer);
+        return card;
+    }
+
+    private VBox buildConversationView(FitopiaUser user) {
+        VBox conversationView = new VBox(12);
+        conversationView.getStyleClass().add("messaging-conversation-shell");
+        VBox.setVgrow(conversationView, Priority.ALWAYS);
+
+        conversationView.getChildren().add(buildConversationHeader(user));
+
+        messageThreadContainer = new VBox(10);
+        messageThreadContainer.getStyleClass().add("message-thread");
+
+        messageThreadScrollPane = new ScrollPane(messageThreadContainer);
+        messageThreadScrollPane.setFitToWidth(true);
+        messageThreadScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        messageThreadScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        messageThreadScrollPane.getStyleClass().add("messaging-scroll");
+        VBox.setVgrow(messageThreadScrollPane, Priority.ALWAYS);
+
+        conversationView.getChildren().addAll(messageThreadScrollPane, buildChatInputBar());
+        refreshMessages();
+        return conversationView;
+    }
+
+    private HBox buildConversationHeader(FitopiaUser user) {
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.getStyleClass().add("messaging-chat-header");
+
+        Button backButton = createGhostButton("Back", this::returnToUserList);
+        backButton.getStyleClass().add("chat-back-btn");
+
+        Label avatar = new Label(initialsOf(displayName(user)));
+        avatar.getStyleClass().add("messaging-avatar");
+
+        VBox details = new VBox(2);
+        Label name = new Label(displayName(user));
+        name.getStyleClass().add("messaging-user-name");
+        Label subtitle = new Label(safe(user.getEmail()));
+        subtitle.getStyleClass().add("messaging-user-email");
+        details.getChildren().addAll(name, subtitle);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label status = new Label(activeConversation == null || activeConversation.getLastMessageAt() == null
+                ? "Conversation ready"
+                : "Last activity " + formatConversationTimestamp(activeConversation.getLastMessageAt()));
+        status.getStyleClass().add("messaging-meta");
+
+        header.getChildren().addAll(backButton, avatar, details, spacer, status);
+        return header;
+    }
+
+    private HBox buildChatInputBar() {
+        HBox bar = new HBox(10);
+        bar.setAlignment(Pos.BOTTOM_LEFT);
+        bar.getStyleClass().add("chat-input-bar");
+
+        taChatInput = new TextArea();
+        taChatInput.setPromptText("Write a private message...");
+        taChatInput.setPrefRowCount(2);
+        taChatInput.getStyleClass().addAll("text-area-input", "chat-input-area");
+        HBox.setHgrow(taChatInput, Priority.ALWAYS);
+        taChatInput.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER && !event.isShiftDown()) {
+                event.consume();
+                sendActiveMessage();
+            }
+        });
+
+        Button sendButton = new Button("Send");
+        sendButton.getStyleClass().addAll("primary-pill", "chat-send-button");
+        sendButton.setOnAction(event -> sendActiveMessage());
+
+        bar.getChildren().addAll(taChatInput, sendButton);
+        return bar;
+    }
+
+    private void openConversation(FitopiaUser user) {
+        try {
+            ensureCurrentUser();
+            activeMessagingUser = user;
+            activeConversation = servicePrivateMessaging.getOrCreateConversation(currentUser.getId(), user.getId());
+            servicePrivateMessaging.markMessagesAsRead(activeConversation.getId(), currentUser.getId());
+            loadMessagingUsers();
+            refreshMessagingSidebar();
+        } catch (Exception exception) {
+            showAlert(Alert.AlertType.ERROR, "Messagerie", exception.getMessage());
+        }
+    }
+
+    private void refreshMessages() {
+        if (activeConversation == null || messageThreadContainer == null) {
+            return;
+        }
+
+        List<PrivateMessage> messages = servicePrivateMessaging.getMessages(activeConversation.getId());
+        messageThreadContainer.getChildren().clear();
+
+        if (messages.isEmpty()) {
+            Label empty = new Label("No messages yet. Start the conversation from here.");
+            empty.getStyleClass().add("messaging-empty");
+            empty.setWrapText(true);
+            messageThreadContainer.getChildren().add(empty);
+        } else {
+            for (PrivateMessage message : messages) {
+                messageThreadContainer.getChildren().add(renderMessageBubble(message));
+            }
+        }
+
+        Platform.runLater(() -> {
+            if (messageThreadScrollPane != null) {
+                messageThreadScrollPane.setVvalue(1.0);
+            }
+        });
+    }
+
+    private HBox renderMessageBubble(PrivateMessage message) {
+        boolean outgoing = currentUser != null && message.getSenderId() == currentUser.getId();
+
+        HBox row = new HBox();
+        row.getStyleClass().add("message-row");
+        row.setAlignment(outgoing ? Pos.CENTER_RIGHT : Pos.CENTER_LEFT);
+
+        VBox bubble = new VBox(4);
+        bubble.getStyleClass().add(outgoing ? "message-bubble-self" : "message-bubble-other");
+        bubble.setMaxWidth(245);
+        bubble.setPadding(new Insets(10, 12, 8, 12));
+
+        Label content = new Label(message.getContent());
+        content.getStyleClass().add(outgoing ? "message-text-self" : "message-text-other");
+        content.setWrapText(true);
+
+        Label timestamp = new Label(formatMessageTimestamp(message.getCreatedAt()));
+        timestamp.getStyleClass().add("message-time");
+
+        bubble.getChildren().addAll(content, timestamp);
+        row.getChildren().add(bubble);
+        return row;
+    }
+
+    private void sendActiveMessage() {
+        try {
+            ensureCurrentUser();
+            if (activeMessagingUser == null) {
+                throw new IllegalStateException("Choisis un utilisateur pour commencer la conversation.");
+            }
+            if (taChatInput == null || taChatInput.getText() == null || taChatInput.getText().trim().isBlank()) {
+                return;
+            }
+            servicePrivateMessaging.sendMessage(currentUser.getId(), activeMessagingUser.getId(), taChatInput.getText());
+            taChatInput.clear();
+            activeConversation = servicePrivateMessaging.getOrCreateConversation(currentUser.getId(), activeMessagingUser.getId());
+            servicePrivateMessaging.markMessagesAsRead(activeConversation.getId(), currentUser.getId());
+            loadMessagingUsers();
+            refreshMessagingSidebar();
+        } catch (Exception exception) {
+            showAlert(Alert.AlertType.ERROR, "Messagerie", exception.getMessage());
+        }
+    }
+
+    private void returnToUserList() {
+        activeMessagingUser = null;
+        activeConversation = null;
+        refreshMessagingSidebar();
+    }
+
     private Button createMetricButton(String text, Runnable action) {
         Button button = new Button(text);
         button.getStyleClass().add("metric-pill");
@@ -443,18 +812,30 @@ public class FrontFeedController {
 
     private void prepareCommentForForum(Forum forum) {
         selectedCommentId = null;
-        cbCommentForum.setValue(forum);
-        taCommentContent.clear();
-        lblCommentContext.setText("New comment for " + forum.getAuthorDisplayName() + "'s post: " + forum.getTitle());
+        if (cbCommentForum != null) {
+            cbCommentForum.setValue(forum);
+        }
+        if (taCommentContent != null) {
+            taCommentContent.clear();
+        }
+        if (lblCommentContext != null) {
+            lblCommentContext.setText("New comment for " + forum.getAuthorDisplayName() + "'s post: " + forum.getTitle());
+        }
     }
 
     private void startEditComment(Comment comment) {
         try {
             ensureCanManageComment(comment);
             selectedCommentId = comment.getId();
-            cbCommentForum.setValue(comment.getForum());
-            taCommentContent.setText(comment.getContent());
-            lblCommentContext.setText("Editing your comment #" + comment.getId());
+            if (cbCommentForum != null) {
+                cbCommentForum.setValue(comment.getForum());
+            }
+            if (taCommentContent != null) {
+                taCommentContent.setText(comment.getContent());
+            }
+            if (lblCommentContext != null) {
+                lblCommentContext.setText("Editing your comment #" + comment.getId());
+            }
             feedScrollPane.setVvalue(0);
         } catch (Exception exception) {
             showAlert(Alert.AlertType.WARNING, "Edition refusee", exception.getMessage());
@@ -687,15 +1068,14 @@ public class FrontFeedController {
         if (user == null) {
             return "Utilisateur inconnu";
         }
-        String fullName = ((user.getFirstName() == null ? "" : user.getFirstName()) + " "
-                + (user.getLastName() == null ? "" : user.getLastName())).trim();
+        String fullName = ((safe(user.getFirstName()) + " " + safe(user.getLastName())).trim());
         if (!fullName.isBlank()) {
             return fullName;
         }
-        if (user.getUsername() != null && !user.getUsername().isBlank()) {
+        if (!safe(user.getUsername()).isBlank()) {
             return user.getUsername();
         }
-        if (user.getEmail() != null && !user.getEmail().isBlank()) {
+        if (!safe(user.getEmail()).isBlank()) {
             return user.getEmail();
         }
         return "Utilisateur inconnu";
@@ -707,9 +1087,46 @@ public class FrontFeedController {
         }
         String[] parts = value.trim().split("\\s+");
         if (parts.length == 1) {
-            return parts[0].substring(0, 1).toUpperCase();
+            return parts[0].substring(0, 1).toUpperCase(Locale.ROOT);
         }
-        return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
+        return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase(Locale.ROOT);
+    }
+
+    private String trimPreview(String value, int maxLength) {
+        if (value == null) {
+            return "";
+        }
+        String trimmed = value.trim();
+        if (trimmed.length() <= maxLength) {
+            return trimmed;
+        }
+        return trimmed.substring(0, Math.max(0, maxLength - 1)) + "…";
+    }
+
+    private String formatConversationTimestamp(LocalDateTime timestamp) {
+        if (timestamp == null) {
+            return "Just now";
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (timestamp.toLocalDate().isEqual(now.toLocalDate())) {
+            return timestamp.format(MESSAGE_TIME_FORMATTER);
+        }
+        return timestamp.format(MESSAGE_DAY_FORMATTER);
+    }
+
+    private String formatMessageTimestamp(LocalDateTime timestamp) {
+        if (timestamp == null) {
+            return "";
+        }
+        LocalDateTime now = LocalDateTime.now();
+        if (timestamp.toLocalDate().isEqual(now.toLocalDate())) {
+            return timestamp.format(MESSAGE_TIME_FORMATTER);
+        }
+        return timestamp.format(MESSAGE_DAY_FORMATTER) + " " + timestamp.format(MESSAGE_TIME_FORMATTER);
+    }
+
+    private String safe(String value) {
+        return value == null ? "" : value;
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {
