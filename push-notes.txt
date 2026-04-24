@@ -12,3 +12,4 @@ Push 11: added a harmless comma note for a unique commit
 Push 12: added a second unique trivial note line
 Push 13: added an extra empty remark with no code change
 Push 14: added a tiny note about a harmless update
+Push 15: added a simple clarification line in notes file
