@@ -51,8 +51,8 @@ import tn.esprit.Pidev3A49.services.ServiceRepas;
 import tn.esprit.Pidev3A49.services.ServiceRegimeAlimentaire;
 import tn.esprit.Pidev3A49.services.ServiceUser;
 import tn.esprit.Pidev3A49.services.OpenFoodFactsService;
-import tn.esprit.Pidev3A49.services.AnalyticsService;
-import tn.esprit.Pidev3A49.Models.RegimeInsight;
+import tn.esprit.Pidev3A49.dto.RapportContradictionDTO;
+import tn.esprit.Pidev3A49.dto.RepasProblematiqueDTO;
 
 import java.text.Normalizer;
 import java.io.File;
@@ -308,12 +308,28 @@ public class MainController {
     @FXML private Label lblBadgeCaloriesTitle;
     @FXML private Label lblBadgeCaloriesDesc;
 
+    // Intelligent Audit Engine Fields
+    @FXML private VBox paneAuditRegime;
+    @FXML private Label lblAuditRegimeNom;
+    @FXML private Label lblAuditTaux;
+    @FXML private ProgressBar pbAuditTaux;
+    @FXML private Label lblAuditDiagnostic;
+    @FXML private Label lblAuditConseil;
+    @FXML private Label lblAuditTotalRepas;
+    @FXML private Label lblAuditMoyCal;
+    @FXML private Label lblAuditMoyProt;
+    @FXML private Label lblAuditCountContradiction;
+    @FXML private TableView<RepasProblematiqueDTO> tableAuditRepas;
+    @FXML private TableColumn<RepasProblematiqueDTO, String> colAuditRepasNom;
+    @FXML private TableColumn<RepasProblematiqueDTO, Integer> colAuditRepasCal;
+    @FXML private TableColumn<RepasProblematiqueDTO, String> colAuditRepasDiag;
+    @FXML private TableColumn<RepasProblematiqueDTO, Integer> colAuditRepasScore;
+
 
     private final ServiceRepas serviceRepas = new ServiceRepas();
     private final ServiceRegimeAlimentaire serviceRegime = new ServiceRegimeAlimentaire();
     private final ServiceUser serviceUser = new ServiceUser();
     private final OpenFoodFactsService openFoodFacts = new OpenFoodFactsService();
-    private final AnalyticsService analyticsService = new AnalyticsService();
     private final ObservableList<Repas> allRepas = FXCollections.observableArrayList();
     private tn.esprit.Pidev3A49.services.BarcodeServer barcodeScannerMobileServer;
     private List<User> allUsers = List.of();
@@ -470,6 +486,7 @@ public class MainController {
         if (paneRepasExplore != null) { paneRepasExplore.setVisible(false); paneRepasExplore.setManaged(false); }
         if (paneScanIA != null) { paneScanIA.setVisible(false); paneScanIA.setManaged(false); }
         if (paneWeeklyProgram != null) { paneWeeklyProgram.setVisible(false); paneWeeklyProgram.setManaged(false); }
+        if (paneAuditRegime != null) { paneAuditRegime.setVisible(false); paneAuditRegime.setManaged(false); }
     }
 
     @FXML
@@ -3264,46 +3281,59 @@ public class MainController {
             errorAlert.showAndWait();
         }
     }
+
+
     /**
-     * MÉTHODE AVANCÉE POUR ÉBLOUIRE LE PROFESSEUR.
-     * Cette méthode invoque l'AnalyticsService qui exécute une requête SQL complexe
-     * et traite les résultats avec l'API Stream de Java.
+     * Affiche le rapport d'audit intelligent pour le régime actif.
      */
     @FXML
-    private void showAdvancedDietaryAnalytics() {
-        List<RegimeInsight> report = analyticsService.generateRegimeHealthAudit(sessionMealsByRegime);
-
-        if (report.isEmpty()) {
-            showAlert(Alert.AlertType.INFORMATION, "Analytics", "Pas assez de données pour générer un audit. Veuillez logger des repas.");
+    private void afficherAuditRegimeActif() {
+        RegimeAlimentaire activeRegime = getActualActiveRegime();
+        if (activeRegime == null) {
+            showAlert(Alert.AlertType.WARNING, "Aucun régime actif", "Veuillez d'abord activer ou sélectionner un régime pour l'analyser.");
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("=== AUDIT DE PERFORMANCE NUTRITIONNELLE (MÉTIER AVANCÉ) ===\n\n");
+        try {
+            RapportContradictionDTO rapport = serviceRegime.analyserContradictionsRegime(activeRegime.getId());
+            if (rapport == null) {
+                showAlert(Alert.AlertType.ERROR, "Erreur Audit", "Impossible de générer le rapport d'audit.");
+                return;
+            }
 
-        for (RegimeInsight insight : report) {
-            sb.append(String.format("👉 Régime : %s (Cible: %d kcal)\n", insight.getLabel(), insight.getTargetCalories()));
-            sb.append(String.format("   • Score d'Adhérence : %.1f/100\n", insight.getAdherenceScore()));
-            sb.append(String.format("   • Profil Dominant : %s\n", insight.getMacroDominant()));
-            sb.append(String.format("   • Repas Préféré : %s\n", insight.getFavoriteMealType()));
-            sb.append(String.format("   • Moyenne Calorique : %.2f kcal/repas\n", insight.getAvgCaloriesPerMeal()));
-            sb.append(String.format("   • Total Repas Loggés : %d\n", insight.getTotalMeals()));
-            sb.append("--------------------------------------------------\n");
+            // Mise à jour de l'UI
+            lblAuditRegimeNom.setText(rapport.getNomRegime() + " - Objectif: " + rapport.getObjectif());
+            lblAuditTaux.setText(String.format("%.1f%%", rapport.getTauxContradiction()));
+            pbAuditTaux.setProgress(rapport.getTauxContradiction() / 100.0);
+            
+            // Couleur du texte selon le taux
+            if (rapport.getTauxContradiction() > 50) lblAuditTaux.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 42px; -fx-font-weight: 900;");
+            else if (rapport.getTauxContradiction() > 20) lblAuditTaux.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 42px; -fx-font-weight: 900;");
+            else lblAuditTaux.setStyle("-fx-text-fill: #10b981; -fx-font-size: 42px; -fx-font-weight: 900;");
+
+            lblAuditDiagnostic.setText("Diagnostic: " + rapport.getDiagnosticGlobal());
+            lblAuditConseil.setText("Conseil: " + rapport.getConseilAutomatique());
+            lblAuditTotalRepas.setText(String.valueOf(rapport.getNombreRepas()));
+            lblAuditMoyCal.setText(String.format("%.0f kcal", rapport.getMoyenneCalories()));
+            lblAuditMoyProt.setText(String.format("%.1f g", rapport.getMoyenneProteines()));
+            lblAuditCountContradiction.setText(String.valueOf(rapport.getNombreContradictions()));
+
+            // Configuration de la table
+            colAuditRepasNom.setCellValueFactory(new PropertyValueFactory<>("nom"));
+            colAuditRepasCal.setCellValueFactory(new PropertyValueFactory<>("calories"));
+            colAuditRepasDiag.setCellValueFactory(new PropertyValueFactory<>("diagnostic"));
+            colAuditRepasScore.setCellValueFactory(new PropertyValueFactory<>("scoreRisque"));
+
+            tableAuditRepas.setItems(FXCollections.observableArrayList(rapport.getRepasProblematiques()));
+
+            // Affichage du pane
+            masquerTousLesFormulaires();
+            paneAuditRegime.setVisible(true);
+            paneAuditRegime.setManaged(true);
+
+        } catch (Exception e) {
+            showError("Erreur Audit", "Une erreur est survenue lors de l'audit : " + e.getMessage());
+            e.printStackTrace();
         }
-
-        // Création d'une boîte de dialogue stylisée
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Analyse Métier Avancée - Fitopia");
-        alert.setHeaderText("Audit des performances de vos régimes alimentaires");
-        
-        TextArea textArea = new TextArea(sb.toString());
-        textArea.setEditable(false);
-        textArea.setWrapText(true);
-        textArea.setPrefHeight(400);
-        textArea.setPrefWidth(500);
-        textArea.setStyle("-fx-font-family: 'Consolas'; -fx-font-size: 13px;");
-
-        alert.getDialogPane().setContent(textArea);
-        alert.showAndWait();
     }
 }

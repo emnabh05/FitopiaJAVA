@@ -134,7 +134,9 @@
                                                         <VBox spacing="4">
                                                             <HBox spacing="6" alignment="CENTER_LEFT">
                                                                 <Label fx:id="lblPlannerRegimeTitle" text="My Regime" style="-fx-font-weight: 900; -fx-font-size: 18px; -fx-text-fill: #111827;"/>
-                                                                <Label text="(Gérez vos régimes alimentaires)" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                                                                                                                                 <Label text="(Gérez vos régimes alimentaires)" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                                                                 <Button text="🔍 Audit Intelligent" onAction="#afficherAuditRegimeActif" style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 4 10; -fx-font-size: 11px; -fx-cursor: hand;"/>
+
                                                             </HBox>
                                                             <Label text="Consultez ici votre profil nutritionnel actif. Le système calcule automatiquement IMC, type de santé et calories cibles selon vos données." wrapText="true" style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-line-spacing: 1.4;"/>
                                                         </VBox>
@@ -209,7 +211,6 @@
                                                     <HBox spacing="10">
                                                          <Button text="+ Ajouter un repas" onAction="#afficherCreationRepas" style="-fx-background-color: #f1f5f9; -fx-text-fill: #0c3f44; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-border-color: #e2e8f0; -fx-border-radius: 8;"/>
                                                          <Button text="Planning 7j" onAction="#afficherProgrammeHebdomadaire" style="-fx-background-color: #0c3f44; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(12, 63, 68, 0.3), 8, 0, 0, 4);"/>
-                                                         <Button text="Audit Performance (MÉTIER)" onAction="#showAdvancedDietaryAnalytics" style="-fx-background-color: #8b5cf6; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 8 16; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(139, 92, 246, 0.3), 8, 0, 0, 4);"/>
                                                     </HBox>
                                                     <HBox spacing="10" alignment="CENTER_LEFT">
                                                          <TextField fx:id="tfCodeManuel" promptText="Saisir code-barres manuellement..." style="-fx-text-fill: #16a34a; -fx-font-weight: 900; -fx-font-size: 14px; -fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 8 12; -fx-background-color: #f8fafc;" HBox.hgrow="ALWAYS"/>
@@ -698,8 +699,87 @@
                             <Label text="Cliquez sur le 'plus' pour ajouter un plat à votre suivi d'aujourd'hui." style="-fx-text-fill: #64748b; -fx-font-style: italic;"/>
                         </HBox>
                     </VBox>
+
+                <!-- 11. AUDIT INTELLIGENT POPUP -->
+                <VBox fx:id="paneAuditRegime" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
+                    <ScrollPane fitToWidth="true" maxWidth="1000" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox spacing="25" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 40; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+                                <!-- Header -->
+                                <HBox alignment="CENTER_LEFT" spacing="20">
+                                    <VBox HBox.hgrow="ALWAYS">
+                                        <Label text="🛡️ Moteur d'Audit Intelligent" style="-fx-font-size: 28px; -fx-font-weight: 900; -fx-text-fill: #111827;"/>
+                                        <Label fx:id="lblAuditRegimeNom" text="Régime #-- - Objectif: --" style="-fx-font-size: 15px; -fx-text-fill: #64748b;"/>
+                                    </VBox>
+                                    <Button onAction="#masquerTousLesFormulaires" text="✖ Fermer" style="-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 10 20; -fx-cursor: hand;"/>
+                                </HBox>
+
+                                <Separator />
+
+                                <!-- Global Diagnostic Card -->
+                                <HBox spacing="30" alignment="CENTER_LEFT" style="-fx-background-color: #f8fafc; -fx-padding: 25; -fx-background-radius: 15; -fx-border-color: #e2e8f0; -fx-border-radius: 15;">
+                                    <VBox alignment="CENTER" spacing="10" minWidth="180">
+                                        <Label text="Taux de Contradiction" style="-fx-font-weight: 700; -fx-text-fill: #64748b; -fx-font-size: 13px;"/>
+                                        <StackPane>
+                                            <Label fx:id="lblAuditTaux" text="0%" style="-fx-font-size: 42px; -fx-font-weight: 900; -fx-text-fill: #ef4444;"/>
+                                        </StackPane>
+                                        <ProgressBar fx:id="pbAuditTaux" progress="0.0" prefWidth="150" />
+                                    </VBox>
+                                    <Separator orientation="VERTICAL" />
+                                    <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                        <Label fx:id="lblAuditDiagnostic" text="Diagnostic: En attente..." style="-fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: #111827;"/>
+                                        <Label fx:id="lblAuditConseil" text="Conseil: --" wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #475569; -fx-line-spacing: 1.4;"/>
+                                    </VBox>
+                                </HBox>
+
+                                <!-- Stats Grid -->
+                                <GridPane hgap="20" vgap="20">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="25" />
+                                        <ColumnConstraints percentWidth="25" />
+                                        <ColumnConstraints percentWidth="25" />
+                                        <ColumnConstraints percentWidth="25" />
+                                    </columnConstraints>
+                                    
+                                    <VBox style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 10;" spacing="5" GridPane.columnIndex="0">
+                                        <Label text="Total Repas" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #64748b;"/>
+                                        <Label fx:id="lblAuditTotalRepas" text="--" style="-fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                    </VBox>
+                                    <VBox style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 10;" spacing="5" GridPane.columnIndex="1">
+                                        <Label text="Moyenne Calories" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #64748b;"/>
+                                        <Label fx:id="lblAuditMoyCal" text="-- kcal" style="-fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                    </VBox>
+                                    <VBox style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 10;" spacing="5" GridPane.columnIndex="2">
+                                        <Label text="Moyenne Protéines" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #64748b;"/>
+                                        <Label fx:id="lblAuditMoyProt" text="-- g" style="-fx-font-size: 18px; -fx-font-weight: 800;"/>
+                                    </VBox>
+                                    <VBox style="-fx-background-color: #f1f5f9; -fx-padding: 15; -fx-background-radius: 10;" spacing="5" GridPane.columnIndex="3">
+                                        <Label text="Contradictions" style="-fx-font-size: 11px; -fx-font-weight: 700; -fx-text-fill: #64748b;"/>
+                                        <Label fx:id="lblAuditCountContradiction" text="--" style="-fx-font-size: 18px; -fx-font-weight: 800; -fx-text-fill: #ef4444;"/>
+                                    </VBox>
+                                </GridPane>
+
+                                <!-- Problematic Meals Table -->
+                                <VBox spacing="10">
+                                    <Label text="⚠️ Repas contradictoires détectés (Classés par risque)" style="-fx-font-weight: 800; -fx-font-size: 16px; -fx-text-fill: #1e293b;"/>
+                                    <TableView fx:id="tableAuditRepas" prefHeight="300" styleClass="data-table">
+                                        <columns>
+                                            <TableColumn fx:id="colAuditRepasNom" prefWidth="180" text="Nom du Repas" />
+                                            <TableColumn fx:id="colAuditRepasCal" prefWidth="100" text="Calories" />
+                                            <TableColumn fx:id="colAuditRepasDiag" prefWidth="350" text="Diagnostic Critique" />
+                                            <TableColumn fx:id="colAuditRepasScore" prefWidth="120" text="Score Risque" />
+                                        </columns>
+                                    </TableView>
+                                </VBox>
+                                
+                                <HBox alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+                                    <Button text="Générer un rapport PDF" disable="true" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 12 30; -fx-cursor: hand;"/>
+                                </HBox>
+                            </VBox>
+                        </content>
+                    </ScrollPane>
                 </VBox>
-            </StackPane>
+                </StackPane>
             
             <!-- Floating Buttons -->
             <Button text="📷 Scanner un plat" onAction="#afficherPopupScanIA" 
