@@ -2,6 +2,7 @@ package tn.esprit.Pidev3A49.controllers;
 
 import java.awt.Desktop;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -18,10 +19,12 @@ import tn.esprit.Pidev3A49.Models.Supplement;
 import tn.esprit.Pidev3A49.Models.SupplementOrder;
 import tn.esprit.Pidev3A49.Models.SupplementOrderItem;
 import tn.esprit.Pidev3A49.services.ServiceSupplementOrder;
+import tn.esprit.Pidev3A49.utils.AppSession;
 import tn.esprit.Pidev3A49.utils.CartStore;
 import tn.esprit.Pidev3A49.utils.ConfirmedOrderStore;
 import tn.esprit.Pidev3A49.utils.PendingOrderStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
+import tn.esprit.Pidev3A49.utils.SessionRouter;
 
 import javafx.event.ActionEvent;
 import java.io.IOException;
@@ -143,8 +146,12 @@ public class CheckoutController {
 
     @FXML
     private void initialize() {
+        if (!SessionRouter.ensureAuthenticated(placeOrderButton)) {
+            return;
+        }
         updatePaymentStyles();
         initializeService();
+        preloadCustomerIdentity();
         refreshSummary();
     }
 
@@ -153,7 +160,7 @@ public class CheckoutController {
     }
 
     public void openBackEnd(ActionEvent event) throws IOException {
-        SceneNavigator.navigate(event, SceneNavigator.CHECKOUT_VIEW, SceneNavigator.BACK_END_VIEW);
+        SessionRouter.logoutToSignIn((Node) event.getSource());
     }
 
     public void openMyOrders(ActionEvent event) throws IOException {
@@ -263,6 +270,20 @@ public class CheckoutController {
         }
     }
 
+    private void preloadCustomerIdentity() {
+        String sessionEmail = AppSession.getInstance().getEmail();
+        if (sessionEmail != null && !sessionEmail.isBlank()) {
+            emailField.setText(sessionEmail.trim());
+            emailField.setEditable(false);
+            return;
+        }
+
+        String lastCheckoutEmail = cartStore.getLastCheckoutEmail();
+        if (lastCheckoutEmail != null && !lastCheckoutEmail.isBlank()) {
+            emailField.setText(lastCheckoutEmail.trim());
+        }
+    }
+
     private void refreshSummary() {
         orderItemsContainer.getChildren().clear();
 
@@ -352,7 +373,7 @@ public class CheckoutController {
         SupplementOrder order = new SupplementOrder();
         order.setFirstName(requireText(firstNameField, "Le prenom est obligatoire."));
         order.setLastName(requireText(lastNameField, "Le nom est obligatoire."));
-        order.setEmail(requireEmail(emailField));
+        order.setEmail(resolveOrderEmail());
         order.setPhone(requireText(phoneField, "Le telephone est obligatoire."));
         order.setAddress(requireText(addressField, "L'adresse est obligatoire."));
         order.setCity(requireText(cityField, "La ville est obligatoire."));
@@ -364,7 +385,7 @@ public class CheckoutController {
         order.setShippingCost(shippingCost);
         order.setDiscountAmount(discountAmount);
         order.setTotalAmount(totalAmount);
-        order.setStatus("PLACED");
+        order.setStatus("ON_PROGRESS");
         order.setItems(cartItems.stream().map(this::toOrderItem).toList());
         return order;
     }
@@ -426,6 +447,14 @@ public class CheckoutController {
         return value;
     }
 
+    private String resolveOrderEmail() {
+        String sessionEmail = AppSession.getInstance().getEmail();
+        if (sessionEmail != null && !sessionEmail.isBlank()) {
+            return sessionEmail.trim();
+        }
+        return requireEmail(emailField);
+    }
+
     private String optionalText(TextArea area) {
         String value = area.getText() == null ? "" : area.getText().trim();
         return value.isEmpty() ? null : value;
@@ -476,6 +505,7 @@ public class CheckoutController {
         discountCodeField.clear();
         paymentMethodGroup.selectToggle(visaRadio);
         updatePaymentStyles();
+        preloadCustomerIdentity();
     }
 
     private String valueOrDefault(String value) {

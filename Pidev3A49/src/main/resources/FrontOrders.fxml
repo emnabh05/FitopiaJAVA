@@ -3,8 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -17,10 +16,50 @@
             fx:controller="tn.esprit.Pidev3A49.controllers.FrontOrdersController"
             prefWidth="1400.0"
             prefHeight="900.0"
+            stylesheets="@styles/admin-theme.css"
             style="-fx-background-color: linear-gradient(to bottom right, #F7FFFB, #E5FBF3);">
 
     <top>
-        <HBox spacing="12.0" alignment="CENTER_LEFT"
+        <VBox spacing="0">
+            <children>
+                <VBox styleClass="navbar-container">
+                    <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                        <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10">
+                            <Label text="FB" styleClass="social-icon" />
+                            <Label text="X" styleClass="social-icon" />
+                            <Label text="IG" styleClass="social-icon" />
+                        </HBox>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
+                        <VBox alignment="CENTER" spacing="0">
+                            <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                            <Label text="FITOPIA" styleClass="navbar-logo-text" />
+                        </VBox>
+
+                        <Region prefWidth="20" />
+
+                        <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                        <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+
+                        <Region prefWidth="10" />
+
+                        <Button onAction="#openStore" text="EXPLORE&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openStore" text="MY&#10;PROGRESS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openStore" text="MONTHLY&#10;RANKING" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openCheckout" text="CHECKOUT" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button text="MY&#10;ORDERS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                        <Button onAction="#goBackOrExit" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
+                    </HBox>
+                </VBox>
+
+                <HBox spacing="12.0" alignment="CENTER_LEFT"
               style="-fx-background-color: linear-gradient(to right, #0D3141, #1B7A61); -fx-background-radius: 0 0 20 20;">
             <padding>
                 <Insets top="16.0" right="20.0" bottom="16.0" left="20.0"/>
@@ -39,8 +78,27 @@
                         style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700;"/>
                 <Button text="Checkout" onAction="#openCheckout"
                         style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+
+                <StackPane prefWidth="52.0" prefHeight="46.0">
+                    <children>
+                        <Button text="🔔"
+                                fx:id="notificationBellButton"
+                                onAction="#toggleNotificationsMenu"
+                                prefWidth="46.0"
+                                prefHeight="46.0"
+                                style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 19px; -fx-font-weight: 900;"/>
+
+                        <Label fx:id="notificationBadgeLabel"
+                               visible="false"
+                               managed="false"
+                               StackPane.alignment="TOP_RIGHT"
+                               style="-fx-background-color: #FF4D4F; -fx-background-radius: 999; -fx-text-fill: white; -fx-font-size: 11px; -fx-font-weight: 900; -fx-padding: 2 6 2 6;"/>
+                    </children>
+                </StackPane>
             </children>
-        </HBox>
+                </HBox>
+            </children>
+        </VBox>
     </top>
 
     <center>
@@ -63,15 +121,16 @@
                 <Label fx:id="statusLabel"
                        style="-fx-text-fill: #255D71; -fx-font-size: 14px; -fx-font-weight: 700;"/>
 
-                <TableView fx:id="ordersTable" prefHeight="650.0"
-                           style="-fx-background-color: white; -fx-background-radius: 18; -fx-border-color: #E1EBF1; -fx-border-radius: 18;">
-                    <columns>
-                        <TableColumn fx:id="orderIdColumn" text="Order ID"/>
-                        <TableColumn fx:id="createdAtColumn" text="Created At"/>
-                        <TableColumn fx:id="totalColumn" text="Total"/>
-                        <TableColumn fx:id="statusColumn" text="Status"/>
-                    </columns>
-                </TableView>
+                <ScrollPane fitToWidth="true"
+                            prefHeight="620.0"
+                            hbarPolicy="NEVER"
+                            vbarPolicy="AS_NEEDED"
+                            style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                    <content>
+                        <VBox fx:id="ordersCardsContainer" spacing="12.0"
+                              style="-fx-background-color: white; -fx-background-radius: 18; -fx-border-color: #E1EBF1; -fx-border-radius: 18; -fx-padding: 14 14 14 14;"/>
+                    </content>
+                </ScrollPane>
 
                 <HBox alignment="CENTER_LEFT">
                     <children>

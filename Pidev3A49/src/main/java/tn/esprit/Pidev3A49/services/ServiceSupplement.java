@@ -10,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.sql.Types;
@@ -20,24 +21,57 @@ import java.util.List;
 public class ServiceSupplement implements IServices<Supplement> {
 
     private final Connection cnx;
+    private final String supplementTable;
+    private final boolean hasDurationColumn;
+    private final boolean hasCreatedAtColumn;
+    private final boolean hasUpdatedAtColumn;
 
     public ServiceSupplement() {
         cnx = MyDataBase.getInstance().getCnx();
         if (cnx == null) {
             throw new IllegalStateException("Impossible de se connecter a MySQL.");
         }
+        supplementTable = SchemaInitializer.SUPPLEMENT_TABLE;
+        hasDurationColumn = hasColumn(supplementTable, "recommended_duration_days");
+        hasCreatedAtColumn = hasColumn(supplementTable, "created_at");
+        hasUpdatedAtColumn = hasColumn(supplementTable, "updated_at");
     }
 
     @Override
     public void add(Supplement supplement) {
         validate(supplement);
-        String query = """
-                INSERT INTO %s (name, category, brand, price, stock, calories, description, image)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """.formatted(SchemaInitializer.SUPPLEMENT_TABLE);
+        StringBuilder columns = new StringBuilder("name, category, brand, price, stock, calories, description, image");
+        StringBuilder values = new StringBuilder("?, ?, ?, ?, ?, ?, ?, ?");
+        if (hasDurationColumn) {
+            columns.append(", recommended_duration_days");
+            values.append(", ?");
+        }
+        if (hasCreatedAtColumn) {
+            columns.append(", created_at");
+            values.append(", ?");
+        }
+        if (hasUpdatedAtColumn) {
+            columns.append(", updated_at");
+            values.append(", ?");
+        }
+        String query = "INSERT INTO " + supplementTable + " (" + columns + ") VALUES (" + values + ")";
 
         try (PreparedStatement preparedStatement = cnx.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            fillStatement(preparedStatement, supplement);
+            int nextParamIndex = fillStatement(preparedStatement, supplement);
+            LocalDateTime now = LocalDateTime.now();
+
+            if (hasDurationColumn) {
+                preparedStatement.setInt(nextParamIndex, 30);
+                nextParamIndex++;
+            }
+            if (hasCreatedAtColumn) {
+                preparedStatement.setTimestamp(nextParamIndex, Timestamp.valueOf(now));
+                nextParamIndex++;
+            }
+            if (hasUpdatedAtColumn) {
+                preparedStatement.setTimestamp(nextParamIndex, Timestamp.valueOf(now));
+            }
+
             preparedStatement.executeUpdate();
 
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -53,7 +87,7 @@ public class ServiceSupplement implements IServices<Supplement> {
     @Override
     public List<Supplement> getAll() {
         List<Supplement> supplements = new ArrayList<>();
-        String query = "SELECT * FROM " + SchemaInitializer.SUPPLEMENT_TABLE + " ORDER BY updated_at DESC, id DESC";
+        String query = "SELECT * FROM " + supplementTable + " ORDER BY updated_at DESC, id DESC";
 
         try (Statement statement = cnx.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
@@ -69,7 +103,7 @@ public class ServiceSupplement implements IServices<Supplement> {
 
     @Override
     public Supplement getById(int id) {
-        String query = "SELECT * FROM " + SchemaInitializer.SUPPLEMENT_TABLE + " WHERE id = ?";
+        String query = "SELECT * FROM " + supplementTable + " WHERE id = ?";
         try (PreparedStatement preparedStatement = cnx.prepareStatement(query)) {
             preparedStatement.setInt(1, id);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -86,16 +120,29 @@ public class ServiceSupplement implements IServices<Supplement> {
     @Override
     public void update(Supplement supplement) {
         validate(supplement);
-        String query = """
+        String query = hasUpdatedAtColumn
+                ? """
+                UPDATE %s
+                SET name = ?, category = ?, brand = ?, price = ?, stock = ?, calories = ?, description = ?, image = ?, updated_at = ?
+                WHERE id = ?
+                """.formatted(supplementTable)
+                : """
                 UPDATE %s
                 SET name = ?, category = ?, brand = ?, price = ?, stock = ?, calories = ?, description = ?, image = ?
                 WHERE id = ?
-                """.formatted(SchemaInitializer.SUPPLEMENT_TABLE);
+                """.formatted(supplementTable);
 
         try (PreparedStatement preparedStatement = cnx.prepareStatement(query)) {
-            fillStatement(preparedStatement, supplement);
-            preparedStatement.setInt(9, supplement.getId());
-            preparedStatement.executeUpdate();
+            int nextParamIndex = fillStatement(preparedStatement, supplement);
+            if (hasUpdatedAtColumn) {
+                preparedStatement.setTimestamp(nextParamIndex, Timestamp.valueOf(LocalDateTime.now()));
+                nextParamIndex++;
+            }
+            preparedStatement.setInt(nextParamIndex, supplement.getId());
+            int updatedRows = preparedStatement.executeUpdate();
+            if (updatedRows != 1) {
+                throw new IllegalStateException("Supplement introuvable pour l'identifiant " + supplement.getId() + ".");
+            }
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de modifier le supplement.", exception);
         }
@@ -103,16 +150,25 @@ public class ServiceSupplement implements IServices<Supplement> {
 
     @Override
     public void delete(Supplement supplement) {
-        String query = "DELETE FROM " + SchemaInitializer.SUPPLEMENT_TABLE + " WHERE id = ?";
+        if (supplement == null || supplement.getId() <= 0) {
+            throw new IllegalArgumentException("Le supplement selectionne est invalide.");
+        }
+
+        String query = "DELETE FROM " + supplementTable + " WHERE id = ?";
         try (PreparedStatement preparedStatement = cnx.prepareStatement(query)) {
             preparedStatement.setInt(1, supplement.getId());
-            preparedStatement.executeUpdate();
+            int deletedRows = preparedStatement.executeUpdate();
+            if (deletedRows != 1) {
+                throw new IllegalStateException("Supplement introuvable pour l'identifiant " + supplement.getId() + ".");
+            }
+        } catch (SQLIntegrityConstraintViolationException exception) {
+            throw new IllegalStateException("Impossible de supprimer ce supplement car il est deja lie a d'autres donnees.", exception);
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de supprimer le supplement.", exception);
         }
     }
 
-    private void fillStatement(PreparedStatement preparedStatement, Supplement supplement) throws SQLException {
+    private int fillStatement(PreparedStatement preparedStatement, Supplement supplement) throws SQLException {
         preparedStatement.setString(1, supplement.getName());
         preparedStatement.setString(2, supplement.getCategory());
         preparedStatement.setString(3, supplement.getBrand());
@@ -132,6 +188,7 @@ public class ServiceSupplement implements IServices<Supplement> {
         } else {
             preparedStatement.setString(8, supplement.getImage());
         }
+        return 9;
     }
 
     private Supplement mapResultSet(ResultSet resultSet) throws SQLException {
@@ -185,6 +242,16 @@ public class ServiceSupplement implements IServices<Supplement> {
         }
         if (supplement.getDescription() == null || supplement.getDescription().isBlank()) {
             throw new IllegalArgumentException("La description du supplement est obligatoire.");
+        }
+    }
+
+    private boolean hasColumn(String tableName, String columnName) {
+        try {
+            try (ResultSet resultSet = cnx.getMetaData().getColumns(cnx.getCatalog(), null, tableName, columnName)) {
+                return resultSet.next();
+            }
+        } catch (SQLException exception) {
+            return false;
         }
     }
 }

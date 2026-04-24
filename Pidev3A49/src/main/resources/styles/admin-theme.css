@@ -297,3 +297,113 @@
     -fx-font-size: 14px;
     -fx-text-fill: #253242;
 }
+
+/* Front top navigation shared with userforum */
+.navbar-container {
+    -fx-background-color: white;
+}
+
+.navbar-shell {
+    -fx-background-color: white;
+    -fx-padding: 10 30 10 30;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 10, 0, 0, 4);
+}
+
+.top-navbar-strip {
+    -fx-background-color: #0d212d;
+    -fx-padding: 6 30;
+}
+
+.top-navbar-text {
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: 500;
+}
+
+.social-icon {
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+    -fx-padding: 0 8;
+}
+
+.navbar-logo-icon {
+    -fx-text-fill: #1D3A5F;
+    -fx-font-size: 20px;
+}
+
+.navbar-logo-text {
+    -fx-text-fill: #1D3A5F;
+    -fx-font-size: 9px;
+    -fx-font-weight: 900;
+    -fx-letter-spacing: 2px;
+}
+
+.navbar-link {
+    -fx-text-fill: #1D3A5F;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+.navbar-link:hover {
+    -fx-text-fill: #1a73e8;
+}
+
+.navbar-link-active {
+    -fx-border-color: transparent transparent #1a73e8 transparent;
+    -fx-border-width: 0 0 2 0;
+}
+
+.navbar-btn-blue,
+.navbar-btn-green,
+.navbar-btn-red {
+    -fx-background-color: transparent;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+    -fx-text-alignment: center;
+}
+
+.navbar-btn-blue {
+    -fx-border-color: #4CA1ED;
+    -fx-text-fill: #4CA1ED;
+    -fx-min-height: 80;
+    -fx-max-height: 80;
+    -fx-min-width: 140;
+    -fx-padding: 0 10;
+}
+
+.navbar-btn-blue:hover {
+    -fx-background-color: #4CA1ED;
+    -fx-text-fill: white;
+}
+
+.navbar-btn-green {
+    -fx-border-color: #4CAF50;
+    -fx-text-fill: #4CAF50;
+    -fx-min-height: 50;
+    -fx-max-height: 50;
+    -fx-padding: 0 16;
+}
+
+.navbar-btn-green:hover {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+}
+
+.navbar-btn-red {
+    -fx-border-color: #F44336;
+    -fx-text-fill: #F44336;
+    -fx-min-height: 50;
+    -fx-max-height: 50;
+    -fx-padding: 0 16;
+}
+
+.navbar-btn-red:hover {
+    -fx-background-color: #F44336;
+    -fx-text-fill: white;
+}

@@ -2,34 +2,179 @@ package tn.esprit.Pidev3A49.utils;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public final class SchemaInitializer {
 
-    public static final String SUPPLEMENT_TABLE = "crud_supplement";
+    public static final String USER_TABLE = "users";
+    public static final String REGIME_TABLE = "regime_alimentaire";
+    public static final String REPAS_TABLE = "repas";
+    public static final String FORUM_TABLE = "forum";
+    public static final String COMMENT_TABLE = "forum_comment";
+    public static final String FORUM_LIKE_TABLE = "forum_like";
+    public static final String FORUM_REPOST_TABLE = "forum_repost";
+    public static final String SUPPLEMENT_TABLE = "supplement";
+    public static final String SUPPLEMENT_FAVORITE_TABLE = "supplement_favorite";
+    public static final String SUPPLEMENT_REVIEW_TABLE = "supplement_review";
     public static final String SUPPLEMENT_ORDER_TABLE = "crud_supplement_order";
     public static final String SUPPLEMENT_ORDER_ITEM_TABLE = "crud_supplement_order_item";
-    public static final String REGIME_TABLE = "crud_regime_alimentaire";
-    public static final String REPAS_TABLE = "crud_repas";
+    public static final String SUPPLEMENT_ORDER_NOTIFICATION_TABLE = "crud_supplement_order_notification";
+    public static final String SUPPLEMENT_ADHERENCE_PLAN_TABLE = "supplement_adherence_plan";
+    public static final String SUPPLEMENT_ADHERENCE_LOG_TABLE = "supplement_adherence_log";
+    public static final String SUPPLEMENT_ADHERENCE_NOTIFICATION_TABLE = "supplement_adherence_notification";
     public static final String EXERCISE_TABLE = "fitness_exercise";
+
+    private static final String APP_METADATA_TABLE = "app_metadata";
+    private static final String FORUM_SOCIAL_RESET_KEY = "forum_social_reset_v1";
+
+    private static final String CREATE_USER_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                email VARCHAR(191) NOT NULL,
+                first_name VARCHAR(100) NULL,
+                last_name VARCHAR(100) NULL,
+                UNIQUE KEY uk_users_email (email)
+            )
+            """.formatted(USER_TABLE);
+
+    private static final String CREATE_REGIME_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NOT NULL,
+                taille DOUBLE NULL,
+                poids DOUBLE NULL,
+                age INT NULL,
+                bmi DOUBLE NULL,
+                type_sante VARCHAR(100) NULL,
+                calories_cibles INT NULL,
+                repas_adequats TEXT NULL,
+                CONSTRAINT fk_regime_user
+                    FOREIGN KEY (user_id) REFERENCES %s(id)
+                    ON UPDATE CASCADE
+                    ON DELETE RESTRICT
+            )
+            """.formatted(REGIME_TABLE, USER_TABLE);
+
+    private static final String CREATE_REPAS_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id_repas INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NOT NULL,
+                date_repas DATETIME NOT NULL,
+                type_repas VARCHAR(100) NOT NULL,
+                nom_repas VARCHAR(255) NOT NULL,
+                calories INT NULL,
+                proteines INT NULL,
+                glucides INT NULL,
+                lipides INT NULL,
+                commentaire TEXT NULL,
+                regime_id INT NULL,
+                CONSTRAINT fk_repas_user
+                    FOREIGN KEY (user_id) REFERENCES %s(id)
+                    ON UPDATE CASCADE
+                    ON DELETE RESTRICT,
+                CONSTRAINT fk_repas_regime
+                    FOREIGN KEY (regime_id) REFERENCES %s(id)
+                    ON UPDATE CASCADE
+                    ON DELETE SET NULL
+            )
+            """.formatted(REPAS_TABLE, USER_TABLE, REGIME_TABLE);
+
+    private static final String CREATE_FORUM_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NULL,
+                title VARCHAR(255) NOT NULL,
+                content TEXT NOT NULL,
+                image_path VARCHAR(500) NULL
+            )
+            """.formatted(FORUM_TABLE);
+
+    private static final String CREATE_COMMENT_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_id INT NULL,
+                content TEXT NOT NULL,
+                forum_id INT NOT NULL,
+                CONSTRAINT fk_forum_comment_forum
+                    FOREIGN KEY (forum_id) REFERENCES %s(id)
+                    ON UPDATE CASCADE
+                    ON DELETE CASCADE
+            )
+            """.formatted(COMMENT_TABLE, FORUM_TABLE);
+
+    private static final String CREATE_FORUM_LIKE_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                forum_id INT NOT NULL,
+                user_id INT NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uk_forum_like_forum_user (forum_id, user_id)
+            )
+            """.formatted(FORUM_LIKE_TABLE);
+
+    private static final String CREATE_FORUM_REPOST_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                forum_id INT NOT NULL,
+                user_id INT NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                UNIQUE KEY uk_forum_repost_forum_user (forum_id, user_id)
+            )
+            """.formatted(FORUM_REPOST_TABLE);
+
+    private static final String CREATE_APP_METADATA_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                meta_key VARCHAR(100) PRIMARY KEY,
+                applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """.formatted(APP_METADATA_TABLE);
 
     private static final String CREATE_SUPPLEMENT_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                name VARCHAR(150) NOT NULL,
+                name VARCHAR(255) NOT NULL,
                 category VARCHAR(100) NOT NULL,
                 brand VARCHAR(100) NOT NULL,
                 price DECIMAL(10, 2) NOT NULL,
                 stock INT NOT NULL,
                 calories INT NULL,
-                description TEXT NOT NULL,
+                description LONGTEXT NOT NULL,
                 image VARCHAR(255) NULL,
-                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                recommended_duration_days INT NOT NULL DEFAULT 30
             )
             """.formatted(SUPPLEMENT_TABLE);
+
+    private static final String CREATE_SUPPLEMENT_REVIEW_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                supplement_id INT NOT NULL,
+                rating TINYINT NOT NULL,
+                comment TEXT NOT NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT chk_supplement_review_rating CHECK (rating BETWEEN 1 AND 5),
+                CONSTRAINT fk_supplement_review_supplement
+                    FOREIGN KEY (supplement_id) REFERENCES %s(id)
+                    ON DELETE CASCADE
+            )
+            """.formatted(SUPPLEMENT_REVIEW_TABLE, SUPPLEMENT_TABLE);
+
+    private static final String CREATE_SUPPLEMENT_FAVORITE_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_email VARCHAR(180) NOT NULL,
+                supplement_id INT NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT uq_supplement_favorite_email_product UNIQUE (user_email, supplement_id),
+                CONSTRAINT fk_supplement_favorite_supplement
+                    FOREIGN KEY (supplement_id) REFERENCES %s(id)
+                    ON DELETE CASCADE
+            )
+            """.formatted(SUPPLEMENT_FAVORITE_TABLE, SUPPLEMENT_TABLE);
 
     private static final String CREATE_SUPPLEMENT_ORDER_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
@@ -48,7 +193,7 @@ public final class SchemaInitializer {
                 shipping_cost DECIMAL(10, 2) NOT NULL,
                 discount_amount DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
                 total_amount DECIMAL(10, 2) NOT NULL,
-                status VARCHAR(40) NOT NULL DEFAULT 'PLACED',
+                status VARCHAR(40) NOT NULL DEFAULT 'ON_PROGRESS',
                 created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
             """.formatted(SUPPLEMENT_ORDER_TABLE);
@@ -68,31 +213,67 @@ public final class SchemaInitializer {
             )
             """.formatted(SUPPLEMENT_ORDER_ITEM_TABLE, SUPPLEMENT_ORDER_TABLE);
 
-    private static final String CREATE_REGIME_TABLE = """
+    private static final String CREATE_SUPPLEMENT_ORDER_NOTIFICATION_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                nom VARCHAR(100) NOT NULL,
-                description VARCHAR(255),
-                objectif_calorique INT NOT NULL,
-                actif BOOLEAN NOT NULL DEFAULT TRUE
+                order_id INT NOT NULL,
+                recipient_email VARCHAR(180) NOT NULL,
+                previous_status VARCHAR(40) NULL,
+                new_status VARCHAR(40) NOT NULL,
+                message VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_supplement_order_notification_order
+                    FOREIGN KEY (order_id) REFERENCES %s(id)
+                    ON DELETE CASCADE
             )
-            """.formatted(REGIME_TABLE);
+            """.formatted(SUPPLEMENT_ORDER_NOTIFICATION_TABLE, SUPPLEMENT_ORDER_TABLE);
 
-    private static final String CREATE_REPAS_TABLE = """
+    private static final String CREATE_SUPPLEMENT_ADHERENCE_PLAN_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
                 id INT PRIMARY KEY AUTO_INCREMENT,
-                nom VARCHAR(100) NOT NULL,
-                description VARCHAR(255),
-                calories INT NOT NULL,
-                type_repas VARCHAR(50) NOT NULL,
-                date_repas DATE,
-                regime_id INT,
-                CONSTRAINT fk_crud_repas_regime
-                    FOREIGN KEY (regime_id) REFERENCES %s(id)
-                    ON UPDATE CASCADE
-                    ON DELETE SET NULL
+                user_email VARCHAR(180) NOT NULL,
+                supplement_id INT NOT NULL,
+                supplement_name VARCHAR(180) NOT NULL,
+                daily_target_units INT NOT NULL DEFAULT 1,
+                planned_days INT NOT NULL DEFAULT 30,
+                start_date DATE NOT NULL,
+                is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                CONSTRAINT chk_supplement_adherence_daily_target CHECK (daily_target_units BETWEEN 1 AND 6),
+                CONSTRAINT chk_supplement_adherence_planned_days CHECK (planned_days BETWEEN 1 AND 730),
+                CONSTRAINT uq_supplement_adherence_user_product UNIQUE (user_email, supplement_id),
+                CONSTRAINT fk_supplement_adherence_plan_product
+                    FOREIGN KEY (supplement_id) REFERENCES %s(id)
+                    ON DELETE CASCADE
             )
-            """.formatted(REPAS_TABLE, REGIME_TABLE);
+            """.formatted(SUPPLEMENT_ADHERENCE_PLAN_TABLE, SUPPLEMENT_TABLE);
+
+    private static final String CREATE_SUPPLEMENT_ADHERENCE_LOG_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                plan_id INT NOT NULL,
+                user_email VARCHAR(180) NOT NULL,
+                supplement_id INT NOT NULL,
+                log_date DATE NOT NULL,
+                taken_units INT NOT NULL DEFAULT 1,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT chk_supplement_adherence_taken_units CHECK (taken_units > 0),
+                CONSTRAINT fk_supplement_adherence_log_plan
+                    FOREIGN KEY (plan_id) REFERENCES %s(id)
+                    ON DELETE CASCADE
+            )
+            """.formatted(SUPPLEMENT_ADHERENCE_LOG_TABLE, SUPPLEMENT_ADHERENCE_PLAN_TABLE);
+
+    private static final String CREATE_SUPPLEMENT_ADHERENCE_NOTIFICATION_TABLE = """
+            CREATE TABLE IF NOT EXISTS %s (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                user_email VARCHAR(180) NOT NULL,
+                notification_type VARCHAR(60) NOT NULL,
+                message VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+            )
+            """.formatted(SUPPLEMENT_ADHERENCE_NOTIFICATION_TABLE);
 
     private static final String CREATE_EXERCISE_TABLE = """
             CREATE TABLE IF NOT EXISTS %s (
@@ -116,13 +297,68 @@ public final class SchemaInitializer {
 
     public static void initialize(Connection connection) throws SQLException {
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate(CREATE_SUPPLEMENT_TABLE);
-            statement.executeUpdate(CREATE_SUPPLEMENT_ORDER_TABLE);
-            statement.executeUpdate(CREATE_SUPPLEMENT_ORDER_ITEM_TABLE);
+            statement.execute("SELECT 1");
+            statement.executeUpdate(CREATE_USER_TABLE);
             statement.executeUpdate(CREATE_REGIME_TABLE);
             statement.executeUpdate(CREATE_REPAS_TABLE);
+            statement.executeUpdate(CREATE_FORUM_TABLE);
+            statement.executeUpdate(CREATE_COMMENT_TABLE);
+            statement.executeUpdate(CREATE_FORUM_LIKE_TABLE);
+            statement.executeUpdate(CREATE_FORUM_REPOST_TABLE);
+            statement.executeUpdate(CREATE_APP_METADATA_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_REVIEW_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_FAVORITE_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_ORDER_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_ORDER_NOTIFICATION_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_ORDER_ITEM_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_ADHERENCE_PLAN_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_ADHERENCE_LOG_TABLE);
+            statement.executeUpdate(CREATE_SUPPLEMENT_ADHERENCE_NOTIFICATION_TABLE);
             statement.executeUpdate(CREATE_EXERCISE_TABLE);
             synchronizeExerciseTable(connection, statement);
+        }
+        migrateForumSocialSchema(connection);
+        seedDefaultUserIfNeeded(connection);
+    }
+
+    private static void seedDefaultUserIfNeeded(Connection connection) throws SQLException {
+        String countQuery = "SELECT COUNT(*) FROM " + USER_TABLE;
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(countQuery)) {
+            if (resultSet.next() && resultSet.getInt(1) > 0) {
+                return;
+            }
+        }
+
+        String insertQuery = """
+                INSERT INTO %s (email, first_name, last_name)
+                VALUES (?, ?, ?)
+                """.formatted(USER_TABLE);
+        try (PreparedStatement preparedStatement = connection.prepareStatement(insertQuery)) {
+            preparedStatement.setString(1, "demo@fitopia.local");
+            preparedStatement.setString(2, "Demo");
+            preparedStatement.setString(3, "User");
+            preparedStatement.executeUpdate();
+        }
+    }
+
+    private static void migrateForumSocialSchema(Connection connection) throws SQLException {
+        ensureColumn(connection, FORUM_TABLE, "user_id",
+                "ALTER TABLE `" + FORUM_TABLE + "` ADD COLUMN user_id INT NULL AFTER id");
+        ensureColumn(connection, FORUM_TABLE, "image_path",
+                "ALTER TABLE `" + FORUM_TABLE + "` ADD COLUMN image_path VARCHAR(500) NULL AFTER content");
+        ensureColumn(connection, COMMENT_TABLE, "user_id",
+                "ALTER TABLE `" + COMMENT_TABLE + "` ADD COLUMN user_id INT NULL AFTER id");
+
+        if (!metadataFlagExists(connection, FORUM_SOCIAL_RESET_KEY)) {
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate("DELETE FROM `" + FORUM_LIKE_TABLE + "`");
+                statement.executeUpdate("DELETE FROM `" + FORUM_REPOST_TABLE + "`");
+                statement.executeUpdate("DELETE FROM `" + COMMENT_TABLE + "`");
+                statement.executeUpdate("DELETE FROM `" + FORUM_TABLE + "`");
+            }
+            insertMetadataFlag(connection, FORUM_SOCIAL_RESET_KEY);
         }
     }
 
@@ -188,6 +424,32 @@ public final class SchemaInitializer {
 
         if (hasLegacySets) {
             statement.executeUpdate("ALTER TABLE " + EXERCISE_TABLE + " DROP COLUMN `sets`");
+        }
+    }
+
+    private static void ensureColumn(Connection connection, String tableName, String columnName, String alterQuery) throws SQLException {
+        if (!hasColumn(connection, tableName, columnName)) {
+            try (Statement statement = connection.createStatement()) {
+                statement.executeUpdate(alterQuery);
+            }
+        }
+    }
+
+    private static boolean metadataFlagExists(Connection connection, String key) throws SQLException {
+        String query = "SELECT 1 FROM `" + APP_METADATA_TABLE + "` WHERE meta_key = ? LIMIT 1";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, key);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return resultSet.next();
+            }
+        }
+    }
+
+    private static void insertMetadataFlag(Connection connection, String key) throws SQLException {
+        String query = "INSERT INTO `" + APP_METADATA_TABLE + "` (meta_key) VALUES (?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setString(1, key);
+            preparedStatement.executeUpdate();
         }
     }
 

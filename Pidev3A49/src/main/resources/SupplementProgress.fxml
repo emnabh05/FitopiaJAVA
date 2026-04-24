@@ -17,44 +17,49 @@
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
+            stylesheets="@styles/admin-theme.css"
             style="-fx-background: #EAF9F3; -fx-background-color: #EAF9F3;">
     <content>
         <VBox prefWidth="1440.0"
               spacing="30.0"
               style="-fx-background-color: linear-gradient(to bottom right, #F7FFFC, #E7F7F1);">
             <children>
-                <HBox alignment="CENTER_LEFT"
-                      spacing="18.0"
-                      prefHeight="78.0"
-                      style="-fx-background-color: white; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-width: 0 0 1 0;">
-                    <padding>
-                        <Insets top="14.0" right="26.0" bottom="14.0" left="26.0"/>
-                    </padding>
-                    <children>
-                        <StackPane prefWidth="62.0" prefHeight="42.0"
-                                   style="-fx-background-color: #F5FAF7; -fx-background-radius: 14; -fx-border-color: #DDECE4; -fx-border-radius: 14;">
-                            <children>
-                                <Label text="FITOPIA"
-                                       style="-fx-text-fill: #274051; -fx-font-size: 11px; -fx-font-weight: 900;"/>
-                            </children>
-                        </StackPane>
+                <VBox styleClass="navbar-container">
+                    <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                        <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10">
+                            <Label text="FB" styleClass="social-icon" />
+                            <Label text="X" styleClass="social-icon" />
+                            <Label text="IG" styleClass="social-icon" />
+                        </HBox>
+                    </HBox>
 
-                        <Button text="Explore Supplements"
-                                onAction="#openSupplementShowcase"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                        <Button text="Monthly Ranking"
-                                onAction="#openMonthlyRanking"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                        <Button text="My Progress"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #10B981; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 800; -fx-padding: 10 18 10 18;"/>
+                    <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
+                        <VBox alignment="CENTER" spacing="0">
+                            <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                            <Label text="FITOPIA" styleClass="navbar-logo-text" />
+                        </VBox>
 
-                        <Region HBox.hgrow="ALWAYS"/>
+                        <Region prefWidth="20" />
 
-                        <Button text="Back End"
-                                onAction="#openBackEnd"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #123B49; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                    </children>
-                </HBox>
+                        <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                        <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+
+                        <Region prefWidth="10" />
+
+                        <Button onAction="#openSupplementShowcase" text="EXPLORE&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button text="MY&#10;PROGRESS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openMonthlyRanking" text="MONTHLY&#10;RANKING" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openSupplementShowcase" text="CHECKOUT" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openMyOrders" text="MY&#10;ORDERS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#openMyOrders" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                        <Button onAction="#openBackEnd" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
+                    </HBox>
+                </VBox>
 
                 <VBox spacing="20.0">
                     <padding>
@@ -72,14 +77,16 @@
                                 <Label text="MY SUPPLEMENT PROGRESS"
                                        wrapText="true"
                                        style="-fx-text-fill: #07161F; -fx-font-size: 52px; -fx-font-weight: 900;"/>
-                                <Label text="See discipline score, consistency streak, risk level, and estimated timeline for each purchased supplement."
+                                <Label text="Track weekly/monthly adherence, active streaks, and safe plan completion."
                                        wrapText="true"
-                                       maxWidth="840.0"
+                                       maxWidth="900.0"
                                        style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 17px; -fx-font-weight: 600;"/>
 
-                                <Label text="Synced automatically with your account orders"
-                                       maxWidth="320.0"
-                                       style="-fx-background-color: rgba(255,255,255,0.12); -fx-background-radius: 999; -fx-border-color: rgba(255,255,255,0.22); -fx-border-radius: 999; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 16 10 16;"/>
+                                <Label fx:id="smartNotificationsLabel"
+                                       text="No alerts yet."
+                                       wrapText="true"
+                                       maxWidth="920.0"
+                                       style="-fx-background-color: rgba(255,255,255,0.12); -fx-background-radius: 16; -fx-border-color: rgba(255,255,255,0.22); -fx-border-radius: 16; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 14 10 14;"/>
 
                                 <FlowPane hgap="12.0" vgap="12.0" prefWrapLength="1100.0">
                                     <children>
@@ -92,7 +99,8 @@
                                             <children>
                                                 <Label text="TRACKED SUPPLEMENTS"
                                                        style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                <Label text="1"
+                                                <Label fx:id="trackedSupplementsValueLabel"
+                                                       text="0"
                                                        style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
                                             </children>
                                         </VBox>
@@ -104,9 +112,10 @@
                                                 <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
                                             </padding>
                                             <children>
-                                                <Label text="AVERAGE COMPLIANCE"
+                                                <Label text="AVERAGE CONSISTENCY"
                                                        style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                <Label text="0%"
+                                                <Label fx:id="averageComplianceValueLabel"
+                                                       text="0%"
                                                        style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
                                             </children>
                                         </VBox>
@@ -120,7 +129,8 @@
                                             <children>
                                                 <Label text="CURRENT MAX STREAK"
                                                        style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                <Label text="0d"
+                                                <Label fx:id="currentMaxStreakValueLabel"
+                                                       text="0d"
                                                        style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
                                             </children>
                                         </VBox>
@@ -134,7 +144,8 @@
                                             <children>
                                                 <Label text="AT-RISK SUPPLEMENTS"
                                                        style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                <Label text="1"
+                                                <Label fx:id="atRiskSupplementsValueLabel"
+                                                       text="0"
                                                        style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
                                             </children>
                                         </VBox>
@@ -146,9 +157,10 @@
                                                 <Insets top="14.0" right="18.0" bottom="14.0" left="18.0"/>
                                             </padding>
                                             <children>
-                                                <Label text="TOTAL XP"
+                                                <Label text="GOAL COMPLETION"
                                                        style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 12px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                <Label text="0"
+                                                <Label fx:id="goalCompletionSummaryValueLabel"
+                                                       text="0%"
                                                        style="-fx-text-fill: white; -fx-font-size: 34px; -fx-font-weight: 900;"/>
                                             </children>
                                         </VBox>
@@ -167,16 +179,20 @@
                                     <children>
                                         <VBox spacing="6.0">
                                             <children>
-                                                <Label text="GSN"
+                                                <Label fx:id="supplementBrandLabel"
+                                                       text="-"
                                                        style="-fx-text-fill: #2E8C7E; -fx-font-size: 13px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                <Label text="PROTEINE"
+                                                <Label fx:id="supplementNameLabel"
+                                                       text="No supplement plan found"
                                                        style="-fx-text-fill: #113649; -fx-font-size: 32px; -fx-font-weight: 900;"/>
-                                                <Label text="Bought since 2026-04-09 | Ordered qty: 1 | Base plan: 56 days"
+                                                <Label fx:id="supplementMetaLabel"
+                                                       text="Place an order first to start adherence tracking."
                                                        style="-fx-text-fill: #8A9BA7; -fx-font-size: 14px; -fx-font-weight: 600;"/>
                                             </children>
                                         </VBox>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Label text="AT RISK"
+                                        <Label fx:id="riskStatusLabel"
+                                               text="NO DATA"
                                                style="-fx-background-color: #FFF2E9; -fx-background-radius: 999; -fx-border-color: #FFD7C4; -fx-border-radius: 999; -fx-text-fill: #C86A3B; -fx-font-size: 12px; -fx-font-weight: 900; -fx-padding: 10 16 10 16;"/>
                                     </children>
                                 </HBox>
@@ -191,15 +207,17 @@
                                                         <Circle radius="40.0" fill="white"/>
                                                         <VBox alignment="CENTER" spacing="2.0">
                                                             <children>
-                                                                <Label text="0%"
+                                                                <Label fx:id="complianceValueLabel"
+                                                                       text="0%"
                                                                        style="-fx-text-fill: #113649; -fx-font-size: 24px; -fx-font-weight: 900;"/>
-                                                                <Label text="COMPLIANCE"
+                                                                <Label text="CONSISTENCY"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 10px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
                                                             </children>
                                                         </VBox>
                                                     </children>
                                                 </StackPane>
-                                                <Label text="0 taken / 1 days"
+                                                <Label fx:id="complianceDetailLabel"
+                                                       text="Consistency this month"
                                                        style="-fx-text-fill: #93A3AE; -fx-font-size: 13px; -fx-font-weight: 700;"/>
                                             </children>
                                         </VBox>
@@ -217,7 +235,8 @@
                                                             <children>
                                                                 <Label text="CURRENT STREAK"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                                <Label text="0 days"
+                                                                <Label fx:id="currentStreakValueLabel"
+                                                                       text="0 days"
                                                                        style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
                                                             </children>
                                                         </VBox>
@@ -230,7 +249,8 @@
                                                             <children>
                                                                 <Label text="BEST STREAK"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                                <Label text="0 days"
+                                                                <Label fx:id="bestStreakValueLabel"
+                                                                       text="0 days"
                                                                        style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
                                                             </children>
                                                         </VBox>
@@ -243,7 +263,8 @@
                                                             <children>
                                                                 <Label text="ESTIMATED PROGRESS"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                                <Label text="0%"
+                                                                <Label fx:id="estimatedProgressValueLabel"
+                                                                       text="0%"
                                                                        style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
                                                             </children>
                                                         </VBox>
@@ -261,7 +282,8 @@
                                                             <children>
                                                                 <Label text="ESTIMATED RESULT DATE"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                                <Label text="N/A"
+                                                                <Label fx:id="resultDateValueLabel"
+                                                                       text="N/A"
                                                                        style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
                                                             </children>
                                                         </VBox>
@@ -274,7 +296,8 @@
                                                             <children>
                                                                 <Label text="ESTIMATED DURATION"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                                <Label text="N/A"
+                                                                <Label fx:id="durationValueLabel"
+                                                                       text="N/A"
                                                                        style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
                                                             </children>
                                                         </VBox>
@@ -287,7 +310,8 @@
                                                             <children>
                                                                 <Label text="LAST INTAKE GAP"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                                <Label text="1 days"
+                                                                <Label fx:id="lastGapValueLabel"
+                                                                       text="0 days"
                                                                        style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
                                                             </children>
                                                         </VBox>
@@ -298,9 +322,43 @@
                                                                 <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
                                                             </padding>
                                                             <children>
-                                                                <Label text="XP POINTS"
+                                                                <Label text="GOAL COMPLETION"
                                                                        style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                                                <Label text="0"
+                                                                <Label fx:id="goalCompletionValueLabel"
+                                                                       text="0%"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
+
+                                                <HBox spacing="10.0">
+                                                    <children>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="WEEKLY CONSISTENCY"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label fx:id="weeklyConsistencyValueLabel"
+                                                                       text="0%"
+                                                                       style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox HBox.hgrow="ALWAYS"
+                                                              spacing="6.0"
+                                                              style="-fx-background-color: #F6FAFE; -fx-background-radius: 14; -fx-border-color: #D8E6EF; -fx-border-radius: 14;">
+                                                            <padding>
+                                                                <Insets top="12.0" right="12.0" bottom="12.0" left="12.0"/>
+                                                            </padding>
+                                                            <children>
+                                                                <Label text="MONTHLY CONSISTENCY"
+                                                                       style="-fx-text-fill: #9AA9B3; -fx-font-size: 11px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                                                <Label fx:id="monthlyConsistencyValueLabel"
+                                                                       text="0%"
                                                                        style="-fx-text-fill: #22465A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
                                                             </children>
                                                         </VBox>
@@ -317,18 +375,36 @@
                                         <Insets top="12.0" right="14.0" bottom="12.0" left="14.0"/>
                                     </padding>
                                     <children>
-                                        <Label text="Your discipline is dropping. Turn on reminders and lock a fixed intake time."
+                                        <Label fx:id="disciplineAlertLabel"
+                                               text="No adherence alerts yet."
+                                               wrapText="true"
                                                style="-fx-text-fill: #D07145; -fx-font-size: 14px; -fx-font-weight: 600;"/>
+                                    </children>
+                                </HBox>
+
+                                <HBox alignment="CENTER_LEFT"
+                                      style="-fx-background-color: #F2FAF6; -fx-background-radius: 14; -fx-border-color: #D3ECE0; -fx-border-radius: 14;">
+                                    <padding>
+                                        <Insets top="10.0" right="14.0" bottom="10.0" left="14.0"/>
+                                    </padding>
+                                    <children>
+                                        <Label fx:id="safetyReminderLabel"
+                                               text="More is not always better. Follow your daily target."
+                                               wrapText="true"
+                                               style="-fx-text-fill: #2B7A68; -fx-font-size: 13px; -fx-font-weight: 700;"/>
                                     </children>
                                 </HBox>
 
                                 <HBox alignment="CENTER_LEFT">
                                     <children>
-                                        <Label text="Not logged yet for today."
+                                        <Label fx:id="todayLogStatusLabel"
+                                               text="Not logged yet for today."
                                                style="-fx-text-fill: #93A3AE; -fx-font-size: 13px; -fx-font-weight: 700;"/>
                                         <Region HBox.hgrow="ALWAYS"/>
-                                        <Button text="Mark as taken today"
-                                                prefWidth="170.0"
+                                        <Button fx:id="markTakenButton"
+                                                text="Mark as taken today"
+                                                onAction="#markAsTakenToday"
+                                                prefWidth="180.0"
                                                 prefHeight="38.0"
                                                 style="-fx-background-color: linear-gradient(to right, #0F6A58, #14795B); -fx-background-radius: 12; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 800;"/>
                                     </children>

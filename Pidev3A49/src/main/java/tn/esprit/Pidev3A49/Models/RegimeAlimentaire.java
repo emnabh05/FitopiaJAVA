@@ -3,27 +3,43 @@ package tn.esprit.Pidev3A49.Models;
 public class RegimeAlimentaire {
 
     private int id;
-    private String nom;
-    private String description;
-    private int objectifCalorique;
-    private boolean actif;
+    private Integer userId;
+    private String userEmail;
+    private Double taille;
+    private Double poids;
+    private Integer age;
+    private Double bmi;
+    private String typeSante;
+    private Integer caloriesCibles;
+    private String repasAdequats;
 
     public RegimeAlimentaire() {
     }
 
-    public RegimeAlimentaire(int id, String nom, String description, int objectifCalorique, boolean actif) {
+    public RegimeAlimentaire(int id, Integer userId, String userEmail, Double taille, Double poids, Integer age,
+                             Double bmi, String typeSante, Integer caloriesCibles, String repasAdequats) {
         this.id = id;
-        this.nom = nom;
-        this.description = description;
-        this.objectifCalorique = objectifCalorique;
-        this.actif = actif;
+        this.userId = userId;
+        this.userEmail = userEmail;
+        this.taille = taille;
+        this.poids = poids;
+        this.age = age;
+        this.bmi = bmi;
+        this.typeSante = typeSante;
+        this.caloriesCibles = caloriesCibles;
+        this.repasAdequats = repasAdequats;
     }
 
-    public RegimeAlimentaire(String nom, String description, int objectifCalorique, boolean actif) {
-        this.nom = nom;
-        this.description = description;
-        this.objectifCalorique = objectifCalorique;
-        this.actif = actif;
+    public RegimeAlimentaire(Integer userId, Double taille, Double poids, Integer age, Double bmi, String typeSante,
+                             Integer caloriesCibles, String repasAdequats) {
+        this.userId = userId;
+        this.taille = taille;
+        this.poids = poids;
+        this.age = age;
+        this.bmi = bmi;
+        this.typeSante = typeSante;
+        this.caloriesCibles = caloriesCibles;
+        this.repasAdequats = repasAdequats;
     }
 
     public int getId() {
@@ -34,46 +50,80 @@ public class RegimeAlimentaire {
         this.id = id;
     }
 
-    public String getNom() {
-        return nom;
+    public Integer getUserId() {
+        return userId;
     }
 
-    public void setNom(String nom) {
-        this.nom = nom;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
-    public String getDescription() {
-        return description;
+    public String getUserEmail() {
+        return userEmail;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setUserEmail(String userEmail) {
+        this.userEmail = userEmail;
     }
 
-    public int getObjectifCalorique() {
-        return objectifCalorique;
+    public Double getTaille() {
+        return taille;
     }
 
-    public void setObjectifCalorique(int objectifCalorique) {
-        this.objectifCalorique = objectifCalorique;
+    public void setTaille(Double taille) {
+        this.taille = taille;
     }
 
-    public boolean isActif() {
-        return actif;
+    public Double getPoids() {
+        return poids;
     }
 
-    public void setActif(boolean actif) {
-        this.actif = actif;
+    public void setPoids(Double poids) {
+        this.poids = poids;
     }
 
-    @Override
-    public String toString() {
-        return "RegimeAlimentaire{" +
-                "id=" + id +
-                ", nom='" + nom + '\'' +
-                ", description='" + description + '\'' +
-                ", objectifCalorique=" + objectifCalorique +
-                ", actif=" + actif +
-                '}';
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Double getBmi() {
+        return bmi;
+    }
+
+    public void setBmi(Double bmi) {
+        this.bmi = bmi;
+    }
+
+    public String getTypeSante() {
+        return typeSante;
+    }
+
+    public void setTypeSante(String typeSante) {
+        this.typeSante = typeSante;
+    }
+
+    public Integer getCaloriesCibles() {
+        return caloriesCibles;
+    }
+
+    public void setCaloriesCibles(Integer caloriesCibles) {
+        this.caloriesCibles = caloriesCibles;
+    }
+
+    public String getRepasAdequats() {
+        return repasAdequats;
+    }
+
+    public void setRepasAdequats(String repasAdequats) {
+        this.repasAdequats = repasAdequats;
+    }
+
+    public String getDisplayLabel() {
+        return "#" + id + " - " + (typeSante == null || typeSante.isBlank() ? "N/A" : typeSante) +
+                " - " + (caloriesCibles == null ? 0 : caloriesCibles) + " kcal";
     }
 }

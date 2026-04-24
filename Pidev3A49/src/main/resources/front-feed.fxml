@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane prefHeight="920.0" prefWidth="1550.0" styleClass="app-root" stylesheets="@styles/front-feed.css,@styles/admin-theme.css"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.FrontFeedController">
+    <top>
+        <VBox styleClass="navbar-container">
+            <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                <Region HBox.hgrow="ALWAYS" />
+                <HBox spacing="10">
+                    <Label text="ï‚š" styleClass="social-icon" />
+                    <Label text="ï‚™" styleClass="social-icon" />
+                    <Label text="ï…­" styleClass="social-icon" />
+                </HBox>
+            </HBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
+                <VBox alignment="CENTER" spacing="0">
+                    <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                    <Label text="FITOPIA" styleClass="navbar-logo-text" />
+                </VBox>
+
+                <Region prefWidth="20" />
+
+                <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+
+                <Region prefWidth="10" />
+
+                <Button onAction="#openDietPlanner" text="EXPLORE&#10;OUR&#10;DIET&amp;EATING&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button onAction="#openSupplementStore" text="EXPLORE&#10;OUR&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button text="EXPLORE&#10;OUR&#10;FITNESS&#10;PLANNER" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button text="EXPLORE&#10;OUR&#10;EVENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                <Button onAction="#refreshData" text="EXPLORE&#10;FORUMS&amp;BLOGS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <Button onAction="#refreshData" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                <Button onAction="#ouvrirAdminInterface" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
+            </HBox>
+        </VBox>
+    </top>
+    <center>
+        <ScrollPane fx:id="feedScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="feed-scroll" vbarPolicy="AS_NEEDED">
+            <content>
+                <HBox alignment="TOP_CENTER" spacing="24.0" styleClass="layout-shell">
+                    <padding>
+                        <Insets bottom="28.0" left="28.0" right="28.0" top="20.0"/>
+                    </padding>
+                    <VBox prefWidth="340.0" spacing="18.0">
+                        <VBox fx:id="messagingSidebarHost" spacing="0.0" VBox.vgrow="ALWAYS"/>
+                    </VBox>
+                    <VBox prefWidth="900.0" spacing="18.0">
+                        <VBox spacing="12.0" styleClass="hero-card hero-card-compact">
+                            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                                <VBox spacing="5.0" HBox.hgrow="ALWAYS">
+                                    <Label styleClass="hero-title hero-title-compact" text="Fitopia Community"/>
+                                    <Label styleClass="hero-subtitle hero-subtitle-compact" text="A clean desktop social feed for posts, reactions, comments, and quick publishing." wrapText="true"/>
+                                </VBox>
+                                <Label fx:id="lblWelcomeUser" styleClass="hero-stats hero-chip" text="Connected user experience"/>
+                            </HBox>
+                            <HBox alignment="CENTER" spacing="10.0" styleClass="hero-toolbar hero-toolbar-centered">
+                                <TextField fx:id="tfSearch" onAction="#refreshData" promptText="Search by title, author, or content" styleClass="search-input hero-search"/>
+                                <Button onAction="#refreshData" styleClass="primary-pill primary-pill-compact" text="Refresh"/>
+                                <Label fx:id="lblFeedStats" styleClass="hero-stats hero-chip" text="0 forums visibles"/>
+                            </HBox>
+                        </VBox>
+                        <VBox fx:id="feedContainer" spacing="16.0"/>
+                    </VBox>
+                    <VBox prefWidth="360.0" spacing="18.0">
+                        <VBox spacing="14.0" styleClass="sidebar-card composer-card composer-card-social">
+                            <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="composer-header">
+                                <Label styleClass="composer-badge" text="+" />
+                                <VBox spacing="3.0">
+                                    <Label styleClass="panel-title" text="Create your post"/>
+                                    <Label fx:id="lblForumComposerHint" styleClass="panel-note composer-subtitle" text="You are posting as the connected user." wrapText="true"/>
+                                </VBox>
+                            </HBox>
+                            <VBox spacing="6.0" styleClass="composer-field-card">
+                                <Label styleClass="composer-section-label" text="Post title"/>
+                                <TextField fx:id="tfForumTitle" promptText="Give your post a short headline" styleClass="text-input compact-input composer-input"/>
+                            </VBox>
+                            <VBox spacing="6.0" styleClass="composer-field-card">
+                                <Label styleClass="composer-section-label" text="Share with the community"/>
+                                <TextArea fx:id="taForumContent" prefRowCount="5" promptText="Share your story, advice, or question..." styleClass="text-area-input compact-area composer-input composer-textarea"/>
+                            </VBox>
+                            <VBox spacing="10.0" styleClass="media-picker-box media-picker-box-compact">
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <VBox spacing="2.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="composer-section-label" text="Add a photo"/>
+                                        <Label styleClass="composer-microcopy" text="Optional image for your post preview." wrapText="true"/>
+                                    </VBox>
+                                </HBox>
+                                <TextField fx:id="tfForumImagePath" editable="false" promptText="No image selected yet" styleClass="text-input compact-input composer-input image-path-input"/>
+                                <HBox spacing="8.0" styleClass="composer-actions-row media-picker-actions">
+                                    <Button onAction="#chooseForumImage" styleClass="ghost-pill compact-pill" text="Add photo"/>
+                                    <Button onAction="#clearForumImage" styleClass="ghost-pill compact-pill" text="Remove"/>
+                                </HBox>
+                            </VBox>
+                            <ImageView fx:id="ivForumPreview" fitHeight="116.0" fitWidth="310.0" managed="false" pickOnBounds="true" preserveRatio="true" styleClass="composer-preview" visible="false"/>
+                            <HBox spacing="10.0" styleClass="composer-actions-row composer-footer-row">
+                                <Button onAction="#saveForum" styleClass="primary-pill primary-pill-compact" text="Publish"/>
+                                <Button onAction="#clearForumEditor" styleClass="ghost-pill compact-pill" text="Clear"/>
+                            </HBox>
+                        </VBox>
+                        <VBox managed="false" visible="false">
+                            <Label fx:id="lblCommentComposerHint" text="Your comment will be linked to your account." />
+                            <Label fx:id="lblCommentContext" text="No comment selected. Your reply will be linked to your connected account." />
+                            <ComboBox fx:id="cbCommentForum" promptText="Choose forum" />
+                            <TextArea fx:id="taCommentContent" promptText="Write your comment..." />
+                        </VBox>
+                    </VBox>
+                </HBox>
+            </content>
+        </ScrollPane>
+    </center>
+</BorderPane>

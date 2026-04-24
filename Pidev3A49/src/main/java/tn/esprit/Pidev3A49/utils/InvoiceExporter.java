@@ -17,6 +17,7 @@ import java.util.Locale;
 public final class InvoiceExporter {
 
     private static final DateTimeFormatter ORDER_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+    private static final DateTimeFormatter INVOICE_NUMBER_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
 
     private InvoiceExporter() {
     }
@@ -28,8 +29,7 @@ public final class InvoiceExporter {
 
         LocalDateTime orderDate = order.getCreatedAt() == null ? LocalDateTime.now() : order.getCreatedAt();
         List<SupplementOrderItem> items = order.getItems() == null ? List.of() : order.getItems();
-        String invoiceNumber = "FACT-ORD-" + String.format(Locale.ROOT, "%08d", Math.max(order.getId(), 0));
-        String orderReference = "ORD-" + String.format(Locale.ROOT, "%08d", Math.max(order.getId(), 0));
+        String invoiceNumber = "FACT-" + INVOICE_NUMBER_FORMATTER.format(orderDate);
 
         String itemsRows = items.isEmpty()
                 ? """
@@ -299,8 +299,7 @@ public final class InvoiceExporter {
                             <h1 class="title">FACTURE CLIENT</h1>
                             <p class="meta">
                                 Facture No: %s<br>
-                                Date: %s<br>
-                                Commande: %s
+                                Date: %s
                             </p>
                         </div>
                         <button class="print-btn" onclick="window.print()">Imprimer facture</button>
@@ -375,7 +374,6 @@ public final class InvoiceExporter {
                 escapeHtml(invoiceNumber),
                 escapeHtml(invoiceNumber),
                 escapeHtml(ORDER_DATE_FORMATTER.format(orderDate)),
-                escapeHtml(orderReference),
                 escapeHtml(fullName(order)),
                 escapeHtml(valueOrDash(order.getEmail())),
                 escapeHtml(valueOrDash(order.getPhone())),
@@ -392,7 +390,7 @@ public final class InvoiceExporter {
         );
 
         Path target = Files.createTempFile(
-                "fitopia-facture-" + String.format(Locale.ROOT, "%08d", Math.max(order.getId(), 0)) + "-",
+                "fitopia-facture-" + INVOICE_NUMBER_FORMATTER.format(LocalDateTime.now()) + "-",
                 ".html"
         );
         Files.writeString(target, html, StandardCharsets.UTF_8);

@@ -21,10 +21,14 @@ public final class SceneNavigator {
     public static final double WINDOW_HEIGHT = 1024.0;
     public static final boolean OPEN_MAXIMIZED = true;
 
-    public static final ViewState START_VIEW = new ViewState("/Start.fxml", "Fitopia");
-    public static final ViewState FRONT_END_VIEW = new ViewState("/SupplementCatalogShowcase.fxml", "Supplement Front End");
+    public static final ViewState START_VIEW = new ViewState("/SignIn.fxml", "Sign In");
+    public static final ViewState SIGN_IN_VIEW = new ViewState("/SignIn.fxml", "Sign In");
+    public static final ViewState FORUM_FEED_VIEW = new ViewState("/front-feed.fxml", "Fitopia Community");
+    public static final ViewState FRONT_END_VIEW = new ViewState("/SupplementCatalogShowcase.fxml", "Fitopia Supplements");
     public static final ViewState FRONT_ORDERS_VIEW = new ViewState("/FrontOrders.fxml", "My Orders");
-    public static final ViewState BACK_END_VIEW = new ViewState("/Main.fxml", "Supplement Back End");
+    public static final ViewState BACK_END_VIEW = new ViewState("/SupplementAdmin.fxml", "Supplement Back End");
+    public static final ViewState FITNESS_FRONT_VIEW = new ViewState("/frontregime.fxml", "Diet And Eating Planner");
+    public static final ViewState FITNESS_BACK_VIEW = new ViewState("/backrepas.fxml", "Fitopia Back Office");
     public static final ViewState ORDERD_VIEW = new ViewState("/OrderedCustomers.fxml", "Orderd Customers");
     public static final ViewState PROGRESS_VIEW = new ViewState("/SupplementProgress.fxml", "My Supplement Progress");
     public static final ViewState RANKING_VIEW = new ViewState("/MonthlyRanking.fxml", "Monthly Ranking");
@@ -32,8 +36,6 @@ public final class SceneNavigator {
     public static final ViewState CARD_PAYMENT_VIEW = new ViewState("/CardPayment.fxml", "Card Payment");
     public static final ViewState ORDER_CONFIRMATION_VIEW = new ViewState("/OrderConfirmation.fxml", "Commande confirmee");
     public static final ViewState PRODUCT_DETAILS_VIEW = new ViewState("/ProductDetails.fxml", "Product Details");
-    public static final ViewState FITNESS_FRONT_VIEW = new ViewState("/FitopiaHome.fxml", "Fitness Front End");
-    public static final ViewState FITNESS_BACK_VIEW = new ViewState("/FitnessCrudAdmin.fxml", "Fitness Back End");
 
     private static final Deque<ViewState> HISTORY = new ArrayDeque<>();
 
@@ -70,6 +72,10 @@ public final class SceneNavigator {
         }
 
         load(source, HISTORY.pop());
+    }
+
+    public static boolean hasHistory() {
+        return !HISTORY.isEmpty();
     }
 
     public static void load(ActionEvent event, ViewState targetView) throws IOException {

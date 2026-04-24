@@ -21,6 +21,7 @@
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
+            stylesheets="@styles/admin-theme.css"
             style="-fx-background: #F3F7FA; -fx-background-color: #F3F7FA;">
     <fx:define>
         <ToggleGroup fx:id="paymentMethodGroup"/>
@@ -35,6 +36,43 @@
             </padding>
 
             <children>
+                <VBox styleClass="navbar-container">
+                    <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                        <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10">
+                            <Label text="FB" styleClass="social-icon" />
+                            <Label text="X" styleClass="social-icon" />
+                            <Label text="IG" styleClass="social-icon" />
+                        </HBox>
+                    </HBox>
+
+                    <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
+                        <VBox alignment="CENTER" spacing="0">
+                            <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                            <Label text="FITOPIA" styleClass="navbar-logo-text" />
+                        </VBox>
+
+                        <Region prefWidth="20" />
+
+                        <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                        <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+
+                        <Region prefWidth="10" />
+
+                        <Button onAction="#openSupplementShowcase" text="EXPLORE&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openSupplementShowcase" text="MY&#10;PROGRESS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openSupplementShowcase" text="MONTHLY&#10;RANKING" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button text="CHECKOUT" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openMyOrders" text="MY&#10;ORDERS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#openMyOrders" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                        <Button onAction="#openBackEnd" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
+                    </HBox>
+                </VBox>
+
                 <HBox alignment="CENTER_LEFT"
                       spacing="16.0"
                       style="-fx-background-color: linear-gradient(to right, #123C47, #206A57); -fx-background-radius: 24; -fx-effect: dropshadow(gaussian, rgba(6, 36, 33, 0.18), 24, 0.22, 0, 10);">
@@ -73,6 +111,11 @@
                                 onAction="#openMyOrders"
                                 prefHeight="40.0"
                                 style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 0 18 0 18;"/>
+                        <Button text="🔔"
+                                onAction="#openMyOrders"
+                                prefHeight="40.0"
+                                prefWidth="44.0"
+                                style="-fx-background-color: rgba(255,255,255,0.14); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.26); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 900;"/>
                     </children>
                 </HBox>
 
@@ -115,6 +158,9 @@
                                                    promptText="Email"
                                                    prefHeight="48.0"
                                                    style="-fx-background-color: #FBFDFE; -fx-background-radius: 14; -fx-border-color: #D6E2EA; -fx-border-radius: 14; -fx-font-size: 14px; -fx-prompt-text-fill: #8A9CA7;"/>
+                                        <Label text="Invoice and order details will be sent to this email."
+                                               wrapText="true"
+                                               style="-fx-text-fill: #5E7786; -fx-font-size: 12px; -fx-font-weight: 700;"/>
 
                                         <TextField fx:id="phoneField"
                                                    promptText="Phone"

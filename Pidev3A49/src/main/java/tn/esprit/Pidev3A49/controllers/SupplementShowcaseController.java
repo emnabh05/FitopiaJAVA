@@ -6,6 +6,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
@@ -20,10 +21,15 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import tn.esprit.Pidev3A49.Models.CartItem;
 import tn.esprit.Pidev3A49.Models.Supplement;
+import tn.esprit.Pidev3A49.Models.SupplementRecommendation;
+import tn.esprit.Pidev3A49.services.ServiceSupplementFavorite;
+import tn.esprit.Pidev3A49.services.ServiceSupplementRecommendation;
 import tn.esprit.Pidev3A49.services.ServiceSupplement;
+import tn.esprit.Pidev3A49.utils.AppSession;
 import tn.esprit.Pidev3A49.utils.CartStore;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
 import tn.esprit.Pidev3A49.utils.SelectedSupplementStore;
+import tn.esprit.Pidev3A49.utils.SessionRouter;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -31,10 +37,13 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 public class SupplementShowcaseController {
@@ -43,6 +52,18 @@ public class SupplementShowcaseController {
             "-fx-text-fill: #0F6A58; -fx-font-size: 13px; -fx-font-weight: 700;";
 
     private static final String CART_ERROR_STYLE =
+            "-fx-text-fill: #D92D20; -fx-font-size: 13px; -fx-font-weight: 700;";
+
+    private static final String FAVORITE_INFO_STYLE =
+            "-fx-text-fill: #0F6A58; -fx-font-size: 13px; -fx-font-weight: 700;";
+
+    private static final String FAVORITE_ERROR_STYLE =
+            "-fx-text-fill: #D92D20; -fx-font-size: 13px; -fx-font-weight: 700;";
+
+    private static final String SUGGESTION_INFO_STYLE =
+            "-fx-text-fill: #0F6A58; -fx-font-size: 13px; -fx-font-weight: 700;";
+
+    private static final String SUGGESTION_ERROR_STYLE =
             "-fx-text-fill: #D92D20; -fx-font-size: 13px; -fx-font-weight: 700;";
 
     private static final String SORT_DEFAULT = "Sort by...";
@@ -61,6 +82,9 @@ public class SupplementShowcaseController {
 
     @FXML
     private VBox cartPanel;
+
+    @FXML
+    private VBox favoritesPanel;
 
     @FXML
     private FlowPane productGrid;
@@ -90,6 +114,9 @@ public class SupplementShowcaseController {
     private VBox cartItemsContainer;
 
     @FXML
+    private VBox favoriteItemsContainer;
+
+    @FXML
     private Label cartSubtotalLabel;
 
     @FXML
@@ -102,18 +129,45 @@ public class SupplementShowcaseController {
     private Label cartStatusLabel;
 
     @FXML
+    private Label favoritesStatusLabel;
+
+    @FXML
+    private Label favoritesCountLabel;
+
+    @FXML
+    private FlowPane suggestionsGrid;
+
+    @FXML
+    private Label suggestionsStatusLabel;
+
+    @FXML
+    private Label suggestionsCountLabel;
+
+    @FXML
     private Button proceedToCheckoutButton;
 
     private final CartStore cartStore = CartStore.getInstance();
     private ServiceSupplement serviceSupplement;
+    private ServiceSupplementFavorite serviceSupplementFavorite;
+    private ServiceSupplementRecommendation serviceSupplementRecommendation;
     private List<Supplement> allSupplements = List.of();
     private final List<CheckBox> categoryCheckBoxes = new ArrayList<>();
+    private final Set<Integer> favoriteSupplementIds = new HashSet<>();
+    private List<SupplementRecommendation> currentSuggestions = List.of();
+    private String currentUserEmail;
 
     @FXML
     private void initialize() {
+        if (!SessionRouter.ensureAuthenticated(rootScrollPane)) {
+            return;
+        }
         configureFilterControls();
+        initializeFavorites();
+        initializeRecommendations();
         loadProducts();
         renderCart();
+        renderFavorites();
+        loadSuggestionsAsync(false);
     }
 
     public void openProgressTracker(ActionEvent event) throws IOException {
@@ -125,11 +179,7 @@ public class SupplementShowcaseController {
     }
 
     public void openBackEnd(ActionEvent event) throws IOException {
-        SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.BACK_END_VIEW);
-    }
-
-    public void openFitnessFront(ActionEvent event) throws IOException {
-        SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.FITNESS_FRONT_VIEW);
+        SessionRouter.logoutToSignIn((Node) event.getSource());
     }
 
     public void openCheckout(ActionEvent event) throws IOException {
@@ -140,8 +190,47 @@ public class SupplementShowcaseController {
         SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.FRONT_ORDERS_VIEW);
     }
 
+    @FXML
+    public void openDietPlanner(ActionEvent event) throws IOException {
+        SceneNavigator.navigate(event, SceneNavigator.FRONT_END_VIEW, SceneNavigator.FITNESS_FRONT_VIEW);
+    }
+
+    @FXML
+    public void openSupplementStore(ActionEvent event) {
+        if (rootScrollPane != null) {
+            rootScrollPane.setVvalue(0.0);
+        }
+    }
+
+    @FXML
+    public void refreshStore(ActionEvent event) {
+        loadProducts();
+        renderCart();
+        renderFavorites();
+        loadSuggestionsAsync(false);
+        if (rootScrollPane != null) {
+            rootScrollPane.setVvalue(0.0);
+        }
+    }
+
+    @FXML
+    public void openEventsSection(ActionEvent event) {
+        if (rootScrollPane != null) {
+            rootScrollPane.setVvalue(1.0);
+        }
+    }
+
+    @FXML
+    public void openForumFeed(ActionEvent event) {
+        SessionRouter.openFrontHome((Button) event.getSource());
+    }
+
     public void goBackOrExit(ActionEvent event) throws IOException {
-        SceneNavigator.goBackOrClose(event);
+        if (SceneNavigator.hasHistory()) {
+            SceneNavigator.goBackOrClose(event);
+            return;
+        }
+        SessionRouter.openFrontHome((Node) event.getSource());
     }
 
     @FXML
@@ -164,9 +253,39 @@ public class SupplementShowcaseController {
     }
 
     @FXML
+    private void showFavoritesPanel() {
+        renderFavorites();
+        favoritesPanel.setManaged(true);
+        favoritesPanel.setVisible(true);
+
+        Platform.runLater(() -> {
+            double scrollableHeight = contentRoot.getBoundsInLocal().getHeight() - rootScrollPane.getViewportBounds().getHeight();
+            if (scrollableHeight <= 0) {
+                rootScrollPane.setVvalue(0.0);
+                return;
+            }
+
+            double targetY = favoritesPanel.getBoundsInParent().getMinY();
+            double targetValue = Math.max(0.0, Math.min(1.0, targetY / scrollableHeight));
+            rootScrollPane.setVvalue(targetValue);
+        });
+    }
+
+    @FXML
     private void hideCartPanel() {
         cartPanel.setVisible(false);
         cartPanel.setManaged(false);
+    }
+
+    @FXML
+    private void hideFavoritesPanel() {
+        favoritesPanel.setVisible(false);
+        favoritesPanel.setManaged(false);
+    }
+
+    @FXML
+    private void refreshSuggestions() {
+        loadSuggestionsAsync(true);
     }
 
     @FXML
@@ -199,6 +318,35 @@ public class SupplementShowcaseController {
         sortComboBox.valueProperty().addListener((observable, oldValue, newValue) -> applyFilters());
     }
 
+    private void initializeFavorites() {
+        currentUserEmail = resolveFavoriteEmail();
+        if (currentUserEmail == null || currentUserEmail.isBlank()) {
+            setFavoriteMessage("Connect with a valid email to use favorites.", true);
+            return;
+        }
+
+        try {
+            serviceSupplementFavorite = new ServiceSupplementFavorite();
+            favoriteSupplementIds.clear();
+            favoriteSupplementIds.addAll(serviceSupplementFavorite.getFavoriteSupplementIdsByEmail(currentUserEmail));
+            setFavoriteMessage("Favorites synced for " + currentUserEmail + ".", false);
+        } catch (RuntimeException exception) {
+            serviceSupplementFavorite = null;
+            favoriteSupplementIds.clear();
+            setFavoriteMessage("Favorites unavailable: " + exception.getMessage(), true);
+        }
+    }
+
+    private void initializeRecommendations() {
+        try {
+            serviceSupplementRecommendation = new ServiceSupplementRecommendation();
+            setSuggestionMessage("Suggestions are ready. Click refresh anytime.", false);
+        } catch (RuntimeException exception) {
+            serviceSupplementRecommendation = null;
+            setSuggestionMessage("Suggestions unavailable: " + exception.getMessage(), true);
+        }
+    }
+
     private void loadProducts() {
         try {
             serviceSupplement = new ServiceSupplement();
@@ -219,6 +367,7 @@ public class SupplementShowcaseController {
                     "The shop could not load supplements from MySQL. Start the database, then reopen this page."
             ));
         }
+        renderFavorites();
     }
 
     private void updateHeader(int productCount) {
@@ -317,7 +466,10 @@ public class SupplementShowcaseController {
         Label visualLabel = new Label((valueOrDefault(supplement.getCategory()) + " visual").toUpperCase(Locale.ROOT));
         visualLabel.setStyle("-fx-text-fill: rgba(9, 41, 53, 0.48); -fx-font-size: 18px; -fx-font-weight: 800;");
 
-        visualPane.getChildren().add(visualLabel);
+        Button favoriteButton = buildFavoriteToggleButton(supplement);
+        StackPane.setAlignment(favoriteButton, Pos.TOP_RIGHT);
+        StackPane.setMargin(favoriteButton, new Insets(10.0, 10.0, 0.0, 0.0));
+        visualPane.getChildren().addAll(visualLabel, favoriteButton);
 
         VBox detailsBox = new VBox(10.0);
         detailsBox.setPadding(new Insets(0.0, 18.0, 18.0, 18.0));
@@ -371,11 +523,68 @@ public class SupplementShowcaseController {
         return card;
     }
 
+    private Button buildFavoriteToggleButton(Supplement supplement) {
+        Button favoriteButton = new Button();
+        favoriteButton.setPrefHeight(34.0);
+        favoriteButton.setPrefWidth(34.0);
+        boolean isFavorite = favoriteSupplementIds.contains(supplement.getId());
+        updateFavoriteButtonStyle(favoriteButton, isFavorite);
+        favoriteButton.setOnAction(event -> toggleFavorite(supplement));
+        return favoriteButton;
+    }
+
+    private void updateFavoriteButtonStyle(Button favoriteButton, boolean favorite) {
+        if (favorite) {
+            favoriteButton.setText("Fav");
+            favoriteButton.setStyle("-fx-background-color: #FFECEE; -fx-background-radius: 999; -fx-border-color: #F5B9C2; "
+                    + "-fx-border-radius: 999; -fx-text-fill: #D92D20; -fx-font-size: 15px; -fx-font-weight: 900;");
+            return;
+        }
+
+        favoriteButton.setText("+Fav");
+        favoriteButton.setStyle("-fx-background-color: rgba(255,255,255,0.88); -fx-background-radius: 999; "
+                + "-fx-border-color: #D4E2EA; -fx-border-radius: 999; -fx-text-fill: #4E6874; -fx-font-size: 15px; "
+                + "-fx-font-weight: 900;");
+    }
+
+    private void toggleFavorite(Supplement supplement) {
+        if (supplement == null || supplement.getId() <= 0) {
+            setFavoriteMessage("Invalid supplement selected.", true);
+            return;
+        }
+        if (serviceSupplementFavorite == null) {
+            setFavoriteMessage("Favorites are unavailable because MySQL is not connected.", true);
+            return;
+        }
+        if (currentUserEmail == null || currentUserEmail.isBlank()) {
+            setFavoriteMessage("A valid user email is required to save favorites.", true);
+            return;
+        }
+
+        boolean currentlyFavorite = favoriteSupplementIds.contains(supplement.getId());
+        try {
+            if (currentlyFavorite) {
+                serviceSupplementFavorite.removeFavorite(currentUserEmail, supplement.getId());
+                favoriteSupplementIds.remove(supplement.getId());
+                setFavoriteMessage(valueOrDefault(supplement.getName()) + " removed from favorites.", false);
+            } else {
+                serviceSupplementFavorite.addFavorite(currentUserEmail, supplement.getId());
+                favoriteSupplementIds.add(supplement.getId());
+                setFavoriteMessage(valueOrDefault(supplement.getName()) + " added to favorites.", false);
+            }
+            applyFilters();
+            renderFavorites();
+        } catch (RuntimeException exception) {
+            setFavoriteMessage(exception.getMessage(), true);
+        }
+    }
+
     private void addToCart(Supplement supplement) {
         try {
             cartStore.addSupplement(supplement);
             setCartMessage(valueOrDefault(supplement.getName()) + " added to cart.", false);
             showCartPanel();
+            loadSuggestionsAsync(false);
         } catch (RuntimeException exception) {
             setCartMessage(exception.getMessage(), true);
             showCartPanel();
@@ -420,6 +629,197 @@ public class SupplementShowcaseController {
         cartShippingLabel.setText(formatPrice(cartStore.getShippingCost()));
         cartTotalLabel.setText(formatPrice(cartStore.getTotal(BigDecimal.ZERO)));
         proceedToCheckoutButton.setDisable(false);
+    }
+
+    private void renderFavorites() {
+        if (favoriteItemsContainer == null || favoritesCountLabel == null) {
+            return;
+        }
+
+        favoriteItemsContainer.getChildren().clear();
+        favoritesCountLabel.setText(Integer.toString(favoriteSupplementIds.size()));
+
+        if (favoriteSupplementIds.isEmpty()) {
+            favoriteItemsContainer.getChildren().add(buildEmptyFavoritesState(
+                    "No favorites yet",
+                    "Click the heart icon on any supplement to save it here."
+            ));
+            return;
+        }
+
+        if (allSupplements.isEmpty()) {
+            favoriteItemsContainer.getChildren().add(buildEmptyFavoritesState(
+                    "Favorites found",
+                    "Favorites are saved, but products are not loaded yet."
+            ));
+            return;
+        }
+
+        List<Supplement> favorites = allSupplements.stream()
+                .filter(supplement -> favoriteSupplementIds.contains(supplement.getId()))
+                .sorted(Comparator.comparing(supplement -> valueOrDefault(supplement.getName()).toLowerCase(Locale.ROOT)))
+                .toList();
+
+        if (favorites.isEmpty()) {
+            favoriteItemsContainer.getChildren().add(buildEmptyFavoritesState(
+                    "Favorites unavailable",
+                    "Some favorite products were removed from the catalog."
+            ));
+            return;
+        }
+
+        for (Supplement favorite : favorites) {
+            favoriteItemsContainer.getChildren().add(buildFavoriteItemRow(favorite));
+        }
+    }
+
+    private void loadSuggestionsAsync(boolean manualRefresh) {
+        if (suggestionsGrid == null || suggestionsStatusLabel == null || suggestionsCountLabel == null) {
+            return;
+        }
+        if (serviceSupplementRecommendation == null) {
+            currentSuggestions = List.of();
+            renderSuggestions();
+            setSuggestionMessage("Recommendation service is unavailable.", true);
+            return;
+        }
+
+        String suggestionEmail = resolveSuggestionEmail();
+        if (suggestionEmail == null || suggestionEmail.isBlank()) {
+            currentSuggestions = List.of();
+            renderSuggestions();
+            setSuggestionMessage("Place an order first to generate personalized suggestions.", true);
+            return;
+        }
+
+        Set<Integer> excludedIds = cartStore.getItems().stream()
+                .map(item -> item.getSupplement().getId())
+                .collect(Collectors.toSet());
+
+        setSuggestionMessage(
+                manualRefresh ? "Refreshing AI suggestions..." : "Loading AI suggestions from your orders...",
+                false
+        );
+
+        CompletableFuture.supplyAsync(() ->
+                        serviceSupplementRecommendation.recommendForEmail(suggestionEmail, excludedIds, 6))
+                .whenComplete((suggestions, throwable) -> Platform.runLater(() -> {
+                    if (throwable != null) {
+                        currentSuggestions = List.of();
+                        renderSuggestions();
+                        setSuggestionMessage("AI suggestion request failed. Showing no suggestions.", true);
+                        return;
+                    }
+
+                    currentSuggestions = suggestions == null ? List.of() : suggestions;
+                    renderSuggestions();
+
+                    if (currentSuggestions.isEmpty()) {
+                        setSuggestionMessage("No suggestions yet. Add more order history to improve recommendations.", false);
+                    } else {
+                        setSuggestionMessage(currentSuggestions.size() + " suggestion(s) ready for you.", false);
+                    }
+                }));
+    }
+
+    private void renderSuggestions() {
+        if (suggestionsGrid == null || suggestionsCountLabel == null) {
+            return;
+        }
+
+        suggestionsGrid.getChildren().clear();
+        suggestionsCountLabel.setText(Integer.toString(currentSuggestions.size()));
+
+        if (currentSuggestions.isEmpty()) {
+            suggestionsGrid.getChildren().add(buildSuggestionEmptyCard(
+                    "No suggestions available",
+                    "Place a few orders and refresh to get personalized AI recommendations."
+            ));
+            return;
+        }
+
+        Map<Integer, Supplement> supplementById = allSupplements.stream()
+                .collect(Collectors.toMap(Supplement::getId, supplement -> supplement, (left, right) -> left));
+
+        int rendered = 0;
+        for (SupplementRecommendation suggestion : currentSuggestions) {
+            Supplement supplement = supplementById.get(suggestion.getSupplementId());
+            if (supplement == null) {
+                continue;
+            }
+            suggestionsGrid.getChildren().add(buildSuggestionCard(supplement, suggestion));
+            rendered++;
+        }
+
+        suggestionsCountLabel.setText(Integer.toString(rendered));
+        if (rendered == 0) {
+            suggestionsGrid.getChildren().add(buildSuggestionEmptyCard(
+                    "Suggestions unavailable",
+                    "Recommended products are currently missing from catalog or out of stock."
+            ));
+        }
+    }
+
+    private VBox buildSuggestionCard(Supplement supplement, SupplementRecommendation suggestion) {
+        VBox card = new VBox(8.0);
+        card.setPrefWidth(300.0);
+        card.setStyle("-fx-background-color: #FFFFFF; -fx-background-radius: 16; -fx-border-color: #D9E8E2; "
+                + "-fx-border-radius: 16; -fx-padding: 12 12 12 12;");
+
+        Label nameLabel = new Label(valueOrDefault(supplement.getName()));
+        nameLabel.setWrapText(true);
+        nameLabel.setStyle("-fx-text-fill: #113748; -fx-font-size: 15px; -fx-font-weight: 900;");
+
+        Label metaLabel = new Label(valueOrDefault(supplement.getBrand()) + " | " + valueOrDefault(supplement.getCategory()));
+        metaLabel.setStyle("-fx-text-fill: #6F8290; -fx-font-size: 12px; -fx-font-weight: 700;");
+
+        Label reasonLabel = new Label("AI: " + valueOrDefault(suggestion.getReason()));
+        reasonLabel.setWrapText(true);
+        reasonLabel.setStyle("-fx-background-color: #EFF8F4; -fx-background-radius: 10; -fx-text-fill: #2F6F60; "
+                + "-fx-font-size: 12px; -fx-font-weight: 700; -fx-padding: 6 8 6 8;");
+
+        HBox footerRow = new HBox(8.0);
+        footerRow.setAlignment(Pos.CENTER_LEFT);
+
+        Label priceLabel = new Label(formatPrice(supplement.getPrice()));
+        priceLabel.setStyle("-fx-text-fill: #0F6A58; -fx-font-size: 14px; -fx-font-weight: 900;");
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Button viewButton = new Button("View");
+        viewButton.setPrefHeight(30.0);
+        viewButton.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #D4E2EA; "
+                + "-fx-border-radius: 10; -fx-text-fill: #496170; -fx-font-size: 12px; -fx-font-weight: 700;");
+        viewButton.setOnAction(event -> openProductDetails(event, supplement));
+
+        Button addButton = new Button("Add");
+        addButton.setDisable(supplement.getStock() <= 0);
+        addButton.setPrefHeight(30.0);
+        addButton.setStyle("-fx-background-color: linear-gradient(to right, #124A4D, #0F6A58); -fx-background-radius: 10; "
+                + "-fx-text-fill: white; -fx-font-size: 12px; -fx-font-weight: 800;");
+        addButton.setOnAction(event -> addToCart(supplement));
+
+        footerRow.getChildren().addAll(priceLabel, spacer, viewButton, addButton);
+        card.getChildren().addAll(nameLabel, metaLabel, reasonLabel, footerRow);
+        return card;
+    }
+
+    private VBox buildSuggestionEmptyCard(String title, String hint) {
+        VBox card = new VBox(6.0);
+        card.setPrefWidth(930.0);
+        card.setStyle("-fx-background-color: #F6FAFC; -fx-background-radius: 14; -fx-border-color: #D9E6ED; "
+                + "-fx-border-radius: 14; -fx-padding: 12 14 12 14;");
+
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-text-fill: #113748; -fx-font-size: 15px; -fx-font-weight: 900;");
+
+        Label hintLabel = new Label(hint);
+        hintLabel.setWrapText(true);
+        hintLabel.setStyle("-fx-text-fill: #768995; -fx-font-size: 12px; -fx-font-weight: 600;");
+
+        card.getChildren().addAll(titleLabel, hintLabel);
+        return card;
     }
 
     private VBox buildEmptyCartState() {
@@ -471,6 +871,7 @@ public class SupplementShowcaseController {
             cartStore.decreaseQuantity(supplement.getId());
             setCartMessage("Cart updated.", false);
             renderCart();
+            loadSuggestionsAsync(false);
         });
 
         Label quantityLabel = new Label(Integer.toString(item.getQuantity()));
@@ -485,6 +886,7 @@ public class SupplementShowcaseController {
                 setCartMessage(exception.getMessage(), true);
             }
             renderCart();
+            loadSuggestionsAsync(false);
         });
         quantityBox.getChildren().addAll(decreaseButton, quantityLabel, increaseButton);
 
@@ -499,6 +901,7 @@ public class SupplementShowcaseController {
             cartStore.removeSupplement(supplement.getId());
             setCartMessage(valueOrDefault(supplement.getName()) + " removed from cart.", false);
             renderCart();
+            loadSuggestionsAsync(false);
         });
 
         Region spacer = new Region();
@@ -512,6 +915,59 @@ public class SupplementShowcaseController {
 
         wrapper.getChildren().addAll(row, separator);
         return wrapper;
+    }
+
+    private HBox buildFavoriteItemRow(Supplement supplement) {
+        HBox row = new HBox(10.0);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setStyle("-fx-background-color: #F6FAFC; -fx-background-radius: 14; -fx-border-color: #D9E6ED; "
+                + "-fx-border-radius: 14; -fx-padding: 10 12 10 12;");
+
+        VBox details = new VBox(2.0);
+        Label nameLabel = new Label(valueOrDefault(supplement.getName()));
+        nameLabel.setStyle("-fx-text-fill: #113748; -fx-font-size: 14px; -fx-font-weight: 800;");
+
+        Label metaLabel = new Label(valueOrDefault(supplement.getBrand()) + " | " + valueOrDefault(supplement.getCategory()));
+        metaLabel.setStyle("-fx-text-fill: #6F8290; -fx-font-size: 12px; -fx-font-weight: 600;");
+        details.getChildren().addAll(nameLabel, metaLabel);
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        Label priceLabel = new Label(formatPrice(supplement.getPrice()));
+        priceLabel.setStyle("-fx-text-fill: #0F6A58; -fx-font-size: 13px; -fx-font-weight: 800;");
+
+        Button detailsButton = new Button("View");
+        detailsButton.setPrefHeight(30.0);
+        detailsButton.setStyle("-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #D4E2EA; "
+                + "-fx-border-radius: 10; -fx-text-fill: #496170; -fx-font-size: 12px; -fx-font-weight: 700;");
+        detailsButton.setOnAction(event -> openProductDetails(event, supplement));
+
+        Button removeButton = new Button("Remove");
+        removeButton.setPrefHeight(30.0);
+        removeButton.setPrefWidth(34.0);
+        removeButton.setStyle("-fx-background-color: #FFECEE; -fx-background-radius: 999; -fx-border-color: #F5B9C2; "
+                + "-fx-border-radius: 999; -fx-text-fill: #D92D20; -fx-font-size: 13px; -fx-font-weight: 900;");
+        removeButton.setOnAction(event -> toggleFavorite(supplement));
+
+        row.getChildren().addAll(details, spacer, priceLabel, detailsButton, removeButton);
+        return row;
+    }
+
+    private VBox buildEmptyFavoritesState(String title, String hint) {
+        VBox emptyState = new VBox(6.0);
+        emptyState.setStyle("-fx-background-color: #F6FAFC; -fx-background-radius: 14; -fx-border-color: #D9E6ED; "
+                + "-fx-border-radius: 14; -fx-padding: 14 14 14 14;");
+
+        Label titleLabel = new Label(title);
+        titleLabel.setStyle("-fx-text-fill: #113748; -fx-font-size: 15px; -fx-font-weight: 900;");
+
+        Label hintLabel = new Label(hint);
+        hintLabel.setWrapText(true);
+        hintLabel.setStyle("-fx-text-fill: #768995; -fx-font-size: 12px; -fx-font-weight: 600;");
+
+        emptyState.getChildren().addAll(titleLabel, hintLabel);
+        return emptyState;
     }
 
     private Button buildCartControlButton(String text) {
@@ -638,6 +1094,48 @@ public class SupplementShowcaseController {
             return "-";
         }
         return price.setScale(2, RoundingMode.HALF_UP).toPlainString() + " DT";
+    }
+
+    private String resolveFavoriteEmail() {
+        String sessionEmail = AppSession.getInstance().getEmail();
+        if (sessionEmail != null && !sessionEmail.isBlank()) {
+            return sessionEmail.trim();
+        }
+
+        String checkoutEmail = cartStore.getLastCheckoutEmail();
+        if (checkoutEmail != null && !checkoutEmail.isBlank()) {
+            return checkoutEmail.trim();
+        }
+        return null;
+    }
+
+    private String resolveSuggestionEmail() {
+        String checkoutEmail = cartStore.getLastCheckoutEmail();
+        if (checkoutEmail != null && !checkoutEmail.isBlank()) {
+            return checkoutEmail.trim();
+        }
+
+        String sessionEmail = AppSession.getInstance().getEmail();
+        if (sessionEmail != null && !sessionEmail.isBlank()) {
+            return sessionEmail.trim();
+        }
+        return null;
+    }
+
+    private void setFavoriteMessage(String message, boolean error) {
+        if (favoritesStatusLabel == null) {
+            return;
+        }
+        favoritesStatusLabel.setText(message);
+        favoritesStatusLabel.setStyle(error ? FAVORITE_ERROR_STYLE : FAVORITE_INFO_STYLE);
+    }
+
+    private void setSuggestionMessage(String message, boolean error) {
+        if (suggestionsStatusLabel == null) {
+            return;
+        }
+        suggestionsStatusLabel.setText(message);
+        suggestionsStatusLabel.setStyle(error ? SUGGESTION_ERROR_STYLE : SUGGESTION_INFO_STYLE);
     }
 
     private void setCartMessage(String message, boolean error) {

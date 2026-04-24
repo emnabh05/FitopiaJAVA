@@ -18,6 +18,7 @@ import javafx.stage.Window;
 import tn.esprit.Pidev3A49.Models.Supplement;
 import tn.esprit.Pidev3A49.services.ServiceSupplement;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
+import tn.esprit.Pidev3A49.utils.SessionRouter;
 import tn.esprit.Pidev3A49.utils.SupplementImageStorage;
 
 import java.io.File;
@@ -25,6 +26,8 @@ import java.math.BigDecimal;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class AdminDashboardController {
 
@@ -105,6 +108,9 @@ public class AdminDashboardController {
 
     @FXML
     private void initialize() {
+        if (!SessionRouter.ensureAdmin(adminContentRoot)) {
+            return;
+        }
         categoryComboBox.getItems().setAll(SUPPLEMENT_CATEGORIES);
         brandComboBox.getItems().setAll(SUPPLEMENT_BRANDS);
         resetAddForm();
@@ -130,12 +136,26 @@ public class AdminDashboardController {
     }
 
     @FXML
+    public void openSupplementBackEnd(ActionEvent event) {
+        try {
+            SceneNavigator.navigate(event, SceneNavigator.BACK_END_VIEW, SceneNavigator.BACK_END_VIEW);
+        } catch (IOException exception) {
+            setErrorMessage("Impossible d'ouvrir l'administration supplements: " + exception.getMessage());
+        }
+    }
+
+    @FXML
     public void openFitnessBackEnd(ActionEvent event) {
         try {
             SceneNavigator.navigate(event, SceneNavigator.BACK_END_VIEW, SceneNavigator.FITNESS_BACK_VIEW);
         } catch (IOException exception) {
-            setErrorMessage("Impossible d'ouvrir le module fitness: " + exception.getMessage());
+            setErrorMessage("Impossible d'ouvrir le module alimentation: " + exception.getMessage());
         }
+    }
+
+    @FXML
+    public void openChangeSessions(ActionEvent event) {
+        SessionRouter.logoutToSignIn((Node) event.getSource());
     }
 
     @FXML
@@ -336,6 +356,7 @@ public class AdminDashboardController {
         ensureServiceAvailable();
 
         List<Supplement> supplements = serviceSupplement.getAll();
+        refreshSelectionOptions(supplements);
         supplementCountLabel.setText("Supplements enregistres: " + supplements.size());
         adminSupplementGrid.getChildren().clear();
 
@@ -501,6 +522,35 @@ public class AdminDashboardController {
 
     private String valueOrDefault(String value) {
         return value == null || value.isBlank() ? "-" : value;
+    }
+
+    private void refreshSelectionOptions(List<Supplement> supplements) {
+        String selectedCategory = categoryComboBox.getValue();
+        String selectedBrand = brandComboBox.getValue();
+
+        Set<String> categories = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        categories.addAll(SUPPLEMENT_CATEGORIES);
+        Set<String> brands = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+        brands.addAll(SUPPLEMENT_BRANDS);
+
+        for (Supplement supplement : supplements) {
+            if (supplement.getCategory() != null && !supplement.getCategory().isBlank()) {
+                categories.add(supplement.getCategory().trim());
+            }
+            if (supplement.getBrand() != null && !supplement.getBrand().isBlank()) {
+                brands.add(supplement.getBrand().trim());
+            }
+        }
+
+        categoryComboBox.getItems().setAll(categories);
+        brandComboBox.getItems().setAll(brands);
+
+        if (selectedCategory != null && !selectedCategory.isBlank()) {
+            categoryComboBox.setValue(selectedCategory.trim());
+        }
+        if (selectedBrand != null && !selectedBrand.isBlank()) {
+            brandComboBox.setValue(selectedBrand.trim());
+        }
     }
 
     private String truncate(String value, int maxLength) {

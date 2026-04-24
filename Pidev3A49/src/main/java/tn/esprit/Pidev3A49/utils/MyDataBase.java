@@ -7,7 +7,8 @@ import java.sql.SQLException;
 public class MyDataBase {
 
     private static MyDataBase instance ;
-    private final String URL ="jdbc:mysql://127.0.0.1:3306/esprit?createDatabaseIfNotExist=true&serverTimezone=UTC";
+    private static final String DB_NAME = "fitopiabd";
+    private final String URL = "jdbc:mysql://127.0.0.1:3306/" + DB_NAME + "?createDatabaseIfNotExist=true&serverTimezone=UTC";
     private final String USERNAME ="root";
     private final String PASSWORD ="";
     private Connection cnx ;

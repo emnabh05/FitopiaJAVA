@@ -6,41 +6,45 @@ import tn.esprit.Pidev3A49.utils.MyDataBase;
 import tn.esprit.Pidev3A49.utils.SchemaInitializer;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
 
     private static final String TABLE_NAME = SchemaInitializer.REGIME_TABLE;
-
     private final Connection cnx;
+    private final boolean modernSchema;
 
     public ServiceRegimeAlimentaire() {
         cnx = MyDataBase.getInstance().getCnx();
+        modernSchema = hasColumn("id") && hasColumn("type_sante");
     }
 
     @Override
-    public void add(RegimeAlimentaire regimeAlimentaire) {
-        validate(regimeAlimentaire);
-        String qry = """
-                INSERT INTO %s (nom, description, objectif_calorique, actif)
-                VALUES (?, ?, ?, ?)
+    public void add(RegimeAlimentaire regime) {
+        validate(regime);
+        String qry = modernSchema
+                ? """
+                INSERT INTO %s (user_id, taille, poids, age, bmi, type_sante, calories_cibles, repas_adequats)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """.formatted(TABLE_NAME)
+                : """
+                INSERT INTO %s (user_id, objectif, type_regime, calories_cible, restrictions, date_creation, date_mise_a_jour)
+                VALUES (?, ?, ?, ?, ?, NOW(), NOW())
                 """.formatted(TABLE_NAME);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry, Statement.RETURN_GENERATED_KEYS)) {
-            pstm.setString(1, regimeAlimentaire.getNom());
-            pstm.setString(2, regimeAlimentaire.getDescription());
-            pstm.setInt(3, regimeAlimentaire.getObjectifCalorique());
-            pstm.setBoolean(4, regimeAlimentaire.isActif());
+            remplirPreparedStatementRegime(pstm, regime, false);
             pstm.executeUpdate();
-
             try (ResultSet generatedKeys = pstm.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
-                    regimeAlimentaire.setId(generatedKeys.getInt(1));
+                    regime.setId(generatedKeys.getInt(1));
                 }
             }
         } catch (SQLException exception) {
@@ -51,7 +55,20 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
     @Override
     public List<RegimeAlimentaire> getAll() {
         List<RegimeAlimentaire> regimes = new ArrayList<>();
-        String qry = "SELECT * FROM " + TABLE_NAME + " ORDER BY id DESC";
+        String qry = modernSchema
+                ? """
+                SELECT r.id, r.user_id, u.email, r.taille, r.poids, r.age, r.bmi, r.type_sante, r.calories_cibles, r.repas_adequats
+                FROM %s r
+                LEFT JOIN users u ON u.id = r.user_id
+                ORDER BY r.id DESC
+                """.formatted(TABLE_NAME)
+                : """
+                SELECT r.id_regime AS id, r.user_id, u.email, NULL AS taille, NULL AS poids, NULL AS age, NULL AS bmi,
+                       COALESCE(r.type_regime, r.objectif) AS type_sante, r.calories_cible AS calories_cibles, r.restrictions AS repas_adequats
+                FROM %s r
+                LEFT JOIN users u ON u.id = r.user_id
+                ORDER BY r.id_regime DESC
+                """.formatted(TABLE_NAME);
 
         try (Statement stm = cnx.createStatement();
              ResultSet rs = stm.executeQuery(qry)) {
@@ -61,17 +78,28 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de recuperer les regimes alimentaires.", exception);
         }
-
         return regimes;
     }
 
     @Override
     public RegimeAlimentaire getById(int id) {
-        String qry = "SELECT * FROM " + TABLE_NAME + " WHERE id = ?";
+        String qry = modernSchema
+                ? """
+                SELECT r.id, r.user_id, u.email, r.taille, r.poids, r.age, r.bmi, r.type_sante, r.calories_cibles, r.repas_adequats
+                FROM %s r
+                LEFT JOIN users u ON u.id = r.user_id
+                WHERE r.id = ?
+                """.formatted(TABLE_NAME)
+                : """
+                SELECT r.id_regime AS id, r.user_id, u.email, NULL AS taille, NULL AS poids, NULL AS age, NULL AS bmi,
+                       COALESCE(r.type_regime, r.objectif) AS type_sante, r.calories_cible AS calories_cibles, r.restrictions AS repas_adequats
+                FROM %s r
+                LEFT JOIN users u ON u.id = r.user_id
+                WHERE r.id_regime = ?
+                """.formatted(TABLE_NAME);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
             pstm.setInt(1, id);
-
             try (ResultSet rs = pstm.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSet(rs);
@@ -80,25 +108,26 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de recuperer le regime alimentaire avec l'id " + id, exception);
         }
-
         return null;
     }
 
     @Override
-    public void update(RegimeAlimentaire regimeAlimentaire) {
-        validate(regimeAlimentaire);
-        String qry = """
+    public void update(RegimeAlimentaire regime) {
+        validate(regime);
+        String qry = modernSchema
+                ? """
                 UPDATE %s
-                SET nom = ?, description = ?, objectif_calorique = ?, actif = ?
+                SET user_id = ?, taille = ?, poids = ?, age = ?, bmi = ?, type_sante = ?, calories_cibles = ?, repas_adequats = ?
                 WHERE id = ?
+                """.formatted(TABLE_NAME)
+                : """
+                UPDATE %s
+                SET user_id = ?, objectif = ?, type_regime = ?, calories_cible = ?, restrictions = ?, date_mise_a_jour = NOW()
+                WHERE id_regime = ?
                 """.formatted(TABLE_NAME);
 
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
-            pstm.setString(1, regimeAlimentaire.getNom());
-            pstm.setString(2, regimeAlimentaire.getDescription());
-            pstm.setInt(3, regimeAlimentaire.getObjectifCalorique());
-            pstm.setBoolean(4, regimeAlimentaire.isActif());
-            pstm.setInt(5, regimeAlimentaire.getId());
+            remplirPreparedStatementRegime(pstm, regime, true);
             pstm.executeUpdate();
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de modifier le regime alimentaire.", exception);
@@ -106,11 +135,10 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
     }
 
     @Override
-    public void delete(RegimeAlimentaire regimeAlimentaire) {
-        String qry = "DELETE FROM " + TABLE_NAME + " WHERE id = ?";
-
+    public void delete(RegimeAlimentaire regime) {
+        String qry = "DELETE FROM " + TABLE_NAME + (modernSchema ? " WHERE id = ?" : " WHERE id_regime = ?");
         try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
-            pstm.setInt(1, regimeAlimentaire.getId());
+            pstm.setInt(1, regime.getId());
             pstm.executeUpdate();
         } catch (SQLException exception) {
             throw new IllegalStateException("Impossible de supprimer le regime alimentaire.", exception);
@@ -120,24 +148,87 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
     private RegimeAlimentaire mapResultSet(ResultSet rs) throws SQLException {
         return new RegimeAlimentaire(
                 rs.getInt("id"),
-                rs.getString("nom"),
-                rs.getString("description"),
-                rs.getInt("objectif_calorique"),
-                rs.getBoolean("actif")
+                readNullableInt(rs, "user_id"),
+                rs.getString("email"),
+                readNullableDouble(rs, "taille"),
+                readNullableDouble(rs, "poids"),
+                readNullableInt(rs, "age"),
+                readNullableDouble(rs, "bmi"),
+                rs.getString("type_sante"),
+                readNullableInt(rs, "calories_cibles"),
+                rs.getString("repas_adequats")
         );
     }
 
-    private void validate(RegimeAlimentaire regimeAlimentaire) {
-        if (regimeAlimentaire == null) {
+    private void remplirPreparedStatementRegime(PreparedStatement pstm, RegimeAlimentaire regime, boolean withId) throws SQLException {
+        pstm.setInt(1, regime.getUserId());
+        if (modernSchema) {
+            setNullableDouble(pstm, 2, regime.getTaille());
+            setNullableDouble(pstm, 3, regime.getPoids());
+            setNullableInteger(pstm, 4, regime.getAge());
+            setNullableDouble(pstm, 5, regime.getBmi());
+            pstm.setString(6, regime.getTypeSante());
+            setNullableInteger(pstm, 7, regime.getCaloriesCibles());
+            pstm.setString(8, regime.getRepasAdequats());
+            if (withId) {
+                pstm.setInt(9, regime.getId());
+            }
+            return;
+        }
+
+        String regimeType = regime.getTypeSante() == null || regime.getTypeSante().isBlank() ? "normal" : regime.getTypeSante();
+        pstm.setString(2, regimeType);
+        pstm.setString(3, regimeType);
+        setNullableInteger(pstm, 4, regime.getCaloriesCibles());
+        pstm.setString(5, regime.getRepasAdequats());
+        if (withId) {
+            pstm.setInt(6, regime.getId());
+        }
+    }
+
+    private boolean hasColumn(String columnName) {
+        try {
+            DatabaseMetaData metaData = cnx.getMetaData();
+            try (ResultSet rs = metaData.getColumns(cnx.getCatalog(), null, TABLE_NAME, columnName)) {
+                return rs.next();
+            }
+        } catch (SQLException exception) {
+            return false;
+        }
+    }
+
+    private void validate(RegimeAlimentaire regime) {
+        if (regime == null) {
             throw new IllegalArgumentException("Le regime alimentaire est obligatoire.");
         }
-
-        if (regimeAlimentaire.getNom() == null || regimeAlimentaire.getNom().isBlank()) {
-            throw new IllegalArgumentException("Le nom du regime alimentaire est obligatoire.");
+        if (regime.getUserId() == null) {
+            throw new IllegalArgumentException("L'utilisateur du regime est obligatoire.");
         }
+    }
 
-        if (regimeAlimentaire.getObjectifCalorique() <= 0) {
-            throw new IllegalArgumentException("L'objectif calorique doit etre superieur a 0.");
+    private void setNullableInteger(PreparedStatement statement, int index, Integer value) throws SQLException {
+        if (value == null) {
+            statement.setNull(index, Types.INTEGER);
+        } else {
+            statement.setInt(index, value);
         }
+    }
+
+    private void setNullableDouble(PreparedStatement statement, int index, Double value) throws SQLException {
+        if (value == null) {
+            statement.setNull(index, Types.DOUBLE);
+        } else {
+            statement.setDouble(index, value);
+        }
+    }
+
+    private Integer readNullableInt(ResultSet resultSet, String column) throws SQLException {
+        int value = resultSet.getInt(column);
+        return resultSet.wasNull() ? null : value;
+    }
+
+    private Double readNullableDouble(ResultSet resultSet, String column) throws SQLException {
+        double value = resultSet.getDouble(column);
+        return resultSet.wasNull() ? null : value;
     }
 }

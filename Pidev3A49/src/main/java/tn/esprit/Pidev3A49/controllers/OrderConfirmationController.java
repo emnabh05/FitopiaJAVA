@@ -10,6 +10,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import tn.esprit.Pidev3A49.Models.SupplementOrder;
 import tn.esprit.Pidev3A49.Models.SupplementOrderItem;
+import tn.esprit.Pidev3A49.services.OrderEmailService;
 import tn.esprit.Pidev3A49.utils.ConfirmedOrderStore;
 import tn.esprit.Pidev3A49.utils.InvoiceExporter;
 import tn.esprit.Pidev3A49.utils.SceneNavigator;
@@ -27,9 +28,6 @@ public class OrderConfirmationController {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    @FXML
-    private Label orderReferenceLabel;
 
     @FXML
     private Label orderDateLabel;
@@ -79,7 +77,11 @@ public class OrderConfirmationController {
     @FXML
     private Button requestInvoiceButton;
 
+    @FXML
+    private Button emailInvoiceButton;
+
     private final ConfirmedOrderStore confirmedOrderStore = ConfirmedOrderStore.getInstance();
+    private final OrderEmailService orderEmailService = new OrderEmailService();
     private SupplementOrder confirmedOrder;
 
     @FXML
@@ -93,7 +95,7 @@ public class OrderConfirmationController {
         fillCustomerDetails();
         fillItems();
         fillTotals();
-        setInfoMessage("Cliquez sur \"Demande facture\" pour afficher la facture complete avec cachet et signature.");
+        setInfoMessage("Tu peux imprimer la facture ou l'envoyer directement par email.");
     }
 
     @FXML
@@ -117,6 +119,30 @@ public class OrderConfirmationController {
     }
 
     @FXML
+    private void sendInvoiceByEmail() {
+        if (confirmedOrder == null) {
+            setErrorMessage("Aucune commande recente a envoyer.");
+            return;
+        }
+        if (confirmedOrder.getEmail() == null || confirmedOrder.getEmail().isBlank()) {
+            setErrorMessage("Email client manquant pour l'envoi de la facture.");
+            return;
+        }
+
+        try {
+            Path invoicePath = InvoiceExporter.exportInvoiceHtml(confirmedOrder);
+            boolean sent = orderEmailService.sendInvoiceEmail(confirmedOrder, invoicePath);
+            if (sent) {
+                setSuccessMessage("Facture envoyee a " + confirmedOrder.getEmail().trim() + ".");
+            } else {
+                setErrorMessage("Envoi email de la facture echoue. Verifie la configuration SMTP.");
+            }
+        } catch (IOException exception) {
+            setErrorMessage("Impossible de preparer la facture pour email: " + exception.getMessage());
+        }
+    }
+
+    @FXML
     private void continueShopping(ActionEvent event) throws IOException {
         confirmedOrderStore.clear();
         SceneNavigator.navigate(event, SceneNavigator.ORDER_CONFIRMATION_VIEW, SceneNavigator.FRONT_END_VIEW);
@@ -133,7 +159,6 @@ public class OrderConfirmationController {
     }
 
     private void loadEmptyState() {
-        orderReferenceLabel.setText("-");
         orderDateLabel.setText("-");
         paymentMethodLabel.setText("-");
         orderStatusLabel.setText("-");
@@ -150,15 +175,14 @@ public class OrderConfirmationController {
         discountLabel.setText("0.00 DT");
         finalTotalLabel.setText("0.00 DT");
         requestInvoiceButton.setDisable(true);
+        emailInvoiceButton.setDisable(true);
         setErrorMessage("Aucune commande confirmee a afficher.");
     }
 
     private void fillOrderDetails() {
-        int orderId = Math.max(confirmedOrder.getId(), 0);
         LocalDateTime createdAt = confirmedOrder.getCreatedAt() == null ? LocalDateTime.now() : confirmedOrder.getCreatedAt();
         LocalDateTime estimatedDelivery = createdAt.plusDays(3);
 
-        orderReferenceLabel.setText("ORD-" + String.format(Locale.ROOT, "%08d", orderId));
         orderDateLabel.setText(DATE_TIME_FORMATTER.format(createdAt));
         paymentMethodLabel.setText(valueOrDash(confirmedOrder.getPaymentMethod()));
         orderStatusLabel.setText(normalizeStatus(confirmedOrder.getStatus()));

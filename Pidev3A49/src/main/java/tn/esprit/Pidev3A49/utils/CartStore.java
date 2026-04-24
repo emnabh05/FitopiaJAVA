@@ -101,6 +101,11 @@ public final class CartStore {
         itemsBySupplementId.clear();
     }
 
+    public synchronized void clearSessionData() {
+        itemsBySupplementId.clear();
+        lastCheckoutEmail = null;
+    }
+
     public synchronized String getLastCheckoutEmail() {
         return lastCheckoutEmail;
     }

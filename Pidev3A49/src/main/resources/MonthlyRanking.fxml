@@ -16,44 +16,49 @@
             fitToWidth="true"
             hbarPolicy="NEVER"
             vbarPolicy="AS_NEEDED"
+            stylesheets="@styles/admin-theme.css"
             style="-fx-background: #EAF9F3; -fx-background-color: #EAF9F3;">
     <content>
         <VBox prefWidth="1440.0"
               spacing="28.0"
               style="-fx-background-color: linear-gradient(to bottom right, #F8FFFC, #E8F7F1);">
             <children>
-                <HBox alignment="CENTER_LEFT"
-                      spacing="18.0"
-                      prefHeight="78.0"
-                      style="-fx-background-color: white; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-width: 0 0 1 0;">
-                    <padding>
-                        <Insets top="14.0" right="26.0" bottom="14.0" left="26.0"/>
-                    </padding>
-                    <children>
-                        <StackPane prefWidth="62.0" prefHeight="42.0"
-                                   style="-fx-background-color: #F5FAF7; -fx-background-radius: 14; -fx-border-color: #DDECE4; -fx-border-radius: 14;">
-                            <children>
-                                <Label text="FITOPIA"
-                                       style="-fx-text-fill: #274051; -fx-font-size: 11px; -fx-font-weight: 900;"/>
-                            </children>
-                        </StackPane>
+                <VBox styleClass="navbar-container">
+                    <HBox alignment="CENTER_LEFT" styleClass="top-navbar-strip">
+                        <Label text="Phone no: +216 58 938 889 or email us: customerservice@fitopia.com" styleClass="top-navbar-text" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox spacing="10">
+                            <Label text="FB" styleClass="social-icon" />
+                            <Label text="X" styleClass="social-icon" />
+                            <Label text="IG" styleClass="social-icon" />
+                        </HBox>
+                    </HBox>
 
-                        <Button text="Explore Supplements"
-                                onAction="#openSupplementShowcase"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                        <Button text="Monthly Ranking"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 800; -fx-padding: 10 18 10 18;"/>
-                        <Button text="My Progress"
-                                onAction="#openProgressTracker"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #10B981; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                    <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="navbar-shell">
+                        <VBox alignment="CENTER" spacing="0">
+                            <Label text="&#127811;" styleClass="navbar-logo-icon" />
+                            <Label text="FITOPIA" styleClass="navbar-logo-text" />
+                        </VBox>
 
-                        <Region HBox.hgrow="ALWAYS"/>
+                        <Region prefWidth="20" />
 
-                        <Button text="Back End"
-                                onAction="#openBackEnd"
-                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #123B49; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
-                    </children>
-                </HBox>
+                        <Label text="Home" styleClass="navbar-link navbar-link-active" />
+                        <Label text="About&#10;Fitopia" textAlignment="CENTER" styleClass="navbar-link" />
+
+                        <Region prefWidth="10" />
+
+                        <Button onAction="#openSupplementShowcase" text="EXPLORE&#10;SUPPLEMENTS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openProgressTracker" text="MY&#10;PROGRESS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button text="MONTHLY&#10;RANKING" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openSupplementShowcase" text="CHECKOUT" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+                        <Button onAction="#openMyOrders" text="MY&#10;ORDERS" textAlignment="CENTER" styleClass="navbar-btn-blue" />
+
+                        <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#openMyOrders" text="MY&#10;PROFILE" textAlignment="CENTER" styleClass="navbar-btn-green" />
+                        <Button onAction="#openBackEnd" text="LOGOUT" textAlignment="CENTER" styleClass="navbar-btn-red" />
+                    </HBox>
+                </VBox>
 
                 <VBox spacing="18.0">
                     <padding>
@@ -68,37 +73,53 @@
                             <children>
                                 <Label text="GLOBAL RANKING"
                                        style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 13px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
-                                <Label text="MONTHLY DISCIPLINE LEADERBOARD"
+                                <Label text="MONTHLY CONSISTENCY LEADERBOARD"
                                        wrapText="true"
                                        style="-fx-text-fill: #07161F; -fx-font-size: 48px; -fx-font-weight: 900;"/>
-                                <Label text="All users are ranked by XP. Top user of the month wins a free product."
+                                <Label text="Healthy ranking: longest active streak, then consistency %, then goal completion."
                                        wrapText="true"
                                        style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 17px; -fx-font-weight: 600;"/>
 
                                 <HBox spacing="10.0" alignment="CENTER_LEFT">
                                     <children>
-                                        <Button text="April 2026"
-                                                style="-fx-background-color: rgba(255,255,255,0.10); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.20); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700; -fx-padding: 10 16 10 16;"/>
-                                        <TextField text="avril 2026"
-                                                   prefWidth="150.0"
+                                        <TextField fx:id="monthInputField"
+                                                   promptText="yyyy-MM"
+                                                   prefWidth="170.0"
                                                    style="-fx-background-color: rgba(255,255,255,0.10); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.20); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700;"/>
                                         <Button text="Load Month"
+                                                onAction="#loadMonthRanking"
                                                 style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 800; -fx-padding: 10 16 10 16;"/>
+                                        <Label fx:id="selectedMonthLabel"
+                                               text="Month: -"
+                                               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700;"/>
                                     </children>
                                 </HBox>
+
+                                <Label fx:id="rankingNotificationLabel"
+                                       text="Ranking is based on active streak, consistency %, then goal completion."
+                                       wrapText="true"
+                                       maxWidth="980.0"
+                                       style="-fx-background-color: rgba(255,255,255,0.12); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.20); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 14 10 14;"/>
                             </children>
                         </VBox>
 
-                        <HBox alignment="CENTER_LEFT"
-                              style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 20; -fx-border-color: #D5E3EA; -fx-border-radius: 20; -fx-border-style: segments(2, 4);">
+                        <VBox spacing="10.0"
+                              style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 20; -fx-border-color: #D5E3EA; -fx-border-radius: 20;">
                             <padding>
-                                <Insets top="18.0" right="18.0" bottom="18.0" left="18.0"/>
+                                <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
                             </padding>
-                                    <children>
-                                        <Label text="No intake logs were found for this month yet."
-                                               style="-fx-text-fill: #8A9BA7; -fx-font-size: 16px; -fx-font-weight: 600;"/>
-                                    </children>
-                                </HBox>
+                            <children>
+                                <Label text="Safety first: quantity does not improve rank. Follow your personal daily plan only."
+                                       wrapText="true"
+                                       style="-fx-text-fill: #2B7A68; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+
+                                <VBox fx:id="leaderboardRowsContainer" spacing="8.0"/>
+
+                                <Label fx:id="leaderboardEmptyLabel"
+                                       text="No adherence logs were found for this month yet."
+                                       style="-fx-text-fill: #8A9BA7; -fx-font-size: 16px; -fx-font-weight: 600;"/>
+                            </children>
+                        </VBox>
 
                         <HBox alignment="CENTER_LEFT">
                             <children>
