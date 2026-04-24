@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/22"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.MonthlyRankingController"
+            fitToWidth="true"
+            hbarPolicy="NEVER"
+            vbarPolicy="AS_NEEDED"
+            style="-fx-background: #EAF9F3; -fx-background-color: #EAF9F3;">
+    <content>
+        <VBox prefWidth="1440.0"
+              spacing="28.0"
+              style="-fx-background-color: linear-gradient(to bottom right, #F8FFFC, #E8F7F1);">
+            <children>
+                <HBox alignment="CENTER_LEFT"
+                      spacing="18.0"
+                      prefHeight="78.0"
+                      style="-fx-background-color: white; -fx-border-color: rgba(11, 84, 76, 0.08); -fx-border-width: 0 0 1 0;">
+                    <padding>
+                        <Insets top="14.0" right="26.0" bottom="14.0" left="26.0"/>
+                    </padding>
+                    <children>
+                        <StackPane prefWidth="62.0" prefHeight="42.0"
+                                   style="-fx-background-color: #F5FAF7; -fx-background-radius: 14; -fx-border-color: #DDECE4; -fx-border-radius: 14;">
+                            <children>
+                                <Label text="FITOPIA"
+                                       style="-fx-text-fill: #274051; -fx-font-size: 11px; -fx-font-weight: 900;"/>
+                            </children>
+                        </StackPane>
+
+                        <Button text="Explore Supplements"
+                                onAction="#openSupplementShowcase"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                        <Button text="Monthly Ranking"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #3B82F6; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 800; -fx-padding: 10 18 10 18;"/>
+                        <Button text="My Progress"
+                                onAction="#openProgressTracker"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #10B981; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+
+                        <Region HBox.hgrow="ALWAYS"/>
+
+                        <Button text="Alerts"
+                                onAction="#openMyOrders"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #D6E8DF; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 800; -fx-padding: 8 14 8 14;"/>
+                        <Button text="Back End"
+                                onAction="#openBackEnd"
+                                style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #123B49; -fx-border-radius: 12; -fx-text-fill: #163848; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 18 10 18;"/>
+                    </children>
+                </HBox>
+
+                <VBox spacing="18.0">
+                    <padding>
+                        <Insets top="0.0" right="36.0" bottom="36.0" left="36.0"/>
+                    </padding>
+                    <children>
+                        <VBox spacing="14.0"
+                              style="-fx-background-color: linear-gradient(to right, #123B49, #1B8B76); -fx-background-radius: 28; -fx-effect: dropshadow(gaussian, rgba(6, 39, 34, 0.18), 24, 0.22, 0, 10);">
+                            <padding>
+                                <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+                            </padding>
+                            <children>
+                                <Label text="GLOBAL RANKING"
+                                       style="-fx-text-fill: rgba(255,255,255,0.72); -fx-font-size: 13px; -fx-font-weight: 900; -fx-letter-spacing: 1px;"/>
+                                <Label text="MONTHLY CONSISTENCY LEADERBOARD"
+                                       wrapText="true"
+                                       style="-fx-text-fill: #07161F; -fx-font-size: 48px; -fx-font-weight: 900;"/>
+                                <Label text="Healthy ranking: longest active streak, then consistency %, then goal completion."
+                                       wrapText="true"
+                                       style="-fx-text-fill: rgba(255,255,255,0.88); -fx-font-size: 17px; -fx-font-weight: 600;"/>
+
+                                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                    <children>
+                                        <TextField fx:id="monthInputField"
+                                                   promptText="yyyy-MM"
+                                                   prefWidth="170.0"
+                                                   style="-fx-background-color: rgba(255,255,255,0.10); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.20); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                        <Button text="Load Month"
+                                                onAction="#loadMonthRanking"
+                                                style="-fx-background-color: white; -fx-background-radius: 14; -fx-text-fill: #123748; -fx-font-size: 14px; -fx-font-weight: 800; -fx-padding: 10 16 10 16;"/>
+                                        <Label fx:id="selectedMonthLabel"
+                                               text="Month: -"
+                                               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 700;"/>
+                                    </children>
+                                </HBox>
+
+                                <Label fx:id="rankingNotificationLabel"
+                                       text="Ranking is based on active streak, consistency %, then goal completion."
+                                       wrapText="true"
+                                       maxWidth="980.0"
+                                       style="-fx-background-color: rgba(255,255,255,0.12); -fx-background-radius: 14; -fx-border-color: rgba(255,255,255,0.20); -fx-border-radius: 14; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 700; -fx-padding: 10 14 10 14;"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0"
+                              style="-fx-background-color: rgba(255,255,255,0.95); -fx-background-radius: 20; -fx-border-color: #D5E3EA; -fx-border-radius: 20;">
+                            <padding>
+                                <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
+                            </padding>
+                            <children>
+                                <Label text="Safety first: quantity does not improve rank. Follow your personal daily plan only."
+                                       wrapText="true"
+                                       style="-fx-text-fill: #2B7A68; -fx-font-size: 13px; -fx-font-weight: 700;"/>
+
+                                <VBox fx:id="leaderboardRowsContainer" spacing="8.0"/>
+
+                                <Label fx:id="leaderboardEmptyLabel"
+                                       text="No adherence logs were found for this month yet."
+                                       style="-fx-text-fill: #8A9BA7; -fx-font-size: 16px; -fx-font-weight: 600;"/>
+                            </children>
+                        </VBox>
+
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Button text="Return"
+                                        onAction="#goBackOrExit"
+                                        prefWidth="130.0"
+                                        prefHeight="44.0"
+                                        style="-fx-background-color: white; -fx-background-radius: 14; -fx-border-color: #CBD8E0; -fx-border-radius: 14; -fx-text-fill: #163848; -fx-font-size: 14px; -fx-font-weight: 800;"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>
