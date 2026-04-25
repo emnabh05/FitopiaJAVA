@@ -123,7 +123,9 @@ public class RegimeAlimentaire {
     }
 
     public String getDisplayLabel() {
-        return "#" + id + " - " + (typeSante == null || typeSante.isBlank() ? "N/A" : typeSante) +
-                " - " + (caloriesCibles == null ? 0 : caloriesCibles) + " kcal";
+        String label = (typeSante == null || typeSante.isBlank() ? "Général" : typeSante);
+        // Capitalize first letter
+        label = label.substring(0, 1).toUpperCase() + label.substring(1);
+        return "Régime " + label + " (" + (caloriesCibles == null ? 0 : caloriesCibles) + " kcal)";
     }
 }

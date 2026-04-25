@@ -53,6 +53,7 @@ import tn.esprit.Pidev3A49.services.ServiceUser;
 import tn.esprit.Pidev3A49.services.OpenFoodFactsService;
 import tn.esprit.Pidev3A49.dto.RapportContradictionDTO;
 import tn.esprit.Pidev3A49.dto.RepasProblematiqueDTO;
+import tn.esprit.Pidev3A49.dto.RepasSimilariteDTO;
 
 import java.text.Normalizer;
 import java.io.File;
@@ -311,6 +312,11 @@ public class MainController {
     // Intelligent Audit Engine Fields
     @FXML private VBox paneAuditRegime;
     @FXML private Label lblAuditRegimeNom;
+
+    // Moteur de Recommandation — Similarité Nutritionnelle
+    @FXML private VBox paneRecommandation;
+    @FXML private Label lblRecommandationTitre;
+    @FXML private VBox boxRecommandationCards;
     @FXML private Label lblAuditTaux;
     @FXML private ProgressBar pbAuditTaux;
     @FXML private Label lblAuditDiagnostic;
@@ -338,6 +344,7 @@ public class MainController {
     private Integer repasEditSelectionId;
     private int verresEau = 0;
     private final java.util.Map<Integer, List<Repas>> sessionMealsByRegime = new java.util.HashMap<>();
+    private RapportContradictionDTO lastAuditRapport;
 
 
 
@@ -487,6 +494,7 @@ public class MainController {
         if (paneScanIA != null) { paneScanIA.setVisible(false); paneScanIA.setManaged(false); }
         if (paneWeeklyProgram != null) { paneWeeklyProgram.setVisible(false); paneWeeklyProgram.setManaged(false); }
         if (paneAuditRegime != null) { paneAuditRegime.setVisible(false); paneAuditRegime.setManaged(false); }
+        if (paneRecommandation != null) { paneRecommandation.setVisible(false); paneRecommandation.setManaged(false); }
     }
 
     @FXML
@@ -1202,7 +1210,9 @@ public class MainController {
             int rem = Math.max(0, target - curKcal);
 
             setTextIfPresent(lblPlannerHealthBadge, humaniserTypeSante(activeRegime.getTypeSante()));
-            setTextIfPresent(lblPlannerRegimeTitle, "My Regime");
+            String regimeLabel = activeRegime.getTypeSante() == null || activeRegime.getTypeSante().isBlank() ? "Général" : activeRegime.getTypeSante();
+            regimeLabel = regimeLabel.substring(0, 1).toUpperCase() + regimeLabel.substring(1);
+            setTextIfPresent(lblPlannerRegimeTitle, "Régime " + regimeLabel);
             setTextIfPresent(lblPlannerTargetCalories, target + " kcal/j");
             setTextIfPresent(lblPlannerBmi, activeRegime.getBmi() == null ? "--" : String.format(Locale.US, "%.0f", activeRegime.getBmi()));
             setTextIfPresent(lblPlannerTaille, (activeRegime.getTaille() == null ? "--" : activeRegime.getTaille()) + " cm");
@@ -1592,7 +1602,9 @@ public class MainController {
         iconBox.setStyle("-fx-background-color: #f1f5f9; -fx-background-radius: 8; -fx-padding: 10;");
         
         VBox texts = new VBox(2);
-        Label title = new Label("Régime #" + regime.getId());
+        String cardLabel = regime.getTypeSante() == null || regime.getTypeSante().isBlank() ? "Général" : regime.getTypeSante();
+        cardLabel = cardLabel.substring(0, 1).toUpperCase() + cardLabel.substring(1);
+        Label title = new Label("Régime " + cardLabel);
         title.setStyle("-fx-font-weight: 800; -fx-text-fill: #1e293b; -fx-font-size: 14px;");
         
         Label meta = new Label(humaniserTypeSante(regime.getTypeSante()) + " · " + (regime.getCaloriesCibles()==null?0:regime.getCaloriesCibles()) + " kcal/j");
@@ -2799,7 +2811,34 @@ public class MainController {
                 btnAdd.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 50; -fx-min-width: 32; -fx-min-height: 32; -fx-font-weight: 900;");
             });
 
-            titleRow.getChildren().addAll(textCol, btnAdd);
+            Button btnRecipe = new Button("📖 Recette");
+            btnRecipe.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-background-radius: 8; -fx-padding: 6 10; -fx-font-weight: 800; -fx-cursor: hand;");
+            btnRecipe.setOnAction(e -> {
+                String comm = meal.getCommentaire();
+                if (comm == null || comm.trim().isEmpty()) {
+                    showInfo("Recette indisponible", "Aucune information de recette détaillée pour ce plat manuel.");
+                    return;
+                }
+                
+                int recipeId = -1;
+                if (comm.matches("\\d+")) {
+                    recipeId = Integer.parseInt(comm.trim());
+                } else if (comm.matches(".*-(\\d+)$")) {
+                    String[] parts = comm.split("-");
+                    try { recipeId = Integer.parseInt(parts[parts.length - 1]); } catch(Exception ignored){}
+                }
+                
+                if (recipeId != -1) {
+                    afficherRecetteNative(recipeId, meal.getNomRepas());
+                } else {
+                    showInfo("Recette indisponible", "Ce plat ne dispose pas d'un identifiant Spoonacular valide.");
+                }
+            });
+
+            VBox actionBox = new VBox(5, btnAdd, btnRecipe);
+            actionBox.setAlignment(Pos.CENTER);
+
+            titleRow.getChildren().addAll(textCol, actionBox);
             mealPill.getChildren().add(titleRow);
             mealsRow.getChildren().add(mealPill);
         }
@@ -2811,6 +2850,140 @@ public class MainController {
         dayCard.setOnMouseExited(e -> dayCard.setStyle("-fx-background-color: #f0fdf4; -fx-background-radius: 12; -fx-padding: 20; -fx-border-color: #10b981; -fx-border-width: 0 0 0 6;"));
 
         return dayCard;
+    }
+
+    private void afficherRecetteNative(int recipeId, String nomPlat) {
+        new Thread(() -> {
+            try {
+                OkHttpClient client = new OkHttpClient();
+                String url = "https://api.spoonacular.com/recipes/" + recipeId + "/information?apiKey=" + API_KEY_SPOONACULAR;
+                Request request = new Request.Builder().url(url).build();
+                
+                try (Response response = client.newCall(request).execute()) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        String bodyStr = response.body().string();
+                        JSONObject json = new JSONObject(bodyStr);
+                        
+                        int readyIn = json.optInt("readyInMinutes", 0);
+                        int servings = json.optInt("servings", 0);
+                        String instructions = json.optString("instructions", "Pas d'instructions détaillées fournies par le chef.");
+                        
+                        // Nettoyage des balises HTML basiques
+                        instructions = instructions.replaceAll("<[^>]*>", "\n").replaceAll("\\n+", "\n").trim();
+                        final String cleanInstructions = instructions;
+                        
+                        Platform.runLater(() -> {
+                            javafx.stage.Stage recipeStage = new javafx.stage.Stage();
+                            recipeStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+                            
+                            VBox rootNode = new VBox(0);
+                            rootNode.setStyle("-fx-background-color: #f4fbf9;"); // Vert d'eau très clair assorti
+                            
+                            // Header avec dégradé et effets jolis
+                            VBox headerBox = new VBox(8);
+                            headerBox.setStyle("-fx-background-color: linear-gradient(to right, #0d4f49, #1f8d6a); -fx-padding: 25 35; -fx-effect: dropshadow(gaussian, rgba(13,79,73,0.3), 15, 0, 0, 5);");
+                            Label lblHeaderTitle = new Label("👨‍🍳 FICHE RECETTE");
+                            lblHeaderTitle.setStyle("-fx-font-size: 13px; -fx-text-fill: #a7f3d0; -fx-font-weight: 900; -fx-letter-spacing: 2px;");
+                            Label lblDishName = new Label(nomPlat);
+                            lblDishName.setStyle("-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);");
+                            lblDishName.setWrapText(true);
+                            headerBox.getChildren().addAll(lblHeaderTitle, lblDishName);
+                            
+                            // Content
+                            VBox contentBox = new VBox(25);
+                            contentBox.setPadding(new Insets(35));
+                            
+                            // Badges
+                            HBox badgesBox = new HBox(20);
+                            
+                            HBox timeBadge = new HBox(12);
+                            timeBadge.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 20; -fx-border-color: #39b77d; -fx-border-radius: 12; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, rgba(57,183,125,0.15), 10, 0, 0, 4);");
+                            Label lblTimeIcon = new Label("⏱");
+                            lblTimeIcon.setStyle("-fx-font-size: 22px;");
+                            VBox timeText = new VBox();
+                            Label lblTimeLabel = new Label("TEMPS");
+                            lblTimeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b; -fx-font-weight: 800;");
+                            Label lblTimeVal = new Label(readyIn + " min");
+                            lblTimeVal.setStyle("-fx-font-size: 16px; -fx-font-weight: 900; -fx-text-fill: #14725d;");
+                            timeText.getChildren().addAll(lblTimeLabel, lblTimeVal);
+                            timeBadge.getChildren().addAll(lblTimeIcon, timeText);
+                            timeBadge.setAlignment(Pos.CENTER_LEFT);
+                            
+                            HBox servingBadge = new HBox(12);
+                            servingBadge.setStyle("-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 12 20; -fx-border-color: #39b77d; -fx-border-radius: 12; -fx-border-width: 2; -fx-effect: dropshadow(gaussian, rgba(57,183,125,0.15), 10, 0, 0, 4);");
+                            Label lblServIcon = new Label("🍽");
+                            lblServIcon.setStyle("-fx-font-size: 22px;");
+                            VBox servText = new VBox();
+                            Label lblServLabel = new Label("PORTIONS");
+                            lblServLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #64748b; -fx-font-weight: 800;");
+                            Label lblServVal = new Label(String.valueOf(servings));
+                            lblServVal.setStyle("-fx-font-size: 16px; -fx-font-weight: 900; -fx-text-fill: #14725d;");
+                            servText.getChildren().addAll(lblServLabel, lblServVal);
+                            servingBadge.getChildren().addAll(lblServIcon, servText);
+                            servingBadge.setAlignment(Pos.CENTER_LEFT);
+                            
+                            badgesBox.getChildren().addAll(timeBadge, servingBadge);
+                            
+                            // Instructions Block
+                            VBox instBox = new VBox(15);
+                            instBox.setStyle("-fx-background-color: white; -fx-background-radius: 15; -fx-padding: 30; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 15, 0, 0, 8);");
+                            
+                            Label lblInstTitle = new Label("📝 Instructions de préparation");
+                            lblInstTitle.setStyle("-fx-font-weight: 900; -fx-font-size: 18px; -fx-text-fill: #0d4f49;");
+                            
+                            javafx.scene.control.Separator sep = new javafx.scene.control.Separator();
+                            sep.setStyle("-fx-background-color: #e2e8f0;");
+                            
+                            // Process instructions
+                            String[] lines = cleanInstructions.split("\n");
+                            VBox stepsBox = new VBox(14);
+                            for (String line : lines) {
+                                line = line.trim();
+                                if(line.isEmpty()) continue;
+                                HBox stepRow = new HBox(15);
+                                stepRow.setAlignment(Pos.TOP_LEFT);
+                                Label bullet = new Label("•");
+                                bullet.setStyle("-fx-text-fill: #39b77d; -fx-font-size: 24px; -fx-font-weight: bold; -fx-translate-y: -4px;");
+                                Label text = new Label(line);
+                                text.setWrapText(true);
+                                text.setStyle("-fx-text-fill: #334155; -fx-font-size: 14px; -fx-line-spacing: 0.4em;");
+                                stepRow.getChildren().addAll(bullet, text);
+                                stepsBox.getChildren().add(stepRow);
+                            }
+                            
+                            ScrollPane scroll = new ScrollPane(stepsBox);
+                            scroll.setFitToWidth(true);
+                            scroll.setStyle("-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;");
+                            scroll.setPrefHeight(350);
+                            
+                            instBox.getChildren().addAll(lblInstTitle, sep, scroll);
+                            
+                            // Footer Button
+                            HBox footer = new HBox();
+                            footer.setAlignment(Pos.CENTER_RIGHT);
+                            Button btnClose = new Button("✓ J'ai compris, Fermer");
+                            btnClose.setStyle("-fx-background-color: #14725d; -fx-text-fill: white; -fx-font-weight: 900; -fx-padding: 12 30; -fx-background-radius: 10; -fx-cursor: hand; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(20,114,93,0.3), 8, 0, 0, 4);");
+                            btnClose.setOnMouseEntered(e -> btnClose.setStyle("-fx-background-color: #0d4f49; -fx-text-fill: white; -fx-font-weight: 900; -fx-padding: 12 30; -fx-background-radius: 10; -fx-cursor: hand; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(13,79,73,0.4), 10, 0, 0, 5);"));
+                            btnClose.setOnMouseExited(e -> btnClose.setStyle("-fx-background-color: #14725d; -fx-text-fill: white; -fx-font-weight: 900; -fx-padding: 12 30; -fx-background-radius: 10; -fx-cursor: hand; -fx-font-size: 14px; -fx-effect: dropshadow(gaussian, rgba(20,114,93,0.3), 8, 0, 0, 4);"));
+                            btnClose.setOnAction(e -> recipeStage.close());
+                            footer.getChildren().add(btnClose);
+                            
+                            contentBox.getChildren().addAll(badgesBox, instBox, footer);
+                            rootNode.getChildren().addAll(headerBox, contentBox);
+                            
+                            javafx.scene.Scene scene = new javafx.scene.Scene(rootNode, 750, 800);
+                            recipeStage.setScene(scene);
+                            recipeStage.show();
+                        });
+                    } else {
+                        Platform.runLater(() -> showError("Erreur API", "Impossible de charger la recette (" + response.code() + ")."));
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> showError("Erreur Réseau", "Vérifiez votre connexion Internet."));
+            }
+        }).start();
     }
 
     @FXML
@@ -2847,14 +3020,28 @@ public class MainController {
                     urlBuilder.addQueryParameter("timeFrame", "week");
                     urlBuilder.addQueryParameter("targetCalories", String.valueOf(cibles));
                     String dietParam = diet.toLowerCase().trim();
-                    if (dietParam.contains("végétarien")) dietParam = "vegetarian";
-                    if (dietParam.contains("végétalien") || dietParam.contains("vegan")) dietParam = "status:vegan";
-                    if (dietParam.contains("sans gluten")) dietParam = "gluten free";
-                    if (dietParam.contains("cétogène") || dietParam.contains("keto")) dietParam = "ketogenic";
-                    if (dietParam.contains("paléo")) dietParam = "paleo";
+                    // Mapping French + English → Spoonacular valid values
+                    if (dietParam.contains("végétarien") || dietParam.equals("vegetarian") || dietParam.contains("lacto")) {
+                        dietParam = "vegetarian";
+                    } else if (dietParam.contains("végétalien") || dietParam.contains("vegan") || dietParam.contains("végan")) {
+                        dietParam = "vegan";
+                    } else if (dietParam.contains("sans gluten") || dietParam.contains("gluten free") || dietParam.contains("gluten-free")) {
+                        dietParam = "gluten free";
+                    } else if (dietParam.contains("cétogène") || dietParam.contains("cetogene") || dietParam.contains("keto") || dietParam.contains("ketogenic")) {
+                        dietParam = "ketogenic";
+                    } else if (dietParam.contains("paléo") || dietParam.contains("paleo")) {
+                        dietParam = "paleo";
+                    } else if (dietParam.contains("pescetarien") || dietParam.contains("pescetarian")) {
+                        dietParam = "pescetarian";
+                    } else if (dietParam.contains("primal")) {
+                        dietParam = "primal";
+                    } else if (dietParam.contains("whole30") || dietParam.contains("whole 30")) {
+                        dietParam = "whole30";
+                    }
+                    // else: leave as-is or empty
                     
                     if (!dietParam.isEmpty()) {
-                        urlBuilder.addQueryParameter("diet", dietParam); 
+                        urlBuilder.addQueryParameter("diet", dietParam);
                     }
                     urlBuilder.addQueryParameter("apiKey", API_KEY_SPOONACULAR);
     
@@ -2888,9 +3075,12 @@ public class MainController {
                                 for (int i = 0; i < meals.length(); i++) {
                                     JSONObject meal = meals.getJSONObject(i);
                                     String title = meal.optString("title", "Repas");
+                                    int mealId = meal.optInt("id", -1);
+                                    String sourceUrl = meal.optString("sourceUrl", "");
                                     
                                     Repas r = new Repas();
-                                    r.setNomRepas(preTraduire(title)); 
+                                    r.setNomRepas(preTraduire(title));
+                                    r.setCommentaire(mealId != -1 ? String.valueOf(mealId) : sourceUrl);
                                     
                                     double factor = (i < repartitions.length) ? repartitions[i] : 0.33;
                                     r.setCalories((int) Math.round(dailyCals * factor));
@@ -3300,9 +3490,10 @@ public class MainController {
                 showAlert(Alert.AlertType.ERROR, "Erreur Audit", "Impossible de générer le rapport d'audit.");
                 return;
             }
+            this.lastAuditRapport = rapport;
 
             // Mise à jour de l'UI
-            lblAuditRegimeNom.setText(rapport.getNomRegime() + " - Objectif: " + rapport.getObjectif());
+            lblAuditRegimeNom.setText(rapport.getNomRegime());
             lblAuditTaux.setText(String.format("%.1f%%", rapport.getTauxContradiction()));
             pbAuditTaux.setProgress(rapport.getTauxContradiction() / 100.0);
             
@@ -3335,5 +3526,280 @@ public class MainController {
             showError("Erreur Audit", "Une erreur est survenue lors de l'audit : " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Exporte le rapport d'audit en PDF.
+     */
+    @FXML
+    private void genererRapportAuditPDF() {
+        if (lastAuditRapport == null) {
+            showAlert(Alert.AlertType.WARNING, "Aucune donnée", "Veuillez d'abord lancer un audit.");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer le rapport d'audit");
+        fileChooser.setInitialFileName("Audit_Regime_" + lastAuditRapport.getNomRegime().replace(" ", "_") + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+        File file = fileChooser.showSaveDialog(paneAuditRegime.getScene().getWindow());
+
+        if (file == null) return;
+
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
+            document.addPage(page);
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                // Header Background
+                contentStream.setNonStrokingColor(12, 63, 68); // #0c3f44
+                contentStream.addRect(0, 750, 600, 100);
+                contentStream.fill();
+
+                // Title
+                contentStream.beginText();
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 22);
+                contentStream.setNonStrokingColor(java.awt.Color.WHITE);
+                contentStream.newLineAtOffset(50, 800);
+                contentStream.showText("RAPPORT D'AUDIT NUTRITIONNEL");
+                contentStream.endText();
+
+                contentStream.beginText();
+                contentStream.setFont(PDType1Font.HELVETICA, 12);
+                contentStream.newLineAtOffset(50, 780);
+                contentStream.showText("Fitopia Intelligence Engine - " + java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm").format(java.time.LocalDateTime.now()));
+                contentStream.endText();
+
+                // Summary Section
+                contentStream.setNonStrokingColor(java.awt.Color.BLACK);
+                contentStream.beginText();
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 14);
+                contentStream.newLineAtOffset(50, 700);
+                contentStream.showText("Informations du Régime :");
+                contentStream.endText();
+
+                contentStream.setFont(PDType1Font.HELVETICA, 12);
+                contentStream.beginText();
+                contentStream.newLineAtOffset(60, 680);
+                contentStream.showText("• " + lastAuditRapport.getNomRegime());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("• Objectif : " + lastAuditRapport.getObjectif());
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("• Taux de Contradiction : " + String.format("%.1f%%", lastAuditRapport.getTauxContradiction()));
+                contentStream.newLineAtOffset(0, -20);
+                contentStream.showText("• Diagnostic : " + lastAuditRapport.getDiagnosticGlobal());
+                contentStream.endText();
+
+                // Advice Box
+                contentStream.setNonStrokingColor(248, 250, 252); // #f8fafc
+                contentStream.addRect(50, 530, 500, 60);
+                contentStream.fill();
+                contentStream.setNonStrokingColor(java.awt.Color.BLACK);
+                contentStream.beginText();
+                contentStream.setFont(PDType1Font.HELVETICA_OBLIQUE, 11);
+                contentStream.newLineAtOffset(60, 565);
+                contentStream.showText("Conseil de l'expert :");
+                contentStream.newLineAtOffset(0, -15);
+                contentStream.setFont(PDType1Font.HELVETICA, 10);
+                contentStream.showText(lastAuditRapport.getConseilAutomatique());
+                contentStream.endText();
+
+                // Table Header
+                float tableY = 480;
+                contentStream.setNonStrokingColor(241, 245, 249); // #f1f5f9
+                contentStream.addRect(50, tableY, 500, 25);
+                contentStream.fill();
+                contentStream.setNonStrokingColor(java.awt.Color.BLACK);
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 10);
+                contentStream.beginText();
+                contentStream.newLineAtOffset(60, tableY + 8);
+                contentStream.showText("Nom du Repas");
+                contentStream.newLineAtOffset(150, 0);
+                contentStream.showText("Calories");
+                contentStream.newLineAtOffset(80, 0);
+                contentStream.showText("Diagnostic Critique");
+                contentStream.newLineAtOffset(180, 0);
+                contentStream.showText("Risque");
+                contentStream.endText();
+
+                // Table Content
+                float currentY = tableY - 20;
+                contentStream.setNonStrokingColor(java.awt.Color.BLACK);
+                contentStream.setFont(PDType1Font.HELVETICA, 9);
+                for (RepasProblematiqueDTO r : lastAuditRapport.getRepasProblematiques()) {
+                    if (currentY < 50) break; // Simple overflow check
+                    contentStream.beginText();
+                    contentStream.newLineAtOffset(60, currentY);
+                    contentStream.showText(r.getNom().length() > 25 ? r.getNom().substring(0, 22) + "..." : r.getNom());
+                    contentStream.newLineAtOffset(150, 0);
+                    contentStream.showText(r.getCalories() + " kcal");
+                    contentStream.newLineAtOffset(80, 0);
+                    contentStream.showText(r.getDiagnostic());
+                    contentStream.newLineAtOffset(180, 0);
+                    contentStream.showText(String.valueOf(r.getScoreRisque()));
+                    contentStream.endText();
+                    currentY -= 15;
+                }
+            }
+
+            document.save(file);
+            showInfo("Rapport PDF généré avec succès !");
+            
+            // Ouvrir le fichier automatiquement
+            if (java.awt.Desktop.isDesktopSupported()) {
+                java.awt.Desktop.getDesktop().open(file);
+            }
+
+        } catch (IOException e) {
+            showError("Erreur PDF", "Impossible de générer le fichier : " + e.getMessage());
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  MOTEUR DE RECOMMANDATION — Similarité Nutritionnelle
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Ouvre le panneau du moteur de recommandation pour le régime actif.
+     *
+     * <p>Récupère les 5 repas les plus proches nutritionnellement des objectifs
+     * du régime en utilisant {@link ServiceRepas#trouverRepasSimilaires(int)},
+     * puis affiche les résultats sous forme de cartes visuelles dans le panneau
+     * FXML {@code paneRecommandation}.</p>
+     *
+     * <p>Gestion des cas limites :
+     * <ul>
+     *   <li>Aucun régime actif → alerte utilisateur</li>
+     *   <li>Aucun repas en base → message explicatif dans le panneau</li>
+     * </ul>
+     * </p>
+     */
+    @FXML
+    private void afficherMoteurRecommandation() {
+        // 1. Vérifier qu'un régime est actif
+        RegimeAlimentaire regimeActif = getActualActiveRegime();
+        if (regimeActif == null) {
+            showAlert(Alert.AlertType.WARNING,
+                    "Aucun régime actif",
+                    "Veuillez sélectionner ou créer un régime alimentaire avant d'utiliser le moteur de recommandation.");
+            return;
+        }
+
+        // 2. Afficher le panneau overlay
+        if (paneRecommandation != null) {
+            masquerTousLesFormulaires();
+            paneRecommandation.setVisible(true);
+            paneRecommandation.setManaged(true);
+        }
+
+        // 3. Mettre à jour le titre
+        if (lblRecommandationTitre != null) {
+            lblRecommandationTitre.setText(
+                    "Recommandations pour : " + regimeActif.getDisplayLabel());
+        }
+
+        // 4. Vider la zone de cartes
+        if (boxRecommandationCards == null) return;
+        boxRecommandationCards.getChildren().clear();
+
+        // 5. Appeler le service métier (Distance de Manhattan en SQL)
+        List<RepasSimilariteDTO> recommandations;
+        try {
+            recommandations = serviceRepas.trouverRepasSimilaires(regimeActif.getId());
+        } catch (Exception e) {
+            showError("Erreur recommandation", e.getMessage());
+            return;
+        }
+
+        // 6. Cas : aucun repas en base
+        if (recommandations.isEmpty()) {
+            Label lblVide = new Label(
+                    "Aucun repas disponible en base. Ajoutez des repas pour obtenir des recommandations.");
+            lblVide.setStyle("-fx-text-fill: #64748b; -fx-font-size: 14px; -fx-padding: 20;");
+            boxRecommandationCards.getChildren().add(lblVide);
+            return;
+        }
+
+        // 7. Construire une carte pour chaque repas recommandé
+        for (int i = 0; i < recommandations.size(); i++) {
+            RepasSimilariteDTO dto = recommandations.get(i);
+            boxRecommandationCards.getChildren().add(creerCarteRecommandation(dto, i + 1));
+        }
+    }
+
+    /**
+     * Crée une carte visuelle JavaFX pour un repas recommandé.
+     *
+     * @param dto  données du repas recommandé
+     * @param rang position dans le classement (1 = meilleur)
+     * @return nœud JavaFX prêt à être inséré dans le layout
+     */
+    private VBox creerCarteRecommandation(RepasSimilariteDTO dto, int rang) {
+        // Couleur de rang : or, argent, bronze, puis neutre
+        String couleurRang = switch (rang) {
+            case 1 -> "#f59e0b"; // Or
+            case 2 -> "#94a3b8"; // Argent
+            case 3 -> "#b45309"; // Bronze
+            default -> "#6366f1"; // Violet pour 4e et 5e
+        };
+
+        // Badge de rang
+        Label lblRang = new Label("#" + rang);
+        lblRang.setStyle("-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: " + couleurRang + ";");
+
+        // Nom et type du repas
+        Label lblNom = new Label(dto.getNom() != null ? dto.getNom() : "(sans nom)");
+        lblNom.setStyle("-fx-font-size: 15px; -fx-font-weight: 800; -fx-text-fill: #1f2937;");
+        lblNom.setWrapText(true);
+
+        Label lblType = new Label(dto.getTypeRepas() != null ? dto.getTypeRepas() : "");
+        lblType.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-background-color: #f1f5f9; "
+                + "-fx-background-radius: 4; -fx-padding: 2 6;");
+
+        // En-tête : rang + nom + type
+        VBox headerNom = new VBox(3, lblNom, lblType);
+        HBox header = new HBox(12, lblRang, headerNom);
+        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+        // Score de similarité
+        Label lblScore = new Label(String.format("Score similarité : %.1f pt", dto.getScoreSimilarite()));
+        lblScore.setStyle("-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: " + couleurRang + ";");
+
+        // Label de compatibilité
+        Label lblCompat = new Label(dto.getLabelCompatibilite());
+        lblCompat.setStyle("-fx-font-size: 12px; -fx-text-fill: #059669; -fx-font-weight: 700;");
+
+        // Macros en ligne
+        HBox macros = new HBox(16);
+        macros.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        macros.getChildren().addAll(
+                creerMacroLabel("🔥", "Calories", dto.getCalories(), "kcal", "#ef4444"),
+                creerMacroLabel("⚡", "Prot.",    dto.getProteines(), "g",    "#3b82f6"),
+                creerMacroLabel("🌿", "Glucides", dto.getGlucides(),  "g",    "#10b981"),
+                creerMacroLabel("💧", "Lipides",  dto.getLipides(),   "g",    "#f59e0b")
+        );
+
+        // Assemblage de la carte
+        VBox card = new VBox(10, header, lblScore, lblCompat, macros);
+        card.setStyle("-fx-background-color: white; "
+                + "-fx-background-radius: 12; "
+                + "-fx-border-color: " + couleurRang + "; "
+                + "-fx-border-radius: 12; "
+                + "-fx-border-width: 2; "
+                + "-fx-padding: 18; "
+                + "-fx-effect: dropshadow(gaussian, rgba(15,23,42,0.06), 12, 0, 0, 6);");
+        return card;
+    }
+
+    /** Crée un petit bloc d'affichage d'une valeur nutritionnelle. */
+    private VBox creerMacroLabel(String emoji, String label, double valeur,
+                                 String unite, String couleur) {
+        Label top = new Label(emoji + " " + label);
+        top.setStyle("-fx-font-size: 10px; -fx-text-fill: #94a3b8; -fx-font-weight: 600;");
+        Label val = new Label(String.format("%.0f", valeur) + " " + unite);
+        val.setStyle("-fx-font-size: 13px; -fx-font-weight: 800; -fx-text-fill: " + couleur + ";");
+        VBox box = new VBox(2, top, val);
+        box.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+        return box;
     }
 }

@@ -168,22 +168,24 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
                     AVG(rp.lipides) AS moyenne_lipides,
                     SUM(
                         CASE
-                            WHEN rg.type_sante = 'PERTE_POIDS' AND rp.calories > 600 THEN 1
-                            WHEN rg.type_sante = 'PERTE_POIDS' AND rp.lipides > 25 THEN 1
-                            WHEN rg.type_sante = 'PRISE_MASSE' AND rp.proteines < 20 THEN 1
-                            WHEN rg.type_sante = 'DIABETIQUE' AND rp.glucides > 45 THEN 1
-                            WHEN rg.type_sante = 'EQUILIBRE' AND (rp.calories > 700 OR rp.lipides > 30 OR rp.glucides > 80) THEN 1
+                            WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.calories > 600 THEN 1
+                            WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.lipides > 25 THEN 1
+                            WHEN rg.type_sante IN ('PRISE_MASSE', 'sous_poids') AND rp.proteines < 20 THEN 1
+                            WHEN rg.type_sante IN ('diabetique', 'DIABETIQUE') AND rp.glucides > 45 THEN 1
+                            WHEN rg.type_sante IN ('EQUILIBRE', 'normal') AND (rp.calories > 750 OR rp.lipides > 30) THEN 1
+                            WHEN rg.type_sante = 'cardiaque' AND rp.lipides > 20 THEN 1
                             ELSE 0
                         END
                     ) AS nombre_contradictions,
                     ROUND(
                         SUM(
                             CASE
-                                WHEN rg.type_sante = 'PERTE_POIDS' AND rp.calories > 600 THEN 1
-                                WHEN rg.type_sante = 'PERTE_POIDS' AND rp.lipides > 25 THEN 1
-                                WHEN rg.type_sante = 'PRISE_MASSE' AND rp.proteines < 20 THEN 1
-                                WHEN rg.type_sante = 'DIABETIQUE' AND rp.glucides > 45 THEN 1
-                                WHEN rg.type_sante = 'EQUILIBRE' AND (rp.calories > 700 OR rp.lipides > 30 OR rp.glucides > 80) THEN 1
+                                WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.calories > 600 THEN 1
+                                WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.lipides > 25 THEN 1
+                                WHEN rg.type_sante IN ('PRISE_MASSE', 'sous_poids') AND rp.proteines < 20 THEN 1
+                                WHEN rg.type_sante IN ('diabetique', 'DIABETIQUE') AND rp.glucides > 45 THEN 1
+                                WHEN rg.type_sante IN ('EQUILIBRE', 'normal') AND (rp.calories > 750 OR rp.lipides > 30) THEN 1
+                                WHEN rg.type_sante = 'cardiaque' AND rp.lipides > 20 THEN 1
                                 ELSE 0
                             END
                         ) * 100.0 / NULLIF(COUNT(rp.id_repas), 0), 2
@@ -205,21 +207,21 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
                     rp.glucides,
                     rp.lipides,
                     CASE
-                        WHEN rg.type_sante = 'PERTE_POIDS' AND rp.calories > 600 THEN 'Calories trop élevées pour une perte de poids'
-                        WHEN rg.type_sante = 'PERTE_POIDS' AND rp.lipides > 25 THEN 'Lipides trop élevés pour une perte de poids'
-                        WHEN rg.type_sante = 'PRISE_MASSE' AND rp.proteines < 20 THEN 'Protéines insuffisantes pour une prise de masse'
-                        WHEN rg.type_sante = 'DIABETIQUE' AND rp.glucides > 45 THEN 'Glucides trop élevés pour un régime diabétique'
-                        WHEN rg.type_sante = 'EQUILIBRE' AND rp.calories > 700 THEN 'Calories trop élevées pour un régime équilibré'
-                        WHEN rg.type_sante = 'EQUILIBRE' AND rp.lipides > 30 THEN 'Lipides trop élevés pour un régime équilibré'
-                        WHEN rg.type_sante = 'EQUILIBRE' AND rp.glucides > 80 THEN 'Glucides trop élevés pour un régime équilibré'
+                        WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.calories > 600 THEN 'Calories trop élevées pour perte de poids'
+                        WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.lipides > 25 THEN 'Excès de lipides (gras) détecté'
+                        WHEN rg.type_sante IN ('PRISE_MASSE', 'sous_poids') AND rp.proteines < 20 THEN 'Protéines insuffisantes pour la masse'
+                        WHEN rg.type_sante IN ('diabetique', 'DIABETIQUE') AND rp.glucides > 45 THEN 'Indice glycémique trop risqué'
+                        WHEN rg.type_sante = 'cardiaque' AND rp.lipides > 20 THEN 'Danger : Lipides trop élevés pour le coeur'
+                        WHEN rg.type_sante IN ('EQUILIBRE', 'normal') AND rp.calories > 750 THEN 'Repas trop lourd pour un équilibre'
                         ELSE 'Compatible'
                     END AS diagnostic,
                     CASE
-                        WHEN rg.type_sante = 'PERTE_POIDS' AND rp.calories > 600 THEN 40
-                        WHEN rg.type_sante = 'PERTE_POIDS' AND rp.lipides > 25 THEN 30
-                        WHEN rg.type_sante = 'PRISE_MASSE' AND rp.proteines < 20 THEN 35
-                        WHEN rg.type_sante = 'DIABETIQUE' AND rp.glucides > 45 THEN 45
-                        WHEN rg.type_sante = 'EQUILIBRE' AND (rp.calories > 700 OR rp.lipides > 30 OR rp.glucides > 80) THEN 25
+                        WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.calories > 600 THEN 40
+                        WHEN rg.type_sante IN ('obesite', 'surpoids', 'PERTE_POIDS') AND rp.lipides > 25 THEN 30
+                        WHEN rg.type_sante IN ('PRISE_MASSE', 'sous_poids') AND rp.proteines < 20 THEN 35
+                        WHEN rg.type_sante IN ('diabetique', 'DIABETIQUE') AND rp.glucides > 45 THEN 45
+                        WHEN rg.type_sante = 'cardiaque' AND rp.lipides > 20 THEN 50
+                        WHEN rg.type_sante IN ('EQUILIBRE', 'normal') AND rp.calories > 750 THEN 20
                         ELSE 0
                     END AS score_risque
                 FROM %s rg
@@ -233,8 +235,11 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
             pstmStats.setInt(1, regimeId);
             try (ResultSet rs = pstmStats.executeQuery()) {
                 if (rs.next()) {
-                    rapport.setNomRegime("Régime #" + rs.getInt("regime_id"));
-                    rapport.setObjectif(rs.getString("regime_objectif"));
+                    String objectif = rs.getString("regime_objectif");
+                    String label = (objectif == null || objectif.isBlank() ? "Général" : objectif);
+                    label = label.substring(0, 1).toUpperCase() + label.substring(1);
+                    rapport.setNomRegime("Régime " + label);
+                    rapport.setObjectif(objectif);
                     rapport.setNombreRepas(rs.getInt("nombre_repas"));
                     rapport.setTotalCalories(rs.getInt("total_calories"));
                     rapport.setMoyenneCalories(rs.getDouble("moyenne_calories"));
@@ -247,7 +252,9 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
                     // Cas où le régime n'a aucun repas ou n'existe pas
                     RegimeAlimentaire reg = getById(regimeId);
                     if (reg != null) {
-                        rapport.setNomRegime("Régime #" + reg.getId());
+                        String label = (reg.getTypeSante() == null || reg.getTypeSante().isBlank() ? "Général" : reg.getTypeSante());
+                        label = label.substring(0, 1).toUpperCase() + label.substring(1);
+                        rapport.setNomRegime("Régime " + label);
                         rapport.setObjectif(reg.getTypeSante());
                         rapport.setNombreRepas(0);
                         rapport.setTauxContradiction(0);
@@ -303,6 +310,16 @@ public class ServiceRegimeAlimentaire implements IServices<RegimeAlimentaire> {
         }
 
         return rapport;
+    }
+
+
+    private void validate(RegimeAlimentaire regime) {
+        if (regime == null) {
+            throw new IllegalArgumentException("Le regime alimentaire est obligatoire.");
+        }
+        if (regime.getUserId() == null) {
+            throw new IllegalArgumentException("L'utilisateur du regime est obligatoire.");
+        }
     }
 
     private void setNullableInteger(PreparedStatement statement, int index, Integer value) throws SQLException {

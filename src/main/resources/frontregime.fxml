@@ -134,8 +134,9 @@
                                                         <VBox spacing="4">
                                                             <HBox spacing="6" alignment="CENTER_LEFT">
                                                                 <Label fx:id="lblPlannerRegimeTitle" text="My Regime" style="-fx-font-weight: 900; -fx-font-size: 18px; -fx-text-fill: #111827;"/>
-                                                                                                                                 <Label text="(Gérez vos régimes alimentaires)" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+                                                                 <Label text="(Gérez vos régimes alimentaires)" style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
                                                                  <Button text="🔍 Audit Intelligent" onAction="#afficherAuditRegimeActif" style="-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 4 10; -fx-font-size: 11px; -fx-cursor: hand;"/>
+                                                                 <Button text="🤖 Recommandations" onAction="#afficherMoteurRecommandation" style="-fx-background-color: #6366f1; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 8; -fx-padding: 4 10; -fx-font-size: 11px; -fx-cursor: hand;"/>
 
                                                             </HBox>
                                                             <Label text="Consultez ici votre profil nutritionnel actif. Le système calcule automatiquement IMC, type de santé et calories cibles selon vos données." wrapText="true" style="-fx-font-size: 13px; -fx-text-fill: #475569; -fx-line-spacing: 1.4;"/>
@@ -698,7 +699,8 @@
                         <HBox alignment="CENTER" style="-fx-padding: 15; -fx-background-color: #f8fafc; -fx-background-radius: 0 0 20 20; -fx-border-color: #e2e8f0; -fx-border-width: 1 0 0 0;">
                             <Label text="Cliquez sur le 'plus' pour ajouter un plat à votre suivi d'aujourd'hui." style="-fx-text-fill: #64748b; -fx-font-style: italic;"/>
                         </HBox>
-                    </VBox>
+                </VBox>
+            </VBox>
 
                 <!-- 11. AUDIT INTELLIGENT POPUP -->
                 <VBox fx:id="paneAuditRegime" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
@@ -773,12 +775,61 @@
                                 </VBox>
                                 
                                 <HBox alignment="CENTER" style="-fx-padding: 10 0 0 0;">
-                                    <Button text="Générer un rapport PDF" disable="true" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 12 30; -fx-cursor: hand;"/>
+                                    <Button text="Générer un rapport PDF" onAction="#genererRapportAuditPDF" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 12 30; -fx-cursor: hand;"/>
                                 </HBox>
                             </VBox>
                         </content>
                     </ScrollPane>
                 </VBox>
+
+                <!-- 12. MOTEUR DE RECOMMANDATION NUTRITIONNELLE -->
+                <VBox fx:id="paneRecommandation" alignment="CENTER" managed="false" visible="false" style="-fx-background-color: rgba(0,0,0,0.6);">
+                    <ScrollPane fitToWidth="true" maxWidth="950" maxHeight="850" style="-fx-background-color: transparent; -fx-background: transparent; -fx-padding: 20;">
+                        <content>
+                            <VBox spacing="25" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 40; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 30, 0, 0, 15);">
+
+                                <!-- En-tête -->
+                                <HBox alignment="CENTER_LEFT" spacing="20">
+                                    <VBox HBox.hgrow="ALWAYS" spacing="4">
+                                        <Label text="&#129302; Moteur de Recommandation Nutritionnelle"
+                                               style="-fx-font-size: 26px; -fx-font-weight: 900; -fx-text-fill: #111827;"/>
+                                        <Label fx:id="lblRecommandationTitre"
+                                               text="5 repas les plus compatibles avec votre r&#233;gime"
+                                               style="-fx-font-size: 14px; -fx-text-fill: #64748b;"/>
+                                    </VBox>
+                                    <Button onAction="#masquerTousLesFormulaires" text="&#10006; Fermer"
+                                            style="-fx-background-color: #f3f4f6; -fx-text-fill: #374151; -fx-font-weight: 800; -fx-background-radius: 10; -fx-padding: 10 20; -fx-cursor: hand;"/>
+                                </HBox>
+
+                                <Separator/>
+
+                                <!-- Bandeau explicatif -->
+                                <HBox spacing="20" alignment="CENTER_LEFT"
+                                      style="-fx-background-color: #eef2ff; -fx-padding: 18; -fx-background-radius: 12; -fx-border-color: #c7d2fe; -fx-border-radius: 12;">
+                                    <Label text="&#127304;" style="-fx-font-size: 28px;"/>
+                                    <VBox spacing="4" HBox.hgrow="ALWAYS">
+                                        <Label text="Comment fonctionne ce moteur ?"
+                                               style="-fx-font-weight: 800; -fx-text-fill: #3730a3; -fx-font-size: 14px;"/>
+                                        <Label text="Chaque repas est compar&#233; &#224; vos objectifs caloriques par une distance de Manhattan :"
+                                               style="-fx-font-size: 12px; -fx-text-fill: #4338ca;"
+                                               wrapText="true" maxWidth="700"/>
+                                        <Label text="Score = |calories - cible| + |prot&#233;ines - moy| + |glucides - moy| + |lipides - moy|"
+                                               style="-fx-font-size: 12px; -fx-font-weight: 700; -fx-text-fill: #6366f1; -fx-font-family: monospace;"
+                                               wrapText="true" maxWidth="700"/>
+                                        <Label text="Un score de 0 = correspondance parfaite. Les r&#233;sultats sont tri&#233;s du plus proche au plus &#233;loign&#233;."
+                                               style="-fx-font-size: 11px; -fx-text-fill: #4338ca;"
+                                               wrapText="true" maxWidth="700"/>
+                                    </VBox>
+                                </HBox>
+
+                                <!-- Zone des cartes de recommandation (inject&#233;e dynamiquement) -->
+                                <VBox fx:id="boxRecommandationCards" spacing="14"/>
+
+                            </VBox>
+                        </content>
+                    </ScrollPane>
+                </VBox>
+
                 </StackPane>
             
             <!-- Floating Buttons -->

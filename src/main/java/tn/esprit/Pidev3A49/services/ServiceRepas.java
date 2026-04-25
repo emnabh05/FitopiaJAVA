@@ -1,6 +1,7 @@
 package tn.esprit.Pidev3A49.services;
 
 import tn.esprit.Pidev3A49.Models.Repas;
+import tn.esprit.Pidev3A49.dto.RepasSimilariteDTO;
 import tn.esprit.Pidev3A49.interfaces.IServices;
 import tn.esprit.Pidev3A49.utils.MyDataBase;
 import tn.esprit.Pidev3A49.utils.SchemaInitializer;
@@ -168,6 +169,209 @@ public class ServiceRepas implements IServices<Repas> {
             pstm.setInt(11, repas.getId());
         }
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  MOTEUR DE RECOMMANDATION — Similarité Nutritionnelle
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Recommande les 5 repas dont le profil nutritionnel est le plus proche
+     * des objectifs caloriques du régime alimentaire donné.
+     *
+     * <p><b>Algorithme — Distance de Manhattan</b> :</p>
+     * <pre>
+     *   score = |calories_repas - objectif_calories|
+     *         + |proteines_repas - moy_proteines_regime|
+     *         + |glucides_repas  - moy_glucides_regime|
+     *         + |lipides_repas   - moy_lipides_regime|
+     * </pre>
+     *
+     * <p>On utilise {@code ABS()} pour mesurer l'écart dans les deux sens :
+     * un repas trop riche ET un repas trop pauvre s'éloignent tous les deux
+     * de l'objectif, et doivent donc être pénalisés de façon symétrique.</p>
+     *
+     * <p>{@code ORDER BY score_similarite ASC} garantit que les repas les
+     * plus proches de l'objectif arrivent en tête de liste.</p>
+     *
+     * <p>{@code LIMIT 5} restreint la réponse aux 5 meilleurs candidats,
+     * ce qui est suffisant pour une interface de recommandation.</p>
+     *
+     * @param regimeId identifiant du régime alimentaire cible
+     * @return liste des 5 repas les plus similaires, triés par score croissant.
+     *         Retourne une liste vide si le régime est introuvable ou si la
+     *         base ne contient aucun repas.
+     * @throws IllegalArgumentException si {@code regimeId} est null ou négatif
+     * @throws IllegalStateException    en cas d'erreur d'accès à la base de données
+     */
+    public List<RepasSimilariteDTO> trouverRepasSimilaires(int regimeId) {
+        if (regimeId <= 0) {
+            throw new IllegalArgumentException("L'identifiant du régime doit être un entier positif.");
+        }
+
+        /*
+         * Requête SQL complexe avec :
+         *  • JOIN entre repas (r) et regime_alimentaire (rg) — chaque repas
+         *    est comparé aux objectifs du régime cible.
+         *  • ABS() — mesure l'écart absolu entre la valeur réelle et l'objectif.
+         *    Sans ABS, un repas à -200 kcal de l'objectif et un repas à +200 kcal
+         *    auraient le même bilan algébrique (0 si on additionne), ce qui serait
+         *    trompeur.
+         *  • Les objectifs macros (protéines, glucides, lipides) sont estimés à
+         *    partir des moyennes des repas déjà associés au régime. Si aucun repas
+         *    n'est encore associé, les sous-requêtes retournent NULL et COALESCE
+         *    remplace par 0, évitant toute erreur.
+         *  • ORDER BY score_similarite ASC — les repas les plus proches en premier.
+         *  • LIMIT 5 — on ne garde que les 5 meilleurs candidats.
+         */
+        String qry = """
+                SELECT
+                    r.id_repas,
+                    r.nom_repas,
+                    r.type_repas,
+                    COALESCE(r.calories,  0) AS calories,
+                    COALESCE(r.proteines, 0) AS proteines,
+                    COALESCE(r.glucides,  0) AS glucides,
+                    COALESCE(r.lipides,   0) AS lipides,
+                    (
+                        ABS(COALESCE(r.calories,  0) - COALESCE(rg.calories_cibles, 0))
+                      + ABS(COALESCE(r.proteines, 0) - COALESCE(
+                              (SELECT AVG(rp2.proteines) FROM %2$s rp2 WHERE rp2.regime_id = rg.id), 0))
+                      + ABS(COALESCE(r.glucides,  0) - COALESCE(
+                              (SELECT AVG(rp2.glucides)  FROM %2$s rp2 WHERE rp2.regime_id = rg.id), 0))
+                      + ABS(COALESCE(r.lipides,   0) - COALESCE(
+                              (SELECT AVG(rp2.lipides)   FROM %2$s rp2 WHERE rp2.regime_id = rg.id), 0))
+                    ) AS score_similarite
+                FROM %2$s r
+                JOIN %1$s rg ON rg.id = ?
+                ORDER BY score_similarite ASC
+                LIMIT 5
+                """.formatted(SchemaInitializer.REGIME_TABLE, TABLE_NAME);
+
+        List<RepasSimilariteDTO> resultats = new ArrayList<>();
+
+        try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
+            pstm.setInt(1, regimeId);
+
+            try (ResultSet rs = pstm.executeQuery()) {
+                // Si le ResultSet est vide, le régime est introuvable OU il n'y a aucun repas :
+                // on retourne une liste vide (comportement défensif).
+                while (rs.next()) {
+                    resultats.add(mapRepasSimilariteResultSet(rs, "score_similarite"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException(
+                    "Erreur lors de la recherche de repas similaires au régime id=" + regimeId, e);
+        }
+
+        return resultats;
+    }
+
+    /**
+     * Recommande les 5 repas dont le profil nutritionnel est le plus proche
+     * d'un repas de référence donné.
+     *
+     * <p>Utile pour proposer des alternatives équivalentes à un repas apprécié,
+     * ou pour trouver des repas interchangeables dans un planning hebdomadaire.</p>
+     *
+     * <p><b>Algorithme — Distance de Manhattan entre deux repas</b> :</p>
+     * <pre>
+     *   distance = |cal(r1) - cal(r2)| + |prot(r1) - prot(r2)|
+     *            + |gluc(r1) - gluc(r2)| + |lip(r1) - lip(r2)|
+     * </pre>
+     *
+     * <p>La jointure {@code r1.id <> r2.id} exclut le repas lui-même
+     * des résultats, évitant qu'un repas soit recommandé comme son propre
+     * substitut.</p>
+     *
+     * @param repasId identifiant du repas de référence
+     * @return liste des 5 repas les plus proches nutritionnellement, triés
+     *         par distance croissante. Liste vide si le repas est introuvable
+     *         ou si aucun autre repas n'existe en base.
+     * @throws IllegalArgumentException si {@code repasId} est null ou négatif
+     * @throws IllegalStateException    en cas d'erreur d'accès à la base de données
+     */
+    public List<RepasSimilariteDTO> trouverRepasSimilairesAUnRepas(int repasId) {
+        if (repasId <= 0) {
+            throw new IllegalArgumentException("L'identifiant du repas doit être un entier positif.");
+        }
+
+        /*
+         * Requête SQL avec auto-jointure (repas r1 vs repas r2) :
+         *  • r1 est le repas de référence (WHERE r1.id_repas = ?).
+         *  • r2 représente tous les autres repas (r1.id_repas <> r2.id_repas).
+         *  • ABS() calcule l'écart absolu pour chaque macro-nutriment.
+         *  • ORDER BY distance ASC — les repas les plus proches en premier.
+         *  • LIMIT 5 — top 5 des repas substituts.
+         */
+        String qry = """
+                SELECT
+                    r2.id_repas,
+                    r2.nom_repas,
+                    r2.type_repas,
+                    COALESCE(r2.calories,  0) AS calories,
+                    COALESCE(r2.proteines, 0) AS proteines,
+                    COALESCE(r2.glucides,  0) AS glucides,
+                    COALESCE(r2.lipides,   0) AS lipides,
+                    (
+                        ABS(COALESCE(r1.calories,  0) - COALESCE(r2.calories,  0))
+                      + ABS(COALESCE(r1.proteines, 0) - COALESCE(r2.proteines, 0))
+                      + ABS(COALESCE(r1.glucides,  0) - COALESCE(r2.glucides,  0))
+                      + ABS(COALESCE(r1.lipides,   0) - COALESCE(r2.lipides,   0))
+                    ) AS score_similarite
+                FROM %1$s r1
+                JOIN %1$s r2 ON r1.id_repas <> r2.id_repas
+                WHERE r1.id_repas = ?
+                ORDER BY score_similarite ASC
+                LIMIT 5
+                """.formatted(TABLE_NAME);
+
+        List<RepasSimilariteDTO> resultats = new ArrayList<>();
+
+        try (PreparedStatement pstm = cnx.prepareStatement(qry)) {
+            pstm.setInt(1, repasId);
+
+            try (ResultSet rs = pstm.executeQuery()) {
+                // Liste vide si le repas est introuvable ou si aucun autre repas n'existe.
+                while (rs.next()) {
+                    resultats.add(mapRepasSimilariteResultSet(rs, "score_similarite"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new IllegalStateException(
+                    "Erreur lors de la recherche de repas similaires au repas id=" + repasId, e);
+        }
+
+        return resultats;
+    }
+
+    /**
+     * Mappe une ligne du ResultSet vers un {@link RepasSimilariteDTO}.
+     *
+     * <p>Les valeurs nutritionnelles sont lues comme {@code double} car
+     * le moteur SQL peut retourner des moyennes décimales (AVG).</p>
+     *
+     * @param rs          le ResultSet positionné sur la ligne courante
+     * @param scoreColumn nom de la colonne SQL contenant le score de similarité
+     * @return instance de {@link RepasSimilariteDTO} renseignée
+     * @throws SQLException en cas de problème de lecture du ResultSet
+     */
+    private RepasSimilariteDTO mapRepasSimilariteResultSet(ResultSet rs, String scoreColumn) throws SQLException {
+        return new RepasSimilariteDTO(
+                rs.getInt("id_repas"),
+                rs.getString("nom_repas"),
+                rs.getString("type_repas"),
+                rs.getDouble("calories"),
+                rs.getDouble("proteines"),
+                rs.getDouble("glucides"),
+                rs.getDouble("lipides"),
+                rs.getDouble(scoreColumn)  // Score de distance nutritionnelle (0 = parfait)
+        );
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    //  Méthodes privées utilitaires
+    // ═══════════════════════════════════════════════════════════════════════════
 
     private void validate(Repas repas) {
         if (repas == null) {
