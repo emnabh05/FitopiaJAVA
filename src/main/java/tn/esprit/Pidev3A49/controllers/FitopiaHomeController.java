@@ -30,6 +30,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
 import tn.esprit.Pidev3A49.Models.FitnessExercise;
+import tn.esprit.Pidev3A49.services.CoachTtsService;
 import tn.esprit.Pidev3A49.services.ServiceFitnessExercise;
 
 import java.time.LocalDateTime;
@@ -67,6 +68,7 @@ public class FitopiaHomeController {
     private static final DateTimeFormatter PLAN_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private final ServiceFitnessExercise serviceFitnessExercise = new ServiceFitnessExercise();
+    private final CoachTtsService coachTts = new CoachTtsService();
     private final List<ProgramExercise> selectedExercisesTemp = new ArrayList<>();
     private final List<ConfirmedPlan> confirmedPlans = new ArrayList<>();
     private String selectedProgram;
@@ -95,7 +97,23 @@ public class FitopiaHomeController {
     @FXML private VBox plannerPlansContent;
     @FXML private VBox plannerProgramsContent;
     @FXML private VBox plannerCrudContent;
+    @FXML private VBox plannerCoachContent;
     @FXML private FlowPane plansSelectionContainer;
+    @FXML private FlowPane coachCardsContainer;
+    @FXML private FlowPane exerciseCardsGrid;
+    @FXML private VBox coachBookingForm;
+    @FXML private Label lblBookingCoachName;
+    @FXML private Label lblBookingCoachSlots;
+    @FXML private Label lblBookingStatus;
+    @FXML private Label lblSelectedSlot;
+    @FXML private TextField tfBookingName;
+    @FXML private TextField tfBookingEmail;
+    @FXML private TextField tfBookingPhone;
+    @FXML private TextArea taBookingMessage;
+    @FXML private FlowPane bookingDateButtons;
+    @FXML private javafx.scene.control.ComboBox<String> cbBookingSlot;
+    private CoachData selectedBookingCoach = null;
+    private String selectedBookingDate = null;
     @FXML private Label lblPlansEmptyState;
     @FXML private Label lblPlannerContentHint;
     @FXML private Button btnPlannerPlans;
@@ -193,6 +211,8 @@ public class FitopiaHomeController {
         plannerProgramsContent.setManaged(false);
         plannerCrudContent.setVisible(false);
         plannerCrudContent.setManaged(false);
+        plannerCoachContent.setVisible(false);
+        plannerCoachContent.setManaged(false);
         lblPlannerContentHint.setText("Les seances confirmees depuis Programs sont affichees ici.");
         renderPlannedExercises();
     }
@@ -206,6 +226,8 @@ public class FitopiaHomeController {
         plannerProgramsContent.setManaged(true);
         plannerCrudContent.setVisible(false);
         plannerCrudContent.setManaged(false);
+        plannerCoachContent.setVisible(false);
+        plannerCoachContent.setManaged(false);
         lblPlannerContentHint.setText("Choisissez un programme pour ouvrir le choix du lieu d'entrainement.");
     }
 
@@ -218,6 +240,8 @@ public class FitopiaHomeController {
         plannerProgramsContent.setManaged(false);
         plannerCrudContent.setVisible(true);
         plannerCrudContent.setManaged(true);
+        plannerCoachContent.setVisible(false);
+        plannerCoachContent.setManaged(false);
         lblPlannerContentHint.setText("Retour");
     }
 
@@ -230,6 +254,8 @@ public class FitopiaHomeController {
         plannerProgramsContent.setManaged(false);
         plannerCrudContent.setVisible(false);
         plannerCrudContent.setManaged(false);
+        plannerCoachContent.setVisible(false);
+        plannerCoachContent.setManaged(false);
         lblPlannerContentHint.setText("Section Explore selectionnee. Cliquez sur Exercises pour afficher le CRUD des exercices.");
     }
 
@@ -242,7 +268,10 @@ public class FitopiaHomeController {
         plannerProgramsContent.setManaged(false);
         plannerCrudContent.setVisible(false);
         plannerCrudContent.setManaged(false);
-        lblPlannerContentHint.setText("Section Coach selectionnee. Cliquez sur Exercises pour afficher le CRUD des exercices.");
+        plannerCoachContent.setVisible(true);
+        plannerCoachContent.setManaged(true);
+        lblPlannerContentHint.setText("Choisissez un coach et reservez votre seance.");
+        renderCoachCards();
     }
 
     @FXML
@@ -434,11 +463,17 @@ public class FitopiaHomeController {
     @FXML
     private void toggleCoachIa() {
         coachIaEnabled = !coachIaEnabled;
+        coachTts.setEnabled(coachIaEnabled);
         btnCoachIa.setText(coachIaEnabled ? "Coach IA Off" : "Coach IA On");
         String exerciseName = safeExerciseName();
-        afficherTrainingInfo(coachIaEnabled
-                ? "Coach IA active. Conseil: gardez le tempo sur " + exerciseName + "."
-                : "Coach IA desactive.");
+        if (coachIaEnabled) {
+            String[] tips = COACH_WORK_TIPS[coachTipCycle % COACH_WORK_TIPS.length];
+            String tip = tips[currentRound > 0 ? (currentRound - 1) % tips.length : 0];
+            afficherTrainingInfo("Coach IA: " + tip + " (" + exerciseName + ")");
+        } else {
+            coachTts.cancelCurrent();
+            afficherTrainingInfo("Coach IA desactive.");
+        }
     }
 
     @FXML
@@ -840,7 +875,10 @@ public class FitopiaHomeController {
                 }
             }
         });
-        sliderGlobalVolume.valueProperty().addListener((observable, oldValue, newValue) -> updateGlobalVolume(newValue.doubleValue()));
+        sliderGlobalVolume.valueProperty().addListener((observable, oldValue, newValue) -> {
+            updateGlobalVolume(newValue.doubleValue());
+            coachTts.setVolume(newValue.doubleValue());
+        });
     }
 
     private void ensureTrainingTimeline() {
@@ -850,6 +888,23 @@ public class FitopiaHomeController {
         trainingTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> advanceTrainingTimer()));
         trainingTimeline.setCycleCount(Timeline.INDEFINITE);
     }
+
+    private static final String[][] COACH_WORK_TIPS = {
+        {"Gardez le dos bien plaque.", "Respirez : expirez a l'effort.", "Contractez les muscles cibles."},
+        {"Contrôlez la descente lentement.", "Gardez les coudes alignes.", "Poussez jusqu'au bout du mouvement."},
+        {"Restez concentre sur la forme.", "Ne bloquez pas votre respiration.", "Serrez les abdos pour stabiliser."}
+    };
+    private static final String[] COACH_REST_TIPS = {
+        "Repos actif : respirez profondement.",
+        "Hydratez-vous, prochain round bientot.",
+        "Detendez les muscles, restez concentre."
+    };
+    private static final String[] COACH_HALFWAY_TIPS = {
+        "Mi-parcours ! Gardez l'intensite.",
+        "Vous etes a mi-chemin, continuez !",
+        "Bonne progression, ne lachez pas !"
+    };
+    private int coachTipCycle = 0;
 
     private void advanceTrainingTimer() {
         if (currentTrainingPhase == TrainingPhase.COMPLETE) {
@@ -863,6 +918,20 @@ public class FitopiaHomeController {
             remainingSeconds--;
         }
 
+        // Coach IA: tips at key moments during WORK phase
+        if (coachIaEnabled && currentTrainingPhase == TrainingPhase.WORK) {
+            int halfWork = workSeconds / 2;
+            if (remainingSeconds == halfWork) {
+                afficherTrainingInfo("Coach IA: " + COACH_HALFWAY_TIPS[currentRound % COACH_HALFWAY_TIPS.length]);
+            } else if (remainingSeconds == workSeconds - 5 && workSeconds > 10) {
+                String[] tips = COACH_WORK_TIPS[coachTipCycle % COACH_WORK_TIPS.length];
+                afficherTrainingInfo("Coach IA: " + tips[(currentRound - 1) % tips.length]);
+                coachTipCycle++;
+            } else if (remainingSeconds == 3) {
+                afficherTrainingInfo("Coach IA: Plus que 3 secondes, donnez tout !");
+            }
+        }
+
         if (remainingSeconds == 0) {
             if (currentTrainingPhase == TrainingPhase.WORK) {
                 if (currentRound >= totalRounds) {
@@ -874,20 +943,28 @@ public class FitopiaHomeController {
                         trainingVideoPlayer.pause();
                     }
                     if (currentExerciseIndex >= getCurrentTrainingExercises().size() - 1) {
-                        afficherTrainingInfo("Dernier exercice termine. Seance terminee.");
+                        afficherTrainingInfo(coachIaEnabled
+                            ? "Coach IA: Excellent travail ! Seance terminee."
+                            : "Dernier exercice termine. Seance terminee.");
                     } else {
-                        afficherTrainingInfo("Exercice termine. Passez a l'exercice suivant.");
+                        afficherTrainingInfo(coachIaEnabled
+                            ? "Coach IA: Bien joue ! Passez a l'exercice suivant."
+                            : "Exercice termine. Passez a l'exercice suivant.");
                     }
                 } else {
                     currentTrainingPhase = TrainingPhase.REST;
                     remainingSeconds = restSeconds;
-                    afficherTrainingInfo("Phase de repos.");
+                    afficherTrainingInfo(coachIaEnabled
+                        ? "Coach IA: " + COACH_REST_TIPS[currentRound % COACH_REST_TIPS.length]
+                        : "Phase de repos.");
                 }
             } else if (currentTrainingPhase == TrainingPhase.REST) {
                 currentRound++;
                 currentTrainingPhase = TrainingPhase.WORK;
                 remainingSeconds = workSeconds;
-                afficherTrainingInfo("Round " + currentRound + " en cours.");
+                afficherTrainingInfo(coachIaEnabled
+                    ? "Coach IA: Round " + currentRound + " - Allez, on repart !"
+                    : "Round " + currentRound + " en cours.");
             }
         }
 
@@ -924,6 +1001,7 @@ public class FitopiaHomeController {
         currentTrainingPhase = TrainingPhase.WORK;
         remainingSeconds = workSeconds;
         coachIaEnabled = false;
+        coachTipCycle = 0;
         if (btnCoachIa != null) {
             btnCoachIa.setText("Coach IA On");
         }
@@ -1013,6 +1091,7 @@ public class FitopiaHomeController {
 
     private void cleanupTrainingSession(boolean includeMusic) {
         cleanupVideoAndTimer();
+        coachTts.cancelCurrent();
         if (includeMusic) {
             disposeMusicPlayer();
             btnMusicPause.setText("Music Pause");
@@ -1038,6 +1117,11 @@ public class FitopiaHomeController {
     private void afficherTrainingInfo(String message) {
         lblTrainingStatus.setText(message);
         lblTrainingStatus.setStyle("-fx-text-fill: #3d4e5c;");
+        // Speak coach messages aloud
+        if (coachIaEnabled && message.startsWith("Coach IA:")) {
+            String spoken = message.substring("Coach IA:".length()).trim();
+            coachTts.speak(spoken);
+        }
     }
 
     private void afficherTrainingErreur(String message) {
@@ -1097,7 +1181,81 @@ public class FitopiaHomeController {
     }
 
     private void chargerExercises() {
-        tableExercises.setItems(FXCollections.observableArrayList(serviceFitnessExercise.getAll()));
+        List<FitnessExercise> list = serviceFitnessExercise.getAll();
+        tableExercises.setItems(FXCollections.observableArrayList(list));
+        renderExerciseCards(list);
+    }
+
+    private void renderExerciseCards(List<FitnessExercise> exercises) {
+        if (exerciseCardsGrid == null) return;
+        exerciseCardsGrid.getChildren().clear();
+
+        if (exercises.isEmpty()) {
+            javafx.scene.control.Label empty = new javafx.scene.control.Label("Aucun exercice enregistré.");
+            empty.setStyle("-fx-text-fill:#64748b;-fx-font-size:13px;");
+            exerciseCardsGrid.getChildren().add(empty);
+            return;
+        }
+
+        for (FitnessExercise ex : exercises) {
+            javafx.scene.layout.VBox card = new javafx.scene.layout.VBox(6);
+            card.setPrefWidth(200);
+            card.setMaxWidth(220);
+            card.setStyle("-fx-background-color:#fff;-fx-border-color:#dce9ee;-fx-border-radius:12;"
+                + "-fx-background-radius:12;-fx-padding:12;"
+                + "-fx-effect:dropshadow(gaussian,rgba(10,36,54,0.07),8,0,0,2);-fx-cursor:hand;");
+
+            // Couleur badge difficulté
+            String badgeColor = switch (ex.getDifficulty() == null ? "" : ex.getDifficulty().toLowerCase()) {
+                case "avance", "advanced", "intermediaire" -> "#f59e0b";
+                case "expert" -> "#ef4444";
+                default -> "#22c55e";
+            };
+
+            javafx.scene.layout.HBox header = new javafx.scene.layout.HBox(6);
+            header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+            javafx.scene.control.Label nameLabel = new javafx.scene.control.Label(ex.getName());
+            nameLabel.setStyle("-fx-font-weight:800;-fx-font-size:12px;-fx-text-fill:#0b3a3d;");
+            nameLabel.setWrapText(true);
+            nameLabel.setMaxWidth(140);
+            javafx.scene.layout.HBox.setHgrow(nameLabel, javafx.scene.layout.Priority.ALWAYS);
+
+            javafx.scene.control.Label badge = new javafx.scene.control.Label(ex.getDifficulty() != null ? ex.getDifficulty() : "");
+            badge.setStyle("-fx-background-color:" + badgeColor + ";-fx-text-fill:#fff;"
+                + "-fx-font-size:9px;-fx-font-weight:700;-fx-background-radius:6;-fx-padding:2 6;");
+
+            header.getChildren().addAll(nameLabel, badge);
+
+            javafx.scene.control.Label muscleLabel = new javafx.scene.control.Label("💪 " + (ex.getMuscleGroup() != null ? ex.getMuscleGroup() : ""));
+            muscleLabel.setStyle("-fx-font-size:11px;-fx-text-fill:#1a6b5a;-fx-font-weight:600;");
+
+            javafx.scene.layout.HBox stats = new javafx.scene.layout.HBox(10);
+            if (ex.getSets() > 0)
+                stats.getChildren().add(styledStat(ex.getSets() + " séries"));
+            if (ex.getRepetitions() > 0)
+                stats.getChildren().add(styledStat(ex.getRepetitions() + " reps"));
+            if (ex.getDuration() > 0)
+                stats.getChildren().add(styledStat(ex.getDuration() + " min"));
+
+            card.getChildren().addAll(header, muscleLabel);
+            if (!stats.getChildren().isEmpty()) card.getChildren().add(stats);
+
+            // Clic → remplir le formulaire
+            card.setOnMouseClicked(e -> {
+                remplirFormulaire(ex);
+                tableExercises.getSelectionModel().select(ex);
+            });
+
+            exerciseCardsGrid.getChildren().add(card);
+        }
+    }
+
+    private javafx.scene.control.Label styledStat(String text) {
+        javafx.scene.control.Label l = new javafx.scene.control.Label(text);
+        l.setStyle("-fx-background-color:#f1f5f9;-fx-text-fill:#475467;-fx-font-size:10px;"
+            + "-fx-background-radius:5;-fx-padding:2 6;");
+        return l;
     }
 
     private void initialiserContraintesDeSaisie() {
@@ -1185,6 +1343,324 @@ public class FitopiaHomeController {
     private void afficherErreur(String message) {
         lblExerciseStatus.setText(message);
         lblExerciseStatus.setStyle("-fx-text-fill: #b33f48;");
+    }
+
+    // ── Coach data ────────────────────────────────────────────────────────────
+    private record CoachData(String id, String name, String specialty, String phone, String slots, String imagePath, String email) {
+        // slots format: "Lun-Ven 18h-21h | Sam 10h-13h"
+        // Returns list of (dayLabel, timeRange) pairs for the next 14 days
+        List<String[]> availableDates() {
+            List<String[]> result = new java.util.ArrayList<>();
+            String[] parts = slots.split("\\|");
+            java.time.LocalDate today = java.time.LocalDate.now();
+            String[] daysFr = {"Dim","Lun","Mar","Mer","Jeu","Ven","Sam"};
+            String[] monthsFr = {"Jan","Fév","Mar","Avr","Mai","Jun","Jul","Aoû","Sep","Oct","Nov","Déc"};
+
+            for (int offset = 0; offset <= 20; offset++) {
+                java.time.LocalDate date = today.plusDays(offset);
+                String dayShort = daysFr[date.getDayOfWeek().getValue() % 7];
+                for (String part : parts) {
+                    String p = part.trim();
+                    // Extract day range like "Lun-Ven" or "Sam" or "Dim"
+                    String[] tokens = p.split("\\s+", 2);
+                    if (tokens.length < 2) continue;
+                    String dayRange = tokens[0];
+                    String timeRange = tokens[1];
+                    if (matchesDay(dayShort, dayRange)) {
+                        String label = dayShort + " " + date.getDayOfMonth() + " " + monthsFr[date.getMonthValue()-1];
+                        result.add(new String[]{label, timeRange.trim(), date.toString()});
+                        break;
+                    }
+                }
+            }
+            return result;
+        }
+
+        private boolean matchesDay(String dayShort, String dayRange) {
+            String[] daysFr = {"Dim","Lun","Mar","Mer","Jeu","Ven","Sam"};
+            if (dayRange.contains("-")) {
+                String[] bounds = dayRange.split("-");
+                if (bounds.length < 2) return false;
+                int start = indexOf(daysFr, bounds[0].trim());
+                int end   = indexOf(daysFr, bounds[1].trim());
+                int cur   = indexOf(daysFr, dayShort);
+                if (start < 0 || end < 0 || cur < 0) return false;
+                if (start <= end) return cur >= start && cur <= end;
+                else return cur >= start || cur <= end; // wrap (ex: Sam-Lun)
+            }
+            return dayRange.trim().equalsIgnoreCase(dayShort);
+        }
+
+        private int indexOf(String[] arr, String val) {
+            for (int i = 0; i < arr.length; i++) if (arr[i].equalsIgnoreCase(val)) return i;
+            return -1;
+        }
+
+        // Returns time slots (every 30 min) within the range like "18h-21h"
+        List<String> timeSlots(String timeRange) {
+            List<String> slots = new java.util.ArrayList<>();
+            try {
+                String[] bounds = timeRange.replace("h", ":00").split("-");
+                if (bounds.length < 2) return slots;
+                java.time.LocalTime start = java.time.LocalTime.parse(bounds[0].trim().replace("h","").length() <= 2
+                    ? bounds[0].trim().replace("h","") + ":00" : bounds[0].trim().replace("h",":"));
+                java.time.LocalTime end = java.time.LocalTime.parse(bounds[1].trim().replace("h","").length() <= 2
+                    ? bounds[1].trim().replace("h","") + ":00" : bounds[1].trim().replace("h",":"));
+                java.time.LocalTime cur = start;
+                while (cur.isBefore(end)) {
+                    slots.add(String.format("%02d:%02d", cur.getHour(), cur.getMinute()));
+                    cur = cur.plusMinutes(30);
+                }
+            } catch (Exception ignored) {}
+            return slots;
+        }
+    }
+
+    private static final List<CoachData> COACH_LIST = List.of(
+        new CoachData("ahmed", "Ahmed Chebbi",  "Boxe & Cardio",           "+216 25 010 582", "Lun-Ven 18h-21h | Sam 10h-13h", "/media/fitness/coaches/ahmed.jpg", "ahmedchebbi323@gmail.com"),
+        new CoachData("ali",   "Ali Ben Salah", "Musculation & Force",     "+216 53 919 881", "Lun-Jeu 16h-20h | Dim 09h-12h", "/media/fitness/coaches/ali.jpg",   "ahmedchebbi323@gmail.com"),
+        new CoachData("omar",  "Omar Khelifi",  "Judo & Prep physique",    "+216 58 936 689", "Mar-Ven 17h-20h | Sam 15h-18h", "/media/fitness/coaches/omar.jpg",  "ahmedchebbi323@gmail.com"),
+        new CoachData("sarah", "Sarah Mansouri","Yoga & Mobilite",         "+216 28 759 998", "Lun-Ven 07h-10h | Sam 08h-11h", "/media/fitness/coaches/sarah.jpg", "ahmedchebbi323@gmail.com"),
+        new CoachData("rania", "Rania Trabelsi","Danse orientale & Cardio","+216 58 860 916", "Mer-Ven 18h-21h | Dim 16h-19h", "/media/fitness/coaches/rania.jpg", "ahmedchebbi323@gmail.com"),
+        new CoachData("emna",  "Emna Gharbi",   "Pilates & Gainage",       "+216 55 487 965", "Lun-Jeu 10h-13h | Sam 16h-19h", "/media/fitness/coaches/emna.jpg",  "ahmedchebbi323@gmail.com")
+    );
+
+    private void renderCoachCards() {
+        if (coachCardsContainer == null) return;
+        coachCardsContainer.getChildren().clear();
+
+        for (CoachData coach : COACH_LIST) {
+            // Photo
+            javafx.scene.layout.VBox card = new javafx.scene.layout.VBox(8);
+            card.setPrefWidth(220);
+            card.setMaxWidth(240);
+            card.getStyleClass().add("coach-card-item");
+            card.setStyle("-fx-background-color:#fff;-fx-border-color:#dce9ee;-fx-border-radius:14;-fx-background-radius:14;-fx-padding:0;-fx-effect:dropshadow(gaussian,rgba(10,36,54,0.08),10,0,0,3);");
+
+            // Image
+            javafx.scene.image.ImageView photo = new javafx.scene.image.ImageView();
+            photo.setFitWidth(220);
+            photo.setFitHeight(160);
+            photo.setPreserveRatio(false);
+            photo.setStyle("-fx-background-radius:14 14 0 0;");
+            try {
+                URL imgUrl = getClass().getResource(coach.imagePath());
+                if (imgUrl != null) {
+                    photo.setImage(new javafx.scene.image.Image(imgUrl.toExternalForm(), true));
+                }
+            } catch (Exception ignored) {}
+
+            // Info block
+            javafx.scene.layout.VBox info = new javafx.scene.layout.VBox(5);
+            info.setStyle("-fx-padding:10 12 12 12;");
+
+            javafx.scene.control.Label nameLabel = new javafx.scene.control.Label(coach.name());
+            nameLabel.setStyle("-fx-font-weight:800;-fx-font-size:13px;-fx-text-fill:#0b3a3d;");
+            nameLabel.setWrapText(true);
+
+            javafx.scene.control.Label specLabel = new javafx.scene.control.Label(coach.specialty());
+            specLabel.setStyle("-fx-font-size:11px;-fx-text-fill:#1a6b5a;-fx-font-weight:600;");
+
+            javafx.scene.control.Label phoneLabel = new javafx.scene.control.Label("\u260E " + coach.phone());
+            phoneLabel.setStyle("-fx-font-size:11px;-fx-text-fill:#64748b;");
+
+            javafx.scene.control.Label slotsLabel = new javafx.scene.control.Label("\uD83D\uDCC5 " + coach.slots());
+            slotsLabel.setStyle("-fx-font-size:10px;-fx-text-fill:#64748b;");
+            slotsLabel.setWrapText(true);
+
+            javafx.scene.control.Button bookBtn = new javafx.scene.control.Button("Reserver une seance");
+            bookBtn.setMaxWidth(Double.MAX_VALUE);
+            bookBtn.setStyle("-fx-background-color:linear-gradient(to right,#0b3a3d,#1a6b5a);-fx-text-fill:#fff;-fx-font-weight:700;-fx-font-size:11px;-fx-background-radius:8;-fx-padding:7 10;-fx-cursor:hand;");
+            bookBtn.setOnAction(e -> ouvrirFormulaireReservation(coach));
+
+            info.getChildren().addAll(nameLabel, specLabel, phoneLabel, slotsLabel, bookBtn);
+            card.getChildren().addAll(photo, info);
+            coachCardsContainer.getChildren().add(card);
+        }
+    }
+
+    private void ouvrirFormulaireReservation(CoachData coach) {
+        selectedBookingCoach = coach;
+        selectedBookingDate = null;
+
+        if (lblBookingCoachName != null)
+            lblBookingCoachName.setText("Réserver avec " + coach.name() + " — " + coach.specialty());
+        if (lblBookingCoachSlots != null)
+            lblBookingCoachSlots.setText("📞 " + coach.phone() + "   |   🗓 Disponibilités : " + coach.slots());
+        if (lblSelectedSlot != null) lblSelectedSlot.setText("");
+        if (lblBookingStatus != null) lblBookingStatus.setText("");
+        if (tfBookingName != null) tfBookingName.clear();
+        if (tfBookingEmail != null) tfBookingEmail.clear();
+        if (tfBookingPhone != null) tfBookingPhone.clear();
+        if (taBookingMessage != null) taBookingMessage.clear();
+        if (cbBookingSlot != null) { cbBookingSlot.getItems().clear(); cbBookingSlot.setDisable(true); }
+
+        // Générer les boutons de dates disponibles
+        if (bookingDateButtons != null) {
+            bookingDateButtons.getChildren().clear();
+            List<String[]> dates = coach.availableDates();
+            for (String[] entry : dates) {
+                // entry = [label, timeRange, isoDate]
+                javafx.scene.control.Button btn = new javafx.scene.control.Button(entry[0]);
+                btn.setStyle("-fx-background-color:#fff;-fx-border-color:#0b3a3d;-fx-border-radius:8;"
+                    + "-fx-background-radius:8;-fx-font-size:11px;-fx-font-weight:600;"
+                    + "-fx-text-fill:#0b3a3d;-fx-padding:5 12;-fx-cursor:hand;");
+                btn.setOnAction(e -> {
+                    // Désélectionner tous
+                    bookingDateButtons.getChildren().forEach(n -> n.setStyle(
+                        "-fx-background-color:#fff;-fx-border-color:#0b3a3d;-fx-border-radius:8;"
+                        + "-fx-background-radius:8;-fx-font-size:11px;-fx-font-weight:600;"
+                        + "-fx-text-fill:#0b3a3d;-fx-padding:5 12;-fx-cursor:hand;"));
+                    // Sélectionner ce bouton
+                    btn.setStyle("-fx-background-color:#0b3a3d;-fx-border-color:#0b3a3d;-fx-border-radius:8;"
+                        + "-fx-background-radius:8;-fx-font-size:11px;-fx-font-weight:700;"
+                        + "-fx-text-fill:#fff;-fx-padding:5 12;-fx-cursor:hand;");
+                    selectedBookingDate = entry[0] + " — " + entry[1];
+                    // Remplir les heures
+                    if (cbBookingSlot != null) {
+                        cbBookingSlot.getItems().clear();
+                        cbBookingSlot.getItems().addAll(coach.timeSlots(entry[1]));
+                        cbBookingSlot.setDisable(false);
+                        if (!cbBookingSlot.getItems().isEmpty())
+                            cbBookingSlot.getSelectionModel().selectFirst();
+                    }
+                    if (lblSelectedSlot != null)
+                        lblSelectedSlot.setText("✓ " + entry[0]);
+                });
+                bookingDateButtons.getChildren().add(btn);
+            }
+            if (dates.isEmpty()) {
+                javafx.scene.control.Label noDate = new javafx.scene.control.Label("Aucun créneau disponible dans les 3 prochaines semaines.");
+                noDate.setStyle("-fx-text-fill:#64748b;-fx-font-size:11px;");
+                bookingDateButtons.getChildren().add(noDate);
+            }
+        }
+
+        if (coachBookingForm != null) {
+            coachBookingForm.setVisible(true);
+            coachBookingForm.setManaged(true);
+        }
+    }
+
+    @FXML
+    private void annulerReservationCoach() {
+        selectedBookingCoach = null;
+        if (coachBookingForm != null) {
+            coachBookingForm.setVisible(false);
+            coachBookingForm.setManaged(false);
+        }
+    }
+
+    @FXML
+    private void confirmerReservationCoach() {
+        if (selectedBookingCoach == null) return;
+
+        String name  = tfBookingName  != null ? tfBookingName.getText().trim()  : "";
+        String email = tfBookingEmail != null ? tfBookingEmail.getText().trim()  : "";
+        String phone = tfBookingPhone != null ? tfBookingPhone.getText().trim()  : "";
+        String msg   = taBookingMessage != null ? taBookingMessage.getText().trim() : "";
+        String slot  = cbBookingSlot != null ? cbBookingSlot.getValue() : null;
+
+        // Validation
+        if (name.isEmpty()) {
+            if (lblBookingStatus != null) { lblBookingStatus.setStyle("-fx-text-fill:#991b1b;"); lblBookingStatus.setText("⚠ Le nom est obligatoire."); }
+            return;
+        }
+        if (email.isEmpty() || !email.contains("@")) {
+            if (lblBookingStatus != null) { lblBookingStatus.setStyle("-fx-text-fill:#991b1b;"); lblBookingStatus.setText("⚠ Email invalide."); }
+            return;
+        }
+        if (phone.isEmpty()) {
+            if (lblBookingStatus != null) { lblBookingStatus.setStyle("-fx-text-fill:#991b1b;"); lblBookingStatus.setText("⚠ Le téléphone est obligatoire."); }
+            return;
+        }
+        if (selectedBookingDate == null || selectedBookingDate.isEmpty()) {
+            if (lblBookingStatus != null) { lblBookingStatus.setStyle("-fx-text-fill:#991b1b;"); lblBookingStatus.setText("⚠ Veuillez choisir un créneau disponible."); }
+            return;
+        }
+        if (slot == null || slot.isEmpty()) {
+            if (lblBookingStatus != null) { lblBookingStatus.setStyle("-fx-text-fill:#991b1b;"); lblBookingStatus.setText("⚠ Veuillez sélectionner une heure."); }
+            return;
+        }
+
+        String dateComplete = selectedBookingDate + " à " + slot;
+        boolean sent = envoyerEmailReservation(selectedBookingCoach, name, email, phone, dateComplete, msg);
+
+        if (sent) {
+            if (lblBookingStatus != null) {
+                lblBookingStatus.setStyle("-fx-text-fill:#065f46;-fx-font-weight:700;");
+                lblBookingStatus.setText("✅ Réservation envoyée ! " + selectedBookingCoach.name() + " vous contactera bientôt.");
+            }
+            if (tfBookingName != null) tfBookingName.clear();
+            if (tfBookingEmail != null) tfBookingEmail.clear();
+            if (tfBookingPhone != null) tfBookingPhone.clear();
+            if (taBookingMessage != null) taBookingMessage.clear();
+            if (cbBookingSlot != null) cbBookingSlot.getSelectionModel().clearSelection();
+            if (bookingDateButtons != null)
+                bookingDateButtons.getChildren().forEach(n -> n.setStyle(
+                    "-fx-background-color:#fff;-fx-border-color:#0b3a3d;-fx-border-radius:8;"
+                    + "-fx-background-radius:8;-fx-font-size:11px;-fx-font-weight:600;"
+                    + "-fx-text-fill:#0b3a3d;-fx-padding:5 12;-fx-cursor:hand;"));
+            selectedBookingDate = null;
+            if (lblSelectedSlot != null) lblSelectedSlot.setText("");
+        } else {
+            if (lblBookingStatus != null) {
+                lblBookingStatus.setStyle("-fx-text-fill:#991b1b;");
+                lblBookingStatus.setText("❌ Échec envoi email. Vérifiez la configuration SMTP.");
+            }
+        }
+    }
+
+    private boolean envoyerEmailReservation(CoachData coach, String clientName, String clientEmail,
+                                             String clientPhone, String date, String message) {
+        try {
+            String smtpUser = System.getenv("SMTP_USERNAME");
+            String smtpPass = System.getenv("SMTP_PASSWORD");
+            if (smtpUser == null || smtpUser.isBlank()) smtpUser = "ahmedchebbi323@gmail.com";
+            if (smtpPass == null || smtpPass.isBlank()) smtpPass = "jsnxpiuqpzmojsxm";
+
+            java.util.Properties props = new java.util.Properties();
+            props.put("mail.smtp.auth", "true");
+            props.put("mail.smtp.starttls.enable", "true");
+            props.put("mail.smtp.host", "smtp.gmail.com");
+            props.put("mail.smtp.port", "587");
+            props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+            final String user = smtpUser;
+            final String pass = smtpPass;
+            javax.mail.Session session = javax.mail.Session.getInstance(props, new javax.mail.Authenticator() {
+                protected javax.mail.PasswordAuthentication getPasswordAuthentication() {
+                    return new javax.mail.PasswordAuthentication(user, pass);
+                }
+            });
+
+            javax.mail.internet.MimeMessage mimeMsg = new javax.mail.internet.MimeMessage(session);
+            mimeMsg.setFrom(new javax.mail.internet.InternetAddress(smtpUser, "Fitopia Reservations"));
+            mimeMsg.setRecipient(javax.mail.Message.RecipientType.TO,
+                    new javax.mail.internet.InternetAddress(coach.email(), coach.name()));
+            mimeMsg.setReplyTo(new javax.mail.Address[]{
+                    new javax.mail.internet.InternetAddress(clientEmail, clientName)
+            });
+            mimeMsg.setSubject("Nouvelle réservation — " + clientName, "UTF-8");
+
+            String html = "<div style='font-family:Arial,sans-serif;max-width:600px;'>"
+                + "<h2 style='color:#0b3a3d;'>Nouvelle demande de réservation</h2>"
+                + "<p><b>Coach :</b> " + coach.name() + " (" + coach.specialty() + ")</p>"
+                + "<hr/>"
+                + "<p><b>Client :</b> " + clientName + "</p>"
+                + "<p><b>Email :</b> " + clientEmail + "</p>"
+                + "<p><b>Téléphone :</b> " + clientPhone + "</p>"
+                + "<p><b>Date souhaitée :</b> " + date + "</p>"
+                + (message.isEmpty() ? "" : "<p><b>Message :</b> " + message + "</p>")
+                + "<br/><a href='mailto:" + clientEmail + "' style='background:#0b3a3d;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:bold;'>Répondre au client</a>"
+                + "</div>";
+
+            mimeMsg.setContent(html, "text/html; charset=UTF-8");
+            javax.mail.Transport.send(mimeMsg);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private void activatePlannerTab(Button activeButton) {
