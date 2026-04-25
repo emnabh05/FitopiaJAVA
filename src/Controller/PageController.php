@@ -15,6 +15,10 @@ use App\Entity\FitnessPlan;
 use App\Entity\FitnessProgram;
 use App\Entity\FitnessTrend;
 use App\Entity\User;
+use App\Entity\ExerciseCatalog;
+use App\Entity\TrainingSession;
+use App\Entity\PerformanceLog;
+use App\Entity\PerformanceSet;
 use App\Entity\RegimeAlimentaire;
 use App\Entity\Repas;
 use App\Form\BlogPostType;
@@ -1748,7 +1752,129 @@ class PageController extends AbstractController
         $this->addFlash('success', ucfirst($type).' saved.');
         return $this->redirectToRoute('explore_forums_blogs');
     }
+
+    // ── Performance Tracking ─────────────────────────────────────────────────
+
+    #[Route('/performance/exercises', name: 'performance_exercises', methods: ['GET'])]
+    public function performanceExercises(EntityManagerInterface $em): JsonResponse
+    {
+        if (!$this->getUser() instanceof User) {
+            return new JsonResponse(['error' => 'unauthenticated'], 401);
+        }
+        $userId = $this->getUser()->getId();
+        $exercises = $em->getRepository(ExerciseCatalog::class)->findForUser($userId);
+
+        $data = array_map(fn(ExerciseCatalog $e) => [
+            'id'          => $e->getId(),
+            'name'        => $e->getName(),
+            'muscleGroup' => $e->getMuscleGroup(),
+            'equipment'   => $e->getEquipment(),
+            'isCustom'    => $e->isCustom(),
+        ], $exercises);
+
+        return new JsonResponse($data);
+    }
+
+    #[Route('/performance/log', name: 'performance_log', methods: ['POST'])]
+    public function performanceLog(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        if (!$this->getUser() instanceof User) {
+            return new JsonResponse(['error' => 'unauthenticated'], 401);
+        }
+
+        $payload = json_decode($request->getContent(), true);
+        if (!$payload) {
+            return new JsonResponse(['error' => 'invalid_json'], 400);
+        }
+
+        $user = $this->getUser();
+
+        // Créer ou récupérer la session du jour
+        $dateStr = $payload['date'] ?? date('Y-m-d');
+        $date    = new \DateTimeImmutable($dateStr);
+
+        $session = new TrainingSession();
+        $session->setUser($user);
+        $session->setSessionDate($date);
+        $session->setLabel($payload['label'] ?? null);
+        $session->setNotes($payload['notes'] ?? null);
+        $session->setDurationMin(isset($payload['durationMin']) ? (int) $payload['durationMin'] : null);
+
+        $order = 1;
+        foreach (($payload['exercises'] ?? []) as $exData) {
+            $exercise = $em->getRepository(ExerciseCatalog::class)->find((int) ($exData['exerciseId'] ?? 0));
+            if (!$exercise) continue;
+
+            $log = new PerformanceLog();
+            $log->setExercise($exercise);
+            $log->setExerciseOrder($order++);
+            $log->setRestSeconds(isset($exData['restSeconds']) ? (int) $exData['restSeconds'] : null);
+            $log->setNotes($exData['notes'] ?? null);
+
+            foreach (($exData['sets'] ?? []) as $i => $setData) {
+                $set = new PerformanceSet();
+                $set->setSetNumber($i + 1);
+                $set->setWeightKg(isset($setData['weightKg']) && $setData['weightKg'] !== '' ? (float) $setData['weightKg'] : null);
+                $set->setRepetitions(isset($setData['reps']) && $setData['reps'] !== '' ? (int) $setData['reps'] : null);
+                $set->setDurationSec(isset($setData['durationSec']) ? (int) $setData['durationSec'] : null);
+                $set->setRpe(isset($setData['rpe']) ? (int) $setData['rpe'] : null);
+                $set->setIsWarmup((bool) ($setData['isWarmup'] ?? false));
+                $log->addSet($set);
+                $em->persist($set);
+            }
+
+            $session->addPerformanceLog($log);
+            $em->persist($log);
+        }
+
+        $em->persist($session);
+        $em->flush();
+
+        return new JsonResponse(['ok' => true, 'sessionId' => $session->getId()]);
+    }
+
+    #[Route('/performance/progression/{exerciseId}', name: 'performance_progression', methods: ['GET'])]
+    public function performanceProgression(int $exerciseId, EntityManagerInterface $em): JsonResponse
+    {
+        if (!$this->getUser() instanceof User) {
+            return new JsonResponse(['error' => 'unauthenticated'], 401);
+        }
+
+        $userId = $this->getUser()->getId();
+        $data   = $em->getRepository(PerformanceLog::class)->getWeeklyProgression($userId, $exerciseId);
+
+        return new JsonResponse($data);
+    }
+
+    #[Route('/performance/history', name: 'performance_history', methods: ['GET'])]
+    public function performanceHistory(EntityManagerInterface $em): JsonResponse
+    {
+        if (!$this->getUser() instanceof User) {
+            return new JsonResponse(['error' => 'unauthenticated'], 401);
+        }
+
+        $userId   = $this->getUser()->getId();
+        $sessions = $em->getRepository(TrainingSession::class)->findByUser($userId, 30);
+
+        $data = array_map(fn(TrainingSession $s) => [
+            'id'          => $s->getId(),
+            'date'        => $s->getSessionDate()->format('Y-m-d'),
+            'week'        => 'S' . $s->getWeekNumber() . ' ' . $s->getYear(),
+            'label'       => $s->getLabel() ?? $s->getSessionDate()->format('d/m/Y'),
+            'durationMin' => $s->getDurationMin(),
+            'exercises'   => $s->getPerformanceLogs()->map(fn(PerformanceLog $l) => [
+                'name'        => $l->getExercise()->getName(),
+                'muscleGroup' => $l->getExercise()->getMuscleGroup(),
+                'maxWeight'   => $l->getMaxWeight(),
+                'totalVolume' => $l->getTotalVolume(),
+                'nbSets'      => $l->getSets()->count(),
+            ])->toArray(),
+        ], $sessions);
+
+        return new JsonResponse($data);
+    }
 }
+
 
 
 
