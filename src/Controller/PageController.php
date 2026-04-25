@@ -195,6 +195,8 @@ class PageController extends AbstractController
             'programImageLinks' => $programImageLinks,
             'savedPlans' => $savedPlans,
             'plansPersistAvailable' => $plansPersistAvailable,
+            'exerciseImageMapJs' => $this->buildExerciseImageMap($exercises),
+            'externalImageMapJs' => $programImageLinks,
         ]);
     }
 
@@ -1499,6 +1501,19 @@ class PageController extends AbstractController
             'estimatedMinutes' => $plan->getEstimatedMinutes() ?? 0,
             'exercises' => $plan->getExercisesData(),
         ];
+    }
+
+    private function buildExerciseImageMap(array $exercises): array
+    {
+        $map = [];
+        foreach ($exercises as $exercise) {
+            $name = $exercise->getName();
+            $imageUrl = $exercise->getImageUrl();
+            if ($name !== null && $imageUrl !== null && $imageUrl !== '') {
+                $map[$name] = $imageUrl;
+            }
+        }
+        return $map;
     }
 
     private function handleFitnessPlannerPost(Request $request, EntityManagerInterface $em): void

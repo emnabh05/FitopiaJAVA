@@ -1,3 +1,6 @@
 framework:
     mailer:
         dsn: '%env(MAILER_DSN)%'
+        transports:
+            smtp_gmail:
+                dsn: 'smtp://%env(SMTP_USERNAME)%:%env(SMTP_PASSWORD)%@smtp.gmail.com:587?encryption=tls'

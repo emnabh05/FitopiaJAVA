@@ -1,4 +1,4 @@
-ï»¿{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Fitness Planner | Fitopia{% endblock %}
 
@@ -1388,7 +1388,7 @@
         <div class="section-head">
           <div>
             <h2>Explore Training Plans</h2>
-            <p>Tes sÃ©ances confirmÃ©es apparaissent ici.</p>
+            <p>Tes séances confirmées apparaissent ici.</p>
           </div>
         </div>
         <div id="fp-user-plans-list" class="fp-user-plans"></div>
@@ -1409,7 +1409,7 @@
         'Entrainement du corps entier'
       ] %}
       {% set poitrineLevels = {
-        'DÃ©butant': [
+        'Débutant': [
           'Developpe couche avec barre',
           'Developpe couche incline avec barre',
           'Arm chest flyes plies a la poulie'
@@ -1434,7 +1434,7 @@
         <div class="section-head">
           <div>
             <h2>Liste des programmes</h2>
-            <p>AccÃ¨s rapide par groupe musculaire, avec focus Poitrine.</p>
+            <p>Accès rapide par groupe musculaire, avec focus Poitrine.</p>
           </div>
         </div>
         <div class="program-category-list">
@@ -1541,7 +1541,7 @@
         <div class="section-head">
           <div>
             <h2>Explore</h2>
-            <p>Swipe/scroll vertical: haut = exercice suivant, bas = prÃ©cÃ©dent.</p>
+            <p>Swipe/scroll vertical: haut = exercice suivant, bas = précédent.</p>
           </div>
         </div>
         <div class="explore-ai-bar">
@@ -1596,59 +1596,38 @@
       <div class="fitness-card coach-shell">
         <div class="section-head">
           <div>
-            <h2>Module Coach</h2>
-            <p>Choisis un coach, consulte son profil detaille et lance une reservation rapide.</p>
+            <h2>Coachs Privés</h2>
+            <p>Réservez une séance avec l'un de nos 6 coachs certifiés.</p>
           </div>
         </div>
 
-        <div class="coach-layout">
-          <div class="coach-grid" id="fp-coach-grid"></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem;padding:.5rem 0;">
 
-          <aside class="coach-profile" id="fp-coach-profile">
-            <div class="coach-profile-media" id="fp-coach-photo"></div>
-            <h3 class="coach-profile-name" id="fp-coach-name">Selectionne un coach</h3>
-            <p class="coach-profile-role" id="fp-coach-speciality"></p>
-            <div class="coach-profile-meta">
-              <span id="fp-coach-rating"><i class="fa fa-star"></i> --</span>
-              <span id="fp-coach-experience"><i class="fa fa-briefcase"></i> --</span>
-              <span id="fp-coach-phone"><i class="fa fa-phone"></i> --</span>
-            </div>
-            <p class="coach-profile-bio" id="fp-coach-bio"></p>
-            <p class="coach-profile-availability" id="fp-coach-availability"></p>
+          {% set coachList = [
+            {id:'ahmed', name:'Coach Ahmed',    spec:'Boxe & Cardio',          phone:'+216 25 010 582', slots:'Lun-Ven 18h-21h | Sam 10h-13h', img:'images/coaches/ahmed.jpg'},
+            {id:'ali',   name:'Coach Ali',      spec:'Musculation & Force',     phone:'+216 53 919 881', slots:'Lun-Jeu 16h-20h | Dim 09h-12h', img:'images/coaches/ali.jpg'},
+            {id:'omar',  name:'Coach Omar',     spec:'Judo & Prépa physique',   phone:'+216 58 936 689', slots:'Mar-Ven 17h-20h | Sam 15h-18h', img:'images/coaches/omar.jpg'},
+            {id:'sarah', name:'Coach Sarah',    spec:'Yoga & Mobilité',         phone:'+216 28 759 998', slots:'Lun-Ven 07h-10h | Sam 08h-11h', img:'images/coaches/sarah.jpg'},
+            {id:'rania', name:'Coach Rania',    spec:'Danse orientale & Cardio',phone:'+216 58 860 916', slots:'Mer-Ven 18h-21h | Dim 16h-19h', img:'images/coaches/rania.jpg'},
+            {id:'emna',  name:'Coach Emna',     spec:'Pilates & Gainage',       phone:'+216 55 487 965', slots:'Lun-Jeu 10h-13h | Sam 16h-19h', img:'images/coaches/emna.jpg'}
+          ] %}
 
-            <div class="coach-list-block">
-              <div class="coach-list-title">Certifications</div>
-              <ul class="coach-list" id="fp-coach-certifications"></ul>
+          {% for c in coachList %}
+          <div style="background:#fff;border:1px solid #dce9ee;border-radius:16px;overflow:hidden;box-shadow:0 4px 14px rgba(10,36,54,.07);display:flex;flex-direction:column;">
+            <div style="height:180px;background-image:url('{{ asset(c.img) }}');background-size:cover;background-position:center;background-color:#dce9ee;"></div>
+            <div style="padding:1rem;display:flex;flex-direction:column;gap:.4rem;flex:1;">
+              <div style="font-weight:800;font-size:1rem;color:#0b3a3d;">{{ c.name }}</div>
+              <div style="font-size:.82rem;color:#1a6b5a;font-weight:600;">{{ c.spec }}</div>
+              <div style="font-size:.78rem;color:#64748b;"><i class="fa fa-phone"></i> {{ c.phone }}</div>
+              <div style="font-size:.78rem;color:#64748b;"><i class="fa fa-calendar"></i> {{ c.slots }}</div>
+              <a href="{{ path('coach_book', {id: c.id}) }}"
+                 style="margin-top:auto;padding-top:.6rem;display:block;text-align:center;background:linear-gradient(135deg,#0b3a3d,#1a6b5a);color:#fff;border-radius:10px;padding:.6rem;font-weight:700;font-size:.85rem;text-decoration:none;">
+                Réserver une séance
+              </a>
             </div>
-            <div class="coach-list-block">
-              <div class="coach-list-title">Specialites</div>
-              <ul class="coach-list" id="fp-coach-skills"></ul>
-            </div>
-            <div class="coach-list-block">
-              <div class="coach-list-title">Programmes proposes</div>
-              <ul class="coach-list" id="fp-coach-programs"></ul>
-            </div>
+          </div>
+          {% endfor %}
 
-            <label class="coach-message-label" for="fp-coach-message-input">Message</label>
-            <textarea id="fp-coach-message-input" rows="3" placeholder="Ex: Bonjour, je veux reserver une seance cette semaine."></textarea>
-
-            <div class="coach-booking-panel" id="fp-coach-booking" hidden>
-              <div class="coach-list-title">Calendrier des dates disponibles</div>
-              <div class="coach-date-grid" id="fp-coach-date-grid"></div>
-              <label class="coach-message-label" for="fp-coach-slot-select">Creneau</label>
-              <select id="fp-coach-slot-select"></select>
-              <div class="coach-actions">
-                <button type="button" class="fitness-btn fitness-btn-primary" id="fp-coach-book-confirm"><i class="fa fa-check"></i> Confirmer reservation</button>
-                <button type="button" class="fitness-btn fitness-btn-soft" id="fp-coach-book-cancel"><i class="fa fa-times"></i> Annuler</button>
-              </div>
-            </div>
-
-            <div class="coach-actions">
-              <button type="button" class="fitness-btn fitness-btn-primary" id="fp-coach-book"><i class="fa fa-calendar"></i> Reserver</button>
-              <button type="button" class="fitness-btn fitness-btn-soft" id="fp-coach-send"><i class="fa fa-commenting"></i> Envoyer message</button>
-            </div>
-            <p class="coach-message-hint" id="fp-coach-message-hint">Envoi automatique par backend SMS (Twilio) vers le numero du coach selectionne.</p>
-          </aside>
         </div>
       </div>
     </div>
@@ -1668,10 +1647,10 @@
       <div></div>
     </div>
     <div class="fp-location-list">
-      <div class="fp-location-card" id="fp-modal-gym" style="background-image:url('{{ asset('images/fitness/salle.jpg') }}');">
-        <div class="fp-location-label">Ã€ la salle de sport</div>
+      <div class="fp-location-card" id="fp-modal-gym" style="background-image:url('{{ asset("images/fitness/salle.jpg") }}');">
+        <div class="fp-location-label">À la salle de sport</div>
       </div>
-      <div class="fp-location-card" id="fp-modal-home" style="background-image:url('{{ asset('images/fitness/chez-toi.jpg') }}');">
+      <div class="fp-location-card" id="fp-modal-home" style="background-image:url('{{ asset("images/fitness/chez-toi.jpg") }}');">
         <div class="fp-location-label">Chez soi</div>
       </div>
     </div>
@@ -1683,19 +1662,19 @@
     <div class="fp-modal-header">
       <button class="fp-modal-back" type="button" id="fp-level-close">&#8592; Retour</button>
       <div>
-        <h3 class="fp-modal-title" id="fp-level-title">Niveau de difficultÃ©</h3>
+        <h3 class="fp-modal-title" id="fp-level-title">Niveau de difficulté</h3>
         <p class="fp-modal-subtitle" id="fp-level-subtitle">Choisis ton niveau</p>
       </div>
       <div></div>
     </div>
     <div class="fp-location-list">
-      <div class="fp-level-card" data-level="DÃ©butant" style="background-image:url('{{ asset('images/fitness/niveau-debutant.jpg') }}');">
-        <div class="fp-level-label">DÃ©butant</div>
+      <div class="fp-level-card" data-level="Débutant" style="background-image:url('{{ asset("images/fitness/niveau-debutant.jpg") }}');">
+        <div class="fp-level-label">Débutant</div>
       </div>
-      <div class="fp-level-card" data-level="Avance" style="background-image:url('{{ asset('images/fitness/niveau-avance.jpg') }}');">
+      <div class="fp-level-card" data-level="Avance" style="background-image:url('{{ asset("images/fitness/niveau-avance.jpg") }}');">
         <div class="fp-level-label">Avance</div>
       </div>
-      <div class="fp-level-card" data-level="Expert" style="background-image:url('{{ asset('images/fitness/niveau-expert.jpg') }}');">
+      <div class="fp-level-card" data-level="Expert" style="background-image:url('{{ asset("images/fitness/niveau-expert.jpg") }}');">
         <div class="fp-level-label">Expert</div>
       </div>
     </div>
@@ -1715,9 +1694,9 @@
     <div class="fp-exercise-shell">
       <div class="fp-exercise-list" id="fp-exercise-list"></div>
       <aside class="fp-session-panel">
-        <h4 class="fp-session-title">Ma sÃ©ance :</h4>
+        <h4 class="fp-session-title">Ma séance :</h4>
         <div class="fp-session-count" id="fp-session-count">0 exercices</div>
-        <div class="fp-session-meta" id="fp-session-time">Temps estimÃ© : 0 min</div>
+        <div class="fp-session-meta" id="fp-session-time">Temps estimé : 0 min</div>
         <div class="fp-session-list" id="fp-session-list"></div>
         <div class="fp-session-actions">
           <button class="fitness-btn fitness-btn-primary" type="button" id="fp-session-start">Confirmer</button>
@@ -2008,7 +1987,7 @@
 
       const openLevelModal = (placeLabel) => {
         selectedPlace = placeLabel || '';
-        if (levelTitle) levelTitle.textContent = 'Niveau de difficultÃ©';
+        if (levelTitle) levelTitle.textContent = 'Niveau de difficulté';
         if (levelSubtitle) {
           levelSubtitle.textContent = selectedProgram ? `${selectedProgram} - ${placeLabel}` : placeLabel;
         }
@@ -2032,30 +2011,30 @@
         const exerciseImageMap = {{ exerciseImageMapJs|json_encode|raw }};
         const programImageMap = {{ externalImageMapJs|json_encode|raw }};
         const overrideExerciseImages = {
-          'Developpe couche avec barre': '{{ asset('images/fitness/exercises/developpe-couche-avec-barre.webp') }}',
-          'Developpe couche incline avec barre': '{{ asset('images/fitness/exercises/developpe-incline-machine.gif') }}',
-          'Arm chest flyes plies a la poulie': '{{ asset('images/fitness/exercises/arm-chest-flyes-poulie.jpg') }}',
-          'Developpe assis poitrine prise marteau': '{{ asset('images/fitness/exercises/developpe-assis-prise-marteau.gif') }}',
-          'Developpe incline a la machine': '{{ asset('images/fitness/exercises/developpe-incline-machine.gif') }}',
-          'Dips pectoraux': '{{ asset('images/fitness/exercises/dips-pectoraux.png') }}',
-          'Developpe couche allonge avec elastique': '{{ asset('images/fitness/exercises/developpe-couche-allonge-elastique.webp') }}',
-          'Developpe couche a la poulie vis a vis': '{{ asset('images/fitness/exercises/developpe-couche-poulie-vis-a-vis.webp') }}',
-          'Developpe poitrine prise marteau a un bras assis': '{{ asset('images/fitness/exercises/developpe-prise-marteau-un-bras-assis.gif') }}'
+          'Developpe couche avec barre': '{{ asset("images/fitness/exercises/developpe-couche-avec-barre.webp") }}',
+          'Developpe couche incline avec barre': '{{ asset("images/fitness/exercises/developpe-incline-machine.gif") }}',
+          'Arm chest flyes plies a la poulie': '{{ asset("images/fitness/exercises/arm-chest-flyes-poulie.jpg") }}',
+          'Developpe assis poitrine prise marteau': '{{ asset("images/fitness/exercises/developpe-assis-prise-marteau.gif") }}',
+          'Developpe incline a la machine': '{{ asset("images/fitness/exercises/developpe-incline-machine.gif") }}',
+          'Dips pectoraux': '{{ asset("images/fitness/exercises/dips-pectoraux.png") }}',
+          'Developpe couche allonge avec elastique': '{{ asset("images/fitness/exercises/developpe-couche-allonge-elastique.webp") }}',
+          'Developpe couche a la poulie vis a vis': '{{ asset("images/fitness/exercises/developpe-couche-poulie-vis-a-vis.webp") }}',
+          'Developpe poitrine prise marteau a un bras assis': '{{ asset("images/fitness/exercises/developpe-prise-marteau-un-bras-assis.gif") }}'
         };
         const exerciseVideoMap = {
-          'Developpe couche avec barre': '{{ asset('videos/fitness/developpe-couche-avec-barre.mp4') }}',
-          'Developpe couche incline avec barre': '{{ asset('videos/fitness/developpe-couche-incline-avec-barre.mp4') }}',
-          'Arm chest flyes plies a la poulie': '{{ asset('videos/fitness/arm-chest-flyes-poulie.mp4') }}',
-          'Developpe assis poitrine prise marteau': '{{ asset('videos/fitness/developpe-assis-prise-marteau.mp4') }}',
-          'Developpe incline a la machine': '{{ asset('videos/fitness/developpe-incline-machine.mp4') }}',
-          'Dips pectoraux': '{{ asset('videos/fitness/dips-pectoraux.mp4') }}',
-          'Developpe couche allonge avec elastique': '{{ asset('videos/fitness/developpe-couche-allonge-elastique.mp4') }}',
-          'Developpe couche a la poulie vis a vis': '{{ asset('videos/fitness/developpe-couche-poulie-vis-a-vis.mp4') }}',
-          'Developpe poitrine prise marteau a un bras assis': '{{ asset('videos/fitness/developpe-prise-marteau-un-bras-assis.mp4') }}'
+          'Developpe couche avec barre': '{{ asset("videos/fitness/developpe-couche-avec-barre.mp4") }}',
+          'Developpe couche incline avec barre': '{{ asset("videos/fitness/developpe-couche-incline-avec-barre.mp4") }}',
+          'Arm chest flyes plies a la poulie': '{{ asset("videos/fitness/arm-chest-flyes-poulie.mp4") }}',
+          'Developpe assis poitrine prise marteau': '{{ asset("videos/fitness/developpe-assis-prise-marteau.mp4") }}',
+          'Developpe incline a la machine': '{{ asset("videos/fitness/developpe-incline-machine.mp4") }}',
+          'Dips pectoraux': '{{ asset("videos/fitness/dips-pectoraux.mp4") }}',
+          'Developpe couche allonge avec elastique': '{{ asset("videos/fitness/developpe-couche-allonge-elastique.mp4") }}',
+          'Developpe couche a la poulie vis a vis': '{{ asset("videos/fitness/developpe-couche-poulie-vis-a-vis.mp4") }}',
+          'Developpe poitrine prise marteau a un bras assis': '{{ asset("videos/fitness/developpe-prise-marteau-un-bras-assis.mp4") }}'
         };
         const programExercises = {
           'Poitrine': {
-            'DÃ©butant': [
+            'Débutant': [
               'Developpe couche avec barre',
               'Developpe couche incline avec barre',
               'Arm chest flyes plies a la poulie'
@@ -2114,7 +2093,7 @@
               const addBtn = document.createElement('button');
               addBtn.type = 'button';
               addBtn.className = 'fitness-btn fitness-btn-soft fp-exercise-action';
-              addBtn.textContent = '+ Ajouter Ã  ma sÃ©ance';
+              addBtn.textContent = '+ Ajouter à ma séance';
               addBtn.addEventListener('click', (evt) => {
                 evt.stopPropagation();
                 if (!sessionExercises.find((e) => e.name === name)) {
@@ -2130,7 +2109,7 @@
                 if (!video) return;
                 const source = normalizeVideoSource(video);
                 const opened = openVideoModalWithSource(source, {
-                  title: 'Video de lâ€™exercice',
+                  title: 'Video de l’exercice',
                   subtitle: `${selectedProgram} - ${selectedPlace}`,
                   name
                 });
@@ -2166,7 +2145,7 @@
       }
 
       if (gymCard) {
-        gymCard.addEventListener('click', () => openLevelModal('Ã€ la salle de sport'));
+        gymCard.addEventListener('click', () => openLevelModal('À la salle de sport'));
       }
       if (homeCard) {
         homeCard.addEventListener('click', () => openLevelModal('Chez soi'));
@@ -2239,10 +2218,10 @@
       const hiitStretchVolume = 0.2;
 
       const hiitPlaylists = [
-        { id: 'hiit', label: 'HIIT Boost', src: '{{ asset('audio/hiit.mp3') }}' },
-        { id: 'strength', label: 'Strength Power', src: '{{ asset('audio/strength.mp3') }}' },
-        { id: 'chill', label: 'Chill Stretch', src: '{{ asset('audio/chill.m4a') }}' },
-        { id: 'cardio', label: 'Cardio Run', src: '{{ asset('audio/cardio.mp3') }}' }
+        { id: 'hiit', label: 'HIIT Boost', src: '{{ asset("audio/hiit.mp3") }}' },
+        { id: 'strength', label: 'Strength Power', src: '{{ asset("audio/strength.mp3") }}' },
+        { id: 'chill', label: 'Chill Stretch', src: '{{ asset("audio/chill.m4a") }}' },
+        { id: 'cardio', label: 'Cardio Run', src: '{{ asset("audio/cardio.mp3") }}' }
       ];
 
       let hiitPhase = 'work';
@@ -2738,7 +2717,7 @@
         sessionCount.textContent = `${sessionExercises.length} exercices`;
         const estimatedSeconds = sessionExercises.length * 90;
         const mins = Math.max(0, Math.ceil(estimatedSeconds / 60));
-        sessionTime.textContent = `Temps estimÃ© : ${mins} min`;
+        sessionTime.textContent = `Temps estimé : ${mins} min`;
         sessionList.innerHTML = '';
         sessionExercises.forEach((ex) => {
           const row = document.createElement('div');
@@ -2805,7 +2784,7 @@
           meta.className = 'program-meta';
           meta.textContent = query
             ? `Aucune tendance en cours pour "${query}".`
-            : 'Ajoute-les depuis lâ€™admin.';
+            : 'Ajoute-les depuis l’admin.';
 
           empty.appendChild(title);
           empty.appendChild(meta);
@@ -2866,480 +2845,6 @@
         refreshTrends();
       }
 
-      const coachGrid = document.getElementById('fp-coach-grid');
-      const coachProfile = document.getElementById('fp-coach-profile');
-      const coachPhoto = document.getElementById('fp-coach-photo');
-      const coachName = document.getElementById('fp-coach-name');
-      const coachSpeciality = document.getElementById('fp-coach-speciality');
-      const coachRating = document.getElementById('fp-coach-rating');
-      const coachExperience = document.getElementById('fp-coach-experience');
-      const coachPhone = document.getElementById('fp-coach-phone');
-      const coachBio = document.getElementById('fp-coach-bio');
-      const coachAvailability = document.getElementById('fp-coach-availability');
-      const coachCertifications = document.getElementById('fp-coach-certifications');
-      const coachSkills = document.getElementById('fp-coach-skills');
-      const coachPrograms = document.getElementById('fp-coach-programs');
-      const coachMessageInput = document.getElementById('fp-coach-message-input');
-      const coachBookBtn = document.getElementById('fp-coach-book');
-      const coachSendBtn = document.getElementById('fp-coach-send');
-      const coachMessageHint = document.getElementById('fp-coach-message-hint');
-      const coachBookingPanel = document.getElementById('fp-coach-booking');
-      const coachDateGrid = document.getElementById('fp-coach-date-grid');
-      const coachSlotSelect = document.getElementById('fp-coach-slot-select');
-      const coachBookConfirmBtn = document.getElementById('fp-coach-book-confirm');
-      const coachBookCancelBtn = document.getElementById('fp-coach-book-cancel');
-
-      const coachCatalog = [
-        {
-          id: 'coach-ahmed',
-          name: 'Coach Ahmed',
-          speciality: 'Boxe',
-          phone: '+21625010582',
-          rating: 4.8,
-          experienceYears: 6,
-          bio: 'Coach boxe oriente cardio, technique et confiance. Ideal pour perte de poids + explosivite.',
-          certifications: ['Coaching sportif (niveau 1)', 'Secourisme (premiers secours)'],
-          availability: 'Lun-Ven 18:00-21:00 | Sam 10:00-13:00',
-          scheduleSlots: [
-            { days: [1, 2, 3, 4, 5], from: '18:00', to: '21:00' },
-            { days: [6], from: '10:00', to: '13:00' }
-          ],
-          specialties: ['Boxe', 'Cardio', 'Technique', 'Explosivite'],
-          programs: ['Boxe debutant (4 semaines)', 'HIIT Boxe brule-graisse (3 semaines)', 'Technique & footwork (2 semaines)'],
-          photo: '{{ asset('images/coaches/ahmed.jpg') }}'
-        },
-        {
-          id: 'coach-ali',
-          name: 'Coach Ali',
-          speciality: 'Musculation',
-          phone: '+21653919881',
-          rating: 4.9,
-          experienceYears: 8,
-          bio: 'Specialiste hypertrophie et force, programmes salle et maison avec progression claire.',
-          certifications: ['Strength training (intermediaire)', 'Nutrition sportive (bases)'],
-          availability: 'Lun-Jeu 16:00-20:00 | Dim 09:00-12:00',
-          scheduleSlots: [
-            { days: [1, 2, 3, 4], from: '16:00', to: '20:00' },
-            { days: [0], from: '09:00', to: '12:00' }
-          ],
-          specialties: ['Hypertrophie', 'Force', 'Prise de masse'],
-          programs: ['Prise de masse (6 semaines)', 'Full body (4 semaines)', 'Force (5x5) (4 semaines)'],
-          photo: '{{ asset('images/coaches/ali.jpg') }}'
-        },
-        {
-          id: 'coach-omar',
-          name: 'Coach Omar',
-          speciality: 'Judo',
-          phone: '+21658936689',
-          rating: 4.7,
-          experienceYears: 7,
-          bio: 'Judo + preparation physique : mobilite, explosivite, gainage et discipline.',
-          certifications: ['Initiateur arts martiaux', 'Preparation physique generale'],
-          availability: 'Mar-Ven 17:00-20:00 | Sam 15:00-18:00',
-          scheduleSlots: [
-            { days: [2, 3, 4, 5], from: '17:00', to: '20:00' },
-            { days: [6], from: '15:00', to: '18:00' }
-          ],
-          specialties: ['Judo', 'Mobilite', 'Explosivite'],
-          programs: ['Judo conditioning (4 semaines)', 'Mobilite + gainage (3 semaines)', 'Explosivite bas du corps (2 semaines)'],
-          photo: '{{ asset('images/coaches/omar.jpg') }}'
-        },
-        {
-          id: 'coach-sarah',
-          name: 'Coach Sarah',
-          speciality: 'Yoga',
-          phone: '+21628759998',
-          rating: 4.9,
-          experienceYears: 5,
-          bio: 'Yoga pour souplesse, reduction du stress, posture et respiration (debutants bienvenus).',
-          certifications: ['Yoga Teacher (200h)'],
-          availability: 'Lun-Ven 07:00-10:00 | Sam 08:00-11:00',
-          scheduleSlots: [
-            { days: [1, 2, 3, 4, 5], from: '07:00', to: '10:00' },
-            { days: [6], from: '08:00', to: '11:00' }
-          ],
-          specialties: ['Yoga', 'Souplesse', 'Respiration'],
-          programs: ['Yoga debutant (4 semaines)', 'Souplesse & mobilite (3 semaines)', 'Yoga anti-stress (2 semaines)'],
-          photo: '{{ asset('images/coaches/sarah.jpg') }}'
-        },
-        {
-          id: 'coach-rania',
-          name: 'Coach Rania',
-          speciality: 'Danse orientale',
-          phone: '+21658860916',
-          rating: 4.6,
-          experienceYears: 4,
-          bio: 'Danse orientale fitness : cardio fun, coordination, posture, confiance et tonification.',
-          certifications: ['Danse fitness (atelier)', 'Coaching groupe (bases)'],
-          availability: 'Mer-Ven 18:00-21:00 | Dim 16:00-19:00',
-          scheduleSlots: [
-            { days: [3, 4, 5], from: '18:00', to: '21:00' },
-            { days: [0], from: '16:00', to: '19:00' }
-          ],
-          specialties: ['Danse orientale', 'Coordination', 'Cardio'],
-          programs: ['Danse orientale cardio (4 semaines)', 'Taille & hanches (3 semaines)', 'Choregraphie debutant (2 semaines)'],
-          playlist: 'Dance Vibes (Oriental/Pop)',
-          photo: '{{ asset('images/coaches/rania.jpg') }}'
-        },
-        {
-          id: 'coach-emna',
-          name: 'Coach Emna',
-          speciality: 'Pilates',
-          phone: '+21655487965',
-          rating: 4.8,
-          experienceYears: 6,
-          bio: 'Pilates pour gainage, posture, dos, abdos profonds. Parfait pour remise en forme.',
-          certifications: ['Pilates Mat (niveau 1)', 'Posture & dos (bases)'],
-          availability: 'Lun-Jeu 10:00-13:00 | Sam 16:00-19:00',
-          scheduleSlots: [
-            { days: [1, 2, 3, 4], from: '10:00', to: '13:00' },
-            { days: [6], from: '16:00', to: '19:00' }
-          ],
-          specialties: ['Pilates', 'Core', 'Posture'],
-          programs: ['Pilates debutant (4 semaines)', 'Core & posture (3 semaines)', 'Dos sans douleur (2 semaines)'],
-          photo: '{{ asset('images/coaches/emna.jpg') }}'
-        }
-      ];
-
-      let selectedCoachId = '';
-      let coachBookingDates = [];
-      let selectedCoachDateKey = '';
-      let selectedCoachWindow = '';
-
-      const weekDaysShort = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-      const findCoachById = (coachId) => coachCatalog.find((coach) => coach.id === coachId) || null;
-      const toDateKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-      const formatDateShort = (date) => `${weekDaysShort[date.getDay()]} ${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
-      const formatDateLong = (date) => `${weekDaysShort[date.getDay()]} ${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
-
-      const setCoachHint = (message) => {
-        if (!coachMessageHint) return;
-        coachMessageHint.textContent = message;
-      };
-
-      const sendCoachSmsOnServer = async (payload) => {
-        const body = new URLSearchParams();
-        body.set('_token', plannerCsrfToken);
-        body.set('kind', String(payload.kind || 'message'));
-        body.set('coach_name', String(payload.coachName || 'Coach'));
-        body.set('coach_speciality', String(payload.coachSpeciality || ''));
-        body.set('coach_phone', String(payload.coachPhone || ''));
-        body.set('reservation_date', String(payload.reservationDate || ''));
-        body.set('reservation_slot', String(payload.reservationSlot || ''));
-        body.set('client_message', String(payload.clientMessage || ''));
-
-        const response = await fetch(coachSmsSendUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: body.toString()
-        });
-
-        const data = await response.json().catch(() => ({ ok: false, error: 'invalid_response' }));
-        if (!response.ok || !data.ok) {
-          throw new Error((data && (data.message || data.error)) || 'sms_send_failed');
-        }
-
-        return data;
-      };
-
-      const fillCoachList = (target, values) => {
-        if (!target) return;
-        target.innerHTML = '';
-        values.forEach((entry) => {
-          const li = document.createElement('li');
-          li.textContent = entry;
-          target.appendChild(li);
-        });
-      };
-
-      const hideCoachBookingPanel = () => {
-        if (!coachBookingPanel) return;
-        coachBookingPanel.hidden = true;
-        selectedCoachDateKey = '';
-        selectedCoachWindow = '';
-        coachBookingDates = [];
-        if (coachDateGrid) coachDateGrid.innerHTML = '';
-        if (coachSlotSelect) {
-          coachSlotSelect.innerHTML = '';
-          coachSlotSelect.disabled = true;
-        }
-      };
-
-      const getCoachAvailableDates = (coach, horizonDays = 35) => {
-        if (!coach || !Array.isArray(coach.scheduleSlots)) return [];
-
-        const start = new Date();
-        start.setHours(0, 0, 0, 0);
-        const result = [];
-
-        for (let offset = 0; offset <= horizonDays; offset += 1) {
-          const date = new Date(start);
-          date.setDate(start.getDate() + offset);
-          const dayIndex = date.getDay();
-
-          const slotRanges = coach.scheduleSlots
-            .filter((slot) => Array.isArray(slot.days) && slot.days.includes(dayIndex))
-            .map((slot) => `${slot.from}-${slot.to}`);
-
-          const uniqueRanges = Array.from(new Set(slotRanges));
-          if (uniqueRanges.length === 0) continue;
-
-          result.push({
-            key: toDateKey(date),
-            label: formatDateShort(date),
-            longLabel: formatDateLong(date),
-            ranges: uniqueRanges
-          });
-        }
-
-        return result;
-      };
-
-      const setActiveCoachDate = (dateKey) => {
-        if (!coachDateGrid) return;
-        const dateButtons = Array.from(coachDateGrid.querySelectorAll('.coach-date-btn[data-date]'));
-        dateButtons.forEach((btn) => {
-          btn.classList.toggle('is-active', btn.getAttribute('data-date') === dateKey);
-        });
-      };
-
-      const renderCoachSlotOptions = (dateKey) => {
-        if (!coachSlotSelect) return;
-        coachSlotSelect.innerHTML = '';
-
-        const entry = coachBookingDates.find((item) => item.key === dateKey);
-        if (!entry || !Array.isArray(entry.ranges) || entry.ranges.length === 0) {
-          coachSlotSelect.disabled = true;
-          selectedCoachWindow = '';
-          return;
-        }
-
-        entry.ranges.forEach((range) => {
-          const option = document.createElement('option');
-          option.value = range;
-          option.textContent = range;
-          coachSlotSelect.appendChild(option);
-        });
-
-        selectedCoachWindow = entry.ranges[0];
-        coachSlotSelect.value = selectedCoachWindow;
-        coachSlotSelect.disabled = false;
-      };
-
-      const renderCoachBookingPanel = (coach) => {
-        if (!coachBookingPanel || !coachDateGrid) return;
-
-        coachBookingDates = getCoachAvailableDates(coach, 35);
-        selectedCoachDateKey = '';
-        selectedCoachWindow = '';
-        coachDateGrid.innerHTML = '';
-
-        if (coachBookingDates.length === 0) {
-          coachBookingPanel.hidden = false;
-          if (coachSlotSelect) {
-            coachSlotSelect.innerHTML = '';
-            coachSlotSelect.disabled = true;
-          }
-          setCoachHint(`Aucune date disponible pour ${coach.name} sur les 5 prochaines semaines.`);
-          return;
-        }
-
-        coachBookingDates.forEach((entry) => {
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'coach-date-btn';
-          btn.setAttribute('data-date', entry.key);
-          btn.textContent = entry.label;
-          coachDateGrid.appendChild(btn);
-        });
-
-        selectedCoachDateKey = coachBookingDates[0].key;
-        setActiveCoachDate(selectedCoachDateKey);
-        renderCoachSlotOptions(selectedCoachDateKey);
-        coachBookingPanel.hidden = false;
-        setCoachHint(`Selectionne une date puis confirme pour envoyer un SMS a ${coach.name}.`);
-      };
-
-      const renderCoachDetail = (coach) => {
-        if (!coach) return;
-        hideCoachBookingPanel();
-        if (coachPhoto) {
-          coachPhoto.style.backgroundImage = coach.photo ? `url("${coach.photo}")` : '';
-        }
-        if (coachName) coachName.textContent = coach.name;
-        if (coachSpeciality) coachSpeciality.textContent = coach.speciality;
-        if (coachRating) coachRating.innerHTML = `<i class="fa fa-star"></i> ${coach.rating.toFixed(1)}/5`;
-        if (coachExperience) coachExperience.innerHTML = `<i class="fa fa-briefcase"></i> ${coach.experienceYears} ans d'experience`;
-        if (coachPhone) coachPhone.innerHTML = `<i class="fa fa-phone"></i> ${coach.phone}`;
-        if (coachBio) coachBio.textContent = coach.bio;
-        if (coachAvailability) coachAvailability.textContent = `Disponibilite: ${coach.availability}`;
-
-        const skillEntries = Array.isArray(coach.specialties) ? [...coach.specialties] : [];
-        if (coach.playlist) {
-          skillEntries.push(`Playlist preferee: ${coach.playlist}`);
-        }
-
-        fillCoachList(coachCertifications, Array.isArray(coach.certifications) ? coach.certifications : []);
-        fillCoachList(coachSkills, skillEntries);
-        fillCoachList(coachPrograms, Array.isArray(coach.programs) ? coach.programs : []);
-
-        if (coachMessageInput) {
-          coachMessageInput.value = `Bonjour ${coach.name}, je souhaite reserver une seance avec vous.`;
-        }
-      };
-
-      const setActiveCoachCard = (coachId) => {
-        if (!coachGrid) return;
-        const cards = Array.from(coachGrid.querySelectorAll('.coach-item'));
-        cards.forEach((card) => {
-          card.classList.toggle('is-active', card.getAttribute('data-coach-id') === coachId);
-        });
-      };
-
-      const selectCoach = (coachId) => {
-        const coach = findCoachById(coachId) || coachCatalog[0] || null;
-        if (!coach) return;
-        selectedCoachId = coach.id;
-        setActiveCoachCard(selectedCoachId);
-        renderCoachDetail(coach);
-      };
-
-      const renderCoachCards = () => {
-        if (!coachGrid) return;
-        coachGrid.innerHTML = '';
-
-        coachCatalog.forEach((coach) => {
-          const card = document.createElement('article');
-          card.className = 'coach-item';
-          card.setAttribute('data-coach-id', coach.id);
-          card.innerHTML = `
-            <div class="coach-item-photo" style="${coach.photo ? `background-image:url('${coach.photo}')` : ''}"></div>
-            <div class="coach-item-body">
-              <h3 class="coach-item-name">${coach.name}</h3>
-              <p class="coach-item-speciality">${coach.speciality}</p>
-              <div class="coach-item-meta">
-                <span><i class="fa fa-star"></i> ${coach.rating.toFixed(1)}/5</span>
-                <span><i class="fa fa-clock-o"></i> ${coach.experienceYears} ans</span>
-              </div>
-              <p class="coach-item-availability"><i class="fa fa-calendar"></i> ${coach.availability}</p>
-              <button type="button" class="fitness-btn fitness-btn-soft" data-coach-id="${coach.id}"><i class="fa fa-user"></i> Voir profil</button>
-            </div>
-          `;
-          coachGrid.appendChild(card);
-        });
-      };
-
-      if (coachGrid && coachProfile) {
-        renderCoachCards();
-        selectCoach(coachCatalog[0]?.id || '');
-
-        coachGrid.addEventListener('click', (event) => {
-          const trigger = event.target.closest('[data-coach-id]');
-          if (!trigger) return;
-          const coachId = trigger.getAttribute('data-coach-id');
-          if (!coachId) return;
-          selectCoach(coachId);
-        });
-      }
-
-      if (coachDateGrid) {
-        coachDateGrid.addEventListener('click', (event) => {
-          const trigger = event.target.closest('.coach-date-btn[data-date]');
-          if (!trigger) return;
-          const dateKey = trigger.getAttribute('data-date');
-          if (!dateKey) return;
-          selectedCoachDateKey = dateKey;
-          setActiveCoachDate(selectedCoachDateKey);
-          renderCoachSlotOptions(selectedCoachDateKey);
-        });
-      }
-
-      if (coachSlotSelect) {
-        coachSlotSelect.addEventListener('change', () => {
-          selectedCoachWindow = String(coachSlotSelect.value || '').trim();
-        });
-      }
-
-      if (coachBookBtn) {
-        coachBookBtn.addEventListener('click', () => {
-          const coach = findCoachById(selectedCoachId);
-          if (!coach) return;
-          renderCoachBookingPanel(coach);
-        });
-      }
-
-      if (coachBookCancelBtn) {
-        coachBookCancelBtn.addEventListener('click', () => {
-          hideCoachBookingPanel();
-          setCoachHint('Reservation annulee.');
-        });
-      }
-
-      if (coachBookConfirmBtn) {
-        coachBookConfirmBtn.addEventListener('click', async () => {
-          const coach = findCoachById(selectedCoachId);
-          if (!coach) return;
-
-          const dateEntry = coachBookingDates.find((entry) => entry.key === selectedCoachDateKey);
-          if (!dateEntry) {
-            setCoachHint('Choisis d abord une date disponible.');
-            return;
-          }
-
-          const slot = String(selectedCoachWindow || '').trim();
-          if (!slot) {
-            setCoachHint('Choisis un creneau avant de confirmer.');
-            return;
-          }
-
-          const customMessage = String(coachMessageInput?.value || '').trim();
-          try {
-            await sendCoachSmsOnServer({
-              kind: 'reservation',
-              coachName: coach.name,
-              coachSpeciality: coach.speciality,
-              coachPhone: coach.phone,
-              reservationDate: dateEntry.longLabel,
-              reservationSlot: slot,
-              clientMessage: customMessage || 'Je confirme ma reservation.'
-            });
-          } catch (error) {
-            const details = error instanceof Error ? error.message : 'sms_send_failed';
-            setCoachHint(`Echec envoi SMS: ${details}`);
-            return;
-          }
-
-          setCoachHint(`Reservation confirmee. SMS envoye au coach ${coach.name} pour ${dateEntry.longLabel} ${slot}.`);
-          hideCoachBookingPanel();
-        });
-      }
-
-      if (coachSendBtn) {
-        coachSendBtn.addEventListener('click', async () => {
-          const coach = findCoachById(selectedCoachId);
-          if (!coach) return;
-
-          const text = String(coachMessageInput?.value || '').trim();
-          try {
-            await sendCoachSmsOnServer({
-              kind: 'message',
-              coachName: coach.name,
-              coachSpeciality: coach.speciality,
-              coachPhone: coach.phone,
-              clientMessage: text || 'Bonjour, je souhaite discuter du programme.'
-            });
-          } catch (error) {
-            const details = error instanceof Error ? error.message : 'sms_send_failed';
-            setCoachHint(`Echec envoi SMS: ${details}`);
-            return;
-          }
-
-          setCoachHint(`Message envoye au coach ${coach.name} (${coach.phone}).`);
-        });
-      }
 
       const exploreFeed = document.getElementById('fp-explore-feed');
       const exploreCount = document.getElementById('fp-explore-count');
@@ -3872,7 +3377,7 @@
 
       const deleteConfirmedPlan = async (planId) => {
         if (!plansPersistAvailable) {
-          alert('Connecte-toi pour supprimer une sÃ©ance enregistrÃ©e.');
+          alert('Connecte-toi pour supprimer une séance enregistrée.');
           return;
         }
 
@@ -3956,7 +3461,7 @@
         }
 
         if (!plansPersistAvailable) {
-          alert('Connecte-toi pour confirmer et sauvegarder ta sÃ©ance.');
+          alert('Connecte-toi pour confirmer et sauvegarder ta séance.');
           return;
         }
 
@@ -3982,7 +3487,7 @@
           closeModal();
         } catch (error) {
           if (String(error.message || '').includes('unauthorized')) {
-            alert('Tu dois Ãªtre connectÃ© pour confirmer une sÃ©ance.');
+            alert('Tu dois être connecté pour confirmer une séance.');
             return;
           }
           alert('Confirmation impossible pour le moment.');
@@ -4032,7 +3537,7 @@
         }
 
         const opened = openVideoModalWithSource(source, {
-          title: 'Video de lâ€™exercice',
+          title: 'Video de l’exercice',
           subtitle: `${selectedProgram} - ${selectedPlace}`,
           name: current.name
         });
@@ -4070,7 +3575,6 @@
     });
   </script>
 {% endblock %}
-
 
 
 
