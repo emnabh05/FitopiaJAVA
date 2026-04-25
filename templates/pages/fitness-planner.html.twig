@@ -287,219 +287,251 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .explore-card {
-      padding: 1rem;
-    }
+    /* ── Explore Feed — TikTok/Reels style ── */
+    .explore-card { padding: .8rem 1rem; }
 
+    .explore-ai-bar {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: .5rem;
+      align-items: center;
+      margin-bottom: .8rem;
+    }
+    .explore-ai-input {
+      border: 1.5px solid var(--fp-border);
+      border-radius: 999px;
+      min-height: 40px;
+      padding: .45rem 1rem;
+      font-size: .88rem;
+      width: 100%;
+      background: #fff;
+    }
+    .explore-ai-input:focus { outline: none; border-color: #1a6b5a; }
+
+    /* Feed container */
     .explore-shell {
       position: relative;
-      margin-top: .8rem;
-      border-radius: 18px;
+      border-radius: 20px;
       overflow: hidden;
       border: 1px solid #1a3a48;
-      background: #081821;
-      height: min(78vh, 760px);
+      background: #050e14;
+      height: min(82vh, 820px);
     }
-
     .explore-feed {
       height: 100%;
-      overflow-y: auto;
+      overflow-y: scroll;
       scroll-snap-type: y mandatory;
       -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
     }
+    .explore-feed::-webkit-scrollbar { display: none; }
 
+    /* Each slide */
     .explore-slide {
+      height: 100%;
       min-height: 100%;
       position: relative;
       scroll-snap-align: start;
+      scroll-snap-stop: always;
       color: #fff;
-      display: grid;
-      align-items: end;
+      display: flex;
+      align-items: flex-end;
+      background: #050e14;
     }
 
+    /* Media layer */
     .explore-media {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at 35% 20%, #2a7489 0%, #0a2331 70%);
+      background: radial-gradient(circle at 35% 20%, #1a4a5a 0%, #050e14 70%);
     }
-
-    .explore-media img,
     .explore-media video,
     .explore-media iframe {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       object-fit: cover;
       display: block;
     }
 
-    .explore-media-fallback {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      align-content: center;
-      justify-items: center;
-      gap: .7rem;
-      padding: 1rem;
-      text-align: center;
-      background:
-        radial-gradient(circle at 30% 22%, rgba(68, 168, 159, .35) 0%, rgba(8, 24, 33, .94) 68%),
-        linear-gradient(120deg, rgba(8, 24, 33, .98), rgba(14, 38, 51, .98));
-      color: #fff;
-    }
-
-    .explore-media-fallback-label {
-      margin: 0;
-      font-size: .95rem;
-      font-weight: 700;
-      max-width: 42ch;
-    }
-
-    .explore-media-fallback-actions {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: .45rem;
-    }
-
-    .explore-fallback-btn {
-      border: 1px solid rgba(255, 255, 255, .45);
-      background: rgba(255, 255, 255, .08);
-      color: #fff;
-      border-radius: 999px;
-      min-height: 36px;
-      padding: .35rem .78rem;
-      font-size: .8rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .explore-fallback-btn:hover {
-      background: rgba(255, 255, 255, .16);
-    }
-
+    /* Gradient overlay */
     .explore-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to top, rgba(5, 12, 17, .86) 15%, rgba(5, 12, 17, .38) 58%, rgba(5, 12, 17, .2) 100%);
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,.88) 0%,
+        rgba(0,0,0,.45) 40%,
+        rgba(0,0,0,.1) 70%,
+        transparent 100%
+      );
       pointer-events: none;
     }
 
+    /* Right sidebar actions (TikTok style) */
+    .explore-sidebar {
+      position: absolute;
+      right: 14px;
+      bottom: 120px;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+    }
+    .explore-side-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      padding: 0;
+    }
+    .explore-side-btn .icon {
+      width: 46px; height: 46px;
+      background: rgba(255,255,255,.15);
+      backdrop-filter: blur(8px);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      transition: background .2s, transform .15s;
+      border: 1.5px solid rgba(255,255,255,.25);
+    }
+    .explore-side-btn:hover .icon { background: rgba(255,255,255,.28); transform: scale(1.1); }
+    .explore-side-btn.liked .icon { background: #ff2f63; border-color: #ff2f63; }
+    .explore-side-btn span { font-size: .72rem; font-weight: 700; text-shadow: 0 1px 4px rgba(0,0,0,.7); }
+
+    /* Bottom content */
     .explore-content {
       position: relative;
-      z-index: 1;
-      padding: 1rem 1rem 1.2rem;
-      display: grid;
-      gap: .8rem;
+      z-index: 4;
+      padding: 0 70px 22px 18px;
+      width: 100%;
     }
-
-    .explore-top h3 {
-      margin: 0 0 .35rem;
-      font-size: clamp(1.4rem, 2.4vw, 2rem);
-      font-weight: 800;
-      letter-spacing: .02em;
-    }
-
-    .explore-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .4rem;
-      margin-bottom: .35rem;
-    }
-
-    .explore-badge {
-      background: rgba(255, 255, 255, .15);
-      border: 1px solid rgba(255, 255, 255, .35);
-      border-radius: 999px;
-      padding: .2rem .55rem;
-      font-size: .75rem;
-      font-weight: 700;
-      backdrop-filter: blur(4px);
-    }
-
-    .explore-meta {
-      font-size: .85rem;
-      color: rgba(255, 255, 255, .86);
-      font-weight: 600;
-    }
-
-    .explore-tip {
-      margin: 0;
-      font-size: .95rem;
-      color: rgba(255, 255, 255, .92);
-      max-width: 62ch;
-    }
-
-    .explore-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .45rem;
-    }
-
-    .explore-btn {
-      border: 1px solid rgba(255, 255, 255, .34);
-      background: rgba(7, 20, 29, .45);
-      color: #fff;
-      border-radius: 999px;
-      min-height: 38px;
-      padding: .4rem .8rem;
+    .explore-author {
       font-size: .82rem;
       font-weight: 700;
-      cursor: pointer;
+      color: rgba(255,255,255,.75);
+      margin-bottom: 5px;
+      display: flex; align-items: center; gap: 6px;
     }
-
-    .explore-btn.is-active {
-      background: #ff2f63;
-      border-color: #ff2f63;
+    .explore-author-dot {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: linear-gradient(135deg,#0b3a3d,#1a6b5a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 800;
     }
-
-    .explore-ai-bar {
-      margin-top: .65rem;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: .5rem;
-      align-items: center;
-    }
-
-    .explore-ai-input {
-      border: 1px solid var(--fp-border);
-      border-radius: 999px;
-      min-height: 40px;
-      padding: .45rem .8rem;
-      width: 100%;
-    }
-
-    .explore-progress {
-      position: absolute;
-      right: .55rem;
-      top: .7rem;
-      z-index: 4;
-      width: 34px;
-      display: grid;
-      justify-items: center;
-      gap: .4rem;
-    }
-
-    .explore-progress-count {
-      font-size: .74rem;
+    .explore-top h3 {
+      margin: 0 0 6px;
+      font-size: clamp(1rem, 2vw, 1.35rem);
       font-weight: 800;
-      color: rgba(255, 255, 255, .92);
-      text-shadow: 0 2px 8px rgba(0, 0, 0, .55);
+      line-height: 1.25;
+      text-shadow: 0 2px 8px rgba(0,0,0,.6);
     }
-
-    .explore-progress-track {
-      width: 4px;
-      height: 88px;
-      border-radius: 999px;
-      background: rgba(255, 255, 255, .36);
+    .explore-desc {
+      font-size: .82rem;
+      color: rgba(255,255,255,.85);
+      margin: 0 0 8px;
+      max-width: 55ch;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
       overflow: hidden;
     }
-
-    .explore-progress-fill {
-      width: 100%;
-      height: 0;
-      background: #44f1cb;
-      transition: height .2s ease;
+    .explore-badges {
+      display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 8px;
     }
+    .explore-badge {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.3);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: .72rem; font-weight: 700;
+      backdrop-filter: blur(4px);
+    }
+    .explore-meta {
+      font-size: .78rem;
+      color: rgba(255,255,255,.7);
+    }
+
+    /* Source badge */
+    .explore-source-badge {
+      position: absolute;
+      top: 14px; left: 14px;
+      z-index: 5;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+      border-radius: 999px;
+      padding: 4px 12px;
+      font-size: .72rem; font-weight: 700;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.2);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .explore-source-badge.local { border-color: #44f1cb; color: #44f1cb; }
+    .explore-source-badge.youtube { border-color: #ff2f63; color: #ff2f63; }
+
+    /* Progress bar */
+    .explore-progress {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      z-index: 6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .explore-progress-count {
+      font-size: .68rem; font-weight: 800;
+      color: rgba(255,255,255,.85);
+      text-shadow: 0 1px 4px rgba(0,0,0,.6);
+      writing-mode: vertical-rl;
+    }
+    .explore-progress-track {
+      width: 3px; height: 80px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.25);
+      overflow: hidden;
+    }
+    .explore-progress-fill {
+      width: 100%; height: 0;
+      background: #44f1cb;
+      transition: height .25s ease;
+    }
+
+    /* Nav arrows */
+    .explore-nav {
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      z-index: 6;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .explore-nav-top { top: 12px; }
+    .explore-nav-bot { bottom: 12px; }
+    .explore-nav-btn {
+      background: rgba(255,255,255,.15);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,.25);
+      color: #fff; border-radius: 50%;
+      width: 34px; height: 34px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: .9rem;
+      transition: background .2s;
+    }
+    .explore-nav-btn:hover { background: rgba(255,255,255,.3); }
+
+    /* Loading skeleton */
+    .explore-skeleton {
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, #0d1f2a 25%, #162d3a 50%, #0d1f2a 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
     .alert-inline {
       border-radius: 12px;
@@ -1388,11 +1420,92 @@
         <div class="section-head">
           <div>
             <h2>Explore Training Plans</h2>
-            <p>Tes s�ances confirm�es apparaissent ici.</p>
+            <p>Tes séances confirmées apparaissent ici.</p>
           </div>
         </div>
         <div id="fp-user-plans-list" class="fp-user-plans"></div>
       </div>
+
+      {% if app.user %}
+      {# ── Performance Tracker ── #}
+      <div class="fitness-card" style="margin-top:1.2rem;">
+        <div class="section-head">
+          <div>
+            <h2>📈 Suivi des performances</h2>
+            <p>Enregistre tes séances et visualise ta progression semaine par semaine.</p>
+          </div>
+          <button type="button" class="fitness-btn fitness-btn-primary" id="perf-toggle-form">
+            + Nouvelle séance
+          </button>
+        </div>
+
+        {# Formulaire de saisie #}
+        <div id="perf-form-wrap" style="display:none;">
+          <div style="background:#f8fafc;border:1px solid #dce9ee;border-radius:14px;padding:1.2rem;margin-bottom:1rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:.7rem;margin-bottom:.8rem;">
+              <div>
+                <label style="font-size:.82rem;font-weight:700;color:#0b3a3d;">Date *</label>
+                <input type="date" id="perf-date" class="fitness-input"
+                       value="{{ 'now'|date('Y-m-d') }}"
+                       style="width:100%;border:1.5px solid #dce9ee;border-radius:10px;padding:.5rem .75rem;font-size:.9rem;">
+              </div>
+              <div>
+                <label style="font-size:.82rem;font-weight:700;color:#0b3a3d;">Label séance</label>
+                <input type="text" id="perf-label" placeholder="ex: Poitrine lundi"
+                       style="width:100%;border:1.5px solid #dce9ee;border-radius:10px;padding:.5rem .75rem;font-size:.9rem;">
+              </div>
+              <div style="display:flex;align-items:flex-end;">
+                <button type="button" id="perf-add-exercise" class="fitness-btn fitness-btn-soft">
+                  + Exercice
+                </button>
+              </div>
+            </div>
+
+            <div id="perf-exercises-list" style="display:grid;gap:.7rem;"></div>
+
+            <div style="margin-top:.9rem;display:flex;gap:.6rem;flex-wrap:wrap;">
+              <button type="button" id="perf-save" class="fitness-btn fitness-btn-primary">
+                ✓ Enregistrer la séance
+              </button>
+              <button type="button" id="perf-cancel" class="fitness-btn fitness-btn-soft">Annuler</button>
+              <span id="perf-save-status" style="font-size:.85rem;align-self:center;"></span>
+            </div>
+          </div>
+        </div>
+
+        {# Graphique de progression #}
+        <div style="display:grid;grid-template-columns:1fr auto;gap:.7rem;align-items:center;margin-bottom:.8rem;">
+          <div>
+            <label style="font-size:.82rem;font-weight:700;color:#0b3a3d;">Exercice à analyser</label>
+            <select id="perf-chart-exercise"
+                    style="width:100%;border:1.5px solid #dce9ee;border-radius:10px;padding:.5rem .75rem;font-size:.9rem;background:#fff;">
+              <option value="">-- Choisir un exercice --</option>
+            </select>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:.5rem;">
+            <button type="button" id="perf-chart-metric-weight" class="fitness-btn fitness-btn-primary" data-metric="weight">
+              Poids max
+            </button>
+            <button type="button" id="perf-chart-metric-volume" class="fitness-btn fitness-btn-soft" data-metric="volume">
+              Volume
+            </button>
+          </div>
+        </div>
+
+        <div style="position:relative;height:280px;background:#fff;border:1px solid #dce9ee;border-radius:14px;padding:.8rem;">
+          <canvas id="perf-chart"></canvas>
+          <div id="perf-chart-empty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:.9rem;">
+            Sélectionne un exercice pour voir ta progression
+          </div>
+        </div>
+
+        {# Historique des séances #}
+        <div style="margin-top:1rem;">
+          <div style="font-weight:700;font-size:.95rem;color:#0b3a3d;margin-bottom:.6rem;">Historique récent</div>
+          <div id="perf-history" style="display:grid;gap:.5rem;max-height:300px;overflow-y:auto;"></div>
+        </div>
+      </div>
+      {% endif %}
     </div>
 
     <div class="section {{ activeView == 'manage' ? 'is-active' : '' }}" data-section="manage">
@@ -1409,7 +1522,7 @@
         'Entrainement du corps entier'
       ] %}
       {% set poitrineLevels = {
-        'D�butant': [
+        'D�butant': [
           'Developpe couche avec barre',
           'Developpe couche incline avec barre',
           'Arm chest flyes plies a la poulie'
@@ -1434,7 +1547,7 @@
         <div class="section-head">
           <div>
             <h2>Liste des programmes</h2>
-            <p>Acc�s rapide par groupe musculaire, avec focus Poitrine.</p>
+            <p>Acc�s rapide par groupe musculaire, avec focus Poitrine.</p>
           </div>
         </div>
         <div class="program-category-list">
@@ -1538,57 +1651,171 @@
 
     <div class="section {{ activeView == 'explore' ? 'is-active' : '' }}" data-section="explore">
       <div class="fitness-card explore-card">
+
         <div class="section-head">
           <div>
             <h2>Explore</h2>
-            <p>Swipe/scroll vertical: haut = exercice suivant, bas = pr�c�dent.</p>
+            <p>Feed vidéo fitness — scroll vertical pour naviguer, autoplay activé.</p>
           </div>
         </div>
+
         <div class="explore-ai-bar">
-          <input id="fp-explore-ai-query" class="explore-ai-input" type="text" placeholder="Ex: perte de poids, cardio, abdos, debutant...">
-          <button id="fp-explore-ai-generate" type="button" class="fitness-btn fitness-btn-primary"><i class="fa fa-magic"></i> IA Import videos</button>
+          <input id="fp-explore-ai-query" class="explore-ai-input" type="text"
+                 placeholder="Filtrer par thème : abdos, cardio, motivation, biceps...">
+          <button id="fp-explore-ai-generate" type="button" class="fitness-btn fitness-btn-primary">
+            <i class="fa fa-magic"></i> IA Filtrer
+          </button>
+          <button id="fp-explore-reset" type="button" class="fitness-btn fitness-btn-soft">
+            <i class="fa fa-refresh"></i> Tout
+          </button>
         </div>
 
         <div class="explore-shell">
+
+          <!-- Progress indicator -->
           <aside class="explore-progress" aria-hidden="true">
-            <div class="explore-progress-count" id="fp-explore-count">1/1</div>
+            <div class="explore-progress-count" id="fp-explore-count">1/8</div>
             <div class="explore-progress-track">
               <div class="explore-progress-fill" id="fp-explore-fill"></div>
             </div>
           </aside>
 
+          <!-- Nav arrows -->
+          <div class="explore-nav explore-nav-top">
+            <button type="button" class="explore-nav-btn" id="fp-explore-prev">▲</button>
+          </div>
+          <div class="explore-nav explore-nav-bot">
+            <button type="button" class="explore-nav-btn" id="fp-explore-next">▼</button>
+          </div>
+
+          <!-- Feed -->
           <div class="explore-feed" id="fp-explore-feed">
+
+            {# ── Vidéos locales ── #}
+            {% set localVideos = [
+              {src: 'videos/local/back-home-5min.mp4',        title: 'Back Intense at Home',          desc: 'Workout dos intense 5 minutes sans équipement, à faire chez toi.',         tags: ['Dos','5 min','Maison'],    author: 'Fitopia Local'},
+              {src: 'videos/local/abdos-complet-20min.mp4',   title: 'Circuit Abdos Complet 20 min',  desc: 'Circuit abdos complet à suivre en temps réel, 20 minutes non-stop.',       tags: ['Abdos','20 min','Maison'], author: 'Fitopia Local'},
+              {src: 'videos/local/pectoraux-5min.mp4',        title: 'Pectoraux Musclés en 5 min',    desc: 'Entraînement pectoraux à la maison, 5 minutes suffisent.',                 tags: ['Poitrine','5 min','Maison'],author: 'Fitopia Local'},
+              {src: 'videos/local/triceps-dumbbells-10min.mp4',title: 'Triceps Workout — Dumbbells',  desc: '10 minutes de triceps avec haltères, brûlure garantie.',                   tags: ['Triceps','10 min','Haltères'],author: 'Fitopia Local'},
+              {src: 'videos/local/biceps-15min.mp4',          title: 'Biceps Burning 15 min',         desc: '15 minutes de biceps avec haltères par Caroline Girvan.',                  tags: ['Biceps','15 min','Haltères'],author: 'Caroline Girvan'}
+            ] %}
+
+            {% for v in localVideos %}
             <article class="explore-slide"
-              data-name="Feed IA Fitopia"
-              data-video=""
-              data-image=""
-              data-description="Clique sur IA Import videos pour charger un flux sport automatiquement."
-              data-muscle="Corps entier"
-              data-difficulty="Beginner"
-              data-duration="3">
-              <div class="explore-media"></div>
+              data-title="{{ v.title }}"
+              data-source="local"
+              data-tags="{{ v.tags|join(',') }}">
+              <div class="explore-media">
+                <video
+                  src="{{ asset(v.src) }}"
+                  loop muted playsinline preload="none"
+                  class="explore-video"
+                  style="width:100%;height:100%;object-fit:cover;display:block;"></video>
+              </div>
               <div class="explore-overlay"></div>
+
+              <!-- Source badge -->
+              <div class="explore-source-badge local">📁 Local</div>
+
+              <!-- Right sidebar -->
+              <div class="explore-sidebar">
+                <button type="button" class="explore-side-btn like-btn" data-liked="0">
+                  <div class="icon">❤</div>
+                  <span class="like-count">0</span>
+                </button>
+                <button type="button" class="explore-side-btn share-btn">
+                  <div class="icon">↗</div>
+                  <span>Partager</span>
+                </button>
+                <button type="button" class="explore-side-btn mute-btn" data-muted="1">
+                  <div class="icon">🔇</div>
+                  <span>Son</span>
+                </button>
+              </div>
+
+              <!-- Bottom content -->
               <div class="explore-content">
-                <div class="explore-top">
-                  <h3>Feed IA Fitopia</h3>
-                  <div class="explore-badges">
-                    <span class="explore-badge">Corps entier</span>
-                    <span class="explore-badge">Beginner</span>
-                    <span class="explore-badge">Sans materiel</span>
-                  </div>
-                  <div class="explore-meta">~3 min a maitriser</div>
+                <div class="explore-author">
+                  <div class="explore-author-dot">{{ v.author|slice(0,1) }}</div>
+                  {{ v.author }}
                 </div>
-                <p class="explore-tip">Clique sur IA Import videos pour charger un flux sport automatiquement.</p>
-                <div class="explore-actions">
-                  <button type="button" class="explore-btn" data-action="favorite">&#10084; Favori</button>
-                  <button type="button" class="explore-btn" data-action="add">+ Ajouter au plan</button>
-                  <button type="button" class="explore-btn" data-action="try">30s Essayer</button>
-                  <button type="button" class="explore-btn" data-action="details">i Details</button>
+                <div class="explore-top"><h3>{{ v.title }}</h3></div>
+                <p class="explore-desc">{{ v.desc }}</p>
+                <div class="explore-badges">
+                  {% for tag in v.tags %}
+                    <span class="explore-badge">{{ tag }}</span>
+                  {% endfor %}
                 </div>
               </div>
             </article>
-          </div>
-        </div>
+            {% endfor %}
+
+            {# ── Vidéos YouTube fitness ── #}
+            {% set ytVideos = [
+              {id: 'IODxDxX7oi4', title: 'Chest Workout — Poitrine Builder',    desc: 'Séance poitrine complète pour débutants et intermédiaires.',          tags: ['Poitrine','YouTube','Gym'],    author: 'FitnessFR'},
+              {id: 'roCP6wCXPqo', title: 'Dos Strong Flow',                     desc: 'Renforcement du dos, garde la colonne neutre pendant le tirage.',      tags: ['Dos','YouTube','Posture'],     author: 'FitnessFR'},
+              {id: 'aclHkVaku9U', title: 'Jambes Power Squat',                  desc: 'Squats et fentes pour des jambes puissantes, pousse avec les talons.', tags: ['Jambes','YouTube','Force'],    author: 'FitnessFR'},
+              {id: 'Xyd_fa5zoEU', title: 'Fessier Focus — Hip Thrust',          desc: 'Contracte les fessiers en haut du mouvement pour maximiser.',          tags: ['Fessier','YouTube','Maison'],  author: 'FitnessFR'},
+              {id: 'qEwKCR5JCog', title: 'Épaules Sculpt',                      desc: 'Ne monte pas les épaules vers les oreilles, amplitude contrôlée.',     tags: ['Épaules','YouTube','Haltères'],author: 'FitnessFR'},
+              {id: 'AnYl6Nk9GOA', title: 'Abdos Core 10 min',                   desc: 'Garde le bas du dos collé au sol, 10 minutes de core intense.',        tags: ['Abdos','YouTube','Core'],      author: 'FitnessFR'},
+              {id: 'ml6cT4AZdqI', title: 'Corps Entier HIIT',                   desc: 'Reste dynamique, respire en rythme — full body haute intensité.',      tags: ['HIIT','YouTube','Corps entier'],author: 'FitnessFR'}
+            ] %}
+
+            {% for v in ytVideos %}
+            <article class="explore-slide"
+              data-title="{{ v.title }}"
+              data-source="youtube"
+              data-ytid="{{ v.id }}"
+              data-tags="{{ v.tags|join(',') }}">
+              <div class="explore-media">
+                <iframe
+                  data-src="https://www.youtube-nocookie.com/embed/{{ v.id }}?autoplay=1&mute=1&controls=0&loop=1&playlist={{ v.id }}&playsinline=1&modestbranding=1&rel=0"
+                  frameborder="0"
+                  allow="autoplay; encrypted-media"
+                  allowfullscreen
+                  loading="lazy"
+                  style="width:100%;height:100%;display:block;pointer-events:none;"></iframe>
+              </div>
+              <div class="explore-overlay"></div>
+
+              <!-- Source badge -->
+              <div class="explore-source-badge youtube">▶ YouTube</div>
+
+              <!-- Right sidebar -->
+              <div class="explore-sidebar">
+                <button type="button" class="explore-side-btn like-btn" data-liked="0">
+                  <div class="icon">❤</div>
+                  <span class="like-count">0</span>
+                </button>
+                <button type="button" class="explore-side-btn share-btn" data-ytid="{{ v.id }}">
+                  <div class="icon">↗</div>
+                  <span>Partager</span>
+                </button>
+                <button type="button" class="explore-side-btn" onclick="window.open('https://www.youtube.com/watch?v={{ v.id }}','_blank')">
+                  <div class="icon" style="font-size:.85rem;">YT</div>
+                  <span>Ouvrir</span>
+                </button>
+              </div>
+
+              <!-- Bottom content -->
+              <div class="explore-content">
+                <div class="explore-author">
+                  <div class="explore-author-dot">{{ v.author|slice(0,1) }}</div>
+                  {{ v.author }}
+                </div>
+                <div class="explore-top"><h3>{{ v.title }}</h3></div>
+                <p class="explore-desc">{{ v.desc }}</p>
+                <div class="explore-badges">
+                  {% for tag in v.tags %}
+                    <span class="explore-badge">{{ tag }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </article>
+            {% endfor %}
+
+          </div>{# end feed #}
+        </div>{# end shell #}
       </div>
     </div>
 
@@ -1596,8 +1823,8 @@
       <div class="fitness-card coach-shell">
         <div class="section-head">
           <div>
-            <h2>Coachs Priv�s</h2>
-            <p>R�servez une s�ance avec l'un de nos 6 coachs certifi�s.</p>
+            <h2>Coachs Priv�s</h2>
+            <p>R�servez une s�ance avec l'un de nos 6 coachs certifi�s.</p>
           </div>
         </div>
 
@@ -1606,8 +1833,8 @@
           {% set coachList = [
             {id:'ahmed', name:'Coach Ahmed',    spec:'Boxe & Cardio',          phone:'+216 25 010 582', slots:'Lun-Ven 18h-21h | Sam 10h-13h', img:'images/coaches/ahmed.jpg'},
             {id:'ali',   name:'Coach Ali',      spec:'Musculation & Force',     phone:'+216 53 919 881', slots:'Lun-Jeu 16h-20h | Dim 09h-12h', img:'images/coaches/ali.jpg'},
-            {id:'omar',  name:'Coach Omar',     spec:'Judo & Pr�pa physique',   phone:'+216 58 936 689', slots:'Mar-Ven 17h-20h | Sam 15h-18h', img:'images/coaches/omar.jpg'},
-            {id:'sarah', name:'Coach Sarah',    spec:'Yoga & Mobilit�',         phone:'+216 28 759 998', slots:'Lun-Ven 07h-10h | Sam 08h-11h', img:'images/coaches/sarah.jpg'},
+            {id:'omar',  name:'Coach Omar',     spec:'Judo & Pr�pa physique',   phone:'+216 58 936 689', slots:'Mar-Ven 17h-20h | Sam 15h-18h', img:'images/coaches/omar.jpg'},
+            {id:'sarah', name:'Coach Sarah',    spec:'Yoga & Mobilit�',         phone:'+216 28 759 998', slots:'Lun-Ven 07h-10h | Sam 08h-11h', img:'images/coaches/sarah.jpg'},
             {id:'rania', name:'Coach Rania',    spec:'Danse orientale & Cardio',phone:'+216 58 860 916', slots:'Mer-Ven 18h-21h | Dim 16h-19h', img:'images/coaches/rania.jpg'},
             {id:'emna',  name:'Coach Emna',     spec:'Pilates & Gainage',       phone:'+216 55 487 965', slots:'Lun-Jeu 10h-13h | Sam 16h-19h', img:'images/coaches/emna.jpg'}
           ] %}
@@ -1622,7 +1849,7 @@
               <div style="font-size:.78rem;color:#64748b;"><i class="fa fa-calendar"></i> {{ c.slots }}</div>
               <a href="{{ path('coach_book', {id: c.id}) }}"
                  style="margin-top:auto;padding-top:.6rem;display:block;text-align:center;background:linear-gradient(135deg,#0b3a3d,#1a6b5a);color:#fff;border-radius:10px;padding:.6rem;font-weight:700;font-size:.85rem;text-decoration:none;">
-                R�server une s�ance
+                R�server une s�ance
               </a>
             </div>
           </div>
@@ -1648,7 +1875,7 @@
     </div>
     <div class="fp-location-list">
       <div class="fp-location-card" id="fp-modal-gym" style="background-image:url('{{ asset("images/fitness/salle.jpg") }}');">
-        <div class="fp-location-label">� la salle de sport</div>
+        <div class="fp-location-label">� la salle de sport</div>
       </div>
       <div class="fp-location-card" id="fp-modal-home" style="background-image:url('{{ asset("images/fitness/chez-toi.jpg") }}');">
         <div class="fp-location-label">Chez soi</div>
@@ -1662,14 +1889,14 @@
     <div class="fp-modal-header">
       <button class="fp-modal-back" type="button" id="fp-level-close">&#8592; Retour</button>
       <div>
-        <h3 class="fp-modal-title" id="fp-level-title">Niveau de difficult�</h3>
+        <h3 class="fp-modal-title" id="fp-level-title">Niveau de difficult�</h3>
         <p class="fp-modal-subtitle" id="fp-level-subtitle">Choisis ton niveau</p>
       </div>
       <div></div>
     </div>
     <div class="fp-location-list">
-      <div class="fp-level-card" data-level="D�butant" style="background-image:url('{{ asset("images/fitness/niveau-debutant.jpg") }}');">
-        <div class="fp-level-label">D�butant</div>
+      <div class="fp-level-card" data-level="D�butant" style="background-image:url('{{ asset("images/fitness/niveau-debutant.jpg") }}');">
+        <div class="fp-level-label">D�butant</div>
       </div>
       <div class="fp-level-card" data-level="Avance" style="background-image:url('{{ asset("images/fitness/niveau-avance.jpg") }}');">
         <div class="fp-level-label">Avance</div>
@@ -1694,9 +1921,9 @@
     <div class="fp-exercise-shell">
       <div class="fp-exercise-list" id="fp-exercise-list"></div>
       <aside class="fp-session-panel">
-        <h4 class="fp-session-title">Ma s�ance :</h4>
+        <h4 class="fp-session-title">Ma s�ance :</h4>
         <div class="fp-session-count" id="fp-session-count">0 exercices</div>
-        <div class="fp-session-meta" id="fp-session-time">Temps estim� : 0 min</div>
+        <div class="fp-session-meta" id="fp-session-time">Temps estim� : 0 min</div>
         <div class="fp-session-list" id="fp-session-list"></div>
         <div class="fp-session-actions">
           <button class="fitness-btn fitness-btn-primary" type="button" id="fp-session-start">Confirmer</button>
@@ -1801,6 +2028,7 @@
 
 {% block javascripts %}
   {{ parent() }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   {% set exerciseImageMapJs = {} %}
   {% for ex in exercises %}
     {% set exerciseImageMapJs = exerciseImageMapJs|merge({ (ex.name): ex.imageUrl }) %}
@@ -1987,7 +2215,7 @@
 
       const openLevelModal = (placeLabel) => {
         selectedPlace = placeLabel || '';
-        if (levelTitle) levelTitle.textContent = 'Niveau de difficult�';
+        if (levelTitle) levelTitle.textContent = 'Niveau de difficult�';
         if (levelSubtitle) {
           levelSubtitle.textContent = selectedProgram ? `${selectedProgram} - ${placeLabel}` : placeLabel;
         }
@@ -2034,7 +2262,7 @@
         };
         const programExercises = {
           'Poitrine': {
-            'D�butant': [
+            'D�butant': [
               'Developpe couche avec barre',
               'Developpe couche incline avec barre',
               'Arm chest flyes plies a la poulie'
@@ -2093,7 +2321,7 @@
               const addBtn = document.createElement('button');
               addBtn.type = 'button';
               addBtn.className = 'fitness-btn fitness-btn-soft fp-exercise-action';
-              addBtn.textContent = '+ Ajouter � ma s�ance';
+              addBtn.textContent = '+ Ajouter � ma s�ance';
               addBtn.addEventListener('click', (evt) => {
                 evt.stopPropagation();
                 if (!sessionExercises.find((e) => e.name === name)) {
@@ -2109,7 +2337,7 @@
                 if (!video) return;
                 const source = normalizeVideoSource(video);
                 const opened = openVideoModalWithSource(source, {
-                  title: 'Video de l�exercice',
+                  title: 'Video de l�exercice',
                   subtitle: `${selectedProgram} - ${selectedPlace}`,
                   name
                 });
@@ -2145,7 +2373,7 @@
       }
 
       if (gymCard) {
-        gymCard.addEventListener('click', () => openLevelModal('� la salle de sport'));
+        gymCard.addEventListener('click', () => openLevelModal('� la salle de sport'));
       }
       if (homeCard) {
         homeCard.addEventListener('click', () => openLevelModal('Chez soi'));
@@ -2717,7 +2945,7 @@
         sessionCount.textContent = `${sessionExercises.length} exercices`;
         const estimatedSeconds = sessionExercises.length * 90;
         const mins = Math.max(0, Math.ceil(estimatedSeconds / 60));
-        sessionTime.textContent = `Temps estim� : ${mins} min`;
+        sessionTime.textContent = `Temps estim� : ${mins} min`;
         sessionList.innerHTML = '';
         sessionExercises.forEach((ex) => {
           const row = document.createElement('div');
@@ -2784,7 +3012,7 @@
           meta.className = 'program-meta';
           meta.textContent = query
             ? `Aucune tendance en cours pour "${query}".`
-            : 'Ajoute-les depuis l�admin.';
+            : 'Ajoute-les depuis l�admin.';
 
           empty.appendChild(title);
           empty.appendChild(meta);
@@ -2846,674 +3074,176 @@
       }
 
 
-      const exploreFeed = document.getElementById('fp-explore-feed');
-      const exploreCount = document.getElementById('fp-explore-count');
-      const exploreFill = document.getElementById('fp-explore-fill');
+
+      // -- Explore Feed � TikTok/Reels --------------------------------------
+      const exploreFeed    = document.getElementById('fp-explore-feed');
+      const exploreCount   = document.getElementById('fp-explore-count');
+      const exploreFill    = document.getElementById('fp-explore-fill');
       const exploreAiQuery = document.getElementById('fp-explore-ai-query');
-      const exploreAiGenerate = document.getElementById('fp-explore-ai-generate');
-      const exploreFavorites = new Set();
-      let exploreTryInterval = null;
-      let exploreTryButton = null;
+      const exploreAiBtn   = document.getElementById('fp-explore-ai-generate');
+      const exploreReset   = document.getElementById('fp-explore-reset');
+      const explorePrev    = document.getElementById('fp-explore-prev');
+      const exploreNext    = document.getElementById('fp-explore-next');
 
-      const aiVideoLibrary = [
-        { name: 'Poitrine Builder', muscle: 'Poitrine', difficulty: 'Beginner', duration: 6, tip: 'Controle la descente et stabilise les epaules.', video: 'https://www.youtube.com/watch?v=IODxDxX7oi4', tags: ['poitrine', 'chest', 'pompes'] },
-        { name: 'Dos Strong Flow', muscle: 'Dos', difficulty: 'Intermediate', duration: 7, tip: 'Garde la colonne neutre pendant le tirage.', video: 'https://www.youtube.com/watch?v=roCP6wCXPqo', tags: ['dos', 'back', 'posture'] },
-        { name: 'Jambes Power', muscle: 'Jambes', difficulty: 'Intermediate', duration: 8, tip: 'Pousse avec les talons sur les squats.', video: 'https://www.youtube.com/watch?v=aclHkVaku9U', tags: ['jambes', 'legs', 'squat'] },
-        { name: 'Fessier Focus', muscle: 'Fessier', difficulty: 'Beginner', duration: 7, tip: 'Contracte les fessiers en haut du mouvement.', video: 'https://www.youtube.com/watch?v=Xyd_fa5zoEU', tags: ['fessier', 'glutes', 'hip thrust'] },
-        { name: 'Epaules Sculpt', muscle: 'Epaules', difficulty: 'Intermediate', duration: 6, tip: 'Ne monte pas les epaules vers les oreilles.', video: 'https://www.youtube.com/watch?v=qEwKCR5JCog', tags: ['epaules', 'shoulders', 'deltoides'] },
-        { name: 'Biceps Pump', muscle: 'Biceps', difficulty: 'Beginner', duration: 5, tip: 'Garde les coudes fixes pres du corps.', video: 'https://www.youtube.com/watch?v=ykJmrZ5v0Oo', tags: ['biceps', 'bras', 'curl'] },
-        { name: 'Triceps Burn', muscle: 'Triceps', difficulty: 'Beginner', duration: 5, tip: 'Amplitude complete et mouvement controle.', video: 'https://www.youtube.com/watch?v=nRiJVZDpdL0', tags: ['triceps', 'bras', 'dips'] },
-        { name: 'Avant-bras Grip', muscle: 'Avant-bras', difficulty: 'Intermediate', duration: 5, tip: 'Travaille en prise lente pour le grip.', video: 'https://www.youtube.com/watch?v=Ej4WzltO1DA', tags: ['avant-bras', 'forearm', 'grip'] },
-        { name: 'Abdos Core 10', muscle: 'Abdos', difficulty: 'Beginner', duration: 6, tip: 'Garde le bas du dos colle au sol.', video: 'https://www.youtube.com/watch?v=AnYl6Nk9GOA', tags: ['abdos', 'core', 'ventre', 'gainage'] },
-        { name: 'Corps Entier HIIT', muscle: 'Corps entier', difficulty: 'Intermediate', duration: 10, tip: 'Reste dynamique, respire en rythme.', video: 'https://www.youtube.com/watch?v=ml6cT4AZdqI', tags: ['corps entier', 'full body', 'hiit'] }
-      ];
-      const aiFeedState = new Map();
-      const aiVideoValidationCache = new Map();
-      const aiTagAliases = {
-        abdos: ['abdos', 'core', 'ventre', 'ventre plat', 'gainage', 'plank', 'lower abs', 'stomach'],
-        ventre: ['abdos', 'core', 'ventre', 'ventre plat', 'gainage'],
-        gainage: ['gainage', 'plank', 'core', 'abdos'],
-        cardio: ['cardio', 'hiit', 'endurance', 'corde'],
-        jambes: ['jambes', 'squat', 'fessier', 'legs'],
-        dos: ['dos', 'posture', 'back', 'mobilite'],
-        poitrine: ['poitrine', 'pompes', 'chest', 'bras'],
-        souplesse: ['souplesse', 'mobilite', 'yoga', 'stretch']
+      let allSlides = [];
+      let currentSlideIndex = 0;
+      let activeVideo = null;
+      let activeIframe = null;
+
+      const getSlides = () => Array.from(exploreFeed ? exploreFeed.querySelectorAll('.explore-slide') : []);
+
+      // -- Autoplay logic --
+      const stopActive = () => {
+        if (activeVideo) { activeVideo.pause(); activeVideo = null; }
+        if (activeIframe) { activeIframe.src = ''; activeIframe = null; }
       };
 
-      const shuffleArray = (items) => {
-        const list = [...items];
-        for (let i = list.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [list[i], list[j]] = [list[j], list[i]];
-        }
-        return list;
-      };
+      const playSlide = (slide) => {
+        if (!slide) return;
+        stopActive();
+        const video = slide.querySelector('video.explore-video');
+        const iframe = slide.querySelector('iframe');
 
-      const buildRemainingQueue = (pool, lastBatchNames = []) => {
-        const lastSet = new Set(lastBatchNames);
-        const fresh = shuffleArray(pool.filter((entry) => !lastSet.has(entry.name)));
-        const fallback = shuffleArray(pool.filter((entry) => lastSet.has(entry.name)));
-        return [...fresh, ...fallback];
-      };
-
-      const getExploreSlides = () => (exploreFeed ? Array.from(exploreFeed.querySelectorAll('.explore-slide')) : []);
-
-      const extractYoutubeId = (rawUrl) => {
-        if (!rawUrl) return '';
-        const value = String(rawUrl).trim();
-        const shortMatch = value.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/i);
-        if (shortMatch) return shortMatch[1];
-        const watchMatch = value.match(/[?&]v=([A-Za-z0-9_-]{6,})/i);
-        if (watchMatch) return watchMatch[1];
-        const shortsMatch = value.match(/youtube\.com\/shorts\/([A-Za-z0-9_-]{6,})/i);
-        if (shortsMatch) return shortsMatch[1];
-        const embedMatch = value.match(/youtube\.com\/embed\/([A-Za-z0-9_-]{6,})/i);
-        if (embedMatch) return embedMatch[1];
-        return '';
-      };
-
-      const buildYoutubeWatchUrl = (youtubeId) => (youtubeId ? `https://www.youtube.com/watch?v=${youtubeId}` : '');
-
-      const normalizeVideoSource = (rawUrl) => {
-        const value = String(rawUrl || '').trim();
-        if (!value) return { type: 'none', src: '', openUrl: '', youtubeId: '' };
-        const youtubeId = extractYoutubeId(value);
-        if (youtubeId) {
-          const src = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&controls=1&loop=1&playlist=${youtubeId}&playsinline=1&modestbranding=1&rel=0`;
-          return { type: 'youtube', src, openUrl: buildYoutubeWatchUrl(youtubeId), youtubeId };
-        }
-        if (/\.(mp4|webm|ogg)(\?|#|$)/i.test(value)) {
-          return { type: 'video', src: value, openUrl: value, youtubeId: '' };
-        }
-        return { type: 'external', src: value, openUrl: value, youtubeId: '' };
-      };
-
-      const openExploreSource = (rawUrl) => {
-        const source = normalizeVideoSource(rawUrl);
-        const target = source.openUrl || source.src;
-        if (!target) return false;
-        const popup = window.open(target, '_blank', 'noopener');
-        return !!popup;
-      };
-
-      const isYoutubeVideoAvailable = async (rawUrl) => {
-        const source = normalizeVideoSource(rawUrl);
-        if (source.type !== 'youtube') return source.type === 'video';
-        if (aiVideoValidationCache.has(source.src)) {
-          return aiVideoValidationCache.get(source.src);
-        }
-        try {
-          const watchUrl = source.openUrl || rawUrl;
-          const endpoint = `https://www.youtube.com/oembed?url=${encodeURIComponent(watchUrl)}&format=json`;
-          const response = await fetch(endpoint, { method: 'GET' });
-          const ok = response.ok;
-          aiVideoValidationCache.set(source.src, ok);
-          return ok;
-        } catch (error) {
-          aiVideoValidationCache.set(source.src, false);
-          return false;
-        }
-      };
-
-      const renderExploreMediaFallback = (media, source, message) => {
-        media.innerHTML = '';
-        const fallback = document.createElement('div');
-        fallback.className = 'explore-media-fallback';
-
-        const label = document.createElement('p');
-        label.className = 'explore-media-fallback-label';
-        label.textContent = message || 'Lecture indisponible pour le moment.';
-        fallback.appendChild(label);
-
-        const actions = document.createElement('div');
-        actions.className = 'explore-media-fallback-actions';
-
-        if (source.openUrl) {
-          const openBtn = document.createElement('button');
-          openBtn.type = 'button';
-          openBtn.className = 'explore-fallback-btn';
-          openBtn.dataset.action = 'open-source';
-          openBtn.textContent = 'Ouvrir la video';
-          actions.appendChild(openBtn);
-        }
-
-        if (source.type === 'youtube' || source.type === 'video') {
-          const retryBtn = document.createElement('button');
-          retryBtn.type = 'button';
-          retryBtn.className = 'explore-fallback-btn';
-          retryBtn.dataset.action = 'retry-media';
-          retryBtn.textContent = 'Reessayer';
-          actions.appendChild(retryBtn);
-        }
-
-        if (actions.childNodes.length) {
-          fallback.appendChild(actions);
-        }
-
-        media.appendChild(fallback);
-      };
-
-      const renderExploreMedia = (slide) => {
-        const media = slide.querySelector('.explore-media');
-        if (!media) return;
-
-        const videoUrl = slide.dataset.video || '';
-        const imageUrl = slide.dataset.image || '';
-        const source = normalizeVideoSource(videoUrl);
-
-        if (source.type === 'youtube') {
-          media.innerHTML = '';
-          const iframe = document.createElement('iframe');
-          iframe.src = source.src;
-          iframe.title = 'Explore video';
-          iframe.setAttribute('frameborder', '0');
-          iframe.setAttribute('allow', 'autoplay; encrypted-media');
-          iframe.setAttribute('allowfullscreen', 'allowfullscreen');
-          iframe.setAttribute('loading', 'lazy');
-          iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
-          media.appendChild(iframe);
-
-          let loaded = false;
-          const timer = window.setTimeout(() => {
-            if (loaded) return;
-            renderExploreMediaFallback(media, source, 'Video YouTube lente ou bloquee. Ouvre-la directement.');
-          }, 7000);
-
-          iframe.addEventListener('load', () => {
-            loaded = true;
-            clearTimeout(timer);
-          }, { once: true });
-          return;
-        }
-
-        if (source.type === 'video') {
-          media.innerHTML = '';
-          const video = document.createElement('video');
-          video.src = source.src;
-          video.autoplay = true;
+        if (video) {
           video.muted = true;
-          video.loop = true;
-          video.playsInline = true;
-          video.controls = true;
-          video.preload = 'metadata';
-          video.addEventListener('error', () => {
-            renderExploreMediaFallback(media, source, 'Lecture video impossible. Ouvre la source ou reessaye.');
-          }, { once: true });
-          video.addEventListener('stalled', () => {
-            renderExploreMediaFallback(media, source, 'Video en attente trop longue. Ouvre la source ou reessaye.');
-          }, { once: true });
-          media.appendChild(video);
-          return;
-        }
-
-        if (source.type === 'external') {
-          renderExploreMediaFallback(media, source, 'Source externe detectee. Ouvre la video directement.');
-          return;
-        }
-
-        if (imageUrl) {
-          media.innerHTML = `<img src="${imageUrl}" alt="${slide.dataset.name || 'Exercise'}">`;
-          return;
-        }
-
-        media.innerHTML = '';
-      };
-
-      const createExploreSlide = (item) => {
-        const article = document.createElement('article');
-        article.className = 'explore-slide';
-        article.dataset.name = item.name || 'Exercise';
-        article.dataset.video = item.video || '';
-        article.dataset.image = item.image || '';
-        article.dataset.description = item.tip || 'Garde le dos droit et controle le mouvement.';
-        article.dataset.muscle = item.muscle || 'Corps entier';
-        article.dataset.difficulty = item.difficulty || 'Beginner';
-        article.dataset.duration = String(item.duration || 3);
-        article.innerHTML = `
-          <div class="explore-media"></div>
-          <div class="explore-overlay"></div>
-          <div class="explore-content">
-            <div class="explore-top">
-              <h3>${item.name || 'Exercise'}</h3>
-              <div class="explore-badges">
-                <span class="explore-badge">${item.muscle || 'Corps entier'}</span>
-                <span class="explore-badge">${item.difficulty || 'Beginner'}</span>
-                <span class="explore-badge">Sans materiel</span>
-              </div>
-              <div class="explore-meta">~${item.duration || 3} min a maitriser</div>
-            </div>
-            <p class="explore-tip">${item.tip || 'Garde le dos droit et controle le mouvement.'}</p>
-            <div class="explore-actions">
-              <button type="button" class="explore-btn" data-action="favorite">&#10084; Favori</button>
-              <button type="button" class="explore-btn" data-action="add">+ Ajouter au plan</button>
-              <button type="button" class="explore-btn" data-action="try">30s Essayer</button>
-              <button type="button" class="explore-btn" data-action="details">i Details</button>
-            </div>
-          </div>
-        `;
-        renderExploreMedia(article);
-        return article;
-      };
-
-      const stopExploreTryTimer = () => {
-        if (exploreTryInterval) {
-          clearInterval(exploreTryInterval);
-          exploreTryInterval = null;
-        }
-        if (exploreTryButton) {
-          exploreTryButton.textContent = '30s Essayer';
-          exploreTryButton.disabled = false;
-          exploreTryButton = null;
+          video.currentTime = 0;
+          video.play().catch(() => {});
+          activeVideo = video;
+          // Sync mute button
+          const muteBtn = slide.querySelector('.mute-btn');
+          if (muteBtn) muteBtn.dataset.muted = '1';
+        } else if (iframe) {
+          const dataSrc = iframe.getAttribute('data-src');
+          if (dataSrc && !iframe.src) iframe.src = dataSrc;
+          activeIframe = iframe;
         }
       };
 
-      const updateExploreProgress = () => {
-        const exploreSlides = getExploreSlides();
-        if (!exploreFeed || exploreSlides.length === 0) return;
-        const rawIndex = Math.round(exploreFeed.scrollTop / Math.max(1, exploreFeed.clientHeight));
-        const index = Math.min(Math.max(rawIndex, 0), exploreSlides.length - 1);
-        if (exploreCount) {
-          exploreCount.textContent = `${index + 1}/${exploreSlides.length}`;
-        }
-        if (exploreFill) {
-          const ratio = (index + 1) / exploreSlides.length;
-          exploreFill.style.height = `${Math.max(6, Math.round(ratio * 100))}%`;
-        }
+      // -- Progress bar --
+      const updateProgress = () => {
+        const slides = getSlides();
+        const total = slides.length;
+        if (!total) return;
+        const idx = currentSlideIndex + 1;
+        if (exploreCount) exploreCount.textContent = idx + '/' + total;
+        if (exploreFill) exploreFill.style.height = ((idx / total) * 100) + '%';
       };
 
-      const openExploreDetails = (slide) => {
-        const name = slide.dataset.name || 'Exercice';
-        const muscle = slide.dataset.muscle || 'Corps entier';
-        const difficulty = slide.dataset.difficulty || 'Beginner';
-        const duration = slide.dataset.duration || '3';
-        const description = slide.dataset.description || '';
-        const video = slide.dataset.video || '';
-        const source = normalizeVideoSource(video);
-
-        if (source.type === 'video' || source.type === 'youtube') {
-          resetHiit();
-          startHiit();
-          const opened = openVideoModalWithSource(source, {
-            title: 'Explore - Details exercice',
-            subtitle: `${muscle} - ${difficulty} - ~${duration} min`,
-            name
-          });
-          if (!opened) {
-            alert('Impossible d\'ouvrir cette video en incrustation.');
-          }
-          return;
-        }
-
-        if (source.type === 'external') {
-          if (!openExploreSource(video)) {
-            alert('Impossible d\'ouvrir cette source video.');
-          }
-          return;
-        }
-
-        alert(`${name}\n${muscle} - ${difficulty}\n~${duration} min\n\n${description}`);
+      // -- Scroll to slide --
+      const goToSlide = (index) => {
+        const slides = getSlides();
+        if (!slides.length) return;
+        currentSlideIndex = Math.max(0, Math.min(index, slides.length - 1));
+        slides[currentSlideIndex].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        playSlide(slides[currentSlideIndex]);
+        updateProgress();
       };
 
-      if (exploreFeed) {
-        getExploreSlides().forEach((slide) => renderExploreMedia(slide));
-        exploreFeed.addEventListener('scroll', updateExploreProgress, { passive: true });
-        updateExploreProgress();
-      }
-
-      window.addEventListener('resize', updateExploreProgress);
-
-      if (exploreAiGenerate && exploreFeed) {
-        exploreAiGenerate.addEventListener('click', async () => {
-          const query = String(exploreAiQuery?.value || '').toLowerCase().trim();
-          const baseTokens = query.split(/\s+/).filter(Boolean);
-          const expandedTokens = new Set(baseTokens);
-          baseTokens.forEach((token) => {
-            (aiTagAliases[token] || []).forEach((alias) => expandedTokens.add(alias));
-          });
-          const tokens = Array.from(expandedTokens);
-          const ranked = aiVideoLibrary
-            .map((entry) => {
-              let score = 0;
-              tokens.forEach((token) => {
-                if (entry.name.toLowerCase().includes(token)) score += 3;
-                if (entry.muscle.toLowerCase().includes(token)) score += 4;
-                if (entry.difficulty.toLowerCase().includes(token)) score += 2;
-                if (entry.tags.some((tag) => tag.includes(token))) score += 5;
-              });
-              return { entry, score };
-            })
-            .sort((a, b) => b.score - a.score);
-
-          const rawPool = (tokens.length ? ranked.filter((item) => item.score > 0) : ranked).map((item) => item.entry);
-          const pool = rawPool.filter((entry) => {
-            const srcType = normalizeVideoSource(entry.video).type;
-            return srcType === 'youtube' || srcType === 'video';
-          });
-          if (pool.length === 0) {
-            alert('Aucune video trouvee pour cette demande IA.');
-            return;
-          }
-
-          const queryKey = tokens.length ? tokens.join('|') : '__all__';
-          const poolSignature = pool.map((entry) => entry.name).join('|');
-          let state = aiFeedState.get(queryKey);
-
-          if (!state || state.poolSignature !== poolSignature) {
-            state = {
-              pool,
-              poolSignature,
-              remaining: buildRemainingQueue(pool, []),
-              lastBatchNames: []
-            };
-            aiFeedState.set(queryKey, state);
-          }
-
-          const pickCount = Math.min(5, pool.length);
-          const selected = [];
-          let guard = 0;
-          while (selected.length < pickCount && guard < pool.length * 5) {
-            guard += 1;
-            if (!state.remaining.length) {
-              state.remaining = buildRemainingQueue(state.pool, state.lastBatchNames || []);
-            }
-            const next = state.remaining.shift();
-            if (!next || selected.find((entry) => entry.name === next.name)) {
-              continue;
-            }
-            const available = await isYoutubeVideoAvailable(next.video);
-            if (!available) {
-              continue;
-            }
-            selected.push(next);
-          }
-
-          if (selected.length === 0) {
-            alert('Aucune video YouTube disponible pour cette demande.');
-            return;
-          }
-
-          state.lastBatchNames = selected.map((entry) => entry.name);
-
-          exploreFeed.innerHTML = '';
-          selected.forEach((entry) => {
-            exploreFeed.appendChild(createExploreSlide(entry));
-          });
-          exploreFeed.scrollTop = 0;
-          updateExploreProgress();
-        });
-      }
-
-      if (exploreFeed) {
-        exploreFeed.addEventListener('click', (event) => {
-          const actionBtn = event.target.closest('[data-action]');
-          if (!actionBtn) return;
-          const slide = actionBtn.closest('.explore-slide');
-          if (!slide) return;
-
-          const action = actionBtn.dataset.action;
-          const exerciseName = slide.dataset.name || '';
-          const exerciseVideo = slide.dataset.video || '';
-          const source = normalizeVideoSource(exerciseVideo);
-
-          if (action === 'retry-media') {
-            renderExploreMedia(slide);
-            return;
-          }
-
-          if (action === 'open-source') {
-            if (!openExploreSource(exerciseVideo)) {
-              alert('Source video indisponible.');
-            }
-            return;
-          }
-
-          if (action === 'favorite') {
-            if (exploreFavorites.has(exerciseName)) {
-              exploreFavorites.delete(exerciseName);
-              actionBtn.classList.remove('is-active');
-              actionBtn.setAttribute('aria-pressed', 'false');
-              actionBtn.innerHTML = '&#10084; Favori';
+      // -- Intersection Observer for autoplay --
+      const setupObserver = () => {
+        if (!exploreFeed) return;
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio >= 0.7) {
+              const slides = getSlides();
+              currentSlideIndex = slides.indexOf(entry.target);
+              playSlide(entry.target);
+              updateProgress();
             } else {
-              exploreFavorites.add(exerciseName);
-              actionBtn.classList.add('is-active');
-              actionBtn.setAttribute('aria-pressed', 'true');
-              actionBtn.innerHTML = '&#10084; Favori';
+              const video = entry.target.querySelector('video.explore-video');
+              if (video) video.pause();
             }
-            return;
-          }
+          });
+        }, { threshold: 0.7 });
+        getSlides().forEach((s) => observer.observe(s));
+      };
 
-          if (action === 'add') {
-            if (!sessionExercises.find((entry) => entry.name === exerciseName)) {
-              sessionExercises.push({ name: exerciseName, video: source.type === 'video' ? source.src : '' });
-              renderSessionPanel();
-            }
-            actionBtn.textContent = 'Ajoute au plan';
-            return;
+      // -- Like button --
+      exploreFeed && exploreFeed.addEventListener('click', (e) => {
+        const likeBtn = e.target.closest('.like-btn');
+        if (likeBtn) {
+          const liked = likeBtn.dataset.liked === '1';
+          likeBtn.dataset.liked = liked ? '0' : '1';
+          likeBtn.classList.toggle('liked', !liked);
+          const count = likeBtn.querySelector('.like-count');
+          if (count) count.textContent = liked ? Math.max(0, parseInt(count.textContent) - 1) : parseInt(count.textContent) + 1;
+          return;
+        }
+        // Share button
+        const shareBtn = e.target.closest('.share-btn');
+        if (shareBtn) {
+          const ytid = shareBtn.dataset.ytid;
+          const url = ytid ? 'https://www.youtube.com/watch?v=' + ytid : window.location.href;
+          if (navigator.share) {
+            navigator.share({ title: 'Fitopia Explore', url });
+          } else {
+            navigator.clipboard.writeText(url).then(() => alert('Lien copi� !'));
           }
+          return;
+        }
+        // Mute button
+        const muteBtn = e.target.closest('.mute-btn');
+        if (muteBtn && activeVideo) {
+          const muted = muteBtn.dataset.muted === '1';
+          activeVideo.muted = !muted;
+          muteBtn.dataset.muted = muted ? '0' : '1';
+          muteBtn.querySelector('.icon').textContent = muted ? '??' : '??';
+        }
+      });
 
-          if (action === 'try') {
-            stopExploreTryTimer();
-            let remaining = 30;
-            exploreTryButton = actionBtn;
-            exploreTryButton.disabled = true;
-            exploreTryButton.textContent = `${remaining}s`;
-            exploreTryInterval = setInterval(() => {
-              remaining -= 1;
-              if (!exploreTryButton) return;
-              if (remaining <= 0) {
-                stopExploreTryTimer();
-                return;
-              }
-              exploreTryButton.textContent = `${remaining}s`;
-            }, 1000);
-            return;
-          }
+      // -- Nav buttons --
+      if (explorePrev) explorePrev.addEventListener('click', () => goToSlide(currentSlideIndex - 1));
+      if (exploreNext) exploreNext.addEventListener('click', () => goToSlide(currentSlideIndex + 1));
 
-          if (action === 'details') {
-            openExploreDetails(slide);
-          }
+      // -- Keyboard navigation --
+      document.addEventListener('keydown', (e) => {
+        const section = document.querySelector('.section[data-section="explore"]');
+        if (!section || !section.classList.contains('is-active')) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); goToSlide(currentSlideIndex + 1); }
+        if (e.key === 'ArrowUp')   { e.preventDefault(); goToSlide(currentSlideIndex - 1); }
+      });
+
+      // -- AI Filter --
+      const filterSlides = (query) => {
+        const q = query.toLowerCase().trim();
+        const slides = getSlides();
+        if (!q) { slides.forEach((s) => { s.style.display = ''; }); setupObserver(); goToSlide(0); return; }
+        let first = -1;
+        slides.forEach((s, i) => {
+          const tags = (s.dataset.tags || '').toLowerCase();
+          const title = (s.dataset.title || '').toLowerCase();
+          const match = tags.includes(q) || title.includes(q);
+          s.style.display = match ? '' : 'none';
+          if (match && first < 0) first = i;
         });
+        if (first >= 0) goToSlide(first);
+      };
+
+      if (exploreAiBtn) exploreAiBtn.addEventListener('click', () => {
+        filterSlides(exploreAiQuery ? exploreAiQuery.value : '');
+      });
+      if (exploreAiQuery) exploreAiQuery.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') filterSlides(exploreAiQuery.value);
+      });
+      if (exploreReset) exploreReset.addEventListener('click', () => {
+        if (exploreAiQuery) exploreAiQuery.value = '';
+        filterSlides('');
+      });
+
+      // -- Init --
+      if (exploreFeed) {
+        setupObserver();
+        updateProgress();
+        // Autoplay first slide when tab becomes active
+        const exploreTab = document.querySelector('[data-view="explore"]');
+        if (exploreTab) {
+          exploreTab.addEventListener('click', () => {
+            setTimeout(() => { goToSlide(0); }, 150);
+          });
+        }
       }
+      // -- End Explore Feed -------------------------------------------------
 
-      const estimateMinutes = (exerciseCount) => Math.max(0, Math.ceil((exerciseCount * 90) / 60));
-
-      const createPlanOnServer = async (payload) => {
-        const body = new URLSearchParams();
-        body.set('_token', plannerCsrfToken);
-        body.set('title', payload.title || '');
-        body.set('place', payload.place || '');
-        body.set('program_label', payload.programLabel || '');
-        body.set('estimated_minutes', String(payload.estimatedMinutes || 0));
-        body.set('exercises', JSON.stringify(payload.exercises || []));
-
-        const response = await fetch(planCreateUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: body.toString()
-        });
-
-        const data = await response.json().catch(() => ({ ok: false }));
-        if (!response.ok || !data.ok) {
-          throw new Error((data && data.error) || 'create_failed');
-        }
-
-        return data.plan;
-      };
-
-      const deletePlanOnServer = async (planId) => {
-        const body = new URLSearchParams();
-        body.set('_token', plannerCsrfToken);
-
-        const response = await fetch(planDeleteUrlTemplate.replace('__ID__', String(planId)), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-            'X-Requested-With': 'XMLHttpRequest'
-          },
-          body: body.toString()
-        });
-
-        const data = await response.json().catch(() => ({ ok: false }));
-        if (!response.ok || !data.ok) {
-          throw new Error((data && data.error) || 'delete_failed');
-        }
-      };
-
-      const startConfirmedPlan = (planId) => {
-        const plan = confirmedPlans.find((entry) => entry.id === planId);
-        if (!plan || !Array.isArray(plan.exercises) || plan.exercises.length === 0) return;
-        selectedProgram = plan.program || '';
-        selectedPlace = plan.place || '';
-        sessionExercises = plan.exercises.map((exercise) => ({
-          name: exercise.name || '',
-          video: exercise.video || ''
-        }));
-        renderSessionPanel();
-        openSessionExercise(0);
-      };
-
-      const deleteConfirmedPlan = async (planId) => {
-        if (!plansPersistAvailable) {
-          alert('Connecte-toi pour supprimer une s�ance enregistr�e.');
-          return;
-        }
-
-        try {
-          await deletePlanOnServer(planId);
-          confirmedPlans = confirmedPlans.filter((entry) => String(entry.id) !== String(planId));
-          renderConfirmedPlans();
-        } catch (error) {
-          alert('Suppression impossible pour le moment.');
-        }
-      };
-
-      const renderConfirmedPlans = () => {
-        if (!userPlansList) return;
-        userPlansList.innerHTML = '';
-
-        if (!confirmedPlans.length) {
-          const empty = document.createElement('article');
-          empty.className = 'program-card';
-          empty.innerHTML = `
-            <h3 class="program-title">Mes seances confirmees</h3>
-            <div class="program-meta">Confirme une seance depuis le panneau "Ma seance" pour la retrouver ici.</div>
-          `;
-          userPlansList.appendChild(empty);
-          return;
-        }
-
-        confirmedPlans.forEach((plan) => {
-          const card = document.createElement('article');
-          card.className = 'program-card';
-
-          const title = document.createElement('h3');
-          title.className = 'program-title';
-          title.textContent = plan.title || 'Seance personnalisee';
-          card.appendChild(title);
-
-          const meta = document.createElement('div');
-          meta.className = 'program-meta';
-          const locationText = [plan.program || 'Programme libre', plan.place || 'Lieu libre'].join(' - ');
-          meta.textContent = `${locationText} - ${estimateMinutes((plan.exercises || []).length)} min`;
-          card.appendChild(meta);
-
-          const list = document.createElement('ul');
-          list.className = 'fp-user-plan-list';
-          (plan.exercises || []).forEach((exercise) => {
-            const item = document.createElement('li');
-            item.textContent = exercise.name || 'Exercice';
-            list.appendChild(item);
-          });
-          card.appendChild(list);
-
-          const actions = document.createElement('div');
-          actions.className = 'program-actions';
-
-          const startBtn = document.createElement('button');
-          startBtn.type = 'button';
-          startBtn.className = 'fitness-btn fitness-btn-primary';
-          startBtn.textContent = 'Commencer';
-          startBtn.addEventListener('click', () => startConfirmedPlan(plan.id));
-
-          const deleteBtn = document.createElement('button');
-          deleteBtn.type = 'button';
-          deleteBtn.className = 'fitness-btn fitness-btn-danger';
-          deleteBtn.textContent = 'Supprimer';
-          deleteBtn.addEventListener('click', () => {
-            deleteConfirmedPlan(plan.id);
-          });
-
-          actions.appendChild(startBtn);
-          actions.appendChild(deleteBtn);
-          card.appendChild(actions);
-
-          userPlansList.appendChild(card);
-        });
-      };
-
-      const confirmCurrentSession = async () => {
-        if (sessionExercises.length === 0) {
-          alert('Ajoute des exercices a ta seance.');
-          return;
-        }
-
-        if (!plansPersistAvailable) {
-          alert('Connecte-toi pour confirmer et sauvegarder ta s�ance.');
-          return;
-        }
-
-        const payload = {
-          title: `Ma seance (${sessionExercises.length} exercices)`,
-          programLabel: selectedProgram || '',
-          place: selectedPlace || '',
-          estimatedMinutes: estimateMinutes(sessionExercises.length),
-          exercises: sessionExercises.map((exercise) => ({
-            name: exercise.name,
-            video: exercise.video || ''
-          }))
-        };
-
-        try {
-          const savedPlan = await createPlanOnServer(payload);
-          confirmedPlans.unshift(savedPlan);
-          renderConfirmedPlans();
-          setView('plans');
-          syncViewInUrl('plans');
-          closeExerciseModal();
-          closeLevelModal();
-          closeModal();
-        } catch (error) {
-          if (String(error.message || '').includes('unauthorized')) {
-            alert('Tu dois �tre connect� pour confirmer une s�ance.');
-            return;
-          }
-          alert('Confirmation impossible pour le moment.');
-        }
-      };
-
-      const stopSessionRestTimer = () => {
-        if (sessionRestTimer) {
-          clearInterval(sessionRestTimer);
-          sessionRestTimer = null;
-        }
-      };
-
-      const startSessionRestTimer = () => {
-        if (!sessionRest) return;
-        stopSessionRestTimer();
-        let remaining = 60;
-        sessionRest.textContent = `Timer repos : ${remaining}s`;
-        sessionRestTimer = setInterval(() => {
-          remaining -= 1;
-          sessionRest.textContent = `Timer repos : ${remaining}s`;
-          if (remaining <= 0) {
-            stopSessionRestTimer();
-          }
-        }, 1000);
-      };
 
       const openSessionExercise = (index) => {
         if (!sessionExercises.length) return;
@@ -3537,7 +3267,7 @@
         }
 
         const opened = openVideoModalWithSource(source, {
-          title: 'Video de l�exercice',
+          title: 'Video de l�exercice',
           subtitle: `${selectedProgram} - ${selectedPlace}`,
           name: current.name
         });
@@ -3574,8 +3304,351 @@
 
     });
   </script>
-{% endblock %}
 
+  {% if app.user %}
+  <script>
+  // ── Performance Tracker ──────────────────────────────────────────────────
+  (function () {
+    const EXERCISES_URL   = '{{ path('performance_exercises') }}';
+    const LOG_URL         = '{{ path('performance_log') }}';
+    const HISTORY_URL     = '{{ path('performance_history') }}';
+    const PROGRESS_BASE   = '/performance/progression/';
+
+    let exercises     = [];
+    let chartInstance = null;
+    let chartMetric   = 'weight'; // 'weight' | 'volume'
+    let sessionExercisesData = []; // [{exerciseId, sets:[{weightKg,reps}]}]
+
+    // ── Load exercises ──
+    async function loadExercises() {
+      try {
+        const res = await fetch(EXERCISES_URL);
+        exercises = await res.json();
+        populateExerciseSelect();
+        populateChartSelect();
+      } catch (e) { console.warn('perf: exercises load failed', e); }
+    }
+
+    function populateChartSelect() {
+      const sel = document.getElementById('perf-chart-exercise');
+      if (!sel) return;
+      exercises.forEach(ex => {
+        const opt = document.createElement('option');
+        opt.value = ex.id;
+        opt.textContent = ex.name + ' — ' + ex.muscleGroup;
+        sel.appendChild(opt);
+      });
+    }
+
+    // ── Form: add exercise block ──
+    function populateExerciseSelect() {
+      document.querySelectorAll('.perf-ex-select').forEach(sel => {
+        const current = sel.value;
+        sel.innerHTML = '<option value="">-- Exercice --</option>';
+        exercises.forEach(ex => {
+          const opt = document.createElement('option');
+          opt.value = ex.id;
+          opt.textContent = ex.name + ' (' + ex.muscleGroup + ')';
+          if (String(ex.id) === String(current)) opt.selected = true;
+          sel.appendChild(opt);
+        });
+      });
+    }
+
+    function addExerciseBlock() {
+      const idx = sessionExercisesData.length;
+      sessionExercisesData.push({ exerciseId: '', sets: [{ weightKg: '', reps: '' }] });
+      renderExerciseBlocks();
+    }
+
+    function renderExerciseBlocks() {
+      const container = document.getElementById('perf-exercises-list');
+      if (!container) return;
+      container.innerHTML = '';
+
+      sessionExercisesData.forEach((exData, exIdx) => {
+        const block = document.createElement('div');
+        block.style.cssText = 'background:#fff;border:1px solid #dce9ee;border-radius:12px;padding:.8rem;';
+
+        // Exercise selector
+        const selWrap = document.createElement('div');
+        selWrap.style.cssText = 'display:flex;gap:.5rem;align-items:center;margin-bottom:.6rem;';
+        const sel = document.createElement('select');
+        sel.className = 'perf-ex-select';
+        sel.style.cssText = 'flex:1;border:1.5px solid #dce9ee;border-radius:8px;padding:.4rem .6rem;font-size:.88rem;';
+        sel.innerHTML = '<option value="">-- Exercice --</option>';
+        exercises.forEach(ex => {
+          const opt = document.createElement('option');
+          opt.value = ex.id;
+          opt.textContent = ex.name + ' (' + ex.muscleGroup + ')';
+          if (String(ex.id) === String(exData.exerciseId)) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        sel.addEventListener('change', () => { sessionExercisesData[exIdx].exerciseId = sel.value; });
+
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.textContent = '✕';
+        removeBtn.style.cssText = 'background:#fee2e2;border:none;border-radius:8px;padding:.3rem .6rem;cursor:pointer;color:#991b1b;font-weight:700;';
+        removeBtn.addEventListener('click', () => {
+          sessionExercisesData.splice(exIdx, 1);
+          renderExerciseBlocks();
+        });
+        selWrap.appendChild(sel);
+        selWrap.appendChild(removeBtn);
+        block.appendChild(selWrap);
+
+        // Sets
+        const setsWrap = document.createElement('div');
+        setsWrap.style.cssText = 'display:grid;gap:.4rem;';
+
+        exData.sets.forEach((setData, setIdx) => {
+          const setRow = document.createElement('div');
+          setRow.style.cssText = 'display:grid;grid-template-columns:auto 1fr 1fr auto;gap:.4rem;align-items:center;';
+
+          const setLabel = document.createElement('span');
+          setLabel.textContent = 'S' + (setIdx + 1);
+          setLabel.style.cssText = 'font-size:.78rem;font-weight:700;color:#64748b;min-width:22px;';
+
+          const weightInput = document.createElement('input');
+          weightInput.type = 'number'; weightInput.min = '0'; weightInput.step = '0.5';
+          weightInput.placeholder = 'Poids (kg)';
+          weightInput.value = setData.weightKg;
+          weightInput.style.cssText = 'border:1.5px solid #dce9ee;border-radius:8px;padding:.35rem .5rem;font-size:.85rem;';
+          weightInput.addEventListener('input', () => { sessionExercisesData[exIdx].sets[setIdx].weightKg = weightInput.value; });
+
+          const repsInput = document.createElement('input');
+          repsInput.type = 'number'; repsInput.min = '1';
+          repsInput.placeholder = 'Reps';
+          repsInput.value = setData.reps;
+          repsInput.style.cssText = 'border:1.5px solid #dce9ee;border-radius:8px;padding:.35rem .5rem;font-size:.85rem;';
+          repsInput.addEventListener('input', () => { sessionExercisesData[exIdx].sets[setIdx].reps = repsInput.value; });
+
+          const delSet = document.createElement('button');
+          delSet.type = 'button'; delSet.textContent = '−';
+          delSet.style.cssText = 'background:#f1f5f9;border:none;border-radius:6px;padding:.3rem .5rem;cursor:pointer;font-weight:700;';
+          delSet.addEventListener('click', () => {
+            if (sessionExercisesData[exIdx].sets.length > 1) {
+              sessionExercisesData[exIdx].sets.splice(setIdx, 1);
+              renderExerciseBlocks();
+            }
+          });
+
+          setRow.appendChild(setLabel);
+          setRow.appendChild(weightInput);
+          setRow.appendChild(repsInput);
+          setRow.appendChild(delSet);
+          setsWrap.appendChild(setRow);
+        });
+
+        // Add set button
+        const addSetBtn = document.createElement('button');
+        addSetBtn.type = 'button'; addSetBtn.textContent = '+ Série';
+        addSetBtn.style.cssText = 'margin-top:.4rem;background:#e8f5f0;border:none;border-radius:8px;padding:.3rem .7rem;font-size:.8rem;font-weight:700;color:#1a6b5a;cursor:pointer;';
+        addSetBtn.addEventListener('click', () => {
+          sessionExercisesData[exIdx].sets.push({ weightKg: '', reps: '' });
+          renderExerciseBlocks();
+        });
+        setsWrap.appendChild(addSetBtn);
+        block.appendChild(setsWrap);
+        container.appendChild(block);
+      });
+    }
+
+    // ── Save session ──
+    async function saveSession() {
+      const date  = document.getElementById('perf-date')?.value;
+      const label = document.getElementById('perf-label')?.value;
+      const status = document.getElementById('perf-save-status');
+
+      const validExercises = sessionExercisesData.filter(e => e.exerciseId);
+      if (!validExercises.length) {
+        if (status) { status.textContent = '⚠ Ajoute au moins un exercice.'; status.style.color = '#991b1b'; }
+        return;
+      }
+
+      const payload = {
+        date,
+        label,
+        exercises: validExercises.map(e => ({
+          exerciseId: e.exerciseId,
+          sets: e.sets.filter(s => s.weightKg !== '' || s.reps !== '').map(s => ({
+            weightKg: s.weightKg !== '' ? parseFloat(s.weightKg) : null,
+            reps:     s.reps !== ''     ? parseInt(s.reps)       : null,
+          }))
+        }))
+      };
+
+      try {
+        const res = await fetch(LOG_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.ok) {
+          if (status) { status.textContent = '✅ Séance enregistrée !'; status.style.color = '#065f46'; }
+          sessionExercisesData = [];
+          renderExerciseBlocks();
+          loadHistory();
+          // Refresh chart if exercise selected
+          const chartSel = document.getElementById('perf-chart-exercise');
+          if (chartSel?.value) loadChart(chartSel.value);
+          setTimeout(() => {
+            document.getElementById('perf-form-wrap').style.display = 'none';
+            if (status) status.textContent = '';
+          }, 2000);
+        } else {
+          if (status) { status.textContent = '❌ Erreur serveur.'; status.style.color = '#991b1b'; }
+        }
+      } catch (e) {
+        if (status) { status.textContent = '❌ Connexion impossible.'; status.style.color = '#991b1b'; }
+      }
+    }
+
+    // ── Chart ──
+    async function loadChart(exerciseId) {
+      const empty = document.getElementById('perf-chart-empty');
+      if (!exerciseId) { if (empty) empty.style.display = 'flex'; return; }
+      if (empty) empty.style.display = 'none';
+
+      try {
+        const res  = await fetch(PROGRESS_BASE + exerciseId);
+        const data = await res.json();
+
+        const labels  = data.map(d => d.week);
+        const values  = chartMetric === 'weight'
+          ? data.map(d => d.max_weight)
+          : data.map(d => d.total_volume);
+        const label   = chartMetric === 'weight' ? 'Poids max (kg)' : 'Volume total (kg×reps)';
+        const color   = chartMetric === 'weight' ? '#1a6b5a' : '#0b3a3d';
+
+        const ctx = document.getElementById('perf-chart');
+        if (!ctx) return;
+
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label,
+              data: values,
+              borderColor: color,
+              backgroundColor: color + '22',
+              borderWidth: 2.5,
+              pointBackgroundColor: color,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              fill: true,
+              tension: 0.35,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: ctx => ctx.parsed.y + (chartMetric === 'weight' ? ' kg' : ' kg×reps')
+                }
+              }
+            },
+            scales: {
+              x: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 11 } } },
+              y: {
+                grid: { color: '#f1f5f9' },
+                ticks: { font: { size: 11 } },
+                beginAtZero: false,
+              }
+            }
+          }
+        });
+
+        if (!data.length && empty) {
+          empty.textContent = 'Aucune donnée pour cet exercice.';
+          empty.style.display = 'flex';
+        }
+      } catch (e) { console.warn('perf: chart load failed', e); }
+    }
+
+    // ── History ──
+    async function loadHistory() {
+      const container = document.getElementById('perf-history');
+      if (!container) return;
+      try {
+        const res  = await fetch(HISTORY_URL);
+        const data = await res.json();
+        container.innerHTML = '';
+        if (!data.length) {
+          container.innerHTML = '<p style="color:#94a3b8;font-size:.88rem;">Aucune séance enregistrée.</p>';
+          return;
+        }
+        data.forEach(session => {
+          const card = document.createElement('div');
+          card.style.cssText = 'background:#fff;border:1px solid #dce9ee;border-radius:12px;padding:.7rem .9rem;';
+          const header = document.createElement('div');
+          header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;';
+          header.innerHTML = `
+            <span style="font-weight:700;font-size:.9rem;color:#0b3a3d;">${session.label}</span>
+            <span style="font-size:.78rem;color:#64748b;background:#f1f5f9;padding:2px 8px;border-radius:999px;">${session.week}</span>
+          `;
+          const exList = document.createElement('div');
+          exList.style.cssText = 'display:flex;flex-wrap:wrap;gap:.35rem;';
+          session.exercises.forEach(ex => {
+            const tag = document.createElement('span');
+            tag.style.cssText = 'font-size:.75rem;background:#e8f5f0;color:#1a6b5a;border-radius:999px;padding:2px 9px;font-weight:600;';
+            tag.textContent = ex.name + (ex.maxWeight ? ' · ' + ex.maxWeight + 'kg' : '');
+            exList.appendChild(tag);
+          });
+          card.appendChild(header);
+          card.appendChild(exList);
+          container.appendChild(card);
+        });
+      } catch (e) { console.warn('perf: history load failed', e); }
+    }
+
+    // ── Event listeners ──
+    document.addEventListener('DOMContentLoaded', () => {
+      loadExercises();
+      loadHistory();
+
+      document.getElementById('perf-toggle-form')?.addEventListener('click', () => {
+        const wrap = document.getElementById('perf-form-wrap');
+        if (!wrap) return;
+        const visible = wrap.style.display !== 'none';
+        wrap.style.display = visible ? 'none' : 'block';
+        if (!visible && sessionExercisesData.length === 0) addExerciseBlock();
+      });
+
+      document.getElementById('perf-add-exercise')?.addEventListener('click', addExerciseBlock);
+      document.getElementById('perf-save')?.addEventListener('click', saveSession);
+      document.getElementById('perf-cancel')?.addEventListener('click', () => {
+        document.getElementById('perf-form-wrap').style.display = 'none';
+      });
+
+      document.getElementById('perf-chart-exercise')?.addEventListener('change', function () {
+        loadChart(this.value);
+      });
+
+      document.querySelectorAll('[data-metric]').forEach(btn => {
+        btn.addEventListener('click', function () {
+          chartMetric = this.dataset.metric;
+          document.querySelectorAll('[data-metric]').forEach(b => {
+            b.className = b.dataset.metric === chartMetric
+              ? 'fitness-btn fitness-btn-primary'
+              : 'fitness-btn fitness-btn-soft';
+          });
+          const sel = document.getElementById('perf-chart-exercise');
+          if (sel?.value) loadChart(sel.value);
+        });
+      });
+    });
+  })();
+  </script>
+  {% endif %}
+{% endblock %}
 
 
 
