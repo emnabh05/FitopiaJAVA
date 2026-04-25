@@ -125,6 +125,68 @@
                                 </VBox>
                                 <FlowPane fx:id="plansSelectionContainer" hgap="18.0" prefWrapLength="1180.0" vgap="18.0"/>
                                 <Label fx:id="lblPlansEmptyState" styleClass="program-empty-state" text="Aucune seance confirmee dans Plans pour le moment."/>
+
+                                <!-- ── Tracker de performance ── -->
+                                <VBox spacing="12.0" style="-fx-background-color:#f8fafc;-fx-border-color:#dce9ee;-fx-border-radius:16;-fx-background-radius:16;-fx-padding:16;">
+
+                                    <!-- Header -->
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                        <VBox spacing="3.0" HBox.hgrow="ALWAYS">
+                                            <Label style="-fx-font-weight:800;-fx-font-size:14px;-fx-text-fill:#0b3a3d;" text="📈 Suivi des performances"/>
+                                            <Label style="-fx-font-size:11px;-fx-text-fill:#64748b;" text="Enregistre tes séances et visualise ta progression semaine par semaine."/>
+                                        </VBox>
+                                        <Button mnemonicParsing="false" onAction="#togglePerfForm" styleClass="primary-button" text="+ Nouvelle séance"/>
+                                    </HBox>
+
+                                    <!-- Formulaire (caché par défaut) -->
+                                    <VBox fx:id="perfFormBox" managed="false" spacing="10.0" visible="false"
+                                          style="-fx-background-color:#fff;-fx-border-color:#6ee7b7;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14;">
+                                        <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Nouvelle séance"/>
+                                        <GridPane hgap="10.0" vgap="8.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints percentWidth="40.0"/>
+                                                <ColumnConstraints percentWidth="60.0"/>
+                                            </columnConstraints>
+                                            <TextField fx:id="tfPerfDate"  promptText="Date (AAAA-MM-JJ)" styleClass="text-field-modern"/>
+                                            <TextField fx:id="tfPerfLabel" promptText="Label (ex: Poitrine lundi)" styleClass="text-field-modern" GridPane.columnIndex="1"/>
+                                        </GridPane>
+
+                                        <!-- Exercices dynamiques -->
+                                        <Label style="-fx-font-weight:700;-fx-font-size:11px;-fx-text-fill:#0b3a3d;" text="Exercices de la séance"/>
+                                        <VBox fx:id="perfExercisesBox" spacing="8.0"/>
+                                        <Button mnemonicParsing="false" onAction="#perfAddExercise" styleClass="ghost-button" text="+ Ajouter un exercice"/>
+
+                                        <HBox spacing="8.0">
+                                            <Button mnemonicParsing="false" onAction="#perfSaveSession" styleClass="primary-button" text="✓ Enregistrer"/>
+                                            <Button mnemonicParsing="false" onAction="#perfCancelForm"  styleClass="ghost-button"   text="Annuler"/>
+                                            <Label fx:id="lblPerfStatus" style="-fx-font-size:11px;" text=""/>
+                                        </HBox>
+                                    </VBox>
+
+                                    <!-- Graphique de progression -->
+                                    <VBox spacing="8.0" style="-fx-background-color:#fff;-fx-border-color:#dce9ee;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:14;">
+                                        <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Progression par exercice"/>
+                                        <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                            <ComboBox fx:id="cbPerfExercise" promptText="Choisir un exercice..." styleClass="combo-modern" prefWidth="280.0"/>
+                                            <Button mnemonicParsing="false" onAction="#perfShowWeight" styleClass="primary-button" text="Poids max"/>
+                                            <Button mnemonicParsing="false" onAction="#perfShowVolume" styleClass="ghost-button"   text="Volume"/>
+                                        </HBox>
+                                        <!-- Graphique en barres ASCII / canvas JavaFX -->
+                                        <ScrollPane fitToWidth="true" prefHeight="200.0" styleClass="front-scroll">
+                                            <VBox fx:id="perfChartBox" spacing="6.0" style="-fx-padding:4 0;"/>
+                                        </ScrollPane>
+                                        <Label fx:id="lblPerfChartEmpty" style="-fx-font-size:11px;-fx-text-fill:#94a3b8;" text="Sélectionne un exercice pour voir ta progression." wrapText="true"/>
+                                    </VBox>
+
+                                    <!-- Historique -->
+                                    <VBox spacing="6.0">
+                                        <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Historique récent"/>
+                                        <ScrollPane fitToWidth="true" prefHeight="180.0" styleClass="front-scroll">
+                                            <VBox fx:id="perfHistoryBox" spacing="6.0"/>
+                                        </ScrollPane>
+                                    </VBox>
+
+                                </VBox>
                             </VBox>
 
                             <VBox fx:id="plannerProgramsContent" managed="false" spacing="18.0" visible="false">
@@ -133,13 +195,16 @@
                                     <Label styleClass="planner-section-subtitle" text="Acces rapide par groupe musculaire, avec focus Poitrine." wrapText="true"/>
                                 </VBox>
 
-                                <VBox spacing="18.0" styleClass="program-list">
-                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-chest" text="Poitrine" userData="Poitrine"/>
-                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-back" text="Dos" userData="Dos"/>
-                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-legs" text="Jambes" userData="Jambes"/>
-                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-shoulder" text="Epaule" userData="Epaule"/>
-                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-biceps" text="Biceps" userData="Biceps"/>
-                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-triceps" text="Triceps" userData="Triceps"/>
+                                <VBox spacing="12.0" styleClass="program-list">
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-chest"    text="Poitrine"     userData="Poitrine"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-back"     text="Dos"          userData="Dos"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-legs"     text="Jambes"       userData="Jambes"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-fessier"  text="Fessier"      userData="Fessier"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-shoulder" text="Epaules"      userData="Epaules"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-biceps"   text="Biceps"       userData="Biceps"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-triceps"  text="Triceps"      userData="Triceps"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-abdos"    text="Abdos"        userData="Abdos"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-cardio"   text="Corps entier" userData="Corps entier"/>
                                 </VBox>
                             </VBox>
 
@@ -189,6 +254,52 @@
                                         <TableColumn fx:id="colExerciseDuration" text="Duration"/>
                                     </columns>
                                 </TableView>
+                            </VBox>
+
+                            <VBox fx:id="plannerExploreContent" managed="false" spacing="14.0" visible="false">
+                                <!-- Header + filtre -->
+                                <VBox spacing="4.0">
+                                    <Label styleClass="planner-section-title" text="Explore — Feed Vidéo Fitness"/>
+                                    <Label styleClass="planner-section-subtitle" text="Scroll vertical pour naviguer · Autoplay · Vidéos locales + YouTube" wrapText="true"/>
+                                </VBox>
+                                <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                    <TextField fx:id="tfExploreFilter" promptText="Filtrer : abdos, dos, biceps, HIIT..." styleClass="text-field-modern" HBox.hgrow="ALWAYS"/>
+                                    <Button mnemonicParsing="false" onAction="#filtrerExploreFeed" styleClass="primary-button" text="🔍 Filtrer"/>
+                                    <Button mnemonicParsing="false" onAction="#resetExploreFeed"   styleClass="ghost-button"   text="Tout"/>
+                                </HBox>
+                                <!-- Compteur -->
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label fx:id="lblExploreCount" style="-fx-font-size:11px;-fx-text-fill:#64748b;" text="12 vidéos disponibles"/>
+                                    <Label fx:id="lblExploreNowPlaying" style="-fx-font-size:11px;-fx-text-fill:#1a6b5a;-fx-font-weight:700;" text=""/>
+                                </HBox>
+                                <!-- Player principal -->
+                                <HBox spacing="14.0">
+                                    <!-- Vidéo -->
+                                    <VBox spacing="0" style="-fx-background-color:#050e14;-fx-background-radius:16;-fx-border-radius:16;-fx-border-color:#1a3a48;" HBox.hgrow="ALWAYS">
+                                        <StackPane fx:id="explorePlayerPane" prefHeight="420.0" style="-fx-background-color:#050e14;-fx-background-radius:16 16 0 0;">
+                                            <MediaView fx:id="exploreMediaView" fitWidth="700.0" fitHeight="420.0" preserveRatio="true" StackPane.alignment="CENTER"/>
+                                            <Label fx:id="lblExploreVideoTitle" style="-fx-font-size:16px;-fx-font-weight:800;-fx-text-fill:#fff;-fx-background-color:rgba(0,0,0,0.55);-fx-background-radius:8;-fx-padding:6 12;" wrapText="true" StackPane.alignment="BOTTOM_LEFT"/>
+                                        </StackPane>
+                                        <!-- Controls -->
+                                        <HBox spacing="8.0" alignment="CENTER" style="-fx-background-color:#0b1c22;-fx-padding:10;-fx-background-radius:0 0 16 16;">
+                                            <Button fx:id="btnExplorePrev"  mnemonicParsing="false" onAction="#explorePrev"       styleClass="ghost-button" text="◀ Préc"/>
+                                            <Button fx:id="btnExplorePlay"  mnemonicParsing="false" onAction="#explorePlayPause"  styleClass="primary-button" text="⏸ Pause"/>
+                                            <Button fx:id="btnExploreNext"  mnemonicParsing="false" onAction="#exploreNext"       styleClass="ghost-button" text="Suiv ▶"/>
+                                            <Button fx:id="btnExploreMute"  mnemonicParsing="false" onAction="#exploreMute"       styleClass="ghost-button" text="🔇 Mute"/>
+                                            <Slider fx:id="sliderExploreVolume" min="0" max="1" value="0.8" prefWidth="120.0"/>
+                                            <Button fx:id="btnExploreLike"  mnemonicParsing="false" onAction="#exploreLike"       styleClass="ghost-button" text="❤ 0"/>
+                                        </HBox>
+                                    </VBox>
+                                    <!-- Playlist -->
+                                    <VBox spacing="8.0" prefWidth="280.0">
+                                        <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Playlist"/>
+                                        <ScrollPane fitToWidth="true" prefHeight="460.0" styleClass="front-scroll">
+                                            <VBox fx:id="explorePlaylistBox" spacing="6.0"/>
+                                        </ScrollPane>
+                                    </VBox>
+                                </HBox>
+                                <!-- Description -->
+                                <Label fx:id="lblExploreDesc" style="-fx-font-size:12px;-fx-text-fill:#475467;" text="" wrapText="true"/>
                             </VBox>
 
                             <VBox fx:id="plannerCoachContent" managed="false" spacing="16.0" visible="false">
@@ -267,14 +378,14 @@
                     </HBox>
 
                     <VBox fx:id="programLocationStep" spacing="14.0">
-                        <Button mnemonicParsing="false" onAction="#selectTrainingLocation" styleClass="training-option-card gym-card" text="A la salle de sport&#10;Format guide avec equipement et charges progressives." userData="A la salle de sport"/>
-                        <Button mnemonicParsing="false" onAction="#selectTrainingLocation" styleClass="training-option-card home-card" text="A la maison&#10;Version adaptee avec accessoires legers et poids du corps." userData="A la maison"/>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectTrainingLocation" styleClass="training-option-card gym-card"  text="À la salle de sport" userData="A la salle de sport"/>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectTrainingLocation" styleClass="training-option-card home-card" text="À la maison"          userData="A la maison"/>
                     </VBox>
 
                     <VBox fx:id="programDifficultyStep" managed="false" spacing="14.0" visible="false">
-                        <Button mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card beginner-card" text="Debutant" userData="Debutant"/>
-                        <Button mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card advanced-card" text="Avance" userData="Avance"/>
-                        <Button mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card expert-card" text="Expert" userData="Expert"/>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card beginner-card" text="Débutant" userData="Debutant"/>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card advanced-card" text="Avancé"   userData="Avance"/>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card expert-card"   text="Expert"   userData="Expert"/>
                     </VBox>
 
                     <VBox fx:id="programExerciseStep" managed="false" spacing="14.0" visible="false">
