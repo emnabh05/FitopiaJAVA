@@ -1,0 +1,173 @@
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.payment-root {
+    -fx-background-color: linear-gradient(to bottom right, #f8fbff 0%, #eef6f2 58%, #fffaf4 100%);
+}
+
+.payment-summary-card,
+.payment-card,
+.payment-processing-card,
+.payment-success-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #dfe9e4;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(20, 56, 47, 0.10), 18, 0.12, 0, 6);
+}
+
+.payment-title {
+    -fx-text-fill: #14382f;
+    -fx-font-size: 24px;
+    -fx-font-weight: 800;
+}
+
+.payment-section-title {
+    -fx-text-fill: #14382f;
+    -fx-font-size: 19px;
+    -fx-font-weight: 800;
+}
+
+.payment-subtitle,
+.payment-label,
+.payment-feedback {
+    -fx-text-fill: #6f817a;
+    -fx-font-size: 12px;
+}
+
+.payment-label {
+    -fx-font-weight: 800;
+}
+
+.payment-event-title {
+    -fx-text-fill: #163b31;
+    -fx-font-size: 21px;
+    -fx-font-weight: 800;
+}
+
+.payment-value {
+    -fx-text-fill: #244a40;
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+}
+
+.payment-total-box {
+    -fx-background-color: #f7fbf9;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e3ede8;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1;
+}
+
+.payment-amount {
+    -fx-text-fill: #9b4d13;
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+}
+
+.payment-status,
+.payment-status-success {
+    -fx-background-radius: 999px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 6 10;
+}
+
+.payment-status {
+    -fx-background-color: #fff3d8;
+    -fx-text-fill: #9b5a13;
+}
+
+.payment-status-success {
+    -fx-background-color: #ddf2e7;
+    -fx-text-fill: #1f704f;
+}
+
+.payment-method {
+    -fx-text-fill: #2d5147;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.payment-field {
+    -fx-background-color: linear-gradient(to bottom, #fbfdfc 0%, #f4f8f6 100%);
+    -fx-background-radius: 8px;
+    -fx-border-color: #dce8e1;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1;
+    -fx-padding: 11 12;
+    -fx-text-fill: #183c32;
+    -fx-prompt-text-fill: #91a69c;
+}
+
+.payment-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #92b6a5;
+    -fx-effect: dropshadow(gaussian, rgba(76, 122, 102, 0.12), 10, 0.16, 0, 2);
+}
+
+.payment-processing-card {
+    -fx-background-color: #f7fbf9;
+}
+
+.payment-processing-text {
+    -fx-text-fill: #244a40;
+    -fx-font-size: 13px;
+    -fx-font-weight: 800;
+}
+
+.payment-success-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff 0%, #f1faf5 100%);
+    -fx-border-color: #bee0cf;
+}
+
+.payment-success-title {
+    -fx-text-fill: #17603f;
+    -fx-font-size: 21px;
+    -fx-font-weight: 900;
+}
+
+.payment-primary-button,
+.payment-secondary-button,
+.payment-test-button,
+.payment-danger-button {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+    -fx-padding: 11 14;
+}
+
+.payment-primary-button {
+    -fx-background-color: #17473b;
+    -fx-text-fill: white;
+}
+
+.payment-primary-button:hover {
+    -fx-background-color: #215d4d;
+}
+
+.payment-secondary-button {
+    -fx-background-color: white;
+    -fx-border-color: #d8e5df;
+    -fx-text-fill: #315349;
+}
+
+.payment-test-button {
+    -fx-background-color: #fff3d8;
+    -fx-border-color: #f1cf92;
+    -fx-text-fill: #9b5a13;
+}
+
+.payment-danger-button {
+    -fx-background-color: #fff0f0;
+    -fx-border-color: #efb7b7;
+    -fx-text-fill: #a93737;
+}
+
+.payment-feedback {
+    -fx-font-weight: 700;
+}

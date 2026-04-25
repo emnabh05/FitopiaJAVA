@@ -55,7 +55,8 @@
     -fx-font-weight: 800;
 }
 
-.qr-token {
+.qr-token,
+.qr-token-field {
     -fx-background-color: #f3f8f5;
     -fx-background-radius: 16px;
     -fx-border-color: #dfe9e4;
@@ -64,6 +65,15 @@
     -fx-text-fill: #31574d;
     -fx-font-size: 12px;
     -fx-font-weight: 700;
+}
+
+.qr-token-field {
+    -fx-pref-width: 360px;
+}
+
+.qr-token-field:focused {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #9cc9b6;
 }
 
 .qr-status-chip {
@@ -84,4 +94,25 @@
     -fx-font-weight: 800;
     -fx-padding: 12 18;
     -fx-cursor: hand;
+}
+
+.qr-copy-button {
+    -fx-background-color: #17473b;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-padding: 10 14;
+    -fx-cursor: hand;
+}
+
+.qr-copy-button:hover {
+    -fx-background-color: #215d4d;
+}
+
+.qr-copy-feedback {
+    -fx-text-fill: #1f704f;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
 }

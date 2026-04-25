@@ -564,6 +564,26 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void openAdminCheckinWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/AdminCheckinView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 920, 640);
+            scene.getStylesheets().add(getClass().getResource("/styles/admin-checkin.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - Check-in QR");
+            stage.setScene(scene);
+            stage.setMinWidth(860);
+            stage.setMinHeight(600);
+            stage.setOnHidden(event -> refreshAllData());
+            stage.show();
+        } catch (Exception e) {
+            showError("Ouverture impossible", "La vue Check-in QR n'a pas pu etre chargee.", e);
+        }
+    }
+
+    @FXML
     private void refreshEvents() {
         loadEvents();
         updateDashboardStats();

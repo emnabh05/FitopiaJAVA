@@ -238,8 +238,8 @@ public class ReservationHistoryController {
     private String resolveStatusStyle(Reservation reservation) {
         String status = reservation.getStatut() == null ? "" : reservation.getStatut().trim().toLowerCase(Locale.ROOT);
         return switch (status) {
-            case "confirmee" -> "history-status-confirmed";
-            case "annulee" -> "history-status-cancelled";
+            case "confirmee", "payee", "paid" -> "history-status-confirmed";
+            case "annulee", "echec_paiement" -> "history-status-cancelled";
             case "utilisee" -> "history-status-used";
             default -> "history-status-pending";
         };

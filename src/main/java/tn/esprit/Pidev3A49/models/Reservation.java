@@ -8,6 +8,7 @@ public class Reservation {
     private int idEvent;
     private String nomParticipant;
     private String emailParticipant;
+    private String telephoneParticipant;
     private LocalDateTime dateReservation;
     private double montant;
     private String statut;
@@ -22,9 +23,15 @@ public class Reservation {
 
     public Reservation(int idEvent, String nomParticipant, String emailParticipant, LocalDateTime dateReservation,
                        double montant, String statut) {
+        this(idEvent, nomParticipant, emailParticipant, null, dateReservation, montant, statut);
+    }
+
+    public Reservation(int idEvent, String nomParticipant, String emailParticipant, String telephoneParticipant,
+                       LocalDateTime dateReservation, double montant, String statut) {
         this.idEvent = idEvent;
         this.nomParticipant = nomParticipant;
         this.emailParticipant = emailParticipant;
+        this.telephoneParticipant = telephoneParticipant;
         this.dateReservation = dateReservation;
         this.montant = montant;
         this.statut = statut;
@@ -33,10 +40,18 @@ public class Reservation {
     public Reservation(int id, int idEvent, String nomParticipant, String emailParticipant, LocalDateTime dateReservation,
                        double montant, String statut, String transactionId, String qrToken, LocalDateTime checkedInAt,
                        LocalDateTime usedAt, LocalDateTime qrGeneratedAt) {
+        this(id, idEvent, nomParticipant, emailParticipant, null, dateReservation, montant, statut, transactionId,
+                qrToken, checkedInAt, usedAt, qrGeneratedAt);
+    }
+
+    public Reservation(int id, int idEvent, String nomParticipant, String emailParticipant, String telephoneParticipant,
+                       LocalDateTime dateReservation, double montant, String statut, String transactionId,
+                       String qrToken, LocalDateTime checkedInAt, LocalDateTime usedAt, LocalDateTime qrGeneratedAt) {
         this.id = id;
         this.idEvent = idEvent;
         this.nomParticipant = nomParticipant;
         this.emailParticipant = emailParticipant;
+        this.telephoneParticipant = telephoneParticipant;
         this.dateReservation = dateReservation;
         this.montant = montant;
         this.statut = statut;
@@ -77,6 +92,14 @@ public class Reservation {
 
     public void setEmailParticipant(String emailParticipant) {
         this.emailParticipant = emailParticipant;
+    }
+
+    public String getTelephoneParticipant() {
+        return telephoneParticipant;
+    }
+
+    public void setTelephoneParticipant(String telephoneParticipant) {
+        this.telephoneParticipant = telephoneParticipant;
     }
 
     public LocalDateTime getDateReservation() {

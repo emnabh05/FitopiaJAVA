@@ -1,0 +1,135 @@
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.checkin-root {
+    -fx-background-color: linear-gradient(to bottom right, #f7fbf9 0%, #edf5f1 58%, #fffaf4 100%);
+}
+
+.checkin-header,
+.checkin-scan-card,
+.checkin-result-card {
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: #dfe9e4;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(20, 56, 47, 0.10), 18, 0.12, 0, 6);
+}
+
+.checkin-header {
+    -fx-padding: 18 20;
+}
+
+.checkin-title {
+    -fx-text-fill: #14382f;
+    -fx-font-size: 26px;
+    -fx-font-weight: 900;
+}
+
+.checkin-section-title {
+    -fx-text-fill: #14382f;
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+}
+
+.checkin-subtitle,
+.checkin-label,
+.checkin-message-success,
+.checkin-message-error {
+    -fx-font-size: 12px;
+}
+
+.checkin-subtitle,
+.checkin-label {
+    -fx-text-fill: #6f817a;
+}
+
+.checkin-label {
+    -fx-font-weight: 800;
+}
+
+.checkin-value {
+    -fx-text-fill: #244a40;
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+}
+
+.checkin-field {
+    -fx-background-color: linear-gradient(to bottom, #fbfdfc 0%, #f4f8f6 100%);
+    -fx-background-radius: 8px;
+    -fx-border-color: #dce8e1;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1;
+    -fx-padding: 12 13;
+    -fx-text-fill: #183c32;
+    -fx-prompt-text-fill: #91a69c;
+}
+
+.checkin-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #92b6a5;
+    -fx-effect: dropshadow(gaussian, rgba(76, 122, 102, 0.12), 10, 0.16, 0, 2);
+}
+
+.checkin-info-grid {
+    -fx-background-color: #f7fbf9;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e3ede8;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1;
+    -fx-padding: 16;
+}
+
+.checkin-chip,
+.checkin-status {
+    -fx-background-radius: 999px;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+    -fx-padding: 6 10;
+}
+
+.checkin-chip {
+    -fx-background-color: #eef6f2;
+    -fx-text-fill: #315349;
+}
+
+.checkin-status {
+    -fx-background-color: #ddf2e7;
+    -fx-text-fill: #1f704f;
+}
+
+.checkin-primary-button,
+.checkin-secondary-button {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+    -fx-padding: 11 14;
+}
+
+.checkin-primary-button {
+    -fx-background-color: #17473b;
+    -fx-text-fill: white;
+}
+
+.checkin-primary-button:hover {
+    -fx-background-color: #215d4d;
+}
+
+.checkin-secondary-button {
+    -fx-background-color: white;
+    -fx-border-color: #d8e5df;
+    -fx-text-fill: #315349;
+}
+
+.checkin-message-success {
+    -fx-text-fill: #1f704f;
+    -fx-font-weight: 800;
+}
+
+.checkin-message-error {
+    -fx-text-fill: #a93737;
+    -fx-font-weight: 800;
+}

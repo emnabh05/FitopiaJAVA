@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Priority?>
@@ -39,7 +40,17 @@
                         <Label text="Scan check-in" styleClass="qr-section-title"/>
                         <ImageView fx:id="qrImageView" fitWidth="360.0" fitHeight="360.0" preserveRatio="true" styleClass="qr-image"/>
                         <Label text="Token de controle" styleClass="qr-muted-label"/>
-                        <Label fx:id="tokenLabel" text="-" styleClass="qr-token" wrapText="true"/>
+                        <TextField fx:id="tokenField"
+                                   editable="false"
+                                   focusTraversable="false"
+                                   text="-"
+                                   styleClass="qr-token-field"/>
+                        <HBox alignment="CENTER" spacing="10.0">
+                            <children>
+                                <Button text="Copier le token" onAction="#copyToken" styleClass="qr-copy-button"/>
+                                <Label fx:id="copyFeedbackLabel" text="" styleClass="qr-copy-feedback"/>
+                            </children>
+                        </HBox>
                     </children>
                 </VBox>
 

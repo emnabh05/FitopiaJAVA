@@ -167,6 +167,16 @@
                     </children>
                 </VBox>
 
+                <VBox spacing="8.0">
+                    <children>
+                        <Label text="Telephone"
+                               styleClass="reservation-label"/>
+                        <TextField fx:id="phoneField"
+                                   promptText="+216 12 345 678"
+                                   styleClass="reservation-field"/>
+                    </children>
+                </VBox>
+
                 <VBox spacing="10.0" styleClass="reservation-price-panel">
                     <padding>
                         <Insets top="14.0" right="16.0" bottom="14.0" left="16.0"/>

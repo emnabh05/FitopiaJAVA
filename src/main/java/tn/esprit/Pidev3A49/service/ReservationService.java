@@ -53,8 +53,40 @@ public class ReservationService {
         if (reservation.getStatut() == null || reservation.getStatut().isBlank()) {
             reservation.setStatut("confirmee");
         }
-        reservationQrService.attachQrToReservation(reservation);
+        if (shouldAttachQr(reservation)) {
+            reservationQrService.attachQrToReservation(reservation);
+        }
         reservationDAO.add(reservation);
+    }
+
+    public void markPaymentSucceeded(Reservation reservation, String transactionId) {
+        if (reservation == null || reservation.getId() <= 0) {
+            throw new IllegalArgumentException("La reservation est invalide.");
+        }
+        if (isBlank(transactionId)) {
+            throw new IllegalArgumentException("La transaction de paiement est invalide.");
+        }
+
+        reservation.setStatut("PAYEE");
+        reservation.setTransactionId(transactionId.trim());
+        reservationQrService.attachQrToReservation(reservation);
+        int updatedRows = reservationDAO.updatePaymentStatus(reservation);
+        if (updatedRows == 0) {
+            throw new IllegalArgumentException("Reservation introuvable pour validation du paiement.");
+        }
+    }
+
+    public void markPaymentFailed(Reservation reservation) {
+        if (reservation == null || reservation.getId() <= 0) {
+            throw new IllegalArgumentException("La reservation est invalide.");
+        }
+
+        reservation.setStatut("ECHEC_PAIEMENT");
+        reservation.setTransactionId(null);
+        int updatedRows = reservationDAO.updatePaymentStatus(reservation);
+        if (updatedRows == 0) {
+            throw new IllegalArgumentException("Reservation introuvable pour echec de paiement.");
+        }
     }
 
     public List<Reservation> getByEmail(String emailParticipant) {
@@ -73,6 +105,53 @@ public class ReservationService {
 
     public Map<Integer, Long> countValidReservationsByEvent() {
         return reservationDAO.countValidReservationsByEvent();
+    }
+
+    public ReservationHistoryItem validateQrToken(String token) {
+        if (isBlank(token)) {
+            throw new IllegalArgumentException("QR invalide : saisissez ou scannez un token.");
+        }
+
+        ReservationHistoryItem item = reservationDAO.findByQrToken(token.trim());
+        if (item == null || item.getReservation() == null) {
+            throw new IllegalArgumentException("QR invalide.");
+        }
+
+        Reservation reservation = item.getReservation();
+        String status = normalizeStatus(reservation.getStatut());
+        if ("annulee".equals(status) || "cancelled".equals(status)) {
+            throw new IllegalArgumentException("Reservation annulee : entree refusee.");
+        }
+        if ("utilisee".equals(status) || "used".equals(status) || reservation.getUsedAt() != null) {
+            throw new IllegalArgumentException("QR deja utilise.");
+        }
+        if ("en_attente_paiement".equals(status) || "echec_paiement".equals(status)) {
+            throw new IllegalArgumentException("Reservation non payee ou paiement refuse : entree refusee.");
+        }
+        if (!"confirmee".equals(status) && !"payee".equals(status)) {
+            throw new IllegalArgumentException("Reservation non eligible au check-in.");
+        }
+
+        return item;
+    }
+
+    public void confirmCheckin(Reservation reservation) {
+        if (reservation == null || reservation.getId() <= 0) {
+            throw new IllegalArgumentException("Reservation invalide.");
+        }
+        if (reservation.getUsedAt() != null) {
+            throw new IllegalArgumentException("QR deja utilise.");
+        }
+
+        int updatedRows = reservationDAO.markAsUsed(reservation.getId());
+        if (updatedRows == 0) {
+            throw new IllegalArgumentException("QR deja utilise ou reservation non eligible.");
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+        reservation.setStatut("Utilisee");
+        reservation.setCheckedInAt(now);
+        reservation.setUsedAt(now);
     }
 
     public void cancel(Reservation reservation) {
@@ -117,7 +196,12 @@ public class ReservationService {
 
     public boolean isValidForLoyalty(Reservation reservation) {
         String status = normalizeStatus(reservation == null ? null : reservation.getStatut());
-        return "confirmee".equals(status) || "utilisee".equals(status);
+        return "confirmee".equals(status) || "payee".equals(status) || "utilisee".equals(status);
+    }
+
+    private boolean shouldAttachQr(Reservation reservation) {
+        String status = normalizeStatus(reservation.getStatut());
+        return "confirmee".equals(status) || "payee".equals(status);
     }
 
     private void validate(Reservation reservation) {

@@ -667,6 +667,11 @@
                                                                         text="Waitlist"/>
 
                                                                 <Button mnemonicParsing="false"
+                                                                        onAction="#openAdminCheckinWindow"
+                                                                        styleClass="toolbar-button toolbar-button-strong"
+                                                                        text="Check-in QR"/>
+
+                                                                <Button mnemonicParsing="false"
                                                                         onAction="#openEventStatsWindow"
                                                                         styleClass="toolbar-button toolbar-button-strong"
                                                                         text="Analyse des evenements"/>

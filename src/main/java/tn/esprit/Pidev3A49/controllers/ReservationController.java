@@ -1,6 +1,9 @@
 package tn.esprit.Pidev3A49.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -9,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.models.Event;
 import tn.esprit.Pidev3A49.models.Participation;
@@ -47,6 +51,7 @@ public class ReservationController {
     @FXML private TextField fullNameField;
     @FXML private TextField firstNameField;
     @FXML private TextField emailField;
+    @FXML private TextField phoneField;
 
     @FXML private Label bookingAmountLabel;
     @FXML private Label bookingStatusLabel;
@@ -91,11 +96,13 @@ public class ReservationController {
             String firstName = requireText(firstNameField.getText(), "Le prenom est obligatoire.");
             String fullParticipantName = (lastName + " " + firstName).trim();
             String email = requireEmail(emailField.getText());
+            String phone = requirePhone(phoneField.getText());
             eventService.ensureCanReserve(event, email);
             if (remainingPlaces <= 0) {
                 throw new IllegalArgumentException("Il n'y a plus de places disponibles pour cet evenement.");
             }
-            String initialStatus = "confirmee";
+            boolean requiresPayment = event.getPrixEvent() > 0;
+            String initialStatus = requiresPayment ? "EN_ATTENTE_PAIEMENT" : "confirmee";
 
             connection = MyDataBase.getInstance().getConnection();
             previousAutoCommit = connection.getAutoCommit();
@@ -105,6 +112,7 @@ public class ReservationController {
                     event.getIdEvent(),
                     fullParticipantName,
                     email,
+                    phone,
                     LocalDateTime.now(),
                     event.getPrixEvent(),
                     initialStatus
@@ -116,11 +124,16 @@ public class ReservationController {
 
             connection.commit();
 
-            feedbackLabel.setText(
-                    (confirmedReservation ? "Reservation confirmee" : "Demande ajoutee en attente")
-                            + " pour " + reservation.getNomParticipant() + "."
-            );
+            restoreAutoCommit(connection, previousAutoCommit);
+            connection = null;
 
+            if (requiresPayment) {
+                feedbackLabel.setText("Reservation creee en attente de paiement pour " + reservation.getNomParticipant() + ".");
+                openPaymentWindow(reservation, email);
+                return;
+            }
+
+            feedbackLabel.setText("Reservation confirmee pour " + reservation.getNomParticipant() + ".");
             showConfirmation(reservation.getStatut());
             if (onReservationSaved != null) {
                 onReservationSaved.accept(email);
@@ -128,6 +141,7 @@ public class ReservationController {
             closeWindow();
 
         } catch (IllegalArgumentException e) {
+            rollbackReservationTransaction(connection);
             feedbackLabel.setText(e.getMessage());
         } catch (SQLException e) {
             rollbackReservationTransaction(connection);
@@ -153,6 +167,35 @@ public class ReservationController {
                 email,
                 LocalDateTime.now()
         ));
+    }
+
+    private void openPaymentWindow(Reservation reservation, String email) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/PaymentView.fxml"));
+            Parent root = loader.load();
+            PaymentController controller = loader.getController();
+            controller.setContext(event, reservation, paidReservation -> {
+                feedbackLabel.setText("Paiement valide pour " + paidReservation.getNomParticipant() + ".");
+                if (onReservationSaved != null) {
+                    onReservationSaved.accept(email);
+                }
+                closeWindow();
+            });
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - Paiement reservation");
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(confirmButton.getScene().getWindow());
+            Scene scene = new Scene(root, 980, 680);
+            scene.getStylesheets().add(getClass().getResource("/styles/payment-view.css").toExternalForm());
+            stage.setScene(scene);
+            stage.setMinWidth(920);
+            stage.setMinHeight(640);
+            stage.showAndWait();
+        } catch (Exception e) {
+            showError("Paiement impossible", "La fenetre de paiement n'a pas pu etre ouverte.");
+            e.printStackTrace();
+        }
     }
 
     private void rollbackReservationTransaction(Connection connection) {
@@ -203,11 +246,13 @@ public class ReservationController {
         eventDescriptionArea.setText(buildDescription());
 
         bookingAmountLabel.setText(formatPrice(event.getPrixEvent()));
-        bookingStatusLabel.setText("confirmee");
+        bookingStatusLabel.setText(event.getPrixEvent() > 0 ? "EN_ATTENTE_PAIEMENT" : "confirmee");
         formSubtitleLabel.setText(event.isPremium()
                 ? "Evenement Premium: seuls les clients VIP peuvent confirmer cette reservation."
+                : event.getPrixEvent() > 0
+                ? "Complete your details. Payment is required before final confirmation."
                 : "Complete your details to confirm this booking.");
-        confirmButton.setText(event.isPremium() ? "CONFIRMER EN TANT QUE VIP" : "CONFIRMER MA RESERVATION");
+        confirmButton.setText(event.getPrixEvent() > 0 ? "CONTINUER VERS LE PAIEMENT" : event.isPremium() ? "CONFIRMER EN TANT QUE VIP" : "CONFIRMER MA RESERVATION");
         confirmButton.setDisable(remainingPlaces <= 0);
 
         addEventImageIfPossible();
@@ -287,6 +332,26 @@ public class ReservationController {
             throw new IllegalArgumentException("L'email saisi est invalide.");
         }
         return email;
+    }
+
+    private String requirePhone(String value) {
+        String phone = requireText(value, "Le telephone est obligatoire.");
+        String normalizedPhone = normalizeTunisianPhone(phone);
+        if (!normalizedPhone.matches("^\\+216[0-9]{8}$")) {
+            throw new IllegalArgumentException("Le telephone doit etre au format +216XXXXXXXX, 216XXXXXXXX ou XXXXXXXX.");
+        }
+        return normalizedPhone;
+    }
+
+    private String normalizeTunisianPhone(String value) {
+        String phone = value == null ? "" : value.trim().replaceAll("[\\s.-]+", "");
+        if (phone.matches("^[0-9]{8}$")) {
+            return "+216" + phone;
+        }
+        if (phone.matches("^216[0-9]{8}$")) {
+            return "+" + phone;
+        }
+        return phone;
     }
 
     private String formatDate(LocalDate date) {

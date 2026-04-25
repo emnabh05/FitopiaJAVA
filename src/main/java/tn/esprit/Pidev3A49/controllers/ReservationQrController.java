@@ -1,7 +1,10 @@
 package tn.esprit.Pidev3A49.controllers;
 
 import javafx.fxml.FXML;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.models.Event;
@@ -26,7 +29,8 @@ public class ReservationQrController {
     @FXML private Label participantLabel;
     @FXML private Label emailLabel;
     @FXML private Label generatedAtLabel;
-    @FXML private Label tokenLabel;
+    @FXML private TextField tokenField;
+    @FXML private Label copyFeedbackLabel;
     @FXML private ImageView qrImageView;
 
     private final ReservationQrService reservationQrService = new ReservationQrService();
@@ -46,8 +50,24 @@ public class ReservationQrController {
         participantLabel.setText(nullSafe(reservation.getNomParticipant()));
         emailLabel.setText(nullSafe(reservation.getEmailParticipant()));
         generatedAtLabel.setText(reservation.getQrGeneratedAt() == null ? "-" : DATE_TIME_FORMATTER.format(reservation.getQrGeneratedAt()));
-        tokenLabel.setText(reservation.getQrToken());
+        tokenField.setText(nullSafe(reservation.getQrToken()));
+        copyFeedbackLabel.setText("");
         qrImageView.setImage(reservationQrService.generateQrImage(reservation, 360));
+    }
+
+    @FXML
+    private void copyToken() {
+        String qrToken = tokenField.getText();
+        if (qrToken == null || qrToken.isBlank() || "-".equals(qrToken.trim())) {
+            copyFeedbackLabel.setText("Aucun token a copier.");
+            return;
+        }
+
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        ClipboardContent content = new ClipboardContent();
+        content.putString(qrToken.trim());
+        clipboard.setContent(content);
+        copyFeedbackLabel.setText("Token copie avec succes.");
     }
 
     @FXML

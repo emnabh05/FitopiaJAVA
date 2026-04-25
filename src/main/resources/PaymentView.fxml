@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox spacing="20.0"
+      styleClass="payment-root"
+      xmlns="http://javafx.com/javafx/22.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.Pidev3A49.controllers.PaymentController">
+    <padding>
+        <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+    </padding>
+
+    <fx:define>
+        <ToggleGroup fx:id="paymentMethodGroup"/>
+    </fx:define>
+
+    <children>
+        <VBox prefWidth="390.0" spacing="18.0" styleClass="payment-summary-card">
+            <padding>
+                <Insets top="22.0" right="22.0" bottom="22.0" left="22.0"/>
+            </padding>
+            <children>
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Paiement de reservation" styleClass="payment-title"/>
+                        <Label text="Resume avant validation sandbox." wrapText="true" styleClass="payment-subtitle"/>
+                    </children>
+                </VBox>
+
+                <Separator/>
+
+                <VBox spacing="6.0">
+                    <children>
+                        <Label text="Evenement" styleClass="payment-label"/>
+                        <Label fx:id="eventTitleLabel" text="-" wrapText="true" styleClass="payment-event-title"/>
+                    </children>
+                </VBox>
+
+                <GridPane hgap="18.0" vgap="14.0">
+                    <children>
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <children>
+                                <Label text="Date" styleClass="payment-label"/>
+                                <Label fx:id="eventDateLabel" text="-" styleClass="payment-value"/>
+                            </children>
+                        </VBox>
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <children>
+                                <Label text="Lieu" styleClass="payment-label"/>
+                                <Label fx:id="eventLocationLabel" text="-" wrapText="true" styleClass="payment-value"/>
+                            </children>
+                        </VBox>
+                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <children>
+                                <Label text="Client" styleClass="payment-label"/>
+                                <Label fx:id="participantLabel" text="-" wrapText="true" styleClass="payment-value"/>
+                            </children>
+                        </VBox>
+                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <children>
+                                <Label text="Email" styleClass="payment-label"/>
+                                <Label fx:id="emailLabel" text="-" wrapText="true" styleClass="payment-value"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </GridPane>
+
+                <VBox spacing="10.0" styleClass="payment-total-box">
+                    <padding>
+                        <Insets top="16.0" right="16.0" bottom="16.0" left="16.0"/>
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Prix total" styleClass="payment-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="amountLabel" text="0.00 DT" styleClass="payment-amount"/>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Statut actuel" styleClass="payment-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="statusLabel" text="EN_ATTENTE_PAIEMENT" styleClass="payment-status"/>
+                            </children>
+                        </HBox>
+                        <HBox alignment="CENTER_LEFT">
+                            <children>
+                                <Label text="Transaction" styleClass="payment-label"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="transactionLabel" text="-" styleClass="payment-value"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+
+        <VBox spacing="16.0" HBox.hgrow="ALWAYS">
+            <children>
+                <VBox fx:id="paymentFormBox" spacing="16.0" styleClass="payment-card">
+                    <padding>
+                        <Insets top="22.0" right="22.0" bottom="22.0" left="22.0"/>
+                    </padding>
+                    <children>
+                        <VBox spacing="5.0">
+                            <children>
+                                <Label text="Informations de paiement" styleClass="payment-section-title"/>
+                                <Label text="Donnees de test uniquement. Rien n'est stocke en base." styleClass="payment-subtitle"/>
+                            </children>
+                        </VBox>
+
+                        <HBox spacing="10.0">
+                            <children>
+                                <RadioButton fx:id="cardRadio" text="Carte bancaire" toggleGroup="$paymentMethodGroup" styleClass="payment-method"/>
+                                <RadioButton fx:id="paypalRadio" text="PayPal simule" toggleGroup="$paymentMethodGroup" styleClass="payment-method"/>
+                                <RadioButton fx:id="walletRadio" text="Wallet simule" toggleGroup="$paymentMethodGroup" styleClass="payment-method"/>
+                            </children>
+                        </HBox>
+
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label text="Nom sur la carte" styleClass="payment-label"/>
+                                <TextField fx:id="cardHolderField" promptText="Ex: Emna Ben Hmida" styleClass="payment-field"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="8.0">
+                            <children>
+                                <Label text="Numero de carte" styleClass="payment-label"/>
+                                <TextField fx:id="cardNumberField" promptText="16 chiffres" styleClass="payment-field"/>
+                            </children>
+                        </VBox>
+
+                        <HBox spacing="12.0">
+                            <children>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label text="Expiration MM/AA" styleClass="payment-label"/>
+                                        <TextField fx:id="expirationField" promptText="MM/AA" styleClass="payment-field"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label text="CVV" styleClass="payment-label"/>
+                                        <PasswordField fx:id="cvvField" promptText="3 chiffres" styleClass="payment-field"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                            <children>
+                                <Button fx:id="cancelButton" mnemonicParsing="false" onAction="#cancelPayment" text="Annuler" styleClass="payment-secondary-button"/>
+                                <Button fx:id="forceFailureButton" mnemonicParsing="false" onAction="#forceFailedPayment" text="Simuler echec" styleClass="payment-danger-button"/>
+                                <Button fx:id="forceSuccessButton" mnemonicParsing="false" onAction="#forceSuccessfulPayment" text="Simuler reussi" styleClass="payment-test-button"/>
+                                <Button fx:id="payButton" mnemonicParsing="false" onAction="#payNow" text="Payer maintenant" styleClass="payment-primary-button"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox fx:id="processingBox" alignment="CENTER_LEFT" spacing="10.0" styleClass="payment-processing-card">
+                    <padding>
+                        <Insets top="16.0" right="18.0" bottom="16.0" left="18.0"/>
+                    </padding>
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="12.0">
+                            <children>
+                                <ProgressIndicator prefHeight="34.0" prefWidth="34.0"/>
+                                <Label fx:id="processingStepLabel" text="Verification des informations..." styleClass="payment-processing-text"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <VBox fx:id="successBox" spacing="14.0" styleClass="payment-success-card">
+                    <padding>
+                        <Insets top="20.0" right="22.0" bottom="22.0" left="22.0"/>
+                    </padding>
+                    <children>
+                        <Label text="Paiement confirme" styleClass="payment-success-title"/>
+                        <GridPane hgap="20.0" vgap="12.0">
+                            <children>
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label text="Transaction" styleClass="payment-label"/>
+                                        <Label fx:id="successTransactionLabel" text="-" styleClass="payment-value"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <children>
+                                        <Label text="Montant paye" styleClass="payment-label"/>
+                                        <Label fx:id="successAmountLabel" text="-" styleClass="payment-value"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <children>
+                                        <Label text="Statut final" styleClass="payment-label"/>
+                                        <Label fx:id="successStatusLabel" text="PAYEE" styleClass="payment-status-success"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </GridPane>
+                        <HBox alignment="CENTER_RIGHT">
+                            <children>
+                                <Button fx:id="viewReservationsButton" mnemonicParsing="false" onAction="#viewReservations" text="Voir mes reservations" styleClass="payment-primary-button"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Label fx:id="feedbackLabel" text="" wrapText="true" HBox.hgrow="ALWAYS" styleClass="payment-feedback"/>
+                        <Button fx:id="retryButton" mnemonicParsing="false" onAction="#retryPayment" text="Reessayer" styleClass="payment-test-button"/>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</HBox>

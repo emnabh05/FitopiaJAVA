@@ -28,21 +28,22 @@ public class ReservationDAO {
 
     public void add(Reservation reservation) {
         String sql = "INSERT INTO reservation "
-                + "(id_event, nom_participant, email_participant, date_reservation, montant, statut, transaction_id, qr_token, checked_in_at, used_at, qr_generated_at) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "(id_event, nom_participant, email_participant, telephone_participant, date_reservation, montant, statut, transaction_id, qr_token, checked_in_at, used_at, qr_generated_at) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setInt(1, reservation.getIdEvent());
             statement.setString(2, reservation.getNomParticipant());
             statement.setString(3, reservation.getEmailParticipant());
-            statement.setTimestamp(4, Timestamp.valueOf(reservation.getDateReservation()));
-            statement.setDouble(5, reservation.getMontant());
-            statement.setString(6, reservation.getStatut());
-            statement.setString(7, reservation.getTransactionId());
-            statement.setString(8, reservation.getQrToken());
-            statement.setTimestamp(9, reservation.getCheckedInAt() == null ? null : Timestamp.valueOf(reservation.getCheckedInAt()));
-            statement.setTimestamp(10, reservation.getUsedAt() == null ? null : Timestamp.valueOf(reservation.getUsedAt()));
-            statement.setTimestamp(11, reservation.getQrGeneratedAt() == null ? null : Timestamp.valueOf(reservation.getQrGeneratedAt()));
+            statement.setString(4, reservation.getTelephoneParticipant());
+            statement.setTimestamp(5, Timestamp.valueOf(reservation.getDateReservation()));
+            statement.setDouble(6, reservation.getMontant());
+            statement.setString(7, reservation.getStatut());
+            statement.setString(8, reservation.getTransactionId());
+            statement.setString(9, reservation.getQrToken());
+            statement.setTimestamp(10, reservation.getCheckedInAt() == null ? null : Timestamp.valueOf(reservation.getCheckedInAt()));
+            statement.setTimestamp(11, reservation.getUsedAt() == null ? null : Timestamp.valueOf(reservation.getUsedAt()));
+            statement.setTimestamp(12, reservation.getQrGeneratedAt() == null ? null : Timestamp.valueOf(reservation.getQrGeneratedAt()));
 
             int affectedRows = statement.executeUpdate();
             if (affectedRows == 0) {
@@ -61,7 +62,7 @@ public class ReservationDAO {
     }
 
     public List<Reservation> findByEmail(String emailParticipant) {
-        String sql = "SELECT id, id_event, nom_participant, email_participant, date_reservation, montant, statut, "
+        String sql = "SELECT id, id_event, nom_participant, email_participant, telephone_participant, date_reservation, montant, statut, "
                 + "transaction_id, qr_token, checked_in_at, used_at, qr_generated_at "
                 + "FROM reservation WHERE LOWER(email_participant) = LOWER(?) ORDER BY date_reservation DESC";
         List<Reservation> reservations = new ArrayList<>();
@@ -135,7 +136,7 @@ public class ReservationDAO {
     }
 
     public Reservation findById(int reservationId) {
-        String sql = "SELECT id, id_event, nom_participant, email_participant, date_reservation, montant, statut, "
+        String sql = "SELECT id, id_event, nom_participant, email_participant, telephone_participant, date_reservation, montant, statut, "
                 + "transaction_id, qr_token, checked_in_at, used_at, qr_generated_at "
                 + "FROM reservation WHERE id = ?";
 
@@ -154,6 +155,57 @@ public class ReservationDAO {
         return null;
     }
 
+    public ReservationHistoryItem findByQrToken(String token) {
+        String sql = "SELECT r.*, e.titre, e.date_event, e.lieu, e.prix_event, e.image_event, e.description, e.type_event, e.capacite, e.created_at, e.is_premium "
+                + "FROM reservation r "
+                + "JOIN events e ON r.id_event = e.id_event "
+                + "WHERE r.qr_token = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, token);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new ReservationHistoryItem(mapReservation(resultSet), mapEvent(resultSet));
+                }
+            }
+        } catch (SQLException e) {
+            logSqlError(sql, e);
+            throw new RuntimeException("Echec SQL lors de la recherche du QR de reservation.", e);
+        }
+
+        return null;
+    }
+
+    public int updatePaymentStatus(Reservation reservation) {
+        String sql = "UPDATE reservation SET statut = ?, transaction_id = ?, qr_token = ?, qr_generated_at = ? WHERE id = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, reservation.getStatut());
+            statement.setString(2, reservation.getTransactionId());
+            statement.setString(3, reservation.getQrToken());
+            statement.setTimestamp(4, reservation.getQrGeneratedAt() == null ? null : Timestamp.valueOf(reservation.getQrGeneratedAt()));
+            statement.setInt(5, reservation.getId());
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            logSqlError(sql, e);
+            throw new RuntimeException("Echec SQL lors de la mise a jour du paiement.", e);
+        }
+    }
+
+    public int markAsUsed(int reservationId) {
+        String sql = "UPDATE reservation "
+                + "SET statut = 'Utilisee', checked_in_at = NOW(), used_at = NOW() "
+                + "WHERE id = ? AND used_at IS NULL AND LOWER(TRIM(statut)) IN ('confirmee', 'payee', 'confirmed', 'paid')";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, reservationId);
+            return statement.executeUpdate();
+        } catch (SQLException e) {
+            logSqlError(sql, e);
+            throw new RuntimeException("Echec SQL lors de la validation du check-in.", e);
+        }
+    }
+
     public boolean existsByQrToken(String qrToken) {
         String sql = "SELECT COUNT(*) FROM reservation WHERE qr_token = ?";
 
@@ -170,7 +222,7 @@ public class ReservationDAO {
 
     public int countValidReservationsByEvent(int idEvent) {
         String sql = "SELECT COUNT(*) FROM reservation "
-                + "WHERE id_event = ? AND LOWER(TRIM(statut)) IN ('confirmee', 'utilisee', 'confirmed', 'used')";
+                + "WHERE id_event = ? AND LOWER(TRIM(statut)) IN ('confirmee', 'payee', 'utilisee', 'confirmed', 'paid', 'used')";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             System.out.println("[ReservationDAO] SQL countValidReservationsByEvent = " + sql);
@@ -189,7 +241,7 @@ public class ReservationDAO {
 
     public Map<Integer, Long> countValidReservationsByEvent() {
         String sql = "SELECT id_event, COUNT(*) AS total FROM reservation "
-                + "WHERE LOWER(TRIM(statut)) IN ('confirmee', 'utilisee', 'confirmed', 'used') GROUP BY id_event";
+                + "WHERE LOWER(TRIM(statut)) IN ('confirmee', 'payee', 'utilisee', 'confirmed', 'paid', 'used') GROUP BY id_event";
         Map<Integer, Long> counts = new HashMap<>();
 
         try (PreparedStatement statement = connection.prepareStatement(sql);
@@ -208,7 +260,7 @@ public class ReservationDAO {
     public boolean existsValidReservationByEventAndEmail(int idEvent, String emailParticipant) {
         String sql = "SELECT 1 FROM reservation "
                 + "WHERE id_event = ? AND LOWER(email_participant) = LOWER(?) "
-                + "AND LOWER(TRIM(statut)) IN ('confirmee', 'utilisee', 'confirmed', 'used') LIMIT 1";
+                + "AND LOWER(TRIM(statut)) IN ('confirmee', 'payee', 'utilisee', 'confirmed', 'paid', 'used') LIMIT 1";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             System.out.println("[ReservationDAO] SQL existsValidReservationByEventAndEmail = " + sql);
@@ -231,7 +283,7 @@ public class ReservationDAO {
                 + "COALESCE(SUM(montant), 0) AS total_spent, MAX(date_reservation) AS last_purchase "
                 + "FROM reservation "
                 + "WHERE LOWER(email_participant) = LOWER(?) "
-                + "AND LOWER(TRIM(statut)) IN ('confirmee', 'utilisee', 'confirmed', 'used') "
+                + "AND LOWER(TRIM(statut)) IN ('confirmee', 'payee', 'utilisee', 'confirmed', 'paid', 'used') "
                 + "GROUP BY email_participant";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -253,7 +305,7 @@ public class ReservationDAO {
         String sql = "SELECT email_participant, MAX(nom_participant) AS nom_participant, COUNT(*) AS valid_count, "
                 + "COALESCE(SUM(montant), 0) AS total_spent, MAX(date_reservation) AS last_purchase "
                 + "FROM reservation "
-                + "WHERE LOWER(TRIM(statut)) IN ('confirmee', 'utilisee', 'confirmed', 'used') "
+                + "WHERE LOWER(TRIM(statut)) IN ('confirmee', 'payee', 'utilisee', 'confirmed', 'paid', 'used') "
                 + "GROUP BY email_participant "
                 + "ORDER BY valid_count DESC, total_spent DESC, last_purchase DESC";
         List<LoyaltyStatus> items = new ArrayList<>();
@@ -277,6 +329,7 @@ public class ReservationDAO {
                 resultSet.getInt("id_event"),
                 resultSet.getString("nom_participant"),
                 resultSet.getString("email_participant"),
+                resultSet.getString("telephone_participant"),
                 toLocalDateTime(resultSet.getTimestamp("date_reservation")),
                 resultSet.getDouble("montant"),
                 resultSet.getString("statut"),
