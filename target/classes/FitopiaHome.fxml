@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+
+<BorderPane prefHeight="920.0" prefWidth="1440.0" styleClass="front-root" stylesheets="@styles/fitopia-home.css"
+            xmlns="http://javafx.com/javafx/22.0.2" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.FitopiaHomeController">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="24.0" styleClass="topbar">
+            <padding>
+                <Insets bottom="18.0" left="34.0" right="34.0" top="18.0"/>
+            </padding>
+            <Label styleClass="brand-mark" text="F"/>
+            <VBox spacing="2.0">
+                <Label styleClass="brand-title" text="FITOPIA"/>
+                <Label styleClass="brand-subtitle" text="Fitness, nutrition and coaching"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+            <VBox alignment="CENTER_RIGHT" spacing="8.0">
+                <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                    <Label styleClass="nav-link-active" text="Home"/>
+                    <Label styleClass="nav-link" text="Services"/>
+                    <Button mnemonicParsing="false" onAction="#scrollToPlanner" styleClass="nav-link-button" text="EXPLORE OUR FITNESS PLANNER"/>
+                    <Label styleClass="nav-link" text="Contact"/>
+                    <Button mnemonicParsing="false" styleClass="ghost-button" text="Login"/>
+                </HBox>
+            </VBox>
+        </HBox>
+    </top>
+    <center>
+        <StackPane>
+            <ScrollPane fx:id="mainScrollPane" fitToWidth="true" hbarPolicy="NEVER" styleClass="front-scroll" vbarPolicy="AS_NEEDED">
+                <content>
+                    <VBox fillWidth="true" spacing="22.0" styleClass="page-shell">
+                        <padding>
+                            <Insets bottom="28.0" left="32.0" right="32.0" top="28.0"/>
+                        </padding>
+
+                        <HBox spacing="20.0" styleClass="hero-card">
+                            <VBox spacing="18.0" HBox.hgrow="ALWAYS">
+                                <Label styleClass="hero-badge" text="Fitopia Performance Platform"/>
+                                <Label styleClass="hero-title" text="Train smarter, eat better, and stay consistent." wrapText="true"/>
+                                <Label styleClass="hero-subtitle" text="Build sustainable fitness habits with guided programs, practical nutrition plans, and clear progress tracking in one place." wrapText="true"/>
+                                <HBox spacing="12.0">
+                                    <Button mnemonicParsing="false" styleClass="primary-button" text="Learn more"/>
+                                    <Button mnemonicParsing="false" styleClass="light-ghost-button" text="Contact us"/>
+                                </HBox>
+                                <HBox spacing="14.0">
+                                    <VBox spacing="4.0">
+                                        <Label styleClass="hero-mini-value" text="1500+"/>
+                                        <Label styleClass="hero-mini-label" text="members coached"/>
+                                    </VBox>
+                                    <Separator orientation="VERTICAL"/>
+                                    <VBox spacing="4.0">
+                                        <Label styleClass="hero-mini-value" text="24/7"/>
+                                        <Label styleClass="hero-mini-label" text="support access"/>
+                                    </VBox>
+                                </HBox>
+                            </VBox>
+                            <VBox prefWidth="320.0" spacing="14.0">
+                                <VBox spacing="6.0" styleClass="glass-stat-card">
+                                    <Label styleClass="glass-stat-value" text="95%"/>
+                                    <Label styleClass="glass-stat-label" text="Goal completion rate"/>
+                                </VBox>
+                                <VBox spacing="6.0" styleClass="glass-stat-card">
+                                    <Label styleClass="glass-stat-value" text="12 weeks"/>
+                                    <Label styleClass="glass-stat-label" text="Structured transformation cycle"/>
+                                </VBox>
+                                <VBox spacing="10.0" styleClass="coach-card">
+                                    <Label styleClass="coach-tag" text="Coach Focus"/>
+                                    <Label styleClass="coach-title" text="Weekly habits beat short motivation spikes." wrapText="true"/>
+                                    <Label styleClass="coach-text" text="Simple routines, smart meal planning, and better follow-through." wrapText="true"/>
+                                </VBox>
+                            </VBox>
+                        </HBox>
+
+                        <VBox fx:id="plannerSection" spacing="18.0" styleClass="section-card planner-section">
+                            <HBox alignment="CENTER_LEFT">
+                                <VBox spacing="4.0">
+                                    <Label styleClass="section-kicker" text="Fitness Planner"/>
+                                    <Label styleClass="section-heading" text="EXPLORE OUR FITNESS PLANNER"/>
+                                    <Label styleClass="section-body" text="Ajoutez, modifiez et supprimez un exercice depuis le front. Chaque action est synchronisee avec le backend MySQL." wrapText="true"/>
+                                </VBox>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label styleClass="planner-pill" text="Exercice"/>
+                            </HBox>
+
+                            <HBox alignment="CENTER_LEFT" spacing="14.0">
+                                <Button fx:id="btnPlannerPlans" mnemonicParsing="false" onAction="#showPlannerPlans" styleClass="planner-tab-button planner-tab-button-active" text="Plans"/>
+                                <Button fx:id="btnPlannerPrograms" mnemonicParsing="false" onAction="#showPlannerPrograms" styleClass="planner-tab-button" text="Programs"/>
+                                <Button fx:id="btnPlannerExercises" mnemonicParsing="false" onAction="#showPlannerExercises" styleClass="planner-tab-button" text="Exercises"/>
+                                <Button fx:id="btnPlannerExplore" mnemonicParsing="false" onAction="#showPlannerExplore" styleClass="planner-tab-button" text="Explore"/>
+                                <Button fx:id="btnPlannerCoach" mnemonicParsing="false" onAction="#showPlannerCoach" styleClass="planner-tab-button" text="Coach"/>
+                            </HBox>
+
+                            <HBox alignment="CENTER">
+                                <Label fx:id="lblPlannerContentHint" styleClass="planner-return" text="Cliquez sur Exercises pour afficher le CRUD des exercices."/>
+                            </HBox>
+
+                            <VBox fx:id="plannerPlansContent" spacing="16.0">
+                                <VBox spacing="6.0">
+                                    <Label styleClass="planner-section-title" text="Explore Training Plans"/>
+                                    <Label styleClass="planner-section-subtitle" text="Tes seances confirmees apparaissent ici." wrapText="true"/>
+                                </VBox>
+                                <FlowPane fx:id="plansSelectionContainer" hgap="18.0" prefWrapLength="1180.0" vgap="18.0"/>
+                                <Label fx:id="lblPlansEmptyState" styleClass="program-empty-state" text="Aucune seance confirmee dans Plans pour le moment."/>
+                            </VBox>
+
+                            <VBox fx:id="plannerProgramsContent" managed="false" spacing="18.0" visible="false">
+                                <VBox spacing="6.0">
+                                    <Label styleClass="planner-section-title" text="Liste des programmes"/>
+                                    <Label styleClass="planner-section-subtitle" text="Acces rapide par groupe musculaire, avec focus Poitrine." wrapText="true"/>
+                                </VBox>
+
+                                <VBox spacing="18.0" styleClass="program-list">
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-chest" text="Poitrine" userData="Poitrine"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-back" text="Dos" userData="Dos"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-legs" text="Jambes" userData="Jambes"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-shoulder" text="Epaule" userData="Epaule"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-biceps" text="Biceps" userData="Biceps"/>
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-triceps" text="Triceps" userData="Triceps"/>
+                                </VBox>
+                            </VBox>
+
+                            <VBox fx:id="plannerCrudContent" managed="false" spacing="18.0" visible="false">
+                                <GridPane hgap="14.0" vgap="14.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="25.0"/>
+                                        <ColumnConstraints percentWidth="25.0"/>
+                                        <ColumnConstraints percentWidth="25.0"/>
+                                        <ColumnConstraints percentWidth="25.0"/>
+                                    </columnConstraints>
+                                    <TextField fx:id="tfExerciseId" editable="false" managed="false" promptText="ID" visible="false"/>
+                                    <TextField fx:id="tfExerciseName" promptText="Nom de l'exercice *" styleClass="text-field-modern"/>
+                                    <ComboBox fx:id="cbExerciseMuscleGroup" promptText="Groupe musculaire" styleClass="combo-modern" GridPane.columnIndex="1"/>
+                                    <ComboBox fx:id="cbExerciseDifficulty" promptText="Difficulté" styleClass="combo-modern" GridPane.columnIndex="2"/>
+                                    <TextField fx:id="tfExerciseSets" promptText="Séries" styleClass="text-field-modern" GridPane.columnIndex="3"/>
+                                    <TextField fx:id="tfExerciseRepetitions" promptText="Répétitions" styleClass="text-field-modern" GridPane.rowIndex="1"/>
+                                    <TextField fx:id="tfExerciseDuration" promptText="Durée (min)" styleClass="text-field-modern" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                                    <TextField fx:id="tfExerciseImageUrl" promptText="URL Image" styleClass="text-field-modern" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                                    <TextField fx:id="tfExerciseVideoUrl" promptText="URL Vidéo" styleClass="text-field-modern" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                                    <TextArea fx:id="taExerciseDescription" prefHeight="80.0" promptText="Description" styleClass="text-area-modern" wrapText="true" GridPane.columnSpan="4" GridPane.rowIndex="2"/>
+                                </GridPane>
+
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <Button mnemonicParsing="false" onAction="#ajouterExercise" styleClass="primary-button" text="Ajouter"/>
+                                    <Button mnemonicParsing="false" onAction="#modifierExercise" styleClass="secondary-button" text="Modifier"/>
+                                    <Button mnemonicParsing="false" onAction="#supprimerExercise" styleClass="danger-front-button" text="Supprimer"/>
+                                    <Button mnemonicParsing="false" onAction="#viderFormulaire" styleClass="ghost-button" text="Effacer"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblExerciseStatus" styleClass="planner-status" text="Sélectionnez un exercice pour modifier ou supprimer."/>
+                                </HBox>
+
+                                <!-- Cartes exercices (remplace le tableau) -->
+                                <ScrollPane fitToWidth="true" prefHeight="340.0" styleClass="front-scroll">
+                                    <FlowPane fx:id="exerciseCardsGrid" hgap="14.0" prefWrapLength="1100.0" vgap="14.0"/>
+                                </ScrollPane>
+
+                                <!-- TableView caché, gardé pour la sélection interne -->
+                                <TableView fx:id="tableExercises" managed="false" prefHeight="1.0" visible="false">
+                                    <columns>
+                                        <TableColumn fx:id="colExerciseId" text="ID"/>
+                                        <TableColumn fx:id="colExerciseName" text="Exercise"/>
+                                        <TableColumn fx:id="colExerciseMuscleGroup" text="Muscle group"/>
+                                        <TableColumn fx:id="colExerciseDifficulty" text="Difficulty"/>
+                                        <TableColumn fx:id="colExerciseSets" text="Sets"/>
+                                        <TableColumn fx:id="colExerciseRepetitions" text="Repetitions"/>
+                                        <TableColumn fx:id="colExerciseDuration" text="Duration"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+
+                            <VBox fx:id="plannerCoachContent" managed="false" spacing="16.0" visible="false">
+                                <VBox spacing="6.0">
+                                    <Label styleClass="planner-section-title" text="Coachs Privés"/>
+                                    <Label styleClass="planner-section-subtitle" text="Réservez une séance personnalisée avec l'un de nos 6 coachs certifiés." wrapText="true"/>
+                                </VBox>
+                                <FlowPane fx:id="coachCardsContainer" hgap="16.0" prefWrapLength="1180.0" vgap="16.0"/>
+
+                                <!-- Formulaire de réservation (caché par défaut) -->
+                                <VBox fx:id="coachBookingForm" managed="false" spacing="14.0" visible="false"
+                                      style="-fx-background-color:#f0fdf4;-fx-border-color:#6ee7b7;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:20;">
+
+                                    <!-- En-tête coach -->
+                                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                        <VBox spacing="3.0">
+                                            <Label fx:id="lblBookingCoachName" style="-fx-font-weight:800;-fx-font-size:15px;-fx-text-fill:#0b3a3d;" text="Réserver avec Coach"/>
+                                            <Label fx:id="lblBookingCoachSlots" style="-fx-font-size:11px;-fx-text-fill:#64748b;" text="" wrapText="true"/>
+                                        </VBox>
+                                    </HBox>
+
+                                    <Separator/>
+
+                                    <!-- Infos client -->
+                                    <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Vos informations"/>
+                                    <GridPane hgap="12.0" vgap="10.0">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="50.0"/>
+                                            <ColumnConstraints percentWidth="50.0"/>
+                                        </columnConstraints>
+                                        <TextField fx:id="tfBookingName"  promptText="Nom complet *"  styleClass="text-field-modern"/>
+                                        <TextField fx:id="tfBookingEmail" promptText="Email *"         styleClass="text-field-modern" GridPane.columnIndex="1"/>
+                                        <TextField fx:id="tfBookingPhone" promptText="Téléphone *"     styleClass="text-field-modern" GridPane.rowIndex="1"/>
+                                    </GridPane>
+
+                                    <!-- Créneaux disponibles du coach -->
+                                    <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Choisissez un créneau disponible"/>
+                                    <Label style="-fx-font-size:10px;-fx-text-fill:#64748b;" text="Cliquez sur une date puis sélectionnez l'heure"/>
+                                    <FlowPane fx:id="bookingDateButtons" hgap="8.0" prefWrapLength="900.0" vgap="8.0"/>
+                                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                        <Label style="-fx-font-size:11px;-fx-text-fill:#0b3a3d;-fx-font-weight:600;" text="Heure :"/>
+                                        <ComboBox fx:id="cbBookingSlot" promptText="Sélectionner l'heure" styleClass="combo-modern" prefWidth="200.0"/>
+                                        <Label fx:id="lblSelectedSlot" style="-fx-font-size:11px;-fx-text-fill:#1a6b5a;-fx-font-weight:700;" text=""/>
+                                    </HBox>
+
+                                    <!-- Message -->
+                                    <TextArea fx:id="taBookingMessage" prefHeight="65.0" promptText="Message optionnel (objectifs, niveau, questions...)" styleClass="text-area-modern" wrapText="true"/>
+
+                                    <!-- Actions -->
+                                    <HBox spacing="10.0">
+                                        <Button mnemonicParsing="false" onAction="#confirmerReservationCoach" styleClass="primary-button" text="✓  Confirmer la réservation"/>
+                                        <Button mnemonicParsing="false" onAction="#annulerReservationCoach"   styleClass="ghost-button"   text="Annuler"/>
+                                    </HBox>
+                                    <Label fx:id="lblBookingStatus" style="-fx-font-size:12px;-fx-text-fill:#065f46;" text="" wrapText="true"/>
+                                </VBox>
+                            </VBox>
+                        </VBox>
+
+                        <HBox alignment="CENTER" styleClass="footer-bar">
+                            <Label styleClass="footer-text" text="Fitopia front office mockup - JavaFX interface only"/>
+                        </HBox>
+                    </VBox>
+                </content>
+            </ScrollPane>
+
+            <StackPane fx:id="programModalOverlay" managed="false" visible="false">
+                <Pane onMouseClicked="#closeProgramModal" styleClass="modal-backdrop" StackPane.alignment="CENTER"/>
+                <VBox fx:id="programModalCard" maxWidth="980.0" prefWidth="430.0" spacing="14.0" styleClass="program-modal-card" StackPane.alignment="CENTER">
+                    <HBox alignment="CENTER_LEFT">
+                        <Button mnemonicParsing="false" onAction="#navigateProgramModalBack" styleClass="program-modal-back" text="Retour"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <VBox alignment="CENTER_RIGHT" spacing="4.0">
+                            <Label fx:id="lblProgramModalTitle" styleClass="program-modal-title" text="Ou s'entrainer"/>
+                            <Label fx:id="lblSelectedProgram" styleClass="program-modal-subtitle" text="Programme"/>
+                        </VBox>
+                    </HBox>
+
+                    <VBox fx:id="programLocationStep" spacing="14.0">
+                        <Button mnemonicParsing="false" onAction="#selectTrainingLocation" styleClass="training-option-card gym-card" text="A la salle de sport&#10;Format guide avec equipement et charges progressives." userData="A la salle de sport"/>
+                        <Button mnemonicParsing="false" onAction="#selectTrainingLocation" styleClass="training-option-card home-card" text="A la maison&#10;Version adaptee avec accessoires legers et poids du corps." userData="A la maison"/>
+                    </VBox>
+
+                    <VBox fx:id="programDifficultyStep" managed="false" spacing="14.0" visible="false">
+                        <Button mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card beginner-card" text="Debutant" userData="Debutant"/>
+                        <Button mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card advanced-card" text="Avance" userData="Avance"/>
+                        <Button mnemonicParsing="false" onAction="#selectDifficultyLevel" styleClass="difficulty-card expert-card" text="Expert" userData="Expert"/>
+                    </VBox>
+
+                    <VBox fx:id="programExerciseStep" managed="false" spacing="14.0" visible="false">
+                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                            <Label fx:id="lblSelectionStatus" styleClass="exercise-selection-status" text="Aucun exercice selectionne."/>
+                            <Region HBox.hgrow="ALWAYS"/>
+                            <Button mnemonicParsing="false" onAction="#confirmSelectedExercises" styleClass="exercise-confirm-button" text="Confirmer"/>
+                        </HBox>
+                        <VBox fx:id="exerciseCardsContainer" spacing="12.0"/>
+                        <Label fx:id="lblExerciseEmptyState" managed="false" styleClass="program-empty-state" text="Aucun exercice disponible pour cette combinaison." visible="false"/>
+                    </VBox>
+
+                    <VBox fx:id="programTrainingStep" managed="false" spacing="16.0" visible="false">
+                        <VBox spacing="6.0">
+                            <Label fx:id="lblTrainingExerciseName" styleClass="training-title" text="Exercice"/>
+                            <Label fx:id="lblTrainingExerciseMeta" styleClass="training-subtitle" text="Programme - lieu - niveau"/>
+                        </VBox>
+
+                        <HBox spacing="16.0" styleClass="training-stage-layout">
+                            <VBox spacing="12.0" styleClass="training-video-card" HBox.hgrow="ALWAYS">
+                                <StackPane prefHeight="320.0" styleClass="training-video-shell">
+                                    <MediaView fx:id="trainingMediaView" fitHeight="320.0" fitWidth="520.0" preserveRatio="true"/>
+                                </StackPane>
+                                <Label fx:id="lblTrainingStatus" styleClass="training-status" text="Cliquez sur Start pour lancer la session." wrapText="true"/>
+                            </VBox>
+
+                            <VBox minWidth="280.0" prefWidth="320.0" spacing="14.0" styleClass="training-side-card">
+                                <FlowPane hgap="10.0" vgap="10.0">
+                                    <VBox prefWidth="130.0" spacing="4.0" styleClass="training-stat-card">
+                                        <Label styleClass="training-stat-label" text="Round courant"/>
+                                        <Label fx:id="lblCurrentRound" styleClass="training-stat-value" text="1 / 4"/>
+                                    </VBox>
+                                    <VBox prefWidth="130.0" spacing="4.0" styleClass="training-stat-card">
+                                        <Label styleClass="training-stat-label" text="Temps restant"/>
+                                        <Label fx:id="lblTimeRemaining" styleClass="training-stat-value training-stat-emphasis" text="00:45"/>
+                                    </VBox>
+                                </FlowPane>
+
+                                <VBox spacing="8.0" styleClass="training-playlist-card">
+                                    <Label styleClass="training-panel-title" text="Playlist"/>
+                                    <ListView fx:id="playlistListView" prefHeight="140.0" styleClass="playlist-list"/>
+                                </VBox>
+
+                                <VBox spacing="6.0" styleClass="training-volume-card">
+                                    <Label styleClass="training-panel-title" text="Volume global"/>
+                                    <Slider fx:id="sliderGlobalVolume" majorTickUnit="0.25" max="1.0" min="0.0" minorTickCount="0" showTickLabels="false" showTickMarks="false" value="0.65"/>
+                                </VBox>
+                            </VBox>
+                        </HBox>
+
+                        <VBox spacing="10.0">
+                            <HBox spacing="10.0">
+                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#startTrainingSession" styleClass="training-control-button training-control-button-primary" text="Start" HBox.hgrow="ALWAYS"/>
+                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#pauseTrainingSession" styleClass="training-control-button training-control-button-secondary" text="Pause" HBox.hgrow="ALWAYS"/>
+                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#resetTrainingSession" styleClass="training-control-button training-control-button-secondary" text="Reset" HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                            <HBox spacing="10.0">
+                                <Button fx:id="btnMusicPause" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleMusicPlayback" styleClass="training-control-button training-control-button-secondary" text="Music Pause" HBox.hgrow="ALWAYS"/>
+                                <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#playNextMusicTrack" styleClass="training-control-button training-control-button-secondary" text="Next Music" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnMuteMusic" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleMusicMute" styleClass="training-control-button training-control-button-secondary" text="Mute" HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                            <HBox spacing="10.0">
+                                <Button fx:id="btnCoachIa" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleCoachIa" styleClass="training-control-button training-control-button-secondary training-control-button-wide" text="Coach IA On" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="btnNextExercise" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openNextExercise" styleClass="training-control-button training-control-button-secondary training-control-button-wide" text="Exercice suivant" HBox.hgrow="ALWAYS"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </VBox>
+            </StackPane>
+        </StackPane>
+    </center>
+</BorderPane>

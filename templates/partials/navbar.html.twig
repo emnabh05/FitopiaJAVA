@@ -48,6 +48,9 @@
               Explore our fitness planner
             </a>
           {% endif %}
+          <a href="{{ path('coaches') }}" class="btn btn-outline-primary btn-sm px-4 mr-2">
+            Coachs Privés
+          </a>
           {% if app.user %}
             <a href="{{ path('events') }}" class="btn btn-outline-primary btn-sm px-4 mr-2" id="events-btn">
               Explore our events
