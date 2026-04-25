@@ -370,12 +370,7 @@
 
             <StackPane fx:id="programModalOverlay" managed="false" visible="false">
                 <Pane onMouseClicked="#closeProgramModal" styleClass="modal-backdrop" StackPane.alignment="CENTER"/>
-                <ScrollPane fitToWidth="true" maxHeight="880.0" maxWidth="980.0" prefWidth="430.0"
-                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                            styleClass="front-scroll"
-                            style="-fx-background-color:#fff;-fx-background-radius:26;-fx-border-radius:26;-fx-effect:dropshadow(gaussian,rgba(18,37,41,0.24),34,0.2,0,12);"
-                            StackPane.alignment="CENTER">
-                <VBox fx:id="programModalCard" maxWidth="980.0" prefWidth="430.0" spacing="14.0" styleClass="program-modal-card" style="-fx-effect:none;">
+                <VBox fx:id="programModalCard" maxWidth="980.0" prefWidth="430.0" spacing="14.0" styleClass="program-modal-card" StackPane.alignment="CENTER">
                     <HBox alignment="CENTER_LEFT">
                         <Button mnemonicParsing="false" onAction="#navigateProgramModalBack" styleClass="program-modal-back" text="Retour"/>
                         <Region HBox.hgrow="ALWAYS"/>
@@ -464,7 +459,6 @@
                         </VBox>
                     </VBox>
                 </VBox>
-                </ScrollPane>
             </StackPane>
 
             <!-- ── Feature 2 : Calculateur IMC ── -->
