@@ -1,2 +1,0 @@
-﻿Non-functional note 5
-Updated on 2026-04-18 to complete a sequence of no-op maintenance pushes.

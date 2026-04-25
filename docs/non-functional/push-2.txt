@@ -1,2 +1,0 @@
-﻿Non-functional note 2
-Updated on 2026-04-18 to modify the maintenance wording only, with no runtime impact.
