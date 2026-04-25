@@ -146,44 +146,104 @@
                             <VBox fx:id="plannerCrudContent" managed="false" spacing="18.0" visible="false">
                                 <GridPane hgap="14.0" vgap="14.0">
                                     <columnConstraints>
-                                        <ColumnConstraints percentWidth="20.0"/>
-                                        <ColumnConstraints percentWidth="20.0"/>
-                                        <ColumnConstraints percentWidth="20.0"/>
-                                        <ColumnConstraints percentWidth="20.0"/>
-                                        <ColumnConstraints percentWidth="20.0"/>
+                                        <ColumnConstraints percentWidth="25.0"/>
+                                        <ColumnConstraints percentWidth="25.0"/>
+                                        <ColumnConstraints percentWidth="25.0"/>
+                                        <ColumnConstraints percentWidth="25.0"/>
                                     </columnConstraints>
                                     <TextField fx:id="tfExerciseId" editable="false" managed="false" promptText="ID" visible="false"/>
-                                    <TextField fx:id="tfExerciseName" promptText="Exercise name" styleClass="text-field-modern"/>
-                                    <ComboBox fx:id="cbExerciseMuscleGroup" promptText="Muscle group" styleClass="combo-modern" GridPane.columnIndex="1"/>
-                                    <ComboBox fx:id="cbExerciseDifficulty" promptText="Difficulty..." styleClass="combo-modern" GridPane.columnIndex="2"/>
-                                    <TextField fx:id="tfExerciseSets" promptText="Sets" styleClass="text-field-modern" GridPane.columnIndex="3"/>
-                                    <TextField fx:id="tfExerciseRepetitions" promptText="Repetitions" styleClass="text-field-modern" GridPane.columnIndex="4"/>
-                                    <TextField fx:id="tfExerciseDuration" promptText="Duration (min)" styleClass="text-field-modern" GridPane.rowIndex="1"/>
-                                    <TextField fx:id="tfExerciseImageUrl" promptText="Image URL" styleClass="text-field-modern" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                                    <TextField fx:id="tfExerciseVideoUrl" promptText="Video URL" styleClass="text-field-modern" GridPane.columnIndex="2" GridPane.rowIndex="1" GridPane.columnSpan="3"/>
-                                    <TextArea fx:id="taExerciseDescription" prefHeight="110.0" promptText="Description" styleClass="text-area-modern" wrapText="true" GridPane.columnSpan="5" GridPane.rowIndex="2"/>
+                                    <TextField fx:id="tfExerciseName" promptText="Nom de l'exercice *" styleClass="text-field-modern"/>
+                                    <ComboBox fx:id="cbExerciseMuscleGroup" promptText="Groupe musculaire" styleClass="combo-modern" GridPane.columnIndex="1"/>
+                                    <ComboBox fx:id="cbExerciseDifficulty" promptText="Difficulté" styleClass="combo-modern" GridPane.columnIndex="2"/>
+                                    <TextField fx:id="tfExerciseSets" promptText="Séries" styleClass="text-field-modern" GridPane.columnIndex="3"/>
+                                    <TextField fx:id="tfExerciseRepetitions" promptText="Répétitions" styleClass="text-field-modern" GridPane.rowIndex="1"/>
+                                    <TextField fx:id="tfExerciseDuration" promptText="Durée (min)" styleClass="text-field-modern" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                                    <TextField fx:id="tfExerciseImageUrl" promptText="URL Image" styleClass="text-field-modern" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                                    <TextField fx:id="tfExerciseVideoUrl" promptText="URL Vidéo" styleClass="text-field-modern" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                                    <TextArea fx:id="taExerciseDescription" prefHeight="80.0" promptText="Description" styleClass="text-area-modern" wrapText="true" GridPane.columnSpan="4" GridPane.rowIndex="2"/>
                                 </GridPane>
 
                                 <HBox alignment="CENTER_LEFT" spacing="12.0">
-                                    <Button mnemonicParsing="false" onAction="#ajouterExercise" styleClass="primary-button" text="Create Exercise"/>
-                                    <Button mnemonicParsing="false" onAction="#modifierExercise" styleClass="secondary-button" text="Update Exercise"/>
-                                    <Button mnemonicParsing="false" onAction="#supprimerExercise" styleClass="danger-front-button" text="Delete Exercise"/>
-                                    <Button mnemonicParsing="false" onAction="#viderFormulaire" styleClass="ghost-button" text="Clear"/>
+                                    <Button mnemonicParsing="false" onAction="#ajouterExercise" styleClass="primary-button" text="Ajouter"/>
+                                    <Button mnemonicParsing="false" onAction="#modifierExercise" styleClass="secondary-button" text="Modifier"/>
+                                    <Button mnemonicParsing="false" onAction="#supprimerExercise" styleClass="danger-front-button" text="Supprimer"/>
+                                    <Button mnemonicParsing="false" onAction="#viderFormulaire" styleClass="ghost-button" text="Effacer"/>
                                     <Region HBox.hgrow="ALWAYS"/>
-                                    <Label fx:id="lblExerciseStatus" styleClass="planner-status" text="Selectionnez un exercice pour modifier ou supprimer."/>
+                                    <Label fx:id="lblExerciseStatus" styleClass="planner-status" text="Sélectionnez un exercice pour modifier ou supprimer."/>
                                 </HBox>
 
-                                <TableView fx:id="tableExercises" prefHeight="300.0" styleClass="planner-table">
+                                <!-- Cartes exercices (remplace le tableau) -->
+                                <ScrollPane fitToWidth="true" prefHeight="340.0" styleClass="front-scroll">
+                                    <FlowPane fx:id="exerciseCardsGrid" hgap="14.0" prefWrapLength="1100.0" vgap="14.0"/>
+                                </ScrollPane>
+
+                                <!-- TableView caché, gardé pour la sélection interne -->
+                                <TableView fx:id="tableExercises" managed="false" prefHeight="1.0" visible="false">
                                     <columns>
-                                        <TableColumn fx:id="colExerciseId" prefWidth="70.0" text="ID"/>
-                                        <TableColumn fx:id="colExerciseName" prefWidth="180.0" text="Exercise"/>
-                                        <TableColumn fx:id="colExerciseMuscleGroup" prefWidth="150.0" text="Muscle group"/>
-                                        <TableColumn fx:id="colExerciseDifficulty" prefWidth="130.0" text="Difficulty"/>
-                                        <TableColumn fx:id="colExerciseSets" prefWidth="90.0" text="Sets"/>
-                                        <TableColumn fx:id="colExerciseRepetitions" prefWidth="110.0" text="Repetitions"/>
-                                        <TableColumn fx:id="colExerciseDuration" prefWidth="120.0" text="Duration"/>
+                                        <TableColumn fx:id="colExerciseId" text="ID"/>
+                                        <TableColumn fx:id="colExerciseName" text="Exercise"/>
+                                        <TableColumn fx:id="colExerciseMuscleGroup" text="Muscle group"/>
+                                        <TableColumn fx:id="colExerciseDifficulty" text="Difficulty"/>
+                                        <TableColumn fx:id="colExerciseSets" text="Sets"/>
+                                        <TableColumn fx:id="colExerciseRepetitions" text="Repetitions"/>
+                                        <TableColumn fx:id="colExerciseDuration" text="Duration"/>
                                     </columns>
                                 </TableView>
+                            </VBox>
+
+                            <VBox fx:id="plannerCoachContent" managed="false" spacing="16.0" visible="false">
+                                <VBox spacing="6.0">
+                                    <Label styleClass="planner-section-title" text="Coachs Privés"/>
+                                    <Label styleClass="planner-section-subtitle" text="Réservez une séance personnalisée avec l'un de nos 6 coachs certifiés." wrapText="true"/>
+                                </VBox>
+                                <FlowPane fx:id="coachCardsContainer" hgap="16.0" prefWrapLength="1180.0" vgap="16.0"/>
+
+                                <!-- Formulaire de réservation (caché par défaut) -->
+                                <VBox fx:id="coachBookingForm" managed="false" spacing="14.0" visible="false"
+                                      style="-fx-background-color:#f0fdf4;-fx-border-color:#6ee7b7;-fx-border-radius:12;-fx-background-radius:12;-fx-padding:20;">
+
+                                    <!-- En-tête coach -->
+                                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                        <VBox spacing="3.0">
+                                            <Label fx:id="lblBookingCoachName" style="-fx-font-weight:800;-fx-font-size:15px;-fx-text-fill:#0b3a3d;" text="Réserver avec Coach"/>
+                                            <Label fx:id="lblBookingCoachSlots" style="-fx-font-size:11px;-fx-text-fill:#64748b;" text="" wrapText="true"/>
+                                        </VBox>
+                                    </HBox>
+
+                                    <Separator/>
+
+                                    <!-- Infos client -->
+                                    <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Vos informations"/>
+                                    <GridPane hgap="12.0" vgap="10.0">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="50.0"/>
+                                            <ColumnConstraints percentWidth="50.0"/>
+                                        </columnConstraints>
+                                        <TextField fx:id="tfBookingName"  promptText="Nom complet *"  styleClass="text-field-modern"/>
+                                        <TextField fx:id="tfBookingEmail" promptText="Email *"         styleClass="text-field-modern" GridPane.columnIndex="1"/>
+                                        <TextField fx:id="tfBookingPhone" promptText="Téléphone *"     styleClass="text-field-modern" GridPane.rowIndex="1"/>
+                                    </GridPane>
+
+                                    <!-- Créneaux disponibles du coach -->
+                                    <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Choisissez un créneau disponible"/>
+                                    <Label style="-fx-font-size:10px;-fx-text-fill:#64748b;" text="Cliquez sur une date puis sélectionnez l'heure"/>
+                                    <FlowPane fx:id="bookingDateButtons" hgap="8.0" prefWrapLength="900.0" vgap="8.0"/>
+                                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                                        <Label style="-fx-font-size:11px;-fx-text-fill:#0b3a3d;-fx-font-weight:600;" text="Heure :"/>
+                                        <ComboBox fx:id="cbBookingSlot" promptText="Sélectionner l'heure" styleClass="combo-modern" prefWidth="200.0"/>
+                                        <Label fx:id="lblSelectedSlot" style="-fx-font-size:11px;-fx-text-fill:#1a6b5a;-fx-font-weight:700;" text=""/>
+                                    </HBox>
+
+                                    <!-- Message -->
+                                    <TextArea fx:id="taBookingMessage" prefHeight="65.0" promptText="Message optionnel (objectifs, niveau, questions...)" styleClass="text-area-modern" wrapText="true"/>
+
+                                    <!-- Actions -->
+                                    <HBox spacing="10.0">
+                                        <Button mnemonicParsing="false" onAction="#confirmerReservationCoach" styleClass="primary-button" text="✓  Confirmer la réservation"/>
+                                        <Button mnemonicParsing="false" onAction="#annulerReservationCoach"   styleClass="ghost-button"   text="Annuler"/>
+                                    </HBox>
+                                    <Label fx:id="lblBookingStatus" style="-fx-font-size:12px;-fx-text-fill:#065f46;" text="" wrapText="true"/>
+                                </VBox>
                             </VBox>
                         </VBox>
 
