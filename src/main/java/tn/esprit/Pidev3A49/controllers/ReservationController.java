@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.models.Event;
 import tn.esprit.Pidev3A49.models.Participation;
 import tn.esprit.Pidev3A49.models.Reservation;
+import tn.esprit.Pidev3A49.service.EventService;
 import tn.esprit.Pidev3A49.service.ParticipationService;
 import tn.esprit.Pidev3A49.service.ReservationService;
 import tn.esprit.Pidev3A49.utils.MyDataBase;
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class ReservationController {
 
@@ -38,6 +40,7 @@ public class ReservationController {
     @FXML private Label eventLocationLabel;
     @FXML private Label eventPriceLabel;
     @FXML private Label eventSeatsLabel;
+    @FXML private Label eventPremiumLabel;
     @FXML private TextArea eventDescriptionArea;
 
     @FXML private Label formSubtitleLabel;
@@ -52,13 +55,25 @@ public class ReservationController {
 
     private final ReservationService reservationService = new ReservationService();
     private final ParticipationService participationService = new ParticipationService();
+    private final EventService eventService = new EventService();
 
     private Event event;
     private int remainingPlaces;
+    private Consumer<String> onReservationSaved;
 
     public void setEvent(Event event, int remainingPlaces) {
         this.event = event;
         this.remainingPlaces = remainingPlaces;
+        renderEvent();
+    }
+
+    public void setContext(Event event, int remainingPlaces, String initialEmail, Consumer<String> onReservationSaved) {
+        this.event = event;
+        this.remainingPlaces = remainingPlaces;
+        this.onReservationSaved = onReservationSaved;
+        if (emailField != null && initialEmail != null && !initialEmail.isBlank()) {
+            emailField.setText(initialEmail);
+        }
         renderEvent();
     }
 
@@ -76,7 +91,11 @@ public class ReservationController {
             String firstName = requireText(firstNameField.getText(), "Le prenom est obligatoire.");
             String fullParticipantName = (lastName + " " + firstName).trim();
             String email = requireEmail(emailField.getText());
-            String initialStatus = remainingPlaces > 0 ? "confirmee" : "en_attente";
+            eventService.ensureCanReserve(event, email);
+            if (remainingPlaces <= 0) {
+                throw new IllegalArgumentException("Il n'y a plus de places disponibles pour cet evenement.");
+            }
+            String initialStatus = "confirmee";
 
             connection = MyDataBase.getInstance().getConnection();
             previousAutoCommit = connection.getAutoCommit();
@@ -103,6 +122,9 @@ public class ReservationController {
             );
 
             showConfirmation(reservation.getStatut());
+            if (onReservationSaved != null) {
+                onReservationSaved.accept(email);
+            }
             closeWindow();
 
         } catch (IllegalArgumentException e) {
@@ -172,23 +194,21 @@ public class ReservationController {
         eventLocationLabel.setText(nullSafe(event.getLieu()));
         eventPriceLabel.setText(formatPrice(event.getPrixEvent()));
         eventSeatsLabel.setText(String.valueOf(Math.max(0, remainingPlaces)));
+        if (eventPremiumLabel != null) {
+            eventPremiumLabel.setText(event.isPremium() ? "Premium - reserve VIP" : "Standard");
+            eventPremiumLabel.getStyleClass().removeAll("reservation-premium-chip", "reservation-status-chip");
+            eventPremiumLabel.getStyleClass().add(event.isPremium() ? "reservation-premium-chip" : "reservation-status-chip");
+        }
 
         eventDescriptionArea.setText(buildDescription());
 
         bookingAmountLabel.setText(formatPrice(event.getPrixEvent()));
-        bookingStatusLabel.setText(remainingPlaces > 0 ? "confirmee" : "en_attente");
-
-        formSubtitleLabel.setText(
-                remainingPlaces > 0
-                        ? "Complete your details to confirm this booking."
-                        : "This event is full. You can still join the waitlist with your details."
-        );
-
-        confirmButton.setText(
-                remainingPlaces > 0
-                        ? "CONFIRMER MA RESERVATION"
-                        : "REJOINDRE LA WAITLIST"
-        );
+        bookingStatusLabel.setText("confirmee");
+        formSubtitleLabel.setText(event.isPremium()
+                ? "Evenement Premium: seuls les clients VIP peuvent confirmer cette reservation."
+                : "Complete your details to confirm this booking.");
+        confirmButton.setText(event.isPremium() ? "CONFIRMER EN TANT QUE VIP" : "CONFIRMER MA RESERVATION");
+        confirmButton.setDisable(remainingPlaces <= 0);
 
         addEventImageIfPossible();
     }
@@ -228,7 +248,7 @@ public class ReservationController {
     private String buildDescription() {
         String description = event.getDescription();
         if (description == null || description.isBlank()) {
-            return "This wellness experience is ready for booking. You can confirm your reservation now and complete advanced flows later.";
+            return "This wellness experience is ready for booking. You can confirm your reservation now.";
         }
         return description.trim();
     }

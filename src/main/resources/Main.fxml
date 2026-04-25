@@ -2,8 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -121,19 +121,6 @@
                                               styleClass="submenu-container submenu-container-nested"
                                               visible="true">
                                             <children>
-                                                <Button disable="true"
-                                                        focusTraversable="false"
-                                                        maxWidth="1.7976931348623157E308"
-                                                        mnemonicParsing="false"
-                                                        styleClass="nav-button submenu-button sidebar-link-button submenu-button-nested nav-button-muted"
-                                                        text="🏆 Fidelite clients"/>
-
-                                                <Button disable="true"
-                                                        focusTraversable="false"
-                                                        maxWidth="1.7976931348623157E308"
-                                                        mnemonicParsing="false"
-                                                        styleClass="nav-button submenu-button sidebar-link-button submenu-button-nested nav-button-muted"
-                                                        text="⌁ Check-in QR"/>
                                             </children>
                                         </VBox>
 
@@ -159,6 +146,12 @@
                                         onAction="#showParticipantsSection"
                                         styleClass="nav-button sidebar-link-button"
                                         text="🧾 Participation"/>
+                                <Button fx:id="loyaltyNavButton"
+                                        maxWidth="1.7976931348623157E308"
+                                        mnemonicParsing="false"
+                                        onAction="#showLoyaltySection"
+                                        styleClass="nav-button sidebar-link-button"
+                                        text="Fidelite clients"/>
                             </children>
                         </VBox>
 
@@ -261,14 +254,15 @@
                                     </children>
                                 </VBox>
 
-                                <VBox minWidth="185.0" prefWidth="190.0" spacing="6.0" styleClass="stat-card">
+                                <VBox minWidth="185.0" prefWidth="190.0" spacing="6.0" styleClass="stat-card loyalty-highlight-card">
                                     <children>
                                         <Label text="04" styleClass="stat-kicker"/>
-                                        <Label text="Premium Events" styleClass="stat-title"/>
-                                        <Label fx:id="premiumEventsLabel" text="0" styleClass="stat-value"/>
-                                        <Label text="Evenements premium actuellement disponibles." styleClass="stat-caption"/>
+                                        <Label text="Clients Fidelite" styleClass="stat-title"/>
+                                        <Label fx:id="loyaltyClientCountLabel" text="0" styleClass="stat-value"/>
+                                        <Label text="Clients avec reservations confirmees ou utilisees." styleClass="stat-caption"/>
                                     </children>
                                 </VBox>
+
                             </children>
                         </FlowPane>
 
@@ -285,6 +279,12 @@
                                         onAction="#showParticipantsSection"
                                         styleClass="workspace-button"
                                         text="Liste des Participants"/>
+
+                                <Button fx:id="loyaltyWorkspaceButton"
+                                        mnemonicParsing="false"
+                                        onAction="#showLoyaltySection"
+                                        styleClass="workspace-button"
+                                        text="Fidelite Clients"/>
                             </children>
                         </HBox>
 
@@ -349,7 +349,7 @@
                                                         <Label text="🗓 8 events" styleClass="events-intro-chip"/>
                                                         <Label text="👤 27 participants" styleClass="events-intro-chip"/>
                                                         <Label text="❕ 3 full events" styleClass="events-intro-chip"/>
-                                                        <Label text="★ 1 premium" styleClass="events-intro-chip"/>
+                                                        <Label text="🗓 CRUD simple" styleClass="events-intro-chip"/>
                                                     </children>
                                                 </HBox>
                                             </children>
@@ -532,14 +532,13 @@
 
                                                                 <VBox spacing="6.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                                                                     <children>
-                                                                        <Label text="Premium" styleClass="form-label"/>
-                                                                        <HBox alignment="CENTER_LEFT" prefHeight="40.0" styleClass="premium-box">
-                                                                            <children>
-                                                                                <CheckBox fx:id="premiumCheckBox" text="Evenement premium"/>
-                                                                            </children>
-                                                                        </HBox>
+                                                                        <Label text="Acces" styleClass="form-label"/>
+                                                                        <CheckBox fx:id="premiumEventCheckBox"
+                                                                                  text="Premium - reserve VIP"
+                                                                                  styleClass="premium-box"/>
                                                                     </children>
                                                                 </VBox>
+
 
                                                                 <VBox spacing="6.0" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="4">
                                                                     <children>
@@ -663,6 +662,16 @@
                                                                         text="Refresh"/>
 
                                                                 <Button mnemonicParsing="false"
+                                                                        onAction="#openWaitlistAdminWindow"
+                                                                        styleClass="toolbar-button toolbar-button-strong"
+                                                                        text="Waitlist"/>
+
+                                                                <Button mnemonicParsing="false"
+                                                                        onAction="#openEventStatsWindow"
+                                                                        styleClass="toolbar-button toolbar-button-strong"
+                                                                        text="Analyse des evenements"/>
+
+                                                                <Button mnemonicParsing="false"
                                                                         onAction="#exportPdfPlaceholder"
                                                                         styleClass="toolbar-button toolbar-button-export"
                                                                         text="Export PDF"/>
@@ -679,9 +688,8 @@
                                                                 <TableColumn fx:id="resActivesColumn" prefWidth="95.0" text="Res. actives"/>
                                                                 <TableColumn fx:id="capaciteColumn" prefWidth="90.0" text="Capacity"/>
                                                                 <TableColumn fx:id="restantesColumn" prefWidth="90.0" text="Restantes"/>
-                                                                <TableColumn fx:id="waitlistColumn" prefWidth="90.0" text="Waitlist"/>
-                                                                <TableColumn fx:id="premiumColumn" prefWidth="80.0" text="Premium"/>
                                                                 <TableColumn fx:id="etatColumn" prefWidth="90.0" text="Etat"/>
+                                                                <TableColumn fx:id="premiumColumn" prefWidth="100.0" text="Premium"/>
                                                                 <TableColumn fx:id="prixColumn" prefWidth="85.0" text="Price"/>
                                                                 <TableColumn fx:id="descriptionColumn" prefWidth="180.0" text="Description"/>
                                                                 <TableColumn fx:id="imageEventColumn" prefWidth="140.0" text="Image"/>
@@ -701,27 +709,65 @@
                                             <children>
                                                 <VBox spacing="3.0">
                                                     <children>
-                                                        <Label text="Liste des Participants" styleClass="panel-title panel-title-icon"/>
-                                                        <Label text="Section de consultation des participations liees aux evenements avec recherche et tri simples."
+                                                        <Label text="Liste des participants" styleClass="panel-title panel-title-icon"/>
+                                                        <Label text="Suivi des inscriptions avec recherche, filtres avancés et actions rapides."
                                                                styleClass="panel-subtitle"/>
                                                     </children>
                                                 </VBox>
                                                 <Region HBox.hgrow="ALWAYS"/>
-                                                <Label text="Sort: ID DESC" styleClass="toolbar-chip"/>
+                                                <Label text="Back-office Fitopia" styleClass="toolbar-chip"/>
                                             </children>
                                         </HBox>
 
-                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar-row">
+                                        <HBox spacing="10.0" styleClass="participants-stats-row">
+                                            <children>
+                                                <VBox spacing="4.0" styleClass="participants-stat-card">
+                                                    <children>
+                                                        <Label text="Total participants" styleClass="participants-stat-title"/>
+                                                        <Label fx:id="participantsTotalCountLabel" text="0" styleClass="participants-stat-value"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox spacing="4.0" styleClass="participants-stat-card participants-stat-card-confirmed">
+                                                    <children>
+                                                        <Label text="Confirmes" styleClass="participants-stat-title"/>
+                                                        <Label fx:id="participantsConfirmedCountLabel" text="0" styleClass="participants-stat-value"/>
+                                                    </children>
+                                                </VBox>
+                                                <VBox spacing="4.0" styleClass="participants-stat-card participants-stat-card-cancelled">
+                                                    <children>
+                                                        <Label text="Annules" styleClass="participants-stat-title"/>
+                                                        <Label fx:id="participantsCancelledCountLabel" text="0" styleClass="participants-stat-value"/>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar-row participants-filter-row">
                                             <children>
                                                 <TextField fx:id="participantSearchField"
-                                                           promptText="Search by name, email or event..."
+                                                           promptText="Rechercher par nom, email ou evenement..."
                                                            styleClass="search-field"
                                                            HBox.hgrow="ALWAYS"/>
 
+                                                <ComboBox fx:id="participantEventFilterCombo"
+                                                          prefWidth="220.0"
+                                                          promptText="Filtrer par evenement"
+                                                          styleClass="search-field"/>
+
+                                                <ComboBox fx:id="participantStatusFilterCombo"
+                                                          prefWidth="150.0"
+                                                          promptText="Statut"
+                                                          styleClass="search-field"/>
+
+                                                <TextField fx:id="participantEmailFilterField"
+                                                           prefWidth="220.0"
+                                                           promptText="Filtrer par email"
+                                                           styleClass="search-field"/>
+
                                                 <Button mnemonicParsing="false"
                                                         onAction="#applyParticipantFilter"
-                                                        styleClass="toolbar-button"
-                                                        text="Filter"/>
+                                                        styleClass="toolbar-button toolbar-button-strong"
+                                                        text="Filtrer"/>
 
                                                 <Button mnemonicParsing="false"
                                                         onAction="#resetParticipantFilter"
@@ -802,13 +848,62 @@
                                             </children>
                                         </GridPane>
 
-                                        <TableView fx:id="participationTable" prefHeight="540.0" styleClass="event-table" VBox.vgrow="ALWAYS">
+                                        <TableView fx:id="participationTable"
+                                                   minHeight="620.0"
+                                                   prefHeight="700.0"
+                                                   maxWidth="1.7976931348623157E308"
+                                                   styleClass="event-table participants-table"
+                                                   VBox.vgrow="ALWAYS">
                                             <columns>
-                                                <TableColumn fx:id="participationIdColumn" prefWidth="110.0" text="ID Participation"/>
-                                                <TableColumn fx:id="nomParticipantColumn" prefWidth="180.0" text="Nom"/>
+                                                <TableColumn fx:id="participationIdColumn" prefWidth="95.0" text="ID"/>
+                                                <TableColumn fx:id="nomParticipantColumn" prefWidth="175.0" text="Nom participant"/>
                                                 <TableColumn fx:id="emailParticipantColumn" prefWidth="220.0" text="Email"/>
-                                                <TableColumn fx:id="dateInscriptionColumn" prefWidth="180.0" text="Date d'inscription"/>
-                                                <TableColumn fx:id="evenementParticipationColumn" prefWidth="220.0" text="Evenement"/>
+                                                <TableColumn fx:id="evenementParticipationColumn" prefWidth="210.0" text="Evenement"/>
+                                                <TableColumn fx:id="dateInscriptionColumn" prefWidth="175.0" text="Date inscription"/>
+                                                <TableColumn fx:id="participantStatusColumn" prefWidth="140.0" text="Statut"/>
+                                                <TableColumn fx:id="participantActionColumn" prefWidth="180.0" text="Action"/>
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                </VBox>
+
+                                <VBox fx:id="loyaltySection" managed="false" spacing="14.0" styleClass="panel-card loyalty-panel-admin" visible="false">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="panel-header-row">
+                                            <children>
+                                                <VBox spacing="3.0">
+                                                    <children>
+                                                        <Label text="Fidelite Clients" styleClass="panel-title panel-title-icon"/>
+                                                        <Label text="Vue consolidee des clients selon leurs reservations confirmees/utilisees, depenses et acces VIP."
+                                                               styleClass="panel-subtitle"/>
+                                                    </children>
+                                                </VBox>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Label text="Scoring dynamique" styleClass="toolbar-chip"/>
+                                            </children>
+                                        </HBox>
+
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar-row">
+                                            <children>
+                                                <Label text="Le tier est calcule dynamiquement a partir des reservations confirmees/utilisees." styleClass="panel-subtitle"/>
+                                                <Region HBox.hgrow="ALWAYS"/>
+                                                <Button mnemonicParsing="false"
+                                                        onAction="#refreshLoyalty"
+                                                        styleClass="toolbar-button toolbar-button-strong"
+                                                        text="Refresh"/>
+                                            </children>
+                                        </HBox>
+
+                                        <TableView fx:id="loyaltyTable" prefHeight="560.0" styleClass="event-table loyalty-table" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="loyaltyEmailColumn" prefWidth="220.0" text="Email"/>
+                                                <TableColumn fx:id="loyaltyNameColumn" prefWidth="180.0" text="Nom participant"/>
+                                                <TableColumn fx:id="loyaltyReservationsColumn" prefWidth="140.0" text="Reservations"/>
+                                                <TableColumn fx:id="loyaltySpentColumn" prefWidth="120.0" text="Total depense"/>
+                                                <TableColumn fx:id="loyaltyLastPurchaseColumn" prefWidth="170.0" text="Dernier achat"/>
+                                                <TableColumn fx:id="loyaltyTierColumn" prefWidth="100.0" text="Tier"/>
+                                                <TableColumn fx:id="loyaltyScoreColumn" prefWidth="90.0" text="Score"/>
+                                                <TableColumn fx:id="loyaltyVipColumn" prefWidth="90.0" text="VIP"/>
                                             </columns>
                                         </TableView>
                                     </children>

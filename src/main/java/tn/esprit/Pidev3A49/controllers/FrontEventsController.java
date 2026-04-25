@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -25,9 +26,17 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tn.esprit.Pidev3A49.models.Event;
+import tn.esprit.Pidev3A49.models.LoyaltyStatus;
 import tn.esprit.Pidev3A49.models.Participation;
+import tn.esprit.Pidev3A49.models.RecommendationResult;
 import tn.esprit.Pidev3A49.service.EventService;
+import tn.esprit.Pidev3A49.service.FavoriteService;
+import tn.esprit.Pidev3A49.service.LoyaltyService;
 import tn.esprit.Pidev3A49.service.ParticipationService;
+import tn.esprit.Pidev3A49.service.RecommendationService;
+import tn.esprit.Pidev3A49.service.ReservationService;
+import tn.esprit.Pidev3A49.service.ReviewService;
+import tn.esprit.Pidev3A49.service.WaitlistService;
 
 import java.io.File;
 import java.net.URL;
@@ -61,40 +70,99 @@ public class FrontEventsController implements Initializable {
     @FXML private Label resultCountLabel;
     @FXML private Label heroTotalEventsLabel;
     @FXML private Label heroOpenEventsLabel;
-    @FXML private Label heroPremiumEventsLabel;
+    @FXML private Label heroFavoriteEventsLabel;
+    @FXML private Label favoriteCountLabel;
+    @FXML private Label recommendationCountLabel;
+    @FXML private Label loyaltyTierLabel;
+    @FXML private Label loyaltyReservationsLabel;
+    @FXML private Label loyaltySpentLabel;
+    @FXML private Label loyaltyProgressLabel;
+    @FXML private Label loyaltyAccessLabel;
+    @FXML private Label loyaltyBenefitsLabel;
+    @FXML private Label loyaltyScoreLabel;
+    @FXML private Label loyaltyIdentityLabel;
 
+    @FXML private TextField currentUserEmailField;
     @FXML private TextField searchField;
     @FXML private ComboBox<String> categoryFilter;
     @FXML private DatePicker dateFilter;
     @FXML private ComboBox<String> priceFilter;
     @FXML private ComboBox<String> sortFilter;
+    @FXML private ProgressBar loyaltyProgressBar;
 
     @FXML private FlowPane cardsContainer;
+    @FXML private FlowPane recommendationCardsContainer;
+    @FXML private FlowPane favoriteCardsContainer;
+    @FXML private StackPane recommendationsEmptyStateBox;
+    @FXML private StackPane favoritesEmptyStateBox;
     @FXML private StackPane emptyStateBox;
     @FXML private VBox eventsSectionAnchor;
+    @FXML private VBox favoritesSectionAnchor;
 
     private final EventService eventService = new EventService();
     private final ParticipationService participationService = new ParticipationService();
+    private final FavoriteService favoriteService = new FavoriteService();
+    private final ReviewService reviewService = new ReviewService();
+    private final RecommendationService recommendationService = new RecommendationService();
+    private final LoyaltyService loyaltyService = new LoyaltyService();
+    private final ReservationService reservationService = new ReservationService();
+    private final WaitlistService waitlistService = new WaitlistService();
 
     private final List<Event> allEvents = new ArrayList<>();
     private final List<Event> currentFilteredEvents = new ArrayList<>();
+    private final List<RecommendationResult> recommendationResults = new ArrayList<>();
     private final Map<Integer, Long> participationCountByEvent = new HashMap<>();
+    private final Map<Integer, Long> validReservationCountByEvent = new HashMap<>();
+    private final Map<Integer, Integer> favoriteCountByEvent = new HashMap<>();
+    private final Map<Integer, Double> averageRatingByEvent = new HashMap<>();
+    private final Map<Integer, Integer> reviewCountByEvent = new HashMap<>();
+    private final Map<Integer, Integer> waitlistCountByEvent = new HashMap<>();
     private final Set<Integer> favoriteEventIds = new HashSet<>();
+    private final Set<Integer> waitlistedEventIds = new HashSet<>();
+    private boolean favoritesOnlyMode = false;
+    private LoyaltyStatus currentLoyaltyStatus;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         configureFilters();
+        currentUserEmailField.setText("client@fitopia.tn");
+        currentUserEmailField.textProperty().addListener((observable, oldValue, newValue) -> {
+            refreshFavoriteData();
+            refreshReviewData();
+            refreshWaitlistData();
+            refreshLoyaltyStatus();
+            refreshRecommendations();
+            applyFilters();
+        });
         loadData();
     }
 
     @FXML
     private void resetFilters() {
+        favoritesOnlyMode = false;
         searchField.clear();
         categoryFilter.getSelectionModel().selectFirst();
         dateFilter.setValue(null);
         priceFilter.getSelectionModel().selectFirst();
         sortFilter.getSelectionModel().selectFirst();
         applyFilters();
+    }
+
+    @FXML
+    private void showAllEvents() {
+        favoritesOnlyMode = false;
+        applyFilters();
+    }
+
+    @FXML
+    private void showFavoriteEvents() {
+        favoritesOnlyMode = true;
+        applyFilters();
+        Platform.runLater(() -> {
+            if (favoritesSectionAnchor != null) {
+                favoritesSectionAnchor.requestFocus();
+            }
+        });
     }
 
     @FXML
@@ -120,6 +188,34 @@ public class FrontEventsController implements Initializable {
         });
     }
 
+    @FXML
+    private void openReservationHistoryView() {
+        try {
+            String email = requireCurrentUserEmail();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ReservationHistoryView.fxml"));
+            Parent root = loader.load();
+
+            ReservationHistoryController controller = loader.getController();
+            controller.loadHistory(email);
+
+            Scene scene = new Scene(root, 1200, 760);
+            scene.getStylesheets().add(getClass().getResource("/styles/front-events.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - Mes reservations");
+            stage.setScene(scene);
+            stage.setMinWidth(1020);
+            stage.setMinHeight(700);
+            stage.setOnHidden(windowEvent -> loadData());
+            stage.show();
+        } catch (IllegalArgumentException e) {
+            showInfo("Mes reservations", e.getMessage());
+        } catch (Exception e) {
+            showInfo("Mes reservations", "La vue historique n'a pas pu etre ouverte.");
+            e.printStackTrace();
+        }
+    }
+
     private void configureFilters() {
         categoryFilter.getItems().add("All categories");
         categoryFilter.getSelectionModel().selectFirst();
@@ -137,8 +233,7 @@ public class FrontEventsController implements Initializable {
                 "Sort: Date (soonest)",
                 "Newest",
                 "Price low to high",
-                "Price high to low",
-                "Premium first"
+                "Price high to low"
         );
         sortFilter.getSelectionModel().selectFirst();
 
@@ -153,10 +248,15 @@ public class FrontEventsController implements Initializable {
         try {
             allEvents.clear();
             allEvents.addAll(eventService.getAll());
-
             List<Participation> participations = participationService.getAll();
             rebuildParticipationMap(participations);
+            refreshReservationCapacityData();
             rebuildCategoryFilter();
+            refreshFavoriteData();
+            refreshReviewData();
+            refreshWaitlistData();
+            refreshLoyaltyStatus();
+            refreshRecommendations();
             applyFilters();
         } catch (Exception e) {
             showInfo("Loading error", "Unable to load front events from the existing backend.");
@@ -192,12 +292,176 @@ public class FrontEventsController implements Initializable {
         }
     }
 
+    private void refreshFavoriteData() {
+        try {
+            favoriteCountByEvent.clear();
+            favoriteCountByEvent.putAll(favoriteService.countFavoritesByEvent());
+
+            favoriteEventIds.clear();
+            String currentEmail = getCurrentUserEmailOrNull();
+            if (currentEmail != null) {
+                favoriteEventIds.addAll(favoriteService.getFavoriteEventIdsByEmail(currentEmail));
+                favoriteCountLabel.setText(favoriteService.countFavoritesByEmail(currentEmail) + " favoris");
+            } else {
+                favoriteCountLabel.setText("0 favoris");
+            }
+        } catch (Exception e) {
+            favoriteCountByEvent.clear();
+            favoriteEventIds.clear();
+            favoriteCountLabel.setText("0 favoris");
+            System.err.println("Impossible de charger les favoris.");
+            e.printStackTrace();
+        }
+
+        if (!currentFilteredEvents.isEmpty()) {
+            renderCards(currentFilteredEvents);
+            renderFavoriteSection();
+            updateHeroStats(currentFilteredEvents);
+        }
+    }
+
+    private void refreshReviewData() {
+        try {
+            averageRatingByEvent.clear();
+            averageRatingByEvent.putAll(reviewService.getAverageNotesByEvent());
+
+            reviewCountByEvent.clear();
+            reviewCountByEvent.putAll(reviewService.getReviewCountsByEvent());
+        } catch (Exception e) {
+            averageRatingByEvent.clear();
+            reviewCountByEvent.clear();
+            System.err.println("Impossible de charger les avis.");
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshReservationCapacityData() {
+        try {
+            validReservationCountByEvent.clear();
+            validReservationCountByEvent.putAll(reservationService.countValidReservationsByEvent());
+        } catch (Exception e) {
+            validReservationCountByEvent.clear();
+            System.err.println("Impossible de charger les capacites depuis les reservations.");
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshWaitlistData() {
+        try {
+            waitlistCountByEvent.clear();
+            waitlistCountByEvent.putAll(waitlistService.countActiveByEvent());
+
+            waitlistedEventIds.clear();
+            String currentEmail = getCurrentUserEmailOrNull();
+            if (currentEmail != null) {
+                waitlistedEventIds.addAll(waitlistService.getActiveWaitlistEventIdsByEmail(currentEmail));
+            }
+        } catch (Exception e) {
+            waitlistCountByEvent.clear();
+            waitlistedEventIds.clear();
+            System.err.println("Impossible de charger la liste d'attente.");
+            e.printStackTrace();
+        }
+    }
+
+    private void refreshRecommendations() {
+        recommendationResults.clear();
+
+        String currentEmail = getCurrentUserEmailOrNull();
+        if (currentEmail == null) {
+            recommendationCountLabel.setText("0 recommandations");
+            if (recommendationCardsContainer != null) {
+                recommendationCardsContainer.getChildren().clear();
+            }
+            if (recommendationsEmptyStateBox != null) {
+                recommendationsEmptyStateBox.setVisible(true);
+                recommendationsEmptyStateBox.setManaged(true);
+            }
+            return;
+        }
+
+        Set<Integer> completeEventIds = allEvents.stream()
+                .filter(event -> getRemainingPlaces(event) <= 0)
+                .map(Event::getIdEvent)
+                .collect(Collectors.toSet());
+
+        try {
+            boolean isVip = currentLoyaltyStatus != null && currentLoyaltyStatus.hasVipAccess();
+            recommendationResults.addAll(recommendationService.recommendEvents(
+                    currentEmail,
+                    isVip,
+                    allEvents,
+                    favoriteEventIds,
+                    completeEventIds,
+                    4
+            ));
+        } catch (Exception e) {
+            System.err.println("Impossible de calculer les recommandations.");
+            e.printStackTrace();
+        }
+
+        renderRecommendations();
+    }
+
+    private void refreshLoyaltyStatus() {
+        String currentEmail = getCurrentUserEmailOrNull();
+        if (currentEmail == null) {
+            currentLoyaltyStatus = null;
+            renderLoyaltyStatus(null);
+            return;
+        }
+
+        try {
+            currentLoyaltyStatus = loyaltyService.getStatusByEmail(currentEmail);
+        } catch (Exception e) {
+            currentLoyaltyStatus = null;
+            System.err.println("Impossible de charger le statut fidelite.");
+            e.printStackTrace();
+        }
+        renderLoyaltyStatus(currentLoyaltyStatus);
+    }
+
+    private void renderLoyaltyStatus(LoyaltyStatus status) {
+        if (loyaltyTierLabel == null) {
+            return;
+        }
+
+        if (status == null) {
+            loyaltyIdentityLabel.setText("Aucun client connecte");
+            loyaltyTierLabel.setText("Bronze");
+            loyaltyReservationsLabel.setText("0 reservations confirmees");
+            loyaltySpentLabel.setText("0.00 DT depenses");
+            loyaltyProgressLabel.setText("Saisis un email client valide pour calculer la fidelite.");
+            loyaltyAccessLabel.setText("Acces VIP inactif");
+            loyaltyBenefitsLabel.setText("Priorite sur les evenements premium, recommendations VIP, avantages exclusifs.");
+            loyaltyScoreLabel.setText("Score 0");
+            loyaltyProgressBar.setProgress(0);
+            return;
+        }
+
+        loyaltyIdentityLabel.setText(status.getNomParticipant() == null || status.getNomParticipant().isBlank()
+                ? status.getEmailParticipant()
+                : status.getNomParticipant() + " • " + status.getEmailParticipant());
+        loyaltyTierLabel.setText(status.getTier());
+        loyaltyReservationsLabel.setText(status.getValidReservations()
+                + (status.getValidReservations() == 1 ? " reservation confirmee/utilisee" : " reservations confirmees/utilisees"));
+        loyaltySpentLabel.setText(String.format(Locale.US, "%.2f DT depenses", status.getTotalSpent()));
+        loyaltyProgressLabel.setText(status.getProgressText());
+        loyaltyAccessLabel.setText(status.hasVipAccess() ? "Acces VIP actif" : "Acces VIP verrouille");
+        loyaltyBenefitsLabel.setText(status.hasVipAccess()
+                ? "Avantages actifs: recommandations premium, priorite sur les experiences VIP et statut prioritaire."
+                : "Encore " + status.getReservationsToVip() + " reservation(s) valide(s) pour debloquer le statut VIP.");
+        loyaltyScoreLabel.setText("Score " + status.getScore());
+        loyaltyProgressBar.setProgress(status.getProgressRatio());
+    }
+
     private void applyFilters() {
         List<Event> filtered = allEvents.stream()
                 .filter(this::matchesSearch)
                 .filter(this::matchesCategory)
                 .filter(this::matchesDate)
                 .filter(this::matchesPrice)
+                .filter(event -> !favoritesOnlyMode || favoriteEventIds.contains(event.getIdEvent()))
                 .sorted(getComparator())
                 .collect(Collectors.toList());
 
@@ -205,9 +469,12 @@ public class FrontEventsController implements Initializable {
         currentFilteredEvents.addAll(filtered);
         renderUpcomingEvent(filtered);
         renderCards(filtered);
+        renderRecommendations();
+        renderFavoriteSection();
         updateHeroStats(filtered);
 
-        resultCountLabel.setText(filtered.size() + (filtered.size() == 1 ? " evenement" : " evenements"));
+        resultCountLabel.setText(filtered.size() + (filtered.size() == 1 ? " evenement" : " evenements")
+                + (favoritesOnlyMode ? " en favoris" : ""));
         emptyStateBox.setVisible(filtered.isEmpty());
         emptyStateBox.setManaged(filtered.isEmpty());
     }
@@ -266,11 +533,6 @@ public class FrontEventsController implements Initializable {
         if ("Price high to low".equals(selected)) {
             return Comparator.comparingDouble(Event::getPrixEvent).reversed();
         }
-        if ("Premium first".equals(selected)) {
-            return Comparator.comparing(Event::isPremium).reversed()
-                    .thenComparing(Event::getDateEvent, Comparator.nullsLast(Comparator.naturalOrder()));
-        }
-
         return Comparator.comparing(Event::getDateEvent, Comparator.nullsLast(Comparator.naturalOrder()))
                 .thenComparing(Event::getCreatedAt, Comparator.nullsLast(Comparator.reverseOrder()));
     }
@@ -301,13 +563,9 @@ public class FrontEventsController implements Initializable {
                 .filter(event -> getRemainingPlaces(event) > 0)
                 .count();
 
-        long premiumEvents = filtered.stream()
-                .filter(Event::isPremium)
-                .count();
-
         heroTotalEventsLabel.setText(filtered.size() + (filtered.size() == 1 ? " evenement" : " evenements"));
         heroOpenEventsLabel.setText(openEvents + (openEvents == 1 ? " ouvert" : " ouverts"));
-        heroPremiumEventsLabel.setText(premiumEvents + " premium");
+        heroFavoriteEventsLabel.setText(favoriteEventIds.size() + (favoriteEventIds.size() == 1 ? " favori" : " favoris"));
     }
 
     private void renderCards(List<Event> events) {
@@ -315,6 +573,124 @@ public class FrontEventsController implements Initializable {
         for (Event event : events) {
             cardsContainer.getChildren().add(buildEventCard(event));
         }
+    }
+
+    private void renderRecommendations() {
+        if (recommendationCardsContainer == null || recommendationsEmptyStateBox == null || recommendationCountLabel == null) {
+            return;
+        }
+
+        recommendationCardsContainer.getChildren().clear();
+        for (RecommendationResult result : recommendationResults) {
+            recommendationCardsContainer.getChildren().add(buildRecommendationCard(result));
+        }
+
+        recommendationCountLabel.setText(recommendationResults.size() + (recommendationResults.size() == 1 ? " recommandation" : " recommandations"));
+        boolean empty = recommendationResults.isEmpty();
+        recommendationsEmptyStateBox.setVisible(empty);
+        recommendationsEmptyStateBox.setManaged(empty);
+    }
+
+    private VBox buildRecommendationCard(RecommendationResult result) {
+        Event event = result.getEvent();
+        VBox card = new VBox(8);
+        card.getStyleClass().addAll("front-event-card", "recommended-card", "recommended-card-compact");
+        card.setPrefWidth(330);
+        card.setMinWidth(330);
+
+        HBox contentRow = new HBox(10);
+        contentRow.setAlignment(Pos.CENTER_LEFT);
+
+        StackPane thumbnail = new StackPane();
+        thumbnail.getStyleClass().add("recommendation-thumbnail");
+        thumbnail.getChildren().add(createRecommendationMedia(event));
+
+        VBox infoColumn = new VBox(4);
+        infoColumn.setAlignment(Pos.CENTER_LEFT);
+
+        Label badge = new Label("Recommande");
+        badge.getStyleClass().addAll("front-badge", "front-badge-recommended", "recommendation-badge-compact");
+
+        Label title = new Label(nullSafe(event.getTitre()));
+        title.getStyleClass().add("recommendation-title-compact");
+        title.setWrapText(true);
+
+        Label typeLabel = new Label(nullSafe(event.getTypeEvent()));
+        typeLabel.getStyleClass().add("recommendation-meta-compact");
+
+        Label dateLabel = new Label(formatDate(event.getDateEvent()));
+        dateLabel.getStyleClass().add("recommendation-meta-compact");
+
+        Button detailsButton = new Button("Voir");
+        detailsButton.getStyleClass().add("recommendation-action-compact");
+        detailsButton.setOnAction(actionEvent -> openEventDetailsWindow(event));
+
+        infoColumn.getChildren().addAll(badge, title, typeLabel, dateLabel, detailsButton);
+        contentRow.getChildren().addAll(thumbnail, infoColumn);
+        card.getChildren().add(contentRow);
+
+        return card;
+    }
+
+    private Node createRecommendationMedia(Event event) {
+        String imageSource = event.getImageEvent();
+        if (imageSource == null || imageSource.isBlank()) {
+            return createRecommendationPlaceholder(event);
+        }
+
+        try {
+            String normalizedSource = imageSource.trim();
+            String url = normalizedSource.startsWith("http://")
+                    || normalizedSource.startsWith("https://")
+                    || normalizedSource.startsWith("file:/")
+                    ? normalizedSource
+                    : new File(normalizedSource).toURI().toString();
+
+            Image image = new Image(url, true);
+            if (image.isError()) {
+                return createRecommendationPlaceholder(event);
+            }
+
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(102);
+            imageView.setFitHeight(72);
+            imageView.setPreserveRatio(false);
+            return imageView;
+        } catch (Exception ignored) {
+            return createRecommendationPlaceholder(event);
+        }
+    }
+
+    private StackPane createRecommendationPlaceholder(Event event) {
+        StackPane placeholder = new StackPane();
+        placeholder.getStyleClass().add("recommendation-placeholder");
+        placeholder.setPrefSize(102, 72);
+
+        Label title = new Label(nullSafe(event.getTypeEvent()));
+        title.getStyleClass().add("recommendation-placeholder-text");
+        title.setWrapText(true);
+        placeholder.getChildren().add(title);
+        return placeholder;
+    }
+
+    private void renderFavoriteSection() {
+        if (favoriteCardsContainer == null || favoritesEmptyStateBox == null) {
+            return;
+        }
+
+        favoriteCardsContainer.getChildren().clear();
+        List<Event> favoriteEvents = allEvents.stream()
+                .filter(event -> favoriteEventIds.contains(event.getIdEvent()))
+                .sorted(Comparator.comparing(Event::getDateEvent, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+
+        for (Event event : favoriteEvents) {
+            favoriteCardsContainer.getChildren().add(buildEventCard(event));
+        }
+
+        boolean empty = favoriteEvents.isEmpty();
+        favoritesEmptyStateBox.setVisible(empty);
+        favoritesEmptyStateBox.setManaged(empty);
     }
 
     private VBox buildEventCard(Event event) {
@@ -361,8 +737,10 @@ public class FrontEventsController implements Initializable {
         HBox socialRow = new HBox(10);
         socialRow.setAlignment(Pos.CENTER_LEFT);
         socialRow.getChildren().addAll(
-                createSoftBadge((favoriteEventIds.contains(event.getIdEvent()) ? "1" : "0") + " favoris"),
-                createSoftBadge(buildRatingText(event))
+                createSoftBadge(buildRatingText(event)),
+                createSoftBadge(getReviewCount(event) + (getReviewCount(event) == 1 ? " avis" : " avis")),
+                createSoftBadge(getFavoriteCount(event) + (getFavoriteCount(event) == 1 ? " favori" : " favoris")),
+                createSoftBadge(getWaitlistCount(event) + " en attente")
         );
 
         HBox infoRow = new HBox(10);
@@ -388,23 +766,32 @@ public class FrontEventsController implements Initializable {
 
         Button infoButton = new Button("INFORMATIONS");
         infoButton.getStyleClass().add("front-card-info-button");
-        infoButton.setOnAction(actionEvent ->
-                showInfo(nullSafe(event.getTitre()), trimDescription(event.getDescription(), 220))
-        );
+        infoButton.setOnAction(actionEvent -> openEventDetailsWindow(event));
 
-        Button reserveButton = new Button(getRemainingPlaces(event) > 0 ? "RESERVER" : "WAITLIST");
-        reserveButton.getStyleClass().add(
-                getRemainingPlaces(event) > 0
-                        ? "front-card-primary-button"
-                        : "front-card-waitlist-button"
-        );
-        reserveButton.setOnAction(actionEvent -> openReservationWindow(event));
+        Button favoriteButton = new Button(isFavorite(event) ? "RETIRER FAVORI" : "AJOUTER FAVORI");
+        favoriteButton.getStyleClass().add(isFavorite(event) ? "front-card-favorite-button-active" : "front-card-favorite-button");
+        favoriteButton.setOnAction(actionEvent -> toggleFavorite(event));
 
-        Button priorityButton = new Button(getRemainingPlaces(event) > 0 ? "Reservation prioritaire" : "Liste d'attente");
-        priorityButton.getStyleClass().add("front-card-priority-button");
-        priorityButton.setDisable(getRemainingPlaces(event) > 0);
+        Button reserveButton = new Button("RESERVER");
+        reserveButton.getStyleClass().add("front-card-primary-button");
+        boolean premiumLocked = event.isPremium() && !isCurrentUserVip();
+        boolean eventFull = isEventFull(event);
+        boolean alreadyWaitlisted = isWaitlisted(event);
+        if (premiumLocked) {
+            reserveButton.setText("RESERVE VIP");
+            reserveButton.setDisable(true);
+            reserveButton.setOnAction(actionEvent -> openReservationWindow(event));
+        } else if (eventFull) {
+            reserveButton.setText(alreadyWaitlisted ? "EN ATTENTE" : "LISTE D'ATTENTE");
+            reserveButton.setDisable(alreadyWaitlisted);
+            reserveButton.setOnAction(actionEvent -> joinWaitlist(event));
+        } else {
+            reserveButton.setText("RESERVER");
+            reserveButton.setDisable(false);
+            reserveButton.setOnAction(actionEvent -> openReservationWindow(event));
+        }
 
-        bottomRow.getChildren().addAll(priceBox, infoButton, reserveButton, priorityButton);
+        bottomRow.getChildren().addAll(priceBox, infoButton, favoriteButton, reserveButton);
 
         content.getChildren().addAll(titleRow, socialRow, infoRow, description, bottomRow);
         card.getChildren().addAll(mediaPane, content);
@@ -466,11 +853,11 @@ public class FrontEventsController implements Initializable {
         label.getStyleClass().add("front-badge");
 
         switch (badge) {
-            case "Premium" -> label.getStyleClass().add("front-badge-premium");
             case "Complet" -> label.getStyleClass().add("front-badge-full");
             case "Tendance" -> label.getStyleClass().add("front-badge-trending");
-            case "Recommande" -> label.getStyleClass().add("front-badge-recommended");
             case "Nouveau" -> label.getStyleClass().add("front-badge-new");
+            case "Premium" -> label.getStyleClass().add("front-badge-premium");
+            case "En attente" -> label.getStyleClass().add("front-badge-waitlist");
             default -> label.getStyleClass().add("front-badge-default");
         }
         return label;
@@ -493,11 +880,11 @@ public class FrontEventsController implements Initializable {
         }
         if (getRemainingPlaces(event) <= 0) {
             badges.add("Complet");
+        }
+        if (isWaitlisted(event)) {
+            badges.add("En attente");
         } else if (getParticipantCount(event) >= Math.max(3, event.getCapacite() / 2)) {
             badges.add("Tendance");
-        }
-        if (event.getPrixEvent() > 0 && event.getPrixEvent() < 50) {
-            badges.add("Recommande");
         }
 
         return badges;
@@ -509,20 +896,156 @@ public class FrontEventsController implements Initializable {
     }
 
     private int getParticipantCount(Event event) {
-        return participationCountByEvent.getOrDefault(event.getIdEvent(), 0L).intValue();
+        return validReservationCountByEvent
+                .getOrDefault(event.getIdEvent(), participationCountByEvent.getOrDefault(event.getIdEvent(), 0L))
+                .intValue();
     }
 
     private int getRemainingPlaces(Event event) {
         return Math.max(0, event.getCapacite() - getParticipantCount(event));
     }
 
+    private boolean isEventFull(Event event) {
+        return getRemainingPlaces(event) <= 0;
+    }
+
+    private int getFavoriteCount(Event event) {
+        return favoriteCountByEvent.getOrDefault(event.getIdEvent(), 0);
+    }
+
+    private int getReviewCount(Event event) {
+        return reviewCountByEvent.getOrDefault(event.getIdEvent(), 0);
+    }
+
+    private boolean isFavorite(Event event) {
+        return favoriteEventIds.contains(event.getIdEvent());
+    }
+
+    private boolean isWaitlisted(Event event) {
+        return waitlistedEventIds.contains(event.getIdEvent());
+    }
+
+    private int getWaitlistCount(Event event) {
+        return waitlistCountByEvent.getOrDefault(event.getIdEvent(), 0);
+    }
+
+    private boolean isCurrentUserVip() {
+        return currentLoyaltyStatus != null && currentLoyaltyStatus.hasVipAccess();
+    }
+
+    private void joinWaitlist(Event event) {
+        try {
+            String currentEmail = requireCurrentUserEmail();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/WaitlistSignupView.fxml"));
+            Parent root = loader.load();
+
+            WaitlistSignupController controller = loader.getController();
+            controller.setContext(event, currentEmail, () -> {
+                refreshWaitlistData();
+                refreshRecommendations();
+                applyFilters();
+            });
+
+            Scene scene = new Scene(root, 560, 560);
+            scene.getStylesheets().add(getClass().getResource("/styles/waitlist-signup.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - Liste d'attente");
+            stage.setScene(scene);
+            stage.setMinWidth(520);
+            stage.setMinHeight(520);
+            stage.setOnHidden(windowEvent -> {
+                refreshWaitlistData();
+                applyFilters();
+            });
+            stage.show();
+        } catch (IllegalArgumentException e) {
+            System.out.println("[FrontEventsController] joinWaitlist refus = " + e.getMessage());
+            showInfo("Liste d'attente", e.getMessage());
+            refreshWaitlistData();
+            applyFilters();
+        } catch (Exception e) {
+            String message = e.getMessage() == null ? "Erreur inconnue" : e.getMessage();
+            System.err.println("[FrontEventsController] joinWaitlist erreur technique = " + message);
+            e.printStackTrace();
+            showInfo("Liste d'attente", "Impossible de rejoindre la liste d'attente : " + message);
+        }
+    }
+
+    private String buildWaitlistName(String email) {
+        if (email == null || !email.contains("@")) {
+            return "Client Fitopia";
+        }
+        return email.substring(0, email.indexOf('@'));
+    }
+
+    private void toggleFavorite(Event event) {
+        try {
+            String currentEmail = requireCurrentUserEmail();
+            if (favoriteService.isFavorite(event.getIdEvent(), currentEmail)) {
+                favoriteService.removeFavorite(event.getIdEvent(), currentEmail);
+            } else {
+                favoriteService.addFavorite(event.getIdEvent(), currentEmail);
+            }
+            refreshFavoriteData();
+            applyFilters();
+        } catch (IllegalArgumentException e) {
+            showInfo("Favoris", e.getMessage());
+        } catch (Exception e) {
+            showInfo("Favoris", "Impossible de mettre a jour les favoris pour cet utilisateur.");
+            e.printStackTrace();
+        }
+    }
+
+    private void openEventDetailsWindow(Event event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventDetails.fxml"));
+            Parent root = loader.load();
+
+            EventDetailsController controller = loader.getController();
+            controller.setContext(event, getCurrentUserEmailOrNull(), this::reloadFrontMetaData);
+
+            Scene scene = new Scene(root, 1120, 760);
+            scene.getStylesheets().add(getClass().getResource("/styles/event-details.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - Avis evenement");
+            stage.setScene(scene);
+            stage.setMinWidth(980);
+            stage.setMinHeight(700);
+            stage.setOnHidden(windowEvent -> reloadFrontMetaData());
+            stage.show();
+        } catch (Exception e) {
+            showInfo("Evenement", "La fiche evenement n'a pas pu etre ouverte.");
+            e.printStackTrace();
+        }
+    }
+
+    private void reloadFrontMetaData() {
+        refreshFavoriteData();
+        refreshReviewData();
+        refreshLoyaltyStatus();
+        refreshRecommendations();
+        applyFilters();
+    }
+
     private void openReservationWindow(Event event) {
+        if (event.isPremium() && !isCurrentUserVip()) {
+            showInfo("Reserve aux VIP", "Reserve aux clients VIP. Continue tes reservations pour debloquer l'acces VIP.");
+            return;
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ReservationView.fxml"));
             Parent root = loader.load();
 
             ReservationController controller = loader.getController();
-            controller.setEvent(event, getRemainingPlaces(event));
+            controller.setContext(
+                    event,
+                    getRemainingPlaces(event),
+                    getCurrentUserEmailOrNull(),
+                    savedEmail -> currentUserEmailField.setText(savedEmail)
+            );
 
             Scene scene = new Scene(root, 1180, 760);
             scene.getStylesheets().add(getClass().getResource("/styles/reservation-view.css").toExternalForm());
@@ -572,10 +1095,27 @@ public class FrontEventsController implements Initializable {
     }
 
     private String buildRatingText(Event event) {
-        if (event.isPremium()) {
-            return "Top note 5.0/5";
+        double average = averageRatingByEvent.getOrDefault(event.getIdEvent(), 0.0);
+        return String.format(Locale.US, "%.1f/5 note", average);
+    }
+
+    private String requireCurrentUserEmail() {
+        String email = getCurrentUserEmailOrNull();
+        if (email == null) {
+            throw new IllegalArgumentException("Saisis un email utilisateur valide pour charger les donnees client.");
         }
-        return "Nouvel event 0.0/5";
+        return email;
+    }
+
+    private String getCurrentUserEmailOrNull() {
+        if (currentUserEmailField == null || currentUserEmailField.getText() == null) {
+            return null;
+        }
+        String email = currentUserEmailField.getText().trim();
+        if (email.isEmpty() || !email.contains("@")) {
+            return null;
+        }
+        return email;
     }
 
     private void showInfo(String title, String message) {

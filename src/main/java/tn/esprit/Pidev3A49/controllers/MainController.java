@@ -27,6 +27,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -37,9 +38,14 @@ import javafx.scene.control.ScrollPane;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import tn.esprit.Pidev3A49.models.Event;
+import tn.esprit.Pidev3A49.models.LoyaltyCustomerSummary;
 import tn.esprit.Pidev3A49.models.Participation;
+import tn.esprit.Pidev3A49.models.Reservation;
 import tn.esprit.Pidev3A49.service.EventService;
+import tn.esprit.Pidev3A49.service.LoyaltyService;
 import tn.esprit.Pidev3A49.service.ParticipationService;
+import tn.esprit.Pidev3A49.service.ReservationService;
+import tn.esprit.Pidev3A49.service.WaitlistService;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -69,16 +75,18 @@ public class MainController implements Initializable {
     @FXML private TextField typeEventField;
     @FXML private TextField imageEventField;
     @FXML private TextField prixEventField;
-    @FXML private CheckBox premiumCheckBox;
+    @FXML private CheckBox premiumEventCheckBox;
     @FXML private Button ajouterButton;
 
     @FXML private Button tablesButton;
     @FXML private Button participantsNavButton;
+    @FXML private Button loyaltyNavButton;
     @FXML private Button eventsManagementButton;
     @FXML private Button dashboardNavButton;
     @FXML private Button createNavButton;
     @FXML private Button eventsWorkspaceButton;
     @FXML private Button participantsWorkspaceButton;
+    @FXML private Button loyaltyWorkspaceButton;
     @FXML private Button createCardButton;
     @FXML private Button updateCardButton;
     @FXML private Button deleteCardButton;
@@ -87,6 +95,7 @@ public class MainController implements Initializable {
     @FXML private VBox tablesLandingSection;
     @FXML private VBox eventsWorkspaceSection;
     @FXML private VBox participantsSection;
+    @FXML private VBox loyaltySection;
     @FXML private BorderPane rootPane;
     @FXML private ScrollPane sidebarScrollPane;
     @FXML private VBox contentShell;
@@ -114,9 +123,8 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Event, Integer> resActivesColumn;
     @FXML private TableColumn<Event, Integer> capaciteColumn;
     @FXML private TableColumn<Event, Integer> restantesColumn;
-    @FXML private TableColumn<Event, Integer> waitlistColumn;
-    @FXML private TableColumn<Event, Boolean> premiumColumn;
     @FXML private TableColumn<Event, String> etatColumn;
+    @FXML private TableColumn<Event, String> premiumColumn;
     @FXML private TableColumn<Event, Double> prixColumn;
     @FXML private TableColumn<Event, String> descriptionColumn;
     @FXML private TableColumn<Event, String> imageEventColumn;
@@ -129,32 +137,57 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Participation, String> emailParticipantColumn;
     @FXML private TableColumn<Participation, LocalDateTime> dateInscriptionColumn;
     @FXML private TableColumn<Participation, String> evenementParticipationColumn;
+    @FXML private TableColumn<Participation, String> participantStatusColumn;
+    @FXML private TableColumn<Participation, Participation> participantActionColumn;
     @FXML private TextField participantSearchField;
+    @FXML private TextField participantEmailFilterField;
+    @FXML private ComboBox<String> participantEventFilterCombo;
+    @FXML private ComboBox<String> participantStatusFilterCombo;
     @FXML private TextField participantNameField;
     @FXML private TextField participantEmailField;
     @FXML private ComboBox<Event> participantEventCombo;
     @FXML private Label participantFormStatusLabel;
+    @FXML private Label participantsTotalCountLabel;
+    @FXML private Label participantsConfirmedCountLabel;
+    @FXML private Label participantsCancelledCountLabel;
 
     @FXML private Label totalEventsLabel;
     @FXML private Label totalParticipantsLabel;
     @FXML private Label completeEventsLabel;
-    @FXML private Label premiumEventsLabel;
+    @FXML private Label loyaltyClientCountLabel;
     @FXML private Label statusLabel;
     @FXML private Label pageTitleLabel;
     @FXML private Label pageSubtitleLabel;
     @FXML private FlowPane crudCardsRow;
 
+    @FXML private TableView<LoyaltyCustomerSummary> loyaltyTable;
+    @FXML private TableColumn<LoyaltyCustomerSummary, String> loyaltyEmailColumn;
+    @FXML private TableColumn<LoyaltyCustomerSummary, String> loyaltyNameColumn;
+    @FXML private TableColumn<LoyaltyCustomerSummary, Integer> loyaltyReservationsColumn;
+    @FXML private TableColumn<LoyaltyCustomerSummary, Double> loyaltySpentColumn;
+    @FXML private TableColumn<LoyaltyCustomerSummary, LocalDateTime> loyaltyLastPurchaseColumn;
+    @FXML private TableColumn<LoyaltyCustomerSummary, String> loyaltyTierColumn;
+    @FXML private TableColumn<LoyaltyCustomerSummary, Integer> loyaltyScoreColumn;
+    @FXML private TableColumn<LoyaltyCustomerSummary, String> loyaltyVipColumn;
+
     private final EventService eventService = new EventService();
     private final ParticipationService participationService = new ParticipationService();
+    private final LoyaltyService loyaltyService = new LoyaltyService();
+    private final ReservationService reservationService = new ReservationService();
+    private final WaitlistService waitlistService = new WaitlistService();
 
     private final ObservableList<Event> eventList = FXCollections.observableArrayList();
     private final FilteredList<Event> filteredEvents = new FilteredList<>(eventList, event -> true);
 
     private final ObservableList<Participation> participationList = FXCollections.observableArrayList();
     private final FilteredList<Participation> filteredParticipations = new FilteredList<>(participationList, participation -> true);
+    private final ObservableList<LoyaltyCustomerSummary> loyaltyList = FXCollections.observableArrayList();
 
     private final Map<Integer, Long> participationCountByEvent = new HashMap<>();
+    private final Map<Integer, Integer> waitlistCountByEvent = new HashMap<>();
     private final Map<Integer, String> eventTitleById = new HashMap<>();
+    private final Map<String, String> participantStatusByKey = new HashMap<>();
+    private final Map<String, LocalDateTime> participantStatusDateByKey = new HashMap<>();
     private final PdfExportService pdfExportService = new PdfExportService();
     private final Timeline liveSyncTimeline = new Timeline();
     private Participation selectedParticipation;
@@ -233,6 +266,8 @@ public class MainController implements Initializable {
         configureDatePicker();
         configureEventTable();
         configureParticipationTable();
+        configureParticipantFilters();
+        configureLoyaltyTable();
         configureSearches();
         configureEventSelection();
         configureParticipantCrud();
@@ -312,16 +347,15 @@ public class MainController implements Initializable {
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         imageEventColumn.setCellValueFactory(new PropertyValueFactory<>("imageEvent"));
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-        premiumColumn.setCellValueFactory(new PropertyValueFactory<>("premium"));
 
         resActivesColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(getActiveParticipants(cellData.getValue())));
         restantesColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(getRemainingPlaces(cellData.getValue())));
-        waitlistColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(getWaitlistCount(cellData.getValue())));
         etatColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(getEventStatus(cellData.getValue())));
+        premiumColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().isPremium() ? "Premium" : "Standard"));
+        premiumColumn.setCellFactory(column -> new PremiumTableCell());
 
         dateColumn.setCellFactory(column -> new FormattedTableCell<>(DATE_FORMATTER));
         createdAtColumn.setCellFactory(column -> new FormattedTableCell<>(DATE_TIME_FORMATTER));
-        premiumColumn.setCellFactory(column -> new BooleanTableCell());
         prixColumn.setCellFactory(column -> new NumberTableCell());
 
         SortedList<Event> sortedEvents = new SortedList<>(filteredEvents);
@@ -335,11 +369,87 @@ public class MainController implements Initializable {
         emailParticipantColumn.setCellValueFactory(new PropertyValueFactory<>("emailParticipant"));
         dateInscriptionColumn.setCellValueFactory(new PropertyValueFactory<>("dateInscription"));
         evenementParticipationColumn.setCellValueFactory(new PropertyValueFactory<>("evenement"));
+        participantStatusColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(getParticipantStatus(cellData.getValue())));
+        participantActionColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue()));
         dateInscriptionColumn.setCellFactory(column -> new FormattedTableCell<>(DATE_TIME_FORMATTER));
+        participantStatusColumn.setCellFactory(column -> new ParticipantStatusTableCell());
+        participantActionColumn.setCellFactory(column -> new TableCell<>() {
+            private final Button detailsButton = new Button("Voir details");
+            private final Button deleteButton = new Button("Supprimer");
+            private final HBox container = new HBox(6, detailsButton, deleteButton);
+
+            {
+                detailsButton.getStyleClass().add("participants-action-view");
+                deleteButton.getStyleClass().add("participants-action-delete");
+                detailsButton.setOnAction(event -> {
+                    Participation participation = getItem();
+                    if (participation != null) {
+                        participationTable.getSelectionModel().select(participation);
+                        populateParticipantForm(participation);
+                        participantFormStatusLabel.setText("Participant charge : ID " + participation.getIdParticipation());
+                    }
+                });
+                deleteButton.setOnAction(event -> {
+                    Participation participation = getItem();
+                    if (participation != null) {
+                        selectedParticipation = participation;
+                        deleteParticipant();
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Participation item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                    return;
+                }
+                setGraphic(container);
+            }
+        });
+
+        participationTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        participationTable.setMaxWidth(Double.MAX_VALUE);
 
         SortedList<Participation> sortedParticipations = new SortedList<>(filteredParticipations);
         sortedParticipations.comparatorProperty().bind(participationTable.comparatorProperty());
         participationTable.setItems(sortedParticipations);
+    }
+
+    private void configureParticipantFilters() {
+        if (participantStatusFilterCombo != null) {
+            participantStatusFilterCombo.getItems().setAll("Tous", "Confirmee", "Annulee", "Utilisee");
+            participantStatusFilterCombo.getSelectionModel().selectFirst();
+            participantStatusFilterCombo.valueProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilter());
+        }
+        if (participantEventFilterCombo != null) {
+            participantEventFilterCombo.getItems().setAll("Tous les evenements");
+            participantEventFilterCombo.getSelectionModel().selectFirst();
+            participantEventFilterCombo.valueProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilter());
+        }
+        if (participantEmailFilterField != null) {
+            participantEmailFilterField.textProperty().addListener((observable, oldValue, newValue) -> applyParticipantFilter());
+        }
+    }
+
+    private void configureLoyaltyTable() {
+        if (loyaltyTable == null) {
+            return;
+        }
+
+        loyaltyEmailColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getEmailParticipant()));
+        loyaltyNameColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getNomParticipant()));
+        loyaltyReservationsColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getValidReservations()));
+        loyaltySpentColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getTotalSpent()));
+        loyaltyLastPurchaseColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getLastPurchase()));
+        loyaltyTierColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().getTier()));
+        loyaltyScoreColumn.setCellValueFactory(cellData -> new ReadOnlyObjectWrapper<>(cellData.getValue().getScore()));
+        loyaltyVipColumn.setCellValueFactory(cellData -> new ReadOnlyStringWrapper(cellData.getValue().isVipAccess() ? "Oui" : "Non"));
+
+        loyaltySpentColumn.setCellFactory(column -> new NumberTableCell());
+        loyaltyLastPurchaseColumn.setCellFactory(column -> new FormattedTableCell<>(DATE_TIME_FORMATTER));
+        loyaltyTable.setItems(loyaltyList);
     }
 
     private void configureSearches() {
@@ -361,6 +471,7 @@ public class MainController implements Initializable {
     private void refreshAllData() {
         loadEvents();
         loadParticipations();
+        loadLoyaltyData();
         updateDashboardStats();
     }
 
@@ -369,6 +480,7 @@ public class MainController implements Initializable {
             List<Event> events = eventService.getAll();
             eventList.setAll(events);
             rebuildEventTitleMap(events);
+            refreshWaitlistStats();
             sortEventTableByIdDesc();
             renderUpdateSection(events);
             renderDeleteSection(events);
@@ -376,10 +488,16 @@ public class MainController implements Initializable {
             List<Participation> participations = participationService.getAll();
             participationList.setAll(participations);
             rebuildParticipationCountMap(participations);
+            rebuildParticipantStatusMap(participations);
             sortParticipationTableByIdDesc();
+
+            loyaltyList.setAll(loyaltyService.getAllCustomerSummaries());
 
             eventTable.refresh();
             participationTable.refresh();
+            if (loyaltyTable != null) {
+                loyaltyTable.refresh();
+            }
             updateDashboardStats();
         } catch (Exception ignored) {
         }
@@ -406,6 +524,46 @@ public class MainController implements Initializable {
     }
 
     @FXML
+    private void openWaitlistAdminWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/WaitlistAdminView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 980, 680);
+            scene.getStylesheets().add(getClass().getResource("/styles/waitlist-admin.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - Waitlist Admin");
+            stage.setScene(scene);
+            stage.setMinWidth(900);
+            stage.setMinHeight(620);
+            stage.setOnHidden(event -> refreshAllData());
+            stage.show();
+        } catch (Exception e) {
+            showError("Ouverture impossible", "La vue admin waitlist n'a pas pu etre chargee.", e);
+        }
+    }
+
+    @FXML
+    private void openEventStatsWindow() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/EventStatsView.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 980, 680);
+            scene.getStylesheets().add(getClass().getResource("/styles/event-stats.css").toExternalForm());
+
+            Stage stage = new Stage();
+            stage.setTitle("Fitopia - Analyse des evenements");
+            stage.setScene(scene);
+            stage.setMinWidth(900);
+            stage.setMinHeight(620);
+            stage.setOnHidden(event -> refreshAllData());
+            stage.show();
+        } catch (Exception e) {
+            showError("Ouverture impossible", "La vue d'analyse des evenements n'a pas pu etre chargee.", e);
+        }
+    }
+
+    @FXML
     private void refreshEvents() {
         loadEvents();
         updateDashboardStats();
@@ -417,11 +575,18 @@ public class MainController implements Initializable {
         updateDashboardStats();
     }
 
+    @FXML
+    private void refreshLoyalty() {
+        loadLoyaltyData();
+        updateDashboardStats();
+    }
+
     private void loadEvents() {
         try {
             List<Event> events = eventService.getAll();
             eventList.setAll(events);
             rebuildEventTitleMap(events);
+            refreshWaitlistStats();
             sortEventTableByIdDesc();
             renderUpdateSection(events);
             renderDeleteSection(events);
@@ -438,6 +603,7 @@ public class MainController implements Initializable {
             List<Participation> participations = participationService.getAll();
             participationList.setAll(participations);
             rebuildParticipationCountMap(participations);
+            rebuildParticipantStatusMap(participations);
             sortParticipationTableByIdDesc();
             participationTable.refresh();
             eventTable.refresh();
@@ -452,9 +618,23 @@ public class MainController implements Initializable {
                     clearParticipantForm();
                 }
             }
+            updateParticipantCounters();
+            refreshParticipantEventFilterOptions();
             System.out.println("Participations chargees : " + participations.size());
         } catch (Exception e) {
             showError("Chargement impossible", "Erreur lors du chargement des participations.", e);
+        }
+    }
+
+    private void loadLoyaltyData() {
+        try {
+            loyaltyList.setAll(loyaltyService.getAllCustomerSummaries());
+            if (loyaltyTable != null) {
+                loyaltyTable.refresh();
+            }
+            System.out.println("Clients fidelite charges : " + loyaltyList.size());
+        } catch (Exception e) {
+            showError("Chargement impossible", "Erreur lors du chargement des donnees fidelite.", e);
         }
     }
 
@@ -541,20 +721,28 @@ public class MainController implements Initializable {
         }
     }
 
+    private void refreshWaitlistStats() {
+        try {
+            waitlistCountByEvent.clear();
+            waitlistCountByEvent.putAll(waitlistService.countActiveByEvent());
+        } catch (Exception e) {
+            waitlistCountByEvent.clear();
+            System.err.println("Impossible de charger les compteurs waitlist.");
+        }
+    }
+
     private void updateDashboardStats() {
         totalEventsLabel.setText(String.valueOf(eventList.size()));
         totalParticipantsLabel.setText(String.valueOf(participationList.size()));
+        if (loyaltyClientCountLabel != null) {
+            loyaltyClientCountLabel.setText(String.valueOf(loyaltyList.size()));
+        }
 
         long completeCount = eventList.stream()
                 .filter(event -> getRemainingPlaces(event) <= 0)
                 .count();
 
-        long premiumCount = eventList.stream()
-                .filter(Event::isPremium)
-                .count();
-
         completeEventsLabel.setText(String.valueOf(completeCount));
-        premiumEventsLabel.setText(String.valueOf(premiumCount));
     }
 
     private void sortEventTableByIdDesc() {
@@ -579,10 +767,6 @@ public class MainController implements Initializable {
         return event.getCapacite() - getActiveParticipants(event);
     }
 
-    private int getWaitlistCount(Event event) {
-        return Math.max(0, getActiveParticipants(event) - event.getCapacite());
-    }
-
     private String getEventStatus(Event event) {
         return getRemainingPlaces(event) <= 0 ? "Complet" : "Ouvert";
     }
@@ -601,6 +785,7 @@ public class MainController implements Initializable {
                     || contains(event.getLieu(), value)
                     || contains(event.getTypeEvent(), value)
                     || contains(event.getImageEvent(), value)
+                    || contains(event.isPremium() ? "premium vip" : "standard normal", value)
                     || contains(getEventStatus(event), value);
         });
     }
@@ -614,24 +799,160 @@ public class MainController implements Initializable {
     @FXML
     private void applyParticipantFilter() {
         String rawValue = participantSearchField.getText();
+        String emailFilterValue = participantEmailFilterField == null ? null : participantEmailFilterField.getText();
+        String selectedEvent = participantEventFilterCombo == null ? null : participantEventFilterCombo.getValue();
+        String selectedStatus = participantStatusFilterCombo == null ? null : participantStatusFilterCombo.getValue();
         filteredParticipations.setPredicate(participation -> {
             if (rawValue == null || rawValue.trim().isEmpty()) {
-                return true;
+                return matchesAdditionalParticipantFilters(participation, emailFilterValue, selectedEvent, selectedStatus);
             }
 
             String value = rawValue.toLowerCase(Locale.ROOT).trim();
             String eventTitle = participation.getEvenement() == null ? "" : participation.getEvenement();
-
-            return contains(participation.getNomParticipant(), value)
+            boolean matchesSearch = contains(participation.getNomParticipant(), value)
                     || contains(participation.getEmailParticipant(), value)
                     || contains(eventTitle, value);
+
+            return matchesSearch && matchesAdditionalParticipantFilters(participation, emailFilterValue, selectedEvent, selectedStatus);
         });
+        updateParticipantCounters();
     }
 
     @FXML
     private void resetParticipantFilter() {
         participantSearchField.clear();
+        if (participantEmailFilterField != null) {
+            participantEmailFilterField.clear();
+        }
+        if (participantEventFilterCombo != null) {
+            participantEventFilterCombo.getSelectionModel().selectFirst();
+        }
+        if (participantStatusFilterCombo != null) {
+            participantStatusFilterCombo.getSelectionModel().selectFirst();
+        }
         filteredParticipations.setPredicate(participation -> true);
+        updateParticipantCounters();
+    }
+
+    private boolean matchesAdditionalParticipantFilters(
+            Participation participation,
+            String emailFilterValue,
+            String selectedEvent,
+            String selectedStatus
+    ) {
+        if (emailFilterValue != null && !emailFilterValue.isBlank()) {
+            String normalized = emailFilterValue.toLowerCase(Locale.ROOT).trim();
+            if (!contains(participation.getEmailParticipant(), normalized)) {
+                return false;
+            }
+        }
+
+        if (selectedEvent != null && !selectedEvent.isBlank() && !"Tous les evenements".equals(selectedEvent)) {
+            String eventTitle = participation.getEvenement() == null ? "" : participation.getEvenement();
+            if (!selectedEvent.equalsIgnoreCase(eventTitle)) {
+                return false;
+            }
+        }
+
+        if (selectedStatus != null && !selectedStatus.isBlank() && !"Tous".equals(selectedStatus)) {
+            String status = getParticipantStatus(participation);
+            if (!selectedStatus.equalsIgnoreCase(status)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void refreshParticipantEventFilterOptions() {
+        if (participantEventFilterCombo == null) {
+            return;
+        }
+        String currentValue = participantEventFilterCombo.getValue();
+        List<String> eventNames = participationList.stream()
+                .map(Participation::getEvenement)
+                .filter(name -> name != null && !name.isBlank())
+                .distinct()
+                .sorted(String::compareToIgnoreCase)
+                .toList();
+        participantEventFilterCombo.getItems().setAll("Tous les evenements");
+        participantEventFilterCombo.getItems().addAll(eventNames);
+        if (currentValue != null && participantEventFilterCombo.getItems().contains(currentValue)) {
+            participantEventFilterCombo.setValue(currentValue);
+        } else {
+            participantEventFilterCombo.getSelectionModel().selectFirst();
+        }
+    }
+
+    private void rebuildParticipantStatusMap(List<Participation> participations) {
+        participantStatusByKey.clear();
+        participantStatusDateByKey.clear();
+        Map<String, List<Participation>> participationsByEmail = participations.stream()
+                .filter(participation -> participation.getEmailParticipant() != null && !participation.getEmailParticipant().isBlank())
+                .collect(java.util.stream.Collectors.groupingBy(participation -> participation.getEmailParticipant().trim().toLowerCase(Locale.ROOT)));
+
+        for (Map.Entry<String, List<Participation>> entry : participationsByEmail.entrySet()) {
+            String email = entry.getKey();
+            List<Reservation> reservations;
+            try {
+                reservations = reservationService.getByEmail(email);
+            } catch (Exception e) {
+                continue;
+            }
+
+            for (Reservation reservation : reservations) {
+                String key = buildParticipantKey(reservation.getIdEvent(), reservation.getEmailParticipant());
+                LocalDateTime reservationDate = reservation.getDateReservation() == null ? LocalDateTime.MIN : reservation.getDateReservation();
+                LocalDateTime currentDate = participantStatusDateByKey.get(key);
+                if (currentDate == null || reservationDate.isAfter(currentDate)) {
+                    participantStatusDateByKey.put(key, reservationDate);
+                    participantStatusByKey.put(key, normalizeParticipantStatus(reservation.getStatut()));
+                }
+            }
+        }
+    }
+
+    private String getParticipantStatus(Participation participation) {
+        if (participation == null) {
+            return "Confirmee";
+        }
+        String key = buildParticipantKey(participation.getIdEvent(), participation.getEmailParticipant());
+        return participantStatusByKey.getOrDefault(key, "Confirmee");
+    }
+
+    private String buildParticipantKey(int idEvent, String email) {
+        return idEvent + "|" + (email == null ? "" : email.trim().toLowerCase(Locale.ROOT));
+    }
+
+    private String normalizeParticipantStatus(String rawStatus) {
+        if (rawStatus == null || rawStatus.isBlank()) {
+            return "Confirmee";
+        }
+        String normalized = rawStatus.trim().toLowerCase(Locale.ROOT);
+        return switch (normalized) {
+            case "annulee", "annulée", "cancelled" -> "Annulee";
+            case "utilisee", "utilisée", "used" -> "Utilisee";
+            case "payee", "payée", "paid", "confirmee", "confirmée", "confirmed" -> "Confirmee";
+            default -> "Confirmee";
+        };
+    }
+
+    private void updateParticipantCounters() {
+        if (participantsTotalCountLabel == null) {
+            return;
+        }
+        List<Participation> currentItems = filteredParticipations.stream().toList();
+        long total = currentItems.size();
+        long confirmed = currentItems.stream()
+                .filter(participation -> "Confirmee".equalsIgnoreCase(getParticipantStatus(participation)))
+                .count();
+        long cancelled = currentItems.stream()
+                .filter(participation -> "Annulee".equalsIgnoreCase(getParticipantStatus(participation)))
+                .count();
+
+        participantsTotalCountLabel.setText(String.valueOf(total));
+        participantsConfirmedCountLabel.setText(String.valueOf(confirmed));
+        participantsCancelledCountLabel.setText(String.valueOf(cancelled));
     }
 
     private boolean contains(String source, String value) {
@@ -753,10 +1074,13 @@ public class MainController implements Initializable {
         badges.setVgap(6);
         badges.getChildren().addAll(
                 buildBadge("Participants actifs: " + getActiveParticipants(event), "soft-badge"),
+                buildBadge("Waitlist: " + waitlistCountByEvent.getOrDefault(event.getIdEvent(), 0), "soft-badge"),
                 buildBadge("Places restantes: " + getRemainingPlaces(event), "soft-badge"),
-                buildBadge(event.isPremium() ? "Premium" : "Standard", event.isPremium() ? "premium-badge" : "soft-badge"),
                 buildBadge(getEventStatus(event), getRemainingPlaces(event) <= 0 ? "danger-badge" : "success-badge")
         );
+        if (event.isPremium()) {
+            badges.getChildren().add(buildBadge("Premium", "premium-badge"));
+        }
 
         HBox actions = new HBox(8);
         Region spacer = new Region();
@@ -795,11 +1119,11 @@ public class MainController implements Initializable {
 
     @FXML
     private void showTablesLanding() {
-        setMainView(true, false, false);
+        setMainView(true, false, false, false);
         hideAllEventSections();
         showCrudCards();
-        setWorkspaceActive(true);
-        setSidebarContext(true, false, false);
+        setWorkspaceMode("events");
+        setSidebarContext(true, false, false, false);
         setQuickAccessMode(null);
         updatePageHero(
                 "Admin Dashboard",
@@ -810,11 +1134,11 @@ public class MainController implements Initializable {
 
     @FXML
     private void showEventsWorkspace() {
-        setMainView(false, true, false);
+        setMainView(false, true, false, false);
         hideAllEventSections();
         showCrudCards();
-        setWorkspaceActive(true);
-        setSidebarContext(false, true, false);
+        setWorkspaceMode("events");
+        setSidebarContext(false, true, false, false);
         setQuickAccessMode(null);
         updatePageHero(
                 "Gestion des evenements",
@@ -826,9 +1150,9 @@ public class MainController implements Initializable {
     @FXML
     private void showParticipantsSection() {
         refreshParticipations();
-        setMainView(false, false, true);
-        setWorkspaceActive(false);
-        setSidebarContext(false, false, true);
+        setMainView(false, false, true, false);
+        setWorkspaceMode("participants");
+        setSidebarContext(false, false, true, false);
         setQuickAccessMode(null);
         updatePageHero(
                 "Participation Dashboard",
@@ -836,6 +1160,23 @@ public class MainController implements Initializable {
         );
         participantSearchField.requestFocus();
         statusLabel.setText("Section participation active.");
+    }
+
+    @FXML
+    private void showLoyaltySection() {
+        refreshLoyalty();
+        setMainView(false, false, false, true);
+        setWorkspaceMode("loyalty");
+        setSidebarContext(false, false, false, true);
+        setQuickAccessMode(null);
+        updatePageHero(
+                "Fidelite Clients",
+                "Suivez les clients actifs, leurs depenses, leur tier et leur acces VIP."
+        );
+        if (loyaltyTable != null) {
+            loyaltyTable.requestFocus();
+        }
+        statusLabel.setText("Section fidelite active.");
     }
 
     @FXML
@@ -897,12 +1238,12 @@ public class MainController implements Initializable {
     }
 
     private void activateEventsWorkspace() {
-        setMainView(false, true, false);
-        setWorkspaceActive(true);
-        setSidebarContext(false, true, false);
+        setMainView(false, true, false, false);
+        setWorkspaceMode("events");
+        setSidebarContext(false, true, false, false);
     }
 
-    private void setMainView(boolean showTablesLanding, boolean showEventsWorkspace, boolean showParticipants) {
+    private void setMainView(boolean showTablesLanding, boolean showEventsWorkspace, boolean showParticipants, boolean showLoyalty) {
         tablesLandingSection.setVisible(showTablesLanding);
         tablesLandingSection.setManaged(showTablesLanding);
 
@@ -911,6 +1252,11 @@ public class MainController implements Initializable {
 
         participantsSection.setVisible(showParticipants);
         participantsSection.setManaged(showParticipants);
+
+        if (loyaltySection != null) {
+            loyaltySection.setVisible(showLoyalty);
+            loyaltySection.setManaged(showLoyalty);
+        }
     }
 
     private void hideAllEventSections() {
@@ -950,15 +1296,17 @@ public class MainController implements Initializable {
         }
     }
 
-    private void setWorkspaceActive(boolean eventsActive) {
-        toggleStyleClass(eventsWorkspaceButton, "active-workspace", eventsActive);
-        toggleStyleClass(participantsWorkspaceButton, "active-workspace", !eventsActive);
+    private void setWorkspaceMode(String workspace) {
+        toggleStyleClass(eventsWorkspaceButton, "active-workspace", "events".equals(workspace));
+        toggleStyleClass(participantsWorkspaceButton, "active-workspace", "participants".equals(workspace));
+        toggleStyleClass(loyaltyWorkspaceButton, "active-workspace", "loyalty".equals(workspace));
     }
 
-    private void setSidebarContext(boolean tablesActive, boolean eventsActive, boolean participationActive) {
+    private void setSidebarContext(boolean tablesActive, boolean eventsActive, boolean participationActive, boolean loyaltyActive) {
         toggleStyleClass(tablesButton, "active-nav", tablesActive);
         toggleStyleClass(eventsManagementButton, "active-nav", eventsActive);
         toggleStyleClass(participantsNavButton, "active-nav", participationActive);
+        toggleStyleClass(loyaltyNavButton, "active-nav", loyaltyActive);
     }
 
     private void syncSidebarMenus() {
@@ -1077,7 +1425,7 @@ public class MainController implements Initializable {
         typeEventField.setText(event.getTypeEvent());
         imageEventField.setText(event.getImageEvent());
         prixEventField.setText(String.valueOf(event.getPrixEvent()));
-        premiumCheckBox.setSelected(event.isPremium());
+        premiumEventCheckBox.setSelected(event.isPremium());
     }
 
     private void clearSelectionAndForm() {
@@ -1091,7 +1439,7 @@ public class MainController implements Initializable {
         typeEventField.clear();
         imageEventField.clear();
         prixEventField.clear();
-        premiumCheckBox.setSelected(false);
+        premiumEventCheckBox.setSelected(false);
     }
 
     private Event buildEventFromForm() {
@@ -1103,6 +1451,7 @@ public class MainController implements Initializable {
         String imageEvent = imageEventField.getText() == null ? "" : imageEventField.getText().trim();
         int capacite = parseInteger(capaciteField.getText(), "capacite");
         double prix = parseDouble(prixEventField.getText(), "prix");
+        boolean premium = premiumEventCheckBox.isSelected();
 
         return new Event(
                 titre,
@@ -1113,7 +1462,7 @@ public class MainController implements Initializable {
                 typeEvent,
                 imageEvent,
                 prix,
-                premiumCheckBox.isSelected()
+                premium
         );
     }
 
@@ -1233,7 +1582,49 @@ public class MainController implements Initializable {
         }
     }
 
-    private static final class NumberTableCell extends TableCell<Event, Double> {
+    private static final class PremiumTableCell extends TableCell<Event, String> {
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            getStyleClass().removeAll("premium-table-cell", "standard-table-cell");
+            if (empty || item == null) {
+                setText(null);
+                return;
+            }
+
+            setText(item);
+            getStyleClass().add("Premium".equals(item) ? "premium-table-cell" : "standard-table-cell");
+        }
+    }
+
+    private static final class ParticipantStatusTableCell extends TableCell<Participation, String> {
+        @Override
+        protected void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            getStyleClass().removeAll(
+                    "participants-status-badge",
+                    "participants-status-confirmed",
+                    "participants-status-cancelled",
+                    "participants-status-used"
+            );
+            if (empty || item == null) {
+                setText(null);
+                setBackground(Background.EMPTY);
+                return;
+            }
+            setText(item);
+            getStyleClass().add("participants-status-badge");
+            if ("Annulee".equalsIgnoreCase(item)) {
+                getStyleClass().add("participants-status-cancelled");
+            } else if ("Utilisee".equalsIgnoreCase(item)) {
+                getStyleClass().add("participants-status-used");
+            } else {
+                getStyleClass().add("participants-status-confirmed");
+            }
+        }
+    }
+
+    private static final class NumberTableCell<S> extends TableCell<S, Double> {
         @Override
         protected void updateItem(Double item, boolean empty) {
             super.updateItem(item, empty);
@@ -1314,7 +1705,7 @@ public class MainController implements Initializable {
 
         configureStandaloneHeader(mode);
 
-        setMainView(false, true, false);
+        setMainView(false, true, false, false);
 
         switch (mode) {
             case CREATE -> {

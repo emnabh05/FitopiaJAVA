@@ -32,4 +32,8 @@ public class ParticipationService {
     public boolean existsForEventAndEmail(int idEvent, String emailParticipant) {
         return participationDAO.existsByEventAndEmail(idEvent, emailParticipant);
     }
+
+    public void deleteByEventAndEmail(int idEvent, String emailParticipant) {
+        participationDAO.deleteByEventAndEmail(idEvent, emailParticipant);
+    }
 }

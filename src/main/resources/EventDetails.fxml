@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true"
+            hbarPolicy="NEVER"
+            styleClass="details-scroll"
+            xmlns="http://javafx.com/javafx/22.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.EventDetailsController">
+    <content>
+        <VBox spacing="18.0" styleClass="details-root">
+            <padding>
+                <Insets top="24.0" right="24.0" bottom="24.0" left="24.0" />
+            </padding>
+
+            <children>
+                <VBox spacing="12.0" styleClass="details-hero">
+                    <children>
+                        <Label text="Fiche evenement" styleClass="details-kicker" />
+                        <Label fx:id="titleLabel" text="Titre evenement" styleClass="details-title" wrapText="true" />
+                        <HBox spacing="10.0">
+                            <children>
+                                <Label fx:id="typeLabel" text="Type" styleClass="details-chip" />
+                                <Label fx:id="dateLabel" text="Date" styleClass="details-chip" />
+                                <Label fx:id="locationLabel" text="Lieu" styleClass="details-chip" />
+                                <Label fx:id="priceLabel" text="Prix" styleClass="details-chip" />
+                                <Label fx:id="premiumLabel" text="Standard" styleClass="details-chip" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <HBox spacing="18.0">
+                    <children>
+                        <VBox spacing="14.0" styleClass="details-panel" HBox.hgrow="ALWAYS">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="12.0">
+                                    <children>
+                                        <VBox spacing="4.0">
+                                            <children>
+                                                <Label text="Avis clients" styleClass="details-section-title" />
+                                                <Label text="Retours laisses par les participants." styleClass="details-subtitle" />
+                                            </children>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="averageLabel" text="0.0 / 5" styleClass="details-rating-pill" />
+                                        <Label fx:id="reviewCountLabel" text="0 avis" styleClass="details-chip" />
+                                    </children>
+                                </HBox>
+
+                                <VBox fx:id="reviewsContainer" spacing="10.0" />
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="14.0" styleClass="details-panel details-form-panel" prefWidth="320.0">
+                            <children>
+                                <Label text="Laisser un avis" styleClass="details-section-title" />
+                                <Label fx:id="userEmailLabel" text="Utilisateur: -" styleClass="details-subtitle" />
+
+                                <VBox spacing="8.0">
+                                    <children>
+                                        <Label text="Note" styleClass="details-field-label" />
+                                        <ComboBox fx:id="noteComboBox" maxWidth="1.7976931348623157E308" />
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="8.0" VBox.vgrow="ALWAYS">
+                                    <children>
+                                        <Label text="Commentaire" styleClass="details-field-label" />
+                                        <TextArea fx:id="commentaireArea" prefRowCount="8" wrapText="true" promptText="Partage ton experience sur cet evenement..." />
+                                    </children>
+                                </VBox>
+
+                                <Button text="PUBLIER MON AVIS" onAction="#submitReview" styleClass="details-primary-button" />
+                                <Label fx:id="formStatusLabel" text="" wrapText="true" styleClass="details-subtitle" />
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

@@ -5,6 +5,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.FlowPane?>
@@ -39,9 +40,13 @@
                         <Region HBox.hgrow="ALWAYS" />
                         <HBox alignment="CENTER_RIGHT" spacing="10.0">
                             <children>
+                                <TextField fx:id="currentUserEmailField" prefWidth="230.0" promptText="client@fitopia.tn" styleClass="front-search-field" />
+                                <Button mnemonicParsing="false" onAction="#showAllEvents" styleClass="front-filter-reset" text="TOUS" />
+                                <Button mnemonicParsing="false" onAction="#showFavoriteEvents" styleClass="front-secondary-ghost-button" text="MES FAVORIS" />
+                                <Label fx:id="loyaltyScoreLabel" text="Score 0" styleClass="topbar-chip topbar-chip-accent" />
                                 <Label fx:id="heroTotalEventsLabel" text="0 evenements" styleClass="topbar-chip" />
                                 <Label fx:id="heroOpenEventsLabel" text="0 ouverts" styleClass="topbar-chip topbar-chip-success" />
-                                <Label fx:id="heroPremiumEventsLabel" text="0 premium" styleClass="topbar-chip topbar-chip-accent" />
+                                <Label fx:id="heroFavoriteEventsLabel" text="0 favoris" styleClass="topbar-chip topbar-chip-accent" />
                             </children>
                         </HBox>
                     </children>
@@ -58,6 +63,7 @@
                                     <children>
                                         <Button mnemonicParsing="false" onAction="#scrollToEvents" styleClass="front-primary-button" text="EXPLORE EVENTS" />
                                         <Button mnemonicParsing="false" onAction="#focusUpcomingCard" styleClass="front-secondary-button" text="REGISTER NEXT EVENT" />
+                                        <Button mnemonicParsing="false" onAction="#openReservationHistoryView" styleClass="front-secondary-ghost-button" text="MES RESERVATIONS" />
                                     </children>
                                 </HBox>
                                 <HBox alignment="CENTER_LEFT" spacing="8.0">
@@ -93,6 +99,84 @@
 
                 <VBox fx:id="eventsSectionAnchor" spacing="16.0" styleClass="front-section">
                     <children>
+                        <VBox spacing="16.0" styleClass="loyalty-panel">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="14.0">
+                                    <children>
+                                        <VBox spacing="4.0">
+                                            <children>
+                                                <Label text="Mon statut fidelite" styleClass="front-section-title" />
+                                                <Label fx:id="loyaltyIdentityLabel" text="Aucun client connecte" styleClass="front-section-subtitle" />
+                                            </children>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="loyaltyTierLabel" text="Bronze" styleClass="loyalty-tier-chip" />
+                                        <Label fx:id="loyaltyAccessLabel" text="Acces VIP inactif" styleClass="loyalty-access-chip" />
+                                    </children>
+                                </HBox>
+
+                                <HBox spacing="18.0">
+                                    <children>
+                                        <VBox prefWidth="250.0" spacing="8.0" styleClass="loyalty-stat-card">
+                                            <children>
+                                                <Label text="Reservations valides" styleClass="loyalty-stat-kicker" />
+                                                <Label fx:id="loyaltyReservationsLabel" text="0 reservations confirmees" styleClass="loyalty-stat-value" />
+                                            </children>
+                                        </VBox>
+                                        <VBox prefWidth="230.0" spacing="8.0" styleClass="loyalty-stat-card">
+                                            <children>
+                                                <Label text="Total depense" styleClass="loyalty-stat-kicker" />
+                                                <Label fx:id="loyaltySpentLabel" text="0.00 DT depenses" styleClass="loyalty-stat-value" />
+                                            </children>
+                                        </VBox>
+                                        <VBox prefWidth="210.0" spacing="8.0" styleClass="loyalty-stat-card">
+                                            <children>
+                                                <Label text="Progression" styleClass="loyalty-stat-kicker" />
+                                                <ProgressBar fx:id="loyaltyProgressBar" prefWidth="190.0" progress="0.0" styleClass="loyalty-progress" />
+                                                <Label fx:id="loyaltyProgressLabel" text="0/5 reservations valides vers VIP" styleClass="loyalty-progress-text" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                        <VBox HBox.hgrow="ALWAYS" spacing="8.0" styleClass="loyalty-stat-card loyalty-benefits-card">
+                                            <children>
+                                                <Label text="Avantages visibles" styleClass="loyalty-stat-kicker" />
+                                                <Label fx:id="loyaltyBenefitsLabel" text="Priorite sur les evenements premium, recommandations VIP, avantages exclusifs." styleClass="loyalty-benefits-text" wrapText="true" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="12.0" styleClass="front-section recommendation-section">
+                            <children>
+                                <HBox alignment="CENTER_LEFT" spacing="14.0">
+                                    <children>
+                                        <VBox spacing="4.0">
+                                            <children>
+                                                <Label text="Recommande pour vous" styleClass="front-section-title front-section-title-compact" />
+                                                <Label text="Suggestions dynamiques selon vos reservations, favoris, type d'evenement et statut VIP." styleClass="front-section-subtitle front-section-subtitle-compact" />
+                                            </children>
+                                        </VBox>
+                                        <Region HBox.hgrow="ALWAYS" />
+                                        <Label fx:id="recommendationCountLabel" text="0 recommandations" styleClass="result-count-chip" />
+                                    </children>
+                                </HBox>
+
+                                <FlowPane fx:id="recommendationCardsContainer" hgap="12.0" prefWrapLength="1360.0" vgap="12.0" />
+
+                                <StackPane fx:id="recommendationsEmptyStateBox" styleClass="front-empty-state recommendation-empty-state">
+                                    <children>
+                                        <VBox alignment="CENTER" spacing="8.0">
+                                            <children>
+                                                <Label text="Aucune recommandation pour le moment" styleClass="front-empty-title" />
+                                                <Label text="Reserve ou ajoute des favoris pour enrichir les suggestions personnalisees." wrapText="true" styleClass="front-empty-text" />
+                                            </children>
+                                        </VBox>
+                                    </children>
+                                </StackPane>
+                            </children>
+                        </VBox>
+
                         <HBox alignment="CENTER_LEFT" spacing="14.0">
                             <children>
                                 <VBox spacing="4.0">
@@ -102,6 +186,7 @@
                                     </children>
                                 </VBox>
                                 <Region HBox.hgrow="ALWAYS" />
+                                <Label fx:id="favoriteCountLabel" text="0 favoris" styleClass="result-count-chip" />
                                 <Label fx:id="resultCountLabel" text="0 evenements" styleClass="result-count-chip" />
                             </children>
                         </HBox>
@@ -125,6 +210,34 @@
                                     <children>
                                         <Label text="No events match your filters" styleClass="front-empty-title" />
                                         <Label text="Try adjusting your search or reset the filters to display all events from the database." wrapText="true" styleClass="front-empty-text" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </StackPane>
+                    </children>
+                </VBox>
+
+                <VBox fx:id="favoritesSectionAnchor" spacing="16.0" styleClass="front-section">
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="14.0">
+                            <children>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label text="Mes favoris" styleClass="front-section-title" />
+                                        <Label text="Retrouve rapidement les evenements enregistres pour l'utilisateur courant." styleClass="front-section-subtitle" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+
+                        <FlowPane fx:id="favoriteCardsContainer" hgap="22.0" prefWrapLength="1420.0" vgap="22.0" />
+
+                        <StackPane fx:id="favoritesEmptyStateBox" styleClass="front-empty-state">
+                            <children>
+                                <VBox alignment="CENTER" spacing="8.0">
+                                    <children>
+                                        <Label text="Aucun favori pour le moment" styleClass="front-empty-title" />
+                                        <Label text="Ajoute des evenements en favoris pour construire cette selection personnelle." wrapText="true" styleClass="front-empty-text" />
                                     </children>
                                 </VBox>
                             </children>

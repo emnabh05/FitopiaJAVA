@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="18.0"
+      styleClass="qr-root"
+      xmlns="http://javafx.com/javafx/22.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="tn.esprit.Pidev3A49.controllers.ReservationQrController">
+    <padding>
+        <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+    </padding>
+
+    <children>
+        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="qr-topbar">
+            <children>
+                <VBox spacing="4.0">
+                    <children>
+                        <Label text="QR RESERVATION" styleClass="qr-kicker"/>
+                        <Label fx:id="eventTitleLabel" text="Evenement" styleClass="qr-title" wrapText="true"/>
+                    </children>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="RETOUR" onAction="#closeView" styleClass="qr-secondary-button"/>
+            </children>
+        </HBox>
+
+        <HBox spacing="22.0">
+            <children>
+                <VBox alignment="CENTER" spacing="14.0" styleClass="qr-panel qr-code-panel" prefWidth="430.0">
+                    <children>
+                        <Label text="Scan check-in" styleClass="qr-section-title"/>
+                        <ImageView fx:id="qrImageView" fitWidth="360.0" fitHeight="360.0" preserveRatio="true" styleClass="qr-image"/>
+                        <Label text="Token de controle" styleClass="qr-muted-label"/>
+                        <Label fx:id="tokenLabel" text="-" styleClass="qr-token" wrapText="true"/>
+                    </children>
+                </VBox>
+
+                <VBox spacing="14.0" styleClass="qr-panel" HBox.hgrow="ALWAYS">
+                    <children>
+                        <Label text="Details reservation" styleClass="qr-section-title"/>
+
+                        <VBox spacing="10.0">
+                            <children>
+                                <Label text="Date evenement" styleClass="qr-muted-label"/>
+                                <Label fx:id="eventDateLabel" text="-" styleClass="qr-value"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0">
+                            <children>
+                                <Label text="Lieu" styleClass="qr-muted-label"/>
+                                <Label fx:id="eventLocationLabel" text="-" styleClass="qr-value"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0">
+                            <children>
+                                <Label text="Statut" styleClass="qr-muted-label"/>
+                                <Label fx:id="reservationStatusLabel" text="-" styleClass="qr-status-chip"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0">
+                            <children>
+                                <Label text="Participant" styleClass="qr-muted-label"/>
+                                <Label fx:id="participantLabel" text="-" styleClass="qr-value"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0">
+                            <children>
+                                <Label text="Email" styleClass="qr-muted-label"/>
+                                <Label fx:id="emailLabel" text="-" styleClass="qr-value"/>
+                            </children>
+                        </VBox>
+
+                        <VBox spacing="10.0">
+                            <children>
+                                <Label text="QR genere le" styleClass="qr-muted-label"/>
+                                <Label fx:id="generatedAtLabel" text="-" styleClass="qr-value"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+</VBox>

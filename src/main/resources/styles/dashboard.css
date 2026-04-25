@@ -335,6 +335,20 @@
     -fx-border-color: rgba(255, 255, 255, 0.10);
 }
 
+.loyalty-highlight-card {
+    -fx-background-color:
+        radial-gradient(center 92% 10%, radius 26%, rgba(255, 255, 255, 0.18), transparent 54%),
+        linear-gradient(to bottom right, #0d2347 0%, #25588c 100%);
+    -fx-border-color: rgba(255, 255, 255, 0.10);
+}
+
+.loyalty-highlight-card .stat-kicker,
+.loyalty-highlight-card .stat-title,
+.loyalty-highlight-card .stat-value,
+.loyalty-highlight-card .stat-caption {
+    -fx-text-fill: white;
+}
+
 .stat-kicker {
     -fx-background-color: linear-gradient(to bottom right, #edf5f0 0%, #f7faf8 100%);
     -fx-background-radius: 12px;
@@ -722,6 +736,16 @@
     -fx-text-fill: #587b2c;
 }
 
+.premium-table-cell {
+    -fx-text-fill: #ad5b10;
+    -fx-font-weight: 800;
+}
+
+.standard-table-cell {
+    -fx-text-fill: #567068;
+    -fx-font-weight: 700;
+}
+
 .success-badge {
     -fx-background-color: #ddf2e7;
     -fx-text-fill: #1f704f;
@@ -747,6 +771,116 @@
     -fx-background-color:
         radial-gradient(center 100% 0%, radius 44%, rgba(234, 243, 238, 0.72), transparent 54%),
         linear-gradient(to bottom right, #ffffff 0%, #fbfdfc 100%);
+}
+
+.participants-stats-row {
+    -fx-padding: 2 0 2 0;
+}
+
+.participants-stat-card {
+    -fx-background-color: linear-gradient(to bottom right, #ffffff 0%, #f7fbf9 100%);
+    -fx-background-radius: 18px;
+    -fx-border-color: #dfe9e4;
+    -fx-border-radius: 18px;
+    -fx-padding: 10 14;
+    -fx-min-width: 170px;
+    -fx-effect: dropshadow(gaussian, rgba(19, 49, 42, 0.05), 10, 0.1, 0, 3);
+}
+
+.participants-stat-title {
+    -fx-text-fill: #6d837b;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.participants-stat-value {
+    -fx-text-fill: #173c32;
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+}
+
+.participants-stat-card-confirmed {
+    -fx-background-color: linear-gradient(to bottom right, #effbf4 0%, #e8f8f0 100%);
+    -fx-border-color: #cbe9d9;
+}
+
+.participants-stat-card-cancelled {
+    -fx-background-color: linear-gradient(to bottom right, #fff4f3 0%, #feeceb 100%);
+    -fx-border-color: #f3d4d0;
+}
+
+.participants-filter-row {
+    -fx-padding: 10 12;
+}
+
+.participants-table .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #edf6f2 0%, #e5f0eb 100%);
+}
+
+.participants-table .table-row-cell {
+    -fx-cell-size: 46px;
+}
+
+.participants-table .table-cell {
+    -fx-font-size: 11px;
+}
+
+.participants-status-badge {
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 4 10;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+}
+
+.participants-status-confirmed {
+    -fx-background-color: #e3f7ec;
+    -fx-border-color: #bee7d0;
+    -fx-text-fill: #1d7b57;
+}
+
+.participants-status-cancelled {
+    -fx-background-color: #fee9e7;
+    -fx-border-color: #f2c5bf;
+    -fx-text-fill: #c45249;
+}
+
+.participants-status-used {
+    -fx-background-color: #edf1ff;
+    -fx-border-color: #ccd4ff;
+    -fx-text-fill: #4e5fd1;
+}
+
+.participants-action-view,
+.participants-action-delete {
+    -fx-cursor: hand;
+    -fx-font-size: 10px;
+    -fx-font-weight: 800;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-padding: 4 10;
+}
+
+.participants-action-view {
+    -fx-background-color: linear-gradient(to bottom, #eef6ff 0%, #e3eefc 100%);
+    -fx-border-color: #cddcf0;
+    -fx-text-fill: #2f5f93;
+}
+
+.participants-action-delete {
+    -fx-background-color: linear-gradient(to bottom, #fff1f0 0%, #ffe5e3 100%);
+    -fx-border-color: #efc2bd;
+    -fx-text-fill: #bf4f48;
+}
+
+.loyalty-panel-admin {
+    -fx-background-color:
+        radial-gradient(center 100% 0%, radius 40%, rgba(233, 241, 255, 0.82), transparent 54%),
+        linear-gradient(to bottom right, #ffffff 0%, #f8fbff 100%);
+}
+
+.loyalty-table .column-header-background {
+    -fx-background-color: linear-gradient(to bottom, #eef4ff 0%, #e8f0fb 100%);
 }
 
 .list-card-title {

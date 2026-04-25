@@ -60,7 +60,7 @@
                     </padding>
                     <children>
                         <Label fx:id="eventDisplayTitleLabel"
-                               text="yoga premium"
+                               text="yoga"
                                styleClass="reservation-display-title"/>
 
                         <GridPane hgap="24.0" vgap="12.0">
@@ -95,6 +95,13 @@
                                     <children>
                                         <Label text="Capacite restante :" styleClass="reservation-meta-label"/>
                                         <Label fx:id="eventSeatsLabel" text="15" styleClass="reservation-meta-value"/>
+                                    </children>
+                                </VBox>
+
+                                <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="2">
+                                    <children>
+                                        <Label text="Acces :" styleClass="reservation-meta-label"/>
+                                        <Label fx:id="eventPremiumLabel" text="Standard" styleClass="reservation-status-chip"/>
                                     </children>
                                 </VBox>
                             </children>

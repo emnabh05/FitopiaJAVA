@@ -151,6 +151,19 @@ public class ParticipationDAO {
         }
     }
 
+    public void deleteByEventAndEmail(int idEvent, String emailParticipant) {
+        String sql = "DELETE FROM participation WHERE id_event = ? AND LOWER(email_participant) = LOWER(?)";
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, idEvent);
+            statement.setString(2, emailParticipant);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            logSqlError(sql, e);
+            throw new RuntimeException("Echec SQL lors de la suppression de la participation liee.", e);
+        }
+    }
+
     private Participation mapParticipation(ResultSet resultSet) throws SQLException {
         Timestamp inscriptionTimestamp = resultSet.getTimestamp("date_inscription");
         LocalDateTime dateInscription = inscriptionTimestamp != null ? inscriptionTimestamp.toLocalDateTime() : null;

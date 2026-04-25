@@ -97,12 +97,13 @@
 
 .front-primary-button,
 .front-secondary-button,
+.front-secondary-ghost-button,
 .upcoming-button,
 .front-filter-reset,
 .front-card-info-button,
 .front-card-primary-button,
-.front-card-waitlist-button,
-.front-card-priority-button {
+.front-card-favorite-button,
+.front-card-favorite-button-active {
     -fx-cursor: hand;
     -fx-font-weight: 800;
     -fx-background-radius: 18px;
@@ -122,6 +123,14 @@
     -fx-text-fill: #eefbf5;
     -fx-padding: 14 22;
     -fx-font-size: 13px;
+}
+
+.front-secondary-ghost-button {
+    -fx-background-color: white;
+    -fx-border-color: #d9e5e0;
+    -fx-text-fill: #18473c;
+    -fx-padding: 12 18;
+    -fx-font-size: 12px;
 }
 
 .front-chip {
@@ -174,6 +183,91 @@
 
 .front-section {
     -fx-spacing: 16;
+}
+
+.loyalty-panel {
+    -fx-background-color:
+        radial-gradient(center 98% 8%, radius 26%, rgba(255, 255, 255, 0.26), transparent 54%),
+        linear-gradient(to right, #133d38 0%, #196453 48%, #2db289 100%);
+    -fx-background-radius: 32px;
+    -fx-border-radius: 32px;
+    -fx-padding: 24 26;
+    -fx-effect: dropshadow(gaussian, rgba(25, 83, 68, 0.16), 30, 0.16, 0, 10);
+}
+
+.loyalty-panel .front-section-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+}
+
+.loyalty-panel .front-section-subtitle {
+    -fx-text-fill: rgba(255, 255, 255, 0.84);
+}
+
+.loyalty-tier-chip,
+.loyalty-access-chip {
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 9 14;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+}
+
+.loyalty-tier-chip {
+    -fx-background-color: #fff1d8;
+    -fx-border-color: #f0c17b;
+    -fx-text-fill: #b45f13;
+}
+
+.loyalty-access-chip {
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+    -fx-border-color: rgba(255, 255, 255, 0.20);
+    -fx-text-fill: white;
+}
+
+.loyalty-stat-card {
+    -fx-background-color: rgba(255, 255, 255, 0.12);
+    -fx-background-radius: 24px;
+    -fx-border-color: rgba(255, 255, 255, 0.18);
+    -fx-border-radius: 24px;
+    -fx-padding: 18 18;
+}
+
+.loyalty-benefits-card {
+    -fx-background-color: rgba(6, 36, 32, 0.22);
+}
+
+.loyalty-stat-kicker {
+    -fx-text-fill: rgba(255, 255, 255, 0.74);
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.loyalty-stat-value {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+    -fx-font-weight: 900;
+}
+
+.loyalty-progress {
+    -fx-accent: #ffd16c;
+}
+
+.loyalty-progress > .track {
+    -fx-background-color: rgba(255, 255, 255, 0.16);
+    -fx-background-radius: 999px;
+}
+
+.loyalty-progress > .bar {
+    -fx-background-color: linear-gradient(to right, #ffe08c 0%, #ffc24d 100%);
+    -fx-background-radius: 999px;
+}
+
+.loyalty-progress-text,
+.loyalty-benefits-text {
+    -fx-text-fill: rgba(255, 255, 255, 0.88);
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
 }
 
 .front-section-title {
@@ -272,6 +366,12 @@
     -fx-text-fill: #ba5f11;
 }
 
+.front-badge-waitlist {
+    -fx-background-color: #eef0ff;
+    -fx-border-color: #cfd5ff;
+    -fx-text-fill: #5b62e6;
+}
+
 .front-badge-full {
     -fx-background-color: #ffe6e5;
     -fx-border-color: #f2beb9;
@@ -356,11 +456,16 @@
     -fx-padding: 14 24;
 }
 
-.front-card-waitlist-button,
-.front-card-priority-button {
-    -fx-background-color: linear-gradient(to bottom, #f8fbff 0%, #eef2f8 100%);
-    -fx-border-color: #d7dfe9;
-    -fx-text-fill: #50627d;
+.front-card-favorite-button {
+    -fx-background-color: linear-gradient(to bottom, #fff5f6 0%, #ffe9ec 100%);
+    -fx-border-color: #f3c5cd;
+    -fx-text-fill: #b53f5d;
+    -fx-padding: 14 20;
+}
+
+.front-card-favorite-button-active {
+    -fx-background-color: linear-gradient(to bottom, #c74262 0%, #9f2846 100%);
+    -fx-text-fill: white;
     -fx-padding: 14 20;
 }
 
@@ -403,4 +508,245 @@
 .front-empty-text {
     -fx-text-fill: #72857d;
     -fx-font-size: 13px;
+}
+
+.history-scroll,
+.history-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.history-root {
+    -fx-background-color:
+        radial-gradient(center 14% 8%, radius 32%, rgba(211, 245, 231, 0.92), transparent 60%),
+        linear-gradient(to bottom right, #eef8f4 0%, #f7fbff 55%, #edf5fb 100%);
+}
+
+.history-topbar {
+    -fx-background-color: rgba(255, 255, 255, 0.88);
+    -fx-background-radius: 22px;
+    -fx-border-color: #dce7e2;
+    -fx-border-radius: 22px;
+    -fx-padding: 16 18;
+}
+
+.history-title {
+    -fx-text-fill: #17372f;
+    -fx-font-size: 26px;
+    -fx-font-weight: 900;
+}
+
+.history-subtitle {
+    -fx-text-fill: #70867d;
+    -fx-font-size: 13px;
+}
+
+.history-count {
+    -fx-background-color: white;
+    -fx-background-radius: 999px;
+    -fx-border-color: #dbe5e1;
+    -fx-border-radius: 999px;
+    -fx-padding: 8 14;
+    -fx-text-fill: #1e4439;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.history-card {
+    -fx-background-color: white;
+    -fx-background-radius: 30px;
+    -fx-border-color: #dfe9e4;
+    -fx-border-radius: 30px;
+    -fx-effect: dropshadow(gaussian, rgba(38, 71, 60, 0.10), 26, 0.12, 0, 8);
+}
+
+.recommended-card {
+    -fx-border-color: #cbe7db;
+}
+
+.recommendation-section {
+    -fx-background-color: rgba(255, 255, 255, 0.58);
+    -fx-background-radius: 18px;
+    -fx-border-color: #dfe9e4;
+    -fx-border-radius: 18px;
+    -fx-padding: 12 14;
+}
+
+.front-section-title-compact {
+    -fx-font-size: 20px;
+    -fx-font-weight: 800;
+}
+
+.front-section-subtitle-compact {
+    -fx-font-size: 12px;
+}
+
+.recommended-card-compact {
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-padding: 10;
+    -fx-effect: dropshadow(gaussian, rgba(38, 71, 60, 0.07), 14, 0.08, 0, 3);
+}
+
+.recommendation-thumbnail {
+    -fx-background-color:
+        radial-gradient(center 84% 10%, radius 26%, rgba(255, 255, 255, 0.24), transparent 54%),
+        linear-gradient(to bottom right, #d7efe6 0%, #b9dbd0 100%);
+    -fx-background-radius: 12px;
+    -fx-border-color: #d4e6de;
+    -fx-border-radius: 12px;
+    -fx-min-width: 102px;
+    -fx-pref-width: 102px;
+    -fx-max-width: 102px;
+    -fx-min-height: 72px;
+    -fx-pref-height: 72px;
+    -fx-max-height: 72px;
+}
+
+.recommendation-placeholder {
+    -fx-background-color:
+        radial-gradient(center 84% 10%, radius 26%, rgba(255, 255, 255, 0.20), transparent 54%),
+        linear-gradient(to bottom right, #0f4c45 0%, #1f8f71 100%);
+    -fx-background-radius: 12px;
+}
+
+.recommendation-placeholder-text {
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: 700;
+    -fx-padding: 4 6;
+}
+
+.recommendation-badge-compact {
+    -fx-padding: 3 8;
+    -fx-font-size: 10px;
+}
+
+.recommendation-title-compact {
+    -fx-text-fill: #19324d;
+    -fx-font-size: 14px;
+    -fx-font-weight: 800;
+}
+
+.recommendation-meta-compact {
+    -fx-text-fill: #6f8298;
+    -fx-font-size: 11px;
+    -fx-font-weight: 700;
+}
+
+.recommendation-action-compact {
+    -fx-cursor: hand;
+    -fx-font-weight: 700;
+    -fx-font-size: 11px;
+    -fx-text-fill: #1b4f78;
+    -fx-background-color: linear-gradient(to bottom, #eef5ff 0%, #e1ecfb 100%);
+    -fx-border-color: #c7d8f0;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-padding: 5 10;
+}
+
+.recommendation-empty-state {
+    -fx-padding: 16;
+    -fx-background-radius: 16px;
+    -fx-border-radius: 16px;
+}
+
+.recommendation-empty-state .front-empty-title {
+    -fx-font-size: 16px;
+}
+
+.recommendation-empty-state .front-empty-text {
+    -fx-font-size: 12px;
+}
+
+.history-card-media {
+    -fx-background-color:
+        radial-gradient(center 80% 12%, radius 24%, rgba(255, 255, 255, 0.20), transparent 54%),
+        linear-gradient(to bottom right, #d7efe6 0%, #bddad2 100%);
+    -fx-background-radius: 30px 30px 0 0;
+    -fx-pref-height: 260px;
+    -fx-min-height: 260px;
+    -fx-max-height: 260px;
+}
+
+.history-card-placeholder {
+    -fx-background-color:
+        radial-gradient(center 86% 10%, radius 28%, rgba(255, 255, 255, 0.18), transparent 54%),
+        linear-gradient(to bottom right, #103f3d 0%, #41ad87 100%);
+    -fx-background-radius: 30px 30px 0 0;
+}
+
+.history-placeholder-title {
+    -fx-text-fill: white;
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+}
+
+.history-card-title {
+    -fx-text-fill: #19324d;
+    -fx-font-size: 26px;
+    -fx-font-weight: 900;
+}
+
+.history-chip {
+    -fx-background-color: linear-gradient(to bottom, #f8fbfd 0%, #eef3f7 100%);
+    -fx-background-radius: 999px;
+    -fx-border-color: #d8e1ea;
+    -fx-border-radius: 999px;
+    -fx-padding: 9 14;
+    -fx-text-fill: #50627d;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.history-secondary-button,
+.history-danger-button {
+    -fx-cursor: hand;
+    -fx-font-weight: 800;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-padding: 14 20;
+}
+
+.history-secondary-button {
+    -fx-background-color: linear-gradient(to bottom, #f3f8ff 0%, #e7f0fb 100%);
+    -fx-border-color: #cddced;
+    -fx-text-fill: #28588f;
+}
+
+.history-danger-button {
+    -fx-background-color: linear-gradient(to bottom, #fff2f1 0%, #ffe1de 100%);
+    -fx-border-color: #f0c1bc;
+    -fx-text-fill: #b54b44;
+}
+
+.history-status-confirmed,
+.history-status-cancelled,
+.history-status-used,
+.history-status-pending {
+    -fx-background-radius: 999px;
+    -fx-border-radius: 999px;
+    -fx-padding: 8 14;
+    -fx-font-size: 11px;
+    -fx-font-weight: 800;
+}
+
+.history-status-confirmed {
+    -fx-background-color: #e4f8ee;
+    -fx-text-fill: #1d8b5e;
+}
+
+.history-status-cancelled {
+    -fx-background-color: #ffe9e8;
+    -fx-text-fill: #d25750;
+}
+
+.history-status-used {
+    -fx-background-color: #eef0ff;
+    -fx-text-fill: #5b62e6;
+}
+
+.history-status-pending {
+    -fx-background-color: #fff3df;
+    -fx-text-fill: #bb6c12;
 }

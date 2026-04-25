@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true"
+            hbarPolicy="NEVER"
+            styleClass="history-scroll"
+            xmlns="http://javafx.com/javafx/22.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="tn.esprit.Pidev3A49.controllers.ReservationHistoryController">
+    <content>
+        <VBox fx:id="contentRoot" spacing="18.0" styleClass="history-root">
+            <padding>
+                <Insets top="24.0" right="24.0" bottom="24.0" left="24.0"/>
+            </padding>
+            <children>
+                <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="history-topbar">
+                    <children>
+                        <VBox spacing="4.0">
+                            <children>
+                                <Label text="MES RESERVATIONS" styleClass="history-title"/>
+                                <Label fx:id="emailLabel" text="Reservations de : -" styleClass="history-subtitle"/>
+                            </children>
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="reservationCountLabel" text="0 reservations" styleClass="history-count"/>
+                    </children>
+                </HBox>
+
+                <FlowPane fx:id="reservationCardsContainer" hgap="22.0" prefWrapLength="1420.0" vgap="22.0"/>
+
+                <StackPane fx:id="emptyStateBox" styleClass="front-empty-state">
+                    <children>
+                        <VBox alignment="CENTER" spacing="8.0">
+                            <children>
+                                <Label text="Aucune reservation" styleClass="front-empty-title"/>
+                                <Label text="Les reservations du client apparaitront ici avec leur statut, QR et actions disponibles." wrapText="true" styleClass="front-empty-text"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </StackPane>
+            </children>
+        </VBox>
+    </content>
+</ScrollPane>

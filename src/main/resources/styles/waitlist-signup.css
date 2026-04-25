@@ -1,0 +1,73 @@
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+.waitlist-root {
+    -fx-background-color:
+        radial-gradient(center 14% 8%, radius 32%, rgba(211, 245, 231, 0.92), transparent 60%),
+        linear-gradient(to bottom right, #eef8f4 0%, #f7fbff 55%, #edf5fb 100%);
+}
+
+.waitlist-hero,
+.waitlist-form-card {
+    -fx-background-color: rgba(255, 255, 255, 0.92);
+    -fx-background-radius: 24px;
+    -fx-border-color: #d9e7e0;
+    -fx-border-radius: 24px;
+    -fx-padding: 22;
+}
+
+.waitlist-kicker {
+    -fx-text-fill: #177561;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+}
+
+.waitlist-title {
+    -fx-text-fill: #17372f;
+    -fx-font-size: 28px;
+    -fx-font-weight: 900;
+}
+
+.waitlist-subtitle,
+.waitlist-status {
+    -fx-text-fill: #73877e;
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+}
+
+.waitlist-label {
+    -fx-text-fill: #214338;
+    -fx-font-size: 12px;
+    -fx-font-weight: 800;
+}
+
+.waitlist-field {
+    -fx-background-color: linear-gradient(to bottom, #fbfdfc 0%, #f4f8f6 100%);
+    -fx-background-radius: 16px;
+    -fx-border-color: #dce8e1;
+    -fx-border-radius: 16px;
+    -fx-padding: 11 12;
+    -fx-text-fill: #183c32;
+    -fx-prompt-text-fill: #91a69c;
+}
+
+.waitlist-primary-button,
+.waitlist-secondary-button {
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-padding: 12 18;
+    -fx-font-weight: 800;
+    -fx-cursor: hand;
+}
+
+.waitlist-primary-button {
+    -fx-background-color: linear-gradient(to bottom, #17473b 0%, #215d4d 100%);
+    -fx-text-fill: white;
+}
+
+.waitlist-secondary-button {
+    -fx-background-color: linear-gradient(to bottom, #f3f8ff 0%, #e7f0fb 100%);
+    -fx-border-color: #cddced;
+    -fx-text-fill: #28588f;
+}
