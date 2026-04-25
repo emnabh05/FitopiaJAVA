@@ -337,7 +337,6 @@
     -fx-border-color: #e4ece8;
     -fx-border-radius: 26;
     -fx-padding: 16;
-    -fx-effect: dropshadow(gaussian, rgba(18, 37, 41, 0.24), 34, 0.2, 0, 12);
 }
 
 .program-modal-back {

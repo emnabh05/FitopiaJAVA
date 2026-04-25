@@ -154,6 +154,20 @@ public class FitopiaHomeController {
     @FXML private Button btnPlannerCoach;
 
     @FXML private VBox programModalCard;
+    // ── Feature 2 : IMC ──
+    @FXML private StackPane imcModalOverlay;
+    @FXML private VBox      imcResultBox;
+    @FXML private TextField tfImcPoids;
+    @FXML private TextField tfImcTaille;
+    @FXML private TextField tfImcAge;
+    @FXML private javafx.scene.control.ComboBox<String> cbImcSexe;
+    @FXML private Label lblImcValeur;
+    @FXML private Label lblImcCategorie;
+    @FXML private Label lblImcConseil;
+    @FXML private Label lblImcProgramme;
+    @FXML private javafx.scene.control.ProgressBar pbImc;
+    private String imcRecommendedProgram = null;
+    // ── Feature 3 : Timer repos (supprimé) ──
     @FXML private Label lblProgramModalTitle;
     @FXML private Label lblSelectedProgram;
     @FXML private VBox programLocationStep;
@@ -231,6 +245,8 @@ public class FitopiaHomeController {
                 if (sel != null && !sel.isEmpty()) renderPerfChart(sel);
             });
         }
+        // Init IMC sexe combo
+        if (cbImcSexe != null) cbImcSexe.getItems().addAll("Homme", "Femme");
     }
 
     @FXML
@@ -2208,6 +2224,83 @@ public class FitopiaHomeController {
             return false;
         }
     }
+
+    // ── Feature 2 : Calculateur IMC ──────────────────────────────────────────
+
+    @FXML private void openImcModal() {
+        if (imcModalOverlay != null) { imcModalOverlay.setVisible(true); imcModalOverlay.setManaged(true); }
+    }
+    @FXML private void closeImcModal() {
+        if (imcModalOverlay != null) { imcModalOverlay.setVisible(false); imcModalOverlay.setManaged(false); }
+    }
+
+    @FXML
+    private void calculerImc() {
+        try {
+            double poids  = Double.parseDouble(tfImcPoids.getText().replace(",", ".").trim());
+            double taille = Double.parseDouble(tfImcTaille.getText().replace(",", ".").trim()) / 100.0;
+            if (poids <= 0 || taille <= 0) throw new NumberFormatException();
+
+            double imc = poids / (taille * taille);
+            String sexe = cbImcSexe.getValue() != null ? cbImcSexe.getValue() : "Homme";
+
+            // Catégorie + couleur + conseil
+            String categorie, couleur, conseil, programme;
+            double progress;
+            if (imc < 18.5) {
+                categorie = "Insuffisance pondérale"; couleur = "#3b82f6"; progress = 0.15;
+                conseil   = "Augmentez votre apport calorique et faites de la musculation.";
+                programme = "Prise de masse — Corps entier (Débutant)";
+                imcRecommendedProgram = "Corps entier";
+            } else if (imc < 25.0) {
+                categorie = "Poids normal ✓"; couleur = "#22c55e"; progress = 0.45;
+                conseil   = "Excellent ! Maintenez votre condition avec un programme équilibré.";
+                programme = "Programme équilibré — Poitrine + Dos (Intermédiaire)";
+                imcRecommendedProgram = "Poitrine";
+            } else if (imc < 30.0) {
+                categorie = "Surpoids"; couleur = "#f59e0b"; progress = 0.65;
+                conseil   = "Combinez cardio et musculation pour perdre du poids progressivement.";
+                programme = "Cardio + Jambes (Débutant) — 3x/semaine";
+                imcRecommendedProgram = "Jambes";
+            } else if (imc < 35.0) {
+                categorie = "Obésité modérée"; couleur = "#f97316"; progress = 0.80;
+                conseil   = "Commencez doucement avec des exercices à faible impact.";
+                programme = "Corps entier léger (Débutant) — 2x/semaine";
+                imcRecommendedProgram = "Corps entier";
+            } else {
+                categorie = "Obésité sévère"; couleur = "#ef4444"; progress = 0.95;
+                conseil   = "Consultez un médecin avant de commencer. Marche et mobilité recommandées.";
+                programme = "Mobilité & Abdos (Débutant) — 2x/semaine";
+                imcRecommendedProgram = "Abdos";
+            }
+
+            // Afficher résultat
+            if (lblImcValeur    != null) lblImcValeur.setText(String.format("%.1f", imc));
+            if (lblImcCategorie != null) { lblImcCategorie.setText(categorie); lblImcCategorie.setStyle("-fx-font-size:16px;-fx-font-weight:800;-fx-text-fill:" + couleur + ";"); }
+            if (lblImcConseil   != null) lblImcConseil.setText(conseil);
+            if (lblImcProgramme != null) lblImcProgramme.setText(programme);
+            if (pbImc           != null) { pbImc.setProgress(progress); pbImc.setStyle("-fx-accent:" + couleur + ";"); }
+            if (imcResultBox    != null) { imcResultBox.setVisible(true); imcResultBox.setManaged(true); }
+
+        } catch (NumberFormatException e) {
+            if (lblImcConseil != null) { lblImcConseil.setText("⚠ Entrez des valeurs valides (poids en kg, taille en cm)."); lblImcConseil.setStyle("-fx-text-fill:#ef4444;"); }
+        }
+    }
+
+    @FXML
+    private void lancerProgrammeImc() {
+        closeImcModal();
+        if (imcRecommendedProgram != null) {
+            selectedProgram    = imcRecommendedProgram;
+            selectedLocation   = null;
+            selectedDifficulty = null;
+            programModalOverlay.setVisible(true);
+            programModalOverlay.setManaged(true);
+            showProgramLocationStep();
+        }
+    }
+
+    // ── Feature 3 : Timer repos (supprimé) ──
 
     private void activatePlannerTab(Button activeButton) {
         closeProgramModal();

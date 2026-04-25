@@ -1,0 +1,176 @@
+{% extends 'base.html.twig' %}
+{% block title %}Dashboard Fitness | Fitopia{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .dash-page { background:#f8fafc; min-height:calc(100vh - 160px); padding:2.5rem 0 3rem; }
+  .dash-shell { width:min(1200px,92vw); margin:0 auto; display:grid; gap:1.4rem; }
+
+  /* Hero */
+  .dash-hero {
+    background:linear-gradient(130deg,#0b3a3d 0%,#1a6b5a 65%,#44a89f 100%);
+    border-radius:22px; color:#fff; padding:2rem 2rem 1.6rem;
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+  }
+  .dash-hero h1 { font-size:1.8rem; font-weight:800; margin:0 0 .3rem; }
+  .dash-hero p  { opacity:.85; margin:0; font-size:.95rem; }
+
+  /* Stats grid */
+  .dash-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
+  .dash-stat {
+    background:#fff; border:1px solid #dce9ee; border-radius:18px;
+    padding:1.2rem 1.4rem; display:flex; align-items:center; gap:1rem;
+    box-shadow:0 4px 14px rgba(10,36,54,.06);
+  }
+  .dash-stat-icon { font-size:2rem; width:52px; height:52px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .dash-stat-val  { font-size:1.8rem; font-weight:900; color:#0b3a3d; line-height:1; }
+  .dash-stat-lbl  { font-size:.8rem; color:#64748b; font-weight:600; margin-top:3px; }
+
+  /* Record card */
+  .dash-record {
+    background:linear-gradient(135deg,#0b3a3d,#1a6b5a); color:#fff;
+    border-radius:18px; padding:1.2rem 1.4rem;
+    display:flex; align-items:center; gap:1rem;
+  }
+  .dash-record-val { font-size:2.2rem; font-weight:900; }
+  .dash-record-lbl { font-size:.85rem; opacity:.85; }
+
+  /* Recent sessions */
+  .dash-section-title { font-size:1.1rem; font-weight:800; color:#0b3a3d; margin:0 0 .8rem; }
+  .dash-sessions { display:grid; gap:.7rem; }
+  .dash-session-card {
+    background:#fff; border:1px solid #dce9ee; border-radius:14px;
+    padding:.9rem 1.1rem; display:flex; align-items:center; gap:1rem;
+    box-shadow:0 2px 8px rgba(10,36,54,.05);
+  }
+  .dash-session-date { font-size:.78rem; font-weight:700; color:#64748b; min-width:80px; }
+  .dash-session-label { font-weight:700; color:#0b3a3d; flex:1; }
+  .dash-session-tags { display:flex; flex-wrap:wrap; gap:.3rem; }
+  .dash-tag { font-size:.72rem; background:#e8f5f0; color:#1a6b5a; border-radius:999px; padding:2px 9px; font-weight:600; }
+  .dash-session-pdf {
+    font-size:.78rem; font-weight:700; color:#1a6b5a; text-decoration:none;
+    border:1px solid #1a6b5a; border-radius:8px; padding:4px 10px;
+    transition:background .2s;
+  }
+  .dash-session-pdf:hover { background:#e8f5f0; }
+
+  /* Quick actions */
+  .dash-actions { display:flex; flex-wrap:wrap; gap:.8rem; }
+  .dash-action-btn {
+    display:flex; align-items:center; gap:.5rem;
+    background:#fff; border:1.5px solid #dce9ee; border-radius:14px;
+    padding:.75rem 1.2rem; font-weight:700; font-size:.9rem; color:#0b3a3d;
+    text-decoration:none; transition:box-shadow .2s, border-color .2s;
+  }
+  .dash-action-btn:hover { border-color:#1a6b5a; box-shadow:0 4px 14px rgba(10,36,54,.1); color:#0b3a3d; text-decoration:none; }
+  .dash-action-btn.primary { background:linear-gradient(135deg,#0b3a3d,#1a6b5a); color:#fff; border-color:transparent; }
+  .dash-action-btn.primary:hover { color:#fff; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dash-page">
+  <div class="dash-shell">
+
+    {# Hero #}
+    <div class="dash-hero">
+      <div>
+        <h1>Bonjour, {{ user.firstName ?? user.userIdentifier }} 👋</h1>
+        <p>Voici un résumé de tes performances fitness.</p>
+      </div>
+      <div class="dash-actions">
+        <a href="{{ path('fitness_planner', {view:'plans'}) }}" class="dash-action-btn primary">🏋️ Fitness Planner</a>
+        <a href="{{ path('coaches') }}" class="dash-action-btn">👤 Coachs</a>
+      </div>
+    </div>
+
+    {# Stats #}
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <div class="dash-stat-icon" style="background:#e8f5f0;">🏃</div>
+        <div>
+          <div class="dash-stat-val">{{ totalSessions }}</div>
+          <div class="dash-stat-lbl">Séances enregistrées</div>
+        </div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-icon" style="background:#fef3c7;">📅</div>
+        <div>
+          <div class="dash-stat-val">{{ weeksActive }}</div>
+          <div class="dash-stat-lbl">Semaines actives</div>
+        </div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-icon" style="background:#ede9fe;">💪</div>
+        <div>
+          <div class="dash-stat-val">{{ distinctExercises }}</div>
+          <div class="dash-stat-lbl">Exercices pratiqués</div>
+        </div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-icon" style="background:#fee2e2;">📋</div>
+        <div>
+          <div class="dash-stat-val">{{ totalPlans }}</div>
+          <div class="dash-stat-lbl">Plans confirmés</div>
+        </div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-icon" style="background:#dbeafe;">🗂</div>
+        <div>
+          <div class="dash-stat-val">{{ totalPrograms }}</div>
+          <div class="dash-stat-lbl">Programmes disponibles</div>
+        </div>
+      </div>
+    </div>
+
+    {# Record #}
+    {% if recordRow %}
+    <div class="dash-record">
+      <div style="font-size:2.5rem;">🏆</div>
+      <div>
+        <div class="dash-record-val">{{ recordRow.max_weight }} kg</div>
+        <div class="dash-record-lbl">Record personnel — {{ recordRow.exercise_name }}</div>
+      </div>
+    </div>
+    {% endif %}
+
+    {# Séances récentes #}
+    <div>
+      <div class="dash-section-title">Séances récentes</div>
+      {% if recentSessions is empty %}
+        <p style="color:#94a3b8;font-size:.9rem;">Aucune séance enregistrée. <a href="{{ path('fitness_planner', {view:'plans'}) }}">Commencer maintenant →</a></p>
+      {% else %}
+        <div class="dash-sessions">
+          {% for session in recentSessions %}
+          <div class="dash-session-card">
+            <div class="dash-session-date">{{ session.sessionDate|date('d/m/Y') }}</div>
+            <div class="dash-session-label">{{ session.label ?? 'Séance du ' ~ session.sessionDate|date('d/m') }}</div>
+            <div class="dash-session-tags">
+              {% for log in session.performanceLogs %}
+                <span class="dash-tag">{{ log.exercise.name }}</span>
+              {% endfor %}
+            </div>
+            <a href="{{ path('performance_session_pdf', {id: session.id}) }}" class="dash-session-pdf">
+              📄 PDF
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    {# Actions rapides #}
+    <div>
+      <div class="dash-section-title">Actions rapides</div>
+      <div class="dash-actions">
+        <a href="{{ path('fitness_planner', {view:'plans'}) }}"    class="dash-action-btn">📈 Suivi performances</a>
+        <a href="{{ path('fitness_planner', {view:'explore'}) }}"  class="dash-action-btn">🎬 Explorer vidéos</a>
+        <a href="{{ path('fitness_planner', {view:'coach'}) }}"    class="dash-action-btn">🧑‍🏫 Coachs</a>
+        <a href="{{ path('fitness_planner', {view:'programs'}) }}" class="dash-action-btn">🗂 Programmes</a>
+        <a href="{{ path('app_profile') }}"                        class="dash-action-btn">👤 Mon profil</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

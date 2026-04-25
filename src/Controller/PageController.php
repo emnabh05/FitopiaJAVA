@@ -34,6 +34,8 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 class PageController extends AbstractController
 {
@@ -46,6 +48,92 @@ class PageController extends AbstractController
     public function home(): Response
     {
         return $this->render('pages/index.html.twig');
+    }
+
+    #[Route('/dashboard', name: 'fitness_dashboard')]
+    public function dashboard(EntityManagerInterface $em): Response
+    {
+        if (!$this->getUser() instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+        $user   = $this->getUser();
+        $userId = $user->getId();
+
+        // Stats fitness
+        $totalSessions = $em->getRepository(TrainingSession::class)->count(['user' => $user]);
+        $totalPlans    = $em->getRepository(FitnessPlan::class)->count(['user' => $user]);
+        $totalPrograms = $em->getRepository(FitnessProgram::class)->count([]);
+
+        // Dernières séances
+        $recentSessions = $em->getRepository(TrainingSession::class)->findByUser($userId, 5);
+
+        // Record poids max toutes séances
+        $recordRow = $em->getConnection()->fetchAssociative('
+            SELECT ec.name AS exercise_name, MAX(ps.weight_kg) AS max_weight
+            FROM performance_set ps
+            JOIN performance_log pl ON pl.id = ps.log_id
+            JOIN training_session ts ON ts.id = pl.session_id
+            JOIN exercise_catalog ec ON ec.id = pl.exercise_id
+            WHERE ts.user_id = :uid AND ps.weight_kg IS NOT NULL AND ps.is_warmup = 0
+            GROUP BY pl.exercise_id ORDER BY max_weight DESC LIMIT 1
+        ', ['uid' => $userId]);
+
+        // Semaines actives (semaines avec au moins 1 séance)
+        $weeksActive = (int) $em->getConnection()->fetchOne('
+            SELECT COUNT(DISTINCT CONCAT(year, week_number))
+            FROM training_session WHERE user_id = :uid
+        ', ['uid' => $userId]);
+
+        // Exercices distincts pratiqués
+        $distinctExercises = (int) $em->getConnection()->fetchOne('
+            SELECT COUNT(DISTINCT pl.exercise_id)
+            FROM performance_log pl
+            JOIN training_session ts ON ts.id = pl.session_id
+            WHERE ts.user_id = :uid
+        ', ['uid' => $userId]);
+
+        return $this->render('pages/fitness_dashboard.html.twig', [
+            'user'              => $user,
+            'totalSessions'     => $totalSessions,
+            'totalPlans'        => $totalPlans,
+            'totalPrograms'     => $totalPrograms,
+            'recentSessions'    => $recentSessions,
+            'recordRow'         => $recordRow ?: null,
+            'weeksActive'       => $weeksActive,
+            'distinctExercises' => $distinctExercises,
+        ]);
+    }
+
+    #[Route('/performance/session/{id}/pdf', name: 'performance_session_pdf', methods: ['GET'])]
+    public function exportSessionPdf(int $id, EntityManagerInterface $em): Response
+    {
+        if (!$this->getUser() instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $session = $em->getRepository(TrainingSession::class)->find($id);
+        if (!$session || $session->getUser()->getId() !== $this->getUser()->getId()) {
+            throw $this->createNotFoundException('Séance introuvable.');
+        }
+
+        $html = $this->renderView('emails/session_pdf.html.twig', ['session' => $session]);
+        $html = @iconv('UTF-8', 'UTF-8//IGNORE', $html) ?: $html;
+
+        $options = new Options();
+        $options->set('isRemoteEnabled', false);
+        $options->set('isFontSubsettingEnabled', false);
+        $options->set('defaultFont', 'Helvetica');
+
+        $dompdf = new Dompdf($options);
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $filename = 'seance-' . $session->getSessionDate()->format('Y-m-d') . '.pdf';
+        return new Response($dompdf->output(), 200, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
     }
 
     #[Route('/about', name: 'about')]

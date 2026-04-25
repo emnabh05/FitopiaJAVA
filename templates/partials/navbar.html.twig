@@ -40,6 +40,11 @@
             </a>
           {% endif %}
           {% if app.user %}
+            <a href="{{ path('fitness_dashboard') }}" class="btn btn-outline-primary btn-sm px-4 mr-2">
+              📊 Dashboard
+            </a>
+          {% endif %}
+          {% if app.user %}
             <a href="{{ path('fitness_planner') }}" class="btn btn-outline-primary btn-sm px-4 mr-2" id="fitness-planner-btn">
               Explore our fitness planner
             </a>

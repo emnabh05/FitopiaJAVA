@@ -190,10 +190,13 @@
                             </VBox>
 
                             <VBox fx:id="plannerProgramsContent" managed="false" spacing="18.0" visible="false">
-                                <VBox spacing="6.0">
-                                    <Label styleClass="planner-section-title" text="Liste des programmes"/>
-                                    <Label styleClass="planner-section-subtitle" text="Acces rapide par groupe musculaire, avec focus Poitrine." wrapText="true"/>
-                                </VBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+                                        <Label styleClass="planner-section-title" text="Liste des programmes"/>
+                                        <Label styleClass="planner-section-subtitle" text="Acces rapide par groupe musculaire. Calcule ton IMC pour une recommandation personnalisée." wrapText="true"/>
+                                    </VBox>
+                                    <Button mnemonicParsing="false" onAction="#openImcModal" styleClass="primary-button" text="🧮 Mon IMC"/>
+                                </HBox>
 
                                 <VBox spacing="12.0" styleClass="program-list">
                                     <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openProgramModal" styleClass="program-card-button program-card-chest"    text="Poitrine"     userData="Poitrine"/>
@@ -367,7 +370,12 @@
 
             <StackPane fx:id="programModalOverlay" managed="false" visible="false">
                 <Pane onMouseClicked="#closeProgramModal" styleClass="modal-backdrop" StackPane.alignment="CENTER"/>
-                <VBox fx:id="programModalCard" maxWidth="980.0" prefWidth="430.0" spacing="14.0" styleClass="program-modal-card" StackPane.alignment="CENTER">
+                <ScrollPane fitToWidth="true" maxHeight="880.0" maxWidth="980.0" prefWidth="430.0"
+                            hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+                            styleClass="front-scroll"
+                            style="-fx-background-color:#fff;-fx-background-radius:26;-fx-border-radius:26;-fx-effect:dropshadow(gaussian,rgba(18,37,41,0.24),34,0.2,0,12);"
+                            StackPane.alignment="CENTER">
+                <VBox fx:id="programModalCard" maxWidth="980.0" prefWidth="430.0" spacing="14.0" styleClass="program-modal-card" style="-fx-effect:none;">
                     <HBox alignment="CENTER_LEFT">
                         <Button mnemonicParsing="false" onAction="#navigateProgramModalBack" styleClass="program-modal-back" text="Retour"/>
                         <Region HBox.hgrow="ALWAYS"/>
@@ -451,7 +459,48 @@
                                 <Button fx:id="btnCoachIa" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#toggleCoachIa" styleClass="training-control-button training-control-button-secondary training-control-button-wide" text="Coach IA On" HBox.hgrow="ALWAYS"/>
                                 <Button fx:id="btnNextExercise" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#openNextExercise" styleClass="training-control-button training-control-button-secondary training-control-button-wide" text="Exercice suivant" HBox.hgrow="ALWAYS"/>
                             </HBox>
+
+                            <!-- ── Feature 3 : Timer de repos supprimé ── -->
                         </VBox>
+                    </VBox>
+                </VBox>
+                </ScrollPane>
+            </StackPane>
+
+            <!-- ── Feature 2 : Calculateur IMC ── -->
+            <StackPane fx:id="imcModalOverlay" managed="false" visible="false">
+                <Pane onMouseClicked="#closeImcModal" style="-fx-background-color:rgba(10,28,36,0.42);" StackPane.alignment="CENTER"/>
+                <VBox maxWidth="480.0" spacing="16.0" style="-fx-background-color:#fff;-fx-background-radius:24;-fx-border-color:#e4ece8;-fx-border-radius:24;-fx-padding:24;-fx-effect:dropshadow(gaussian,rgba(18,37,41,0.22),28,0.18,0,10);" StackPane.alignment="CENTER">
+                    <HBox alignment="CENTER_LEFT">
+                        <Label style="-fx-font-size:18px;-fx-font-weight:900;-fx-text-fill:#0b3a3d;" text="🧮 Calculateur IMC"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button mnemonicParsing="false" onAction="#closeImcModal" styleClass="ghost-button" text="✕"/>
+                    </HBox>
+                    <GridPane hgap="12.0" vgap="10.0">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50.0"/>
+                            <ColumnConstraints percentWidth="50.0"/>
+                        </columnConstraints>
+                        <TextField fx:id="tfImcPoids"  promptText="Poids (kg)"   styleClass="text-field-modern"/>
+                        <TextField fx:id="tfImcTaille" promptText="Taille (cm)"  styleClass="text-field-modern" GridPane.columnIndex="1"/>
+                        <TextField fx:id="tfImcAge"    promptText="Âge"          styleClass="text-field-modern" GridPane.rowIndex="1"/>
+                        <ComboBox  fx:id="cbImcSexe"   promptText="Sexe"         styleClass="combo-modern"      GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    </GridPane>
+                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#calculerImc" styleClass="primary-button" text="Calculer mon IMC"/>
+                    <!-- Résultat -->
+                    <VBox fx:id="imcResultBox" managed="false" spacing="10.0" visible="false"
+                          style="-fx-background-color:#f8fafc;-fx-border-color:#dce9ee;-fx-border-radius:14;-fx-background-radius:14;-fx-padding:14;">
+                        <HBox alignment="CENTER" spacing="16.0">
+                            <Label fx:id="lblImcValeur" style="-fx-font-size:42px;-fx-font-weight:900;-fx-text-fill:#0b3a3d;" text="--"/>
+                            <VBox spacing="4.0">
+                                <Label fx:id="lblImcCategorie" style="-fx-font-size:16px;-fx-font-weight:800;" text=""/>
+                                <Label fx:id="lblImcConseil"   style="-fx-font-size:11px;-fx-text-fill:#64748b;" text="" wrapText="true"/>
+                            </VBox>
+                        </HBox>
+                        <javafx.scene.control.ProgressBar fx:id="pbImc" maxWidth="1.7976931348623157E308" prefHeight="10.0" progress="0.0"/>
+                        <Label style="-fx-font-weight:700;-fx-font-size:12px;-fx-text-fill:#0b3a3d;" text="Programme recommandé"/>
+                        <Label fx:id="lblImcProgramme" style="-fx-font-size:13px;-fx-text-fill:#1a6b5a;-fx-font-weight:700;" text="" wrapText="true"/>
+                        <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#lancerProgrammeImc" styleClass="primary-button" text="🚀 Lancer ce programme"/>
                     </VBox>
                 </VBox>
             </StackPane>
