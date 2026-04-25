@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Nouvelle réservation — Fitopia</title>
+  <style>
+    body { margin:0; padding:0; font-family: Arial, sans-serif; background:#f5f7fb; color:#0f172a; }
+    .container { max-width:620px; margin:0 auto; padding:32px 18px; }
+    .card { background:#fff; border-radius:16px; padding:32px; box-shadow:0 12px 28px rgba(15,23,42,.08); }
+    .header { text-align:center; margin-bottom:28px; }
+    .header .logo { font-size:1.5rem; font-weight:900; color:#0b3a3d; letter-spacing:-1px; }
+    .header h1 { margin:10px 0 4px; font-size:1.4rem; color:#0b3a3d; }
+    .header p { color:#64748b; font-size:.9rem; margin:0; }
+    .divider { height:3px; background:linear-gradient(90deg,#0b3a3d,#1a6b5a); border-radius:2px; margin:24px 0; }
+    .section-title { font-size:.78rem; font-weight:700; color:#0b3a3d; text-transform:uppercase; letter-spacing:.8px; margin-bottom:12px; }
+    .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    .info-box { background:#f8fafc; border-radius:10px; padding:12px 14px; }
+    .info-box .label { font-size:.75rem; color:#64748b; margin-bottom:3px; }
+    .info-box .value { font-size:.92rem; font-weight:700; color:#0f172a; }
+    .message-box { background:#f0fdf4; border-left:4px solid #1a6b5a; border-radius:0 10px 10px 0; padding:14px 16px; font-size:.9rem; color:#065f46; line-height:1.6; }
+    .coach-box { background:#0b3a3d; border-radius:12px; padding:16px 20px; color:#fff; margin-bottom:20px; }
+    .coach-box .coach-label { font-size:.75rem; opacity:.7; margin-bottom:4px; }
+    .coach-box .coach-name { font-size:1.1rem; font-weight:800; }
+    .coach-box .coach-spec { font-size:.85rem; opacity:.85; }
+    .footer { text-align:center; margin-top:24px; font-size:.78rem; color:#94a3b8; }
+    .btn-reply { display:inline-block; background:linear-gradient(135deg,#0b3a3d,#1a6b5a); color:#fff; text-decoration:none; border-radius:10px; padding:11px 28px; font-weight:700; font-size:.9rem; margin-top:20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+
+      <div class="header">
+        <div class="logo">🏋️ Fitopia</div>
+        <h1>Nouvelle demande de réservation</h1>
+        <p>Un client souhaite réserver une séance avec vous.</p>
+      </div>
+
+      <div class="coach-box">
+        <div class="coach-label">Coach destinataire</div>
+        <div class="coach-name">{{ coach.name }}</div>
+        <div class="coach-spec">{{ coach.specialty }}</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section-title">Informations du client</div>
+      <div class="info-grid">
+        <div class="info-box">
+          <div class="label">Nom complet</div>
+          <div class="value">{{ data.client_name }}</div>
+        </div>
+        <div class="info-box">
+          <div class="label">Email</div>
+          <div class="value">{{ data.client_email }}</div>
+        </div>
+        <div class="info-box">
+          <div class="label">Téléphone</div>
+          <div class="value">{{ data.client_phone }}</div>
+        </div>
+        <div class="info-box">
+          <div class="label">Date souhaitée</div>
+          <div class="value">{{ data.desired_date|date('d/m/Y') }}</div>
+        </div>
+      </div>
+
+      {% if data.message %}
+        <div class="section-title">Message du client</div>
+        <div class="message-box">{{ data.message|nl2br }}</div>
+      {% endif %}
+
+      <div style="text-align:center;">
+        <a href="mailto:{{ data.client_email }}" class="btn-reply">
+          Répondre à {{ data.client_name }}
+        </a>
+      </div>
+
+      <div class="divider"></div>
+
+    </div>
+    <div class="footer">
+      Cet email a été envoyé automatiquement par Fitopia.<br>
+      Pour toute question, contactez l'équipe Fitopia.
+    </div>
+  </div>
+</body>
+</html>

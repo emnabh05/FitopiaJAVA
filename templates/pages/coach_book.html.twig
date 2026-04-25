@@ -1,0 +1,307 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réserver avec {{ coach.name }} | Fitopia{% endblock %}
+
+{% block stylesheets %}
+<style>
+  .book-hero {
+    background: linear-gradient(135deg, #0b3a3d 0%, #1a6b5a 100%);
+    padding: 70px 0 50px;
+    color: #fff;
+  }
+  .book-hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: .3rem; }
+  .book-hero p  { opacity: .85; font-size: 1rem; }
+
+  .book-section { padding: 60px 0 80px; background: #f8fafc; }
+
+  /* ── Coach summary card ── */
+  .coach-summary {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 4px 24px rgba(11,58,61,.08);
+    position: sticky;
+    top: 20px;
+  }
+  .coach-summary img {
+    width: 100%; border-radius: 14px;
+    object-fit: cover; height: 220px;
+    margin-bottom: 18px;
+  }
+  .cs-name     { font-size: 1.2rem; font-weight: 800; color: #0b3a3d; }
+  .cs-spec     { font-size: .85rem; color: #1a6b5a; font-weight: 600; margin-bottom: 10px; }
+  .cs-bio      { font-size: .85rem; color: #475467; line-height: 1.55; margin-bottom: 14px; }
+  .cs-contact  { font-size: .83rem; color: #64748b; margin-bottom: 4px; }
+  .cs-contact i { width: 16px; color: #0b3a3d; }
+  .cs-slots-title { font-size: .78rem; font-weight: 700; color: #0b3a3d; text-transform: uppercase; letter-spacing: .5px; margin: 14px 0 6px; }
+  .slot-pill {
+    display: inline-block;
+    background: #e8f5f0; color: #1a6b5a;
+    font-size: .75rem; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    margin: 2px 3px 2px 0;
+  }
+  .cs-stars { color: #f59e0b; font-size: .85rem; margin-bottom: 10px; }
+  .cs-stars span { color: #64748b; font-size: .8rem; margin-left: 4px; }
+
+  /* ── Form card ── */
+  .form-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 36px 32px;
+    box-shadow: 0 4px 24px rgba(11,58,61,.08);
+  }
+  .form-card h2 { font-size: 1.4rem; font-weight: 800; color: #0b3a3d; margin-bottom: 6px; }
+  .form-card .subtitle { color: #64748b; font-size: .9rem; margin-bottom: 28px; }
+
+  .form-group label { font-weight: 600; font-size: .88rem; color: #0b3a3d; margin-bottom: 5px; }
+  .form-control {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: .92rem;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .form-control:focus {
+    border-color: #1a6b5a;
+    box-shadow: 0 0 0 3px rgba(26,107,90,.12);
+    outline: none;
+  }
+  .form-control.is-invalid { border-color: #ef4444; }
+  .invalid-feedback { font-size: .8rem; color: #ef4444; margin-top: 4px; display: block; }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #0b3a3d, #1a6b5a);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 32px;
+    font-weight: 700;
+    font-size: 1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: opacity .2s;
+    margin-top: 8px;
+  }
+  .btn-submit:hover { opacity: .88; }
+
+  /* ── Alerts ── */
+  .alert-success-custom {
+    background: #ecfdf5; border: 1.5px solid #6ee7b7;
+    border-radius: 14px; padding: 20px 24px;
+    color: #065f46; margin-bottom: 24px;
+  }
+  .alert-success-custom h4 { font-weight: 800; margin-bottom: 4px; font-size: 1.05rem; }
+  .alert-error-custom {
+    background: #fef2f2; border: 1.5px solid #fca5a5;
+    border-radius: 14px; padding: 16px 20px;
+    color: #991b1b; margin-bottom: 20px; font-size: .9rem;
+  }
+
+  .back-link { font-size: .88rem; color: #1a6b5a; font-weight: 600; text-decoration: none; }
+  .back-link:hover { text-decoration: underline; }
+
+  /* ── Other coaches ── */
+  .other-coaches { padding: 50px 0 60px; }
+  .other-coaches h3 { font-size: 1.3rem; font-weight: 800; color: #0b3a3d; margin-bottom: 24px; }
+  .mini-coach {
+    background: #fff; border-radius: 14px;
+    padding: 16px; box-shadow: 0 2px 12px rgba(11,58,61,.07);
+    display: flex; align-items: center; gap: 14px;
+    text-decoration: none; color: inherit;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .mini-coach:hover { box-shadow: 0 6px 24px rgba(11,58,61,.13); transform: translateY(-2px); color: inherit; text-decoration: none; }
+  .mini-coach img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+  .mini-coach-name { font-weight: 700; font-size: .9rem; color: #0b3a3d; }
+  .mini-coach-spec { font-size: .78rem; color: #1a6b5a; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="book-hero">
+  <div class="container">
+    <a href="{{ path('coaches') }}" class="back-link" style="color:rgba(255,255,255,.8);">
+      ← Retour aux coachs
+    </a>
+    <h1 class="mt-2">Réserver avec {{ coach.name }}</h1>
+    <p>{{ coach.specialty }}</p>
+  </div>
+</div>
+
+<section class="book-section">
+  <div class="container">
+    <div class="row">
+
+      {# ── Left: Coach summary ── #}
+      <div class="col-lg-4 mb-4">
+        <div class="coach-summary">
+          <img src="{{ asset(coach.image) }}" alt="{{ coach.name }}">
+          <div class="cs-name">{{ coach.name }}</div>
+          <div class="cs-spec">{{ coach.specialty }}</div>
+          <div class="cs-stars">
+            {% for i in 1..5 %}
+              {% if i <= coach.rating|round(0, 'floor') %}★{% else %}☆{% endif %}
+            {% endfor %}
+            <span>{{ coach.rating }}/5 · {{ coach.clients }} clients</span>
+          </div>
+          <div class="cs-bio">{{ coach.bio }}</div>
+          <div class="cs-contact"><i class="fa fa-phone"></i> {{ coach.phone }}</div>
+          <div class="cs-contact"><i class="fa fa-instagram"></i> {{ coach.instagram }}</div>
+          <div class="cs-slots-title">Créneaux disponibles</div>
+          {% for slot in coach.slots %}
+            <span class="slot-pill">{{ slot }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# ── Right: Booking form ── #}
+      <div class="col-lg-8">
+        <div class="form-card">
+
+          {% if success %}
+            <div class="alert-success-custom">
+              <h4>✅ Réservation envoyée !</h4>
+              <p style="margin:0">{{ coach.name }} a reçu votre demande et vous contactera très prochainement.</p>
+            </div>
+          {% endif %}
+
+          {% if errors.send is defined %}
+            <div class="alert-error-custom">
+              ⚠️ {{ errors.send }}
+            </div>
+          {% endif %}
+
+          {% if not success %}
+            <h2>Formulaire de réservation</h2>
+            <p class="subtitle">Remplissez le formulaire ci-dessous. {{ coach.name }} recevra un email avec vos informations.</p>
+
+            <form method="POST" action="{{ path('coach_book', {id: coach.id}) }}" novalidate>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label for="client_name">Nom complet *</label>
+                    <input
+                      type="text"
+                      id="client_name"
+                      name="client_name"
+                      class="form-control {% if errors.client_name is defined %}is-invalid{% endif %}"
+                      value="{{ app.request.request.get('client_name', '') }}"
+                      placeholder="Votre nom"
+                      required
+                    >
+                    {% if errors.client_name is defined %}
+                      <span class="invalid-feedback">{{ errors.client_name }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label for="client_email">Email *</label>
+                    <input
+                      type="email"
+                      id="client_email"
+                      name="client_email"
+                      class="form-control {% if errors.client_email is defined %}is-invalid{% endif %}"
+                      value="{{ app.request.request.get('client_email', '') }}"
+                      placeholder="votre@email.com"
+                      required
+                    >
+                    {% if errors.client_email is defined %}
+                      <span class="invalid-feedback">{{ errors.client_email }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label for="client_phone">Téléphone *</label>
+                    <input
+                      type="tel"
+                      id="client_phone"
+                      name="client_phone"
+                      class="form-control {% if errors.client_phone is defined %}is-invalid{% endif %}"
+                      value="{{ app.request.request.get('client_phone', '') }}"
+                      placeholder="+216 XX XXX XXX"
+                      required
+                    >
+                    {% if errors.client_phone is defined %}
+                      <span class="invalid-feedback">{{ errors.client_phone }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group mb-3">
+                    <label for="desired_date">Date souhaitée *</label>
+                    <input
+                      type="date"
+                      id="desired_date"
+                      name="desired_date"
+                      class="form-control {% if errors.desired_date is defined %}is-invalid{% endif %}"
+                      value="{{ app.request.request.get('desired_date', '') }}"
+                      min="{{ 'today'|date('Y-m-d') }}"
+                      required
+                    >
+                    {% if errors.desired_date is defined %}
+                      <span class="invalid-feedback">{{ errors.desired_date }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group mb-4">
+                <label for="message">Message (optionnel)</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  class="form-control"
+                  rows="4"
+                  placeholder="Décrivez vos objectifs, votre niveau, vos disponibilités..."
+                >{{ app.request.request.get('message', '') }}</textarea>
+              </div>
+
+              <button type="submit" class="btn-submit">
+                Envoyer la demande de réservation
+              </button>
+
+            </form>
+          {% else %}
+            <div style="text-align:center;padding:20px 0;">
+              <a href="{{ path('coaches') }}" class="btn-submit" style="display:inline-block;width:auto;padding:13px 40px;text-decoration:none;">
+                Voir les autres coachs
+              </a>
+            </div>
+          {% endif %}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{# ── Other coaches ── #}
+<section class="other-coaches" style="background:#f8fafc;">
+  <div class="container">
+    <h3>Autres coachs disponibles</h3>
+    <div class="row">
+      {% for c in coaches if c.id != coach.id %}
+      <div class="col-md-6 col-lg-4 mb-3">
+        <a href="{{ path('coach_book', {id: c.id}) }}" class="mini-coach">
+          <img src="{{ asset(c.image) }}" alt="{{ c.name }}">
+          <div>
+            <div class="mini-coach-name">{{ c.name }}</div>
+            <div class="mini-coach-spec">{{ c.specialty }}</div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% endblock %}
