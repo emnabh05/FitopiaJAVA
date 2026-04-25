@@ -98,9 +98,40 @@ public class FitopiaHomeController {
     @FXML private VBox plannerProgramsContent;
     @FXML private VBox plannerCrudContent;
     @FXML private VBox plannerCoachContent;
+    @FXML private VBox plannerExploreContent;
+    @FXML private javafx.scene.media.MediaView exploreMediaView;
+    @FXML private javafx.scene.layout.StackPane explorePlayerPane;
+    @FXML private VBox explorePlaylistBox;
+    @FXML private Label lblExploreVideoTitle;
+    @FXML private Label lblExploreDesc;
+    @FXML private Label lblExploreCount;
+    @FXML private Label lblExploreNowPlaying;
+    @FXML private Button btnExplorePlay;
+    @FXML private Button btnExploreMute;
+    @FXML private Button btnExploreLike;
+    @FXML private TextField tfExploreFilter;
+    @FXML private Slider sliderExploreVolume;
     @FXML private FlowPane plansSelectionContainer;
     @FXML private FlowPane coachCardsContainer;
     @FXML private FlowPane exerciseCardsGrid;
+    // ── Performance tracker fields ──
+    @FXML private VBox  perfFormBox;
+    @FXML private VBox  perfExercisesBox;
+    @FXML private VBox  perfChartBox;
+    @FXML private VBox  perfHistoryBox;
+    @FXML private TextField tfPerfDate;
+    @FXML private TextField tfPerfLabel;
+    @FXML private javafx.scene.control.ComboBox<String> cbPerfExercise;
+    @FXML private Label lblPerfStatus;
+    @FXML private Label lblPerfChartEmpty;
+
+    // In-memory performance data (persists during app session)
+    private record PerfSet(double weightKg, int reps) {}
+    private record PerfExEntry(String exerciseName, List<PerfSet> sets) {}
+    private record PerfSession(String date, String label, List<PerfExEntry> exercises) {}
+    private final List<PerfSession> perfHistory = new java.util.ArrayList<>();
+    private final List<PerfExEntry> perfCurrentExercises = new java.util.ArrayList<>();
+    private String perfChartMetric = "weight"; // "weight" | "volume"
     @FXML private VBox coachBookingForm;
     @FXML private Label lblBookingCoachName;
     @FXML private Label lblBookingCoachSlots;
@@ -192,6 +223,14 @@ public class FitopiaHomeController {
         chargerExercises();
         resetTrainingState();
         showPlannerPlans();
+        // Init performance tracker
+        renderPerfHistory();
+        if (cbPerfExercise != null) {
+            cbPerfExercise.setOnAction(e -> {
+                String sel = cbPerfExercise.getValue();
+                if (sel != null && !sel.isEmpty()) renderPerfChart(sel);
+            });
+        }
     }
 
     @FXML
@@ -205,14 +244,12 @@ public class FitopiaHomeController {
     @FXML
     private void showPlannerPlans() {
         activatePlannerTab(btnPlannerPlans);
-        plannerPlansContent.setVisible(true);
-        plannerPlansContent.setManaged(true);
-        plannerProgramsContent.setVisible(false);
-        plannerProgramsContent.setManaged(false);
-        plannerCrudContent.setVisible(false);
-        plannerCrudContent.setManaged(false);
-        plannerCoachContent.setVisible(false);
-        plannerCoachContent.setManaged(false);
+        stopExplorePlayer();
+        plannerPlansContent.setVisible(true);     plannerPlansContent.setManaged(true);
+        plannerProgramsContent.setVisible(false); plannerProgramsContent.setManaged(false);
+        plannerCrudContent.setVisible(false);     plannerCrudContent.setManaged(false);
+        plannerCoachContent.setVisible(false);    plannerCoachContent.setManaged(false);
+        plannerExploreContent.setVisible(false);  plannerExploreContent.setManaged(false);
         lblPlannerContentHint.setText("Les seances confirmees depuis Programs sont affichees ici.");
         renderPlannedExercises();
     }
@@ -220,58 +257,59 @@ public class FitopiaHomeController {
     @FXML
     private void showPlannerPrograms() {
         activatePlannerTab(btnPlannerPrograms);
-        plannerPlansContent.setVisible(false);
-        plannerPlansContent.setManaged(false);
-        plannerProgramsContent.setVisible(true);
-        plannerProgramsContent.setManaged(true);
-        plannerCrudContent.setVisible(false);
-        plannerCrudContent.setManaged(false);
-        plannerCoachContent.setVisible(false);
-        plannerCoachContent.setManaged(false);
+        stopExplorePlayer();
+        plannerPlansContent.setVisible(false);    plannerPlansContent.setManaged(false);
+        plannerProgramsContent.setVisible(true);  plannerProgramsContent.setManaged(true);
+        plannerCrudContent.setVisible(false);     plannerCrudContent.setManaged(false);
+        plannerCoachContent.setVisible(false);    plannerCoachContent.setManaged(false);
+        plannerExploreContent.setVisible(false);  plannerExploreContent.setManaged(false);
         lblPlannerContentHint.setText("Choisissez un programme pour ouvrir le choix du lieu d'entrainement.");
     }
 
     @FXML
     private void showPlannerExercises() {
         activatePlannerTab(btnPlannerExercises);
-        plannerPlansContent.setVisible(false);
-        plannerPlansContent.setManaged(false);
-        plannerProgramsContent.setVisible(false);
-        plannerProgramsContent.setManaged(false);
-        plannerCrudContent.setVisible(true);
-        plannerCrudContent.setManaged(true);
-        plannerCoachContent.setVisible(false);
-        plannerCoachContent.setManaged(false);
+        stopExplorePlayer();
+        plannerPlansContent.setVisible(false);    plannerPlansContent.setManaged(false);
+        plannerProgramsContent.setVisible(false); plannerProgramsContent.setManaged(false);
+        plannerCrudContent.setVisible(true);      plannerCrudContent.setManaged(true);
+        plannerCoachContent.setVisible(false);    plannerCoachContent.setManaged(false);
+        plannerExploreContent.setVisible(false);  plannerExploreContent.setManaged(false);
         lblPlannerContentHint.setText("Retour");
     }
 
     @FXML
     private void showPlannerExplore() {
         activatePlannerTab(btnPlannerExplore);
-        plannerPlansContent.setVisible(false);
-        plannerPlansContent.setManaged(false);
-        plannerProgramsContent.setVisible(false);
-        plannerProgramsContent.setManaged(false);
-        plannerCrudContent.setVisible(false);
-        plannerCrudContent.setManaged(false);
-        plannerCoachContent.setVisible(false);
-        plannerCoachContent.setManaged(false);
-        lblPlannerContentHint.setText("Section Explore selectionnee. Cliquez sur Exercises pour afficher le CRUD des exercices.");
+        plannerPlansContent.setVisible(false);    plannerPlansContent.setManaged(false);
+        plannerProgramsContent.setVisible(false); plannerProgramsContent.setManaged(false);
+        plannerCrudContent.setVisible(false);     plannerCrudContent.setManaged(false);
+        plannerCoachContent.setVisible(false);    plannerCoachContent.setManaged(false);
+        plannerExploreContent.setVisible(true);   plannerExploreContent.setManaged(true);
+        lblPlannerContentHint.setText("Feed vidéo fitness — locales + YouTube.");
+        initExploreFeed();
     }
 
     @FXML
     private void showPlannerCoach() {
         activatePlannerTab(btnPlannerCoach);
-        plannerPlansContent.setVisible(false);
-        plannerPlansContent.setManaged(false);
-        plannerProgramsContent.setVisible(false);
-        plannerProgramsContent.setManaged(false);
-        plannerCrudContent.setVisible(false);
-        plannerCrudContent.setManaged(false);
-        plannerCoachContent.setVisible(true);
-        plannerCoachContent.setManaged(true);
+        stopExplorePlayer();
+        plannerPlansContent.setVisible(false);    plannerPlansContent.setManaged(false);
+        plannerProgramsContent.setVisible(false); plannerProgramsContent.setManaged(false);
+        plannerCrudContent.setVisible(false);     plannerCrudContent.setManaged(false);
+        plannerExploreContent.setVisible(false);  plannerExploreContent.setManaged(false);
+        plannerCoachContent.setVisible(true);     plannerCoachContent.setManaged(true);
         lblPlannerContentHint.setText("Choisissez un coach et reservez votre seance.");
         renderCoachCards();
+    }
+
+    private void stopExplorePlayer() {
+        if (explorePlayer != null) {
+            explorePlayer.stop();
+            explorePlayer.dispose();
+            explorePlayer = null;
+        }
+        if (exploreMediaView != null) exploreMediaView.setMediaPlayer(null);
     }
 
     @FXML
@@ -1345,7 +1383,515 @@ public class FitopiaHomeController {
         lblExerciseStatus.setStyle("-fx-text-fill: #b33f48;");
     }
 
-    // ── Coach data ────────────────────────────────────────────────────────────
+    // ── Explore Feed ─────────────────────────────────────────────────────────
+    private record VideoEntry(String title, String desc, String[] tags, String resourcePath, String youtubeId) {
+        boolean isLocal() { return resourcePath != null && !resourcePath.isBlank(); }
+    }
+
+    private static final List<VideoEntry> ALL_VIDEOS = List.of(
+        new VideoEntry("Back Intense at Home — 5 min",      "Workout dos intense 5 min sans équipement.",          new String[]{"Dos","Maison","5 min"},       "/media/fitness/local/back-home-5min.mp4",          null),
+        new VideoEntry("Circuit Abdos Complet — 20 min",    "Circuit abdos complet à suivre en temps réel.",       new String[]{"Abdos","Core","20 min"},       "/media/fitness/local/abdos-complet-20min.mp4",     null),
+        new VideoEntry("Pectoraux Musclés — 5 min",         "Entraînement pectoraux à la maison.",                 new String[]{"Poitrine","Maison","5 min"},   "/media/fitness/local/pectoraux-5min.mp4",          null),
+        new VideoEntry("Triceps Workout — Dumbbells 10 min","10 min de triceps avec haltères.",                    new String[]{"Triceps","Haltères","10 min"}, "/media/fitness/local/triceps-dumbbells-10min.mp4", null),
+        new VideoEntry("Biceps Burning — 15 min",           "15 min de biceps avec haltères par Caroline Girvan.", new String[]{"Biceps","Haltères","15 min"},  "/media/fitness/local/biceps-15min.mp4",            null),
+        new VideoEntry("Chest Workout — Poitrine Builder",  "Séance poitrine complète pour débutants.",            new String[]{"Poitrine","YouTube","Gym"},    null, "IODxDxX7oi4"),
+        new VideoEntry("Dos Strong Flow",                   "Renforcement du dos, colonne neutre.",                new String[]{"Dos","YouTube","Posture"},     null, "roCP6wCXPqo"),
+        new VideoEntry("Jambes Power Squat",                "Squats et fentes pour des jambes puissantes.",        new String[]{"Jambes","YouTube","Force"},    null, "aclHkVaku9U"),
+        new VideoEntry("Fessier Focus — Hip Thrust",        "Contracte les fessiers en haut du mouvement.",       new String[]{"Fessier","YouTube","Maison"},  null, "Xyd_fa5zoEU"),
+        new VideoEntry("Épaules Sculpt",                    "Amplitude contrôlée, ne monte pas les épaules.",     new String[]{"Épaules","YouTube","Haltères"},null, "qEwKCR5JCog"),
+        new VideoEntry("Abdos Core 10 min",                 "10 min de core intense, dos collé au sol.",           new String[]{"Abdos","YouTube","Core"},      null, "AnYl6Nk9GOA"),
+        new VideoEntry("Corps Entier HIIT",                 "Full body haute intensité, respire en rythme.",       new String[]{"HIIT","YouTube","Corps entier"},null,"ml6cT4AZdqI")
+    );
+
+    private List<VideoEntry> exploreFiltered = new java.util.ArrayList<>(ALL_VIDEOS);
+    private int exploreIndex = 0;
+    private javafx.scene.media.MediaPlayer explorePlayer = null;
+    private boolean exploreMuted = false;
+    private int exploreLikes = 0;
+
+    private void initExploreFeed() {
+        exploreFiltered = new java.util.ArrayList<>(ALL_VIDEOS);
+        exploreIndex = 0;
+        if (sliderExploreVolume != null) {
+            sliderExploreVolume.valueProperty().addListener((obs, o, n) -> {
+                if (explorePlayer != null) explorePlayer.setVolume(n.doubleValue());
+            });
+        }
+        renderExplorePlaylist();
+        loadExploreVideo(0);
+    }
+
+    private void renderExplorePlaylist() {
+        if (explorePlaylistBox == null) return;
+        explorePlaylistBox.getChildren().clear();
+        for (int i = 0; i < exploreFiltered.size(); i++) {
+            final int idx = i;
+            VideoEntry v = exploreFiltered.get(i);
+            javafx.scene.layout.HBox row = new javafx.scene.layout.HBox(8);
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            row.setStyle("-fx-background-color:" + (i == exploreIndex ? "#e8f5f0" : "#fff")
+                + ";-fx-border-color:#dce9ee;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:8 10;-fx-cursor:hand;");
+
+            // Badge source
+            javafx.scene.control.Label badge = new javafx.scene.control.Label(v.isLocal() ? "📁" : "▶");
+            badge.setStyle("-fx-font-size:13px;");
+
+            javafx.scene.layout.VBox info = new javafx.scene.layout.VBox(2);
+            javafx.scene.control.Label title = new javafx.scene.control.Label(v.title());
+            title.setStyle("-fx-font-weight:700;-fx-font-size:11px;-fx-text-fill:#0b3a3d;");
+            title.setWrapText(true);
+            javafx.scene.control.Label tags = new javafx.scene.control.Label(String.join(" · ", v.tags()));
+            tags.setStyle("-fx-font-size:10px;-fx-text-fill:#64748b;");
+            info.getChildren().addAll(title, tags);
+            javafx.scene.layout.HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
+
+            row.getChildren().addAll(badge, info);
+            row.setOnMouseClicked(e -> loadExploreVideo(idx));
+            explorePlaylistBox.getChildren().add(row);
+        }
+        if (lblExploreCount != null)
+            lblExploreCount.setText(exploreFiltered.size() + " vidéo(s) disponible(s)");
+    }
+
+    private void loadExploreVideo(int index) {
+        if (exploreFiltered.isEmpty()) return;
+        exploreIndex = Math.max(0, Math.min(index, exploreFiltered.size() - 1));
+        VideoEntry v = exploreFiltered.get(exploreIndex);
+
+        // Stop previous
+        if (explorePlayer != null) {
+            explorePlayer.stop();
+            explorePlayer.dispose();
+            explorePlayer = null;
+        }
+        if (exploreMediaView != null) exploreMediaView.setMediaPlayer(null);
+
+        // Update labels
+        if (lblExploreVideoTitle != null) lblExploreVideoTitle.setText(v.title());
+        if (lblExploreDesc != null) lblExploreDesc.setText(v.desc() + "  |  Tags : " + String.join(", ", v.tags()));
+        if (lblExploreNowPlaying != null) lblExploreNowPlaying.setText("▶ " + (exploreIndex + 1) + "/" + exploreFiltered.size() + " — " + v.title());
+        if (btnExploreLike != null) { exploreLikes = 0; btnExploreLike.setText("❤ 0"); }
+
+        // Highlight playlist row
+        renderExplorePlaylist();
+
+        if (v.isLocal()) {
+            // Local MP4
+            URL url = getClass().getResource(v.resourcePath());
+            if (url == null) {
+                if (lblExploreDesc != null) lblExploreDesc.setText("⚠ Fichier introuvable : " + v.resourcePath());
+                return;
+            }
+            javafx.scene.media.Media media = new javafx.scene.media.Media(url.toExternalForm());
+            explorePlayer = new javafx.scene.media.MediaPlayer(media);
+            explorePlayer.setAutoPlay(true);
+            explorePlayer.setCycleCount(javafx.scene.media.MediaPlayer.INDEFINITE);
+            explorePlayer.setVolume(sliderExploreVolume != null ? sliderExploreVolume.getValue() : 0.8);
+            explorePlayer.setMute(exploreMuted);
+            explorePlayer.setOnEndOfMedia(() -> loadExploreVideo(exploreIndex + 1));
+            if (exploreMediaView != null) exploreMediaView.setMediaPlayer(explorePlayer);
+            if (btnExplorePlay != null) btnExplorePlay.setText("⏸ Pause");
+        } else {
+            // YouTube — ouvre dans le navigateur
+            if (lblExploreDesc != null)
+                lblExploreDesc.setText("▶ YouTube : " + v.title() + "\n" + v.desc() + "\nCliquez sur 'Ouvrir YouTube' pour regarder.");
+            if (btnExplorePlay != null) btnExplorePlay.setText("▶ Ouvrir YouTube");
+            // Show thumbnail via background
+            if (explorePlayerPane != null) {
+                String thumbUrl = "https://img.youtube.com/vi/" + v.youtubeId() + "/hqdefault.jpg";
+                try {
+                    javafx.scene.image.ImageView thumb = new javafx.scene.image.ImageView(
+                        new javafx.scene.image.Image(thumbUrl, true));
+                    thumb.setFitWidth(700); thumb.setFitHeight(420);
+                    thumb.setPreserveRatio(false);
+                    // Replace or add thumbnail
+                    explorePlayerPane.getChildren().removeIf(n -> n instanceof javafx.scene.image.ImageView);
+                    explorePlayerPane.getChildren().add(0, thumb);
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+
+    @FXML
+    private void explorePlayPause() {
+        VideoEntry v = exploreFiltered.isEmpty() ? null : exploreFiltered.get(exploreIndex);
+        if (v != null && !v.isLocal()) {
+            // YouTube → open browser
+            try { java.awt.Desktop.getDesktop().browse(new java.net.URI("https://www.youtube.com/watch?v=" + v.youtubeId())); }
+            catch (Exception ignored) {}
+            return;
+        }
+        if (explorePlayer == null) return;
+        if (explorePlayer.getStatus() == javafx.scene.media.MediaPlayer.Status.PLAYING) {
+            explorePlayer.pause();
+            if (btnExplorePlay != null) btnExplorePlay.setText("▶ Play");
+        } else {
+            explorePlayer.play();
+            if (btnExplorePlay != null) btnExplorePlay.setText("⏸ Pause");
+        }
+    }
+
+    @FXML private void exploreNext() { loadExploreVideo(exploreIndex + 1); }
+    @FXML private void explorePrev() { loadExploreVideo(exploreIndex - 1); }
+
+    @FXML
+    private void exploreMute() {
+        exploreMuted = !exploreMuted;
+        if (explorePlayer != null) explorePlayer.setMute(exploreMuted);
+        if (btnExploreMute != null) btnExploreMute.setText(exploreMuted ? "🔊 Son" : "🔇 Mute");
+    }
+
+    @FXML
+    private void exploreLike() {
+        exploreLikes++;
+        if (btnExploreLike != null) btnExploreLike.setText("❤ " + exploreLikes);
+    }
+
+    @FXML
+    private void filtrerExploreFeed() {
+        String q = tfExploreFilter != null ? tfExploreFilter.getText().trim().toLowerCase() : "";
+        if (q.isEmpty()) { resetExploreFeed(); return; }
+        exploreFiltered = ALL_VIDEOS.stream().filter(v -> {
+            String combined = v.title().toLowerCase() + " " + v.desc().toLowerCase()
+                + " " + String.join(" ", v.tags()).toLowerCase();
+            return combined.contains(q);
+        }).collect(java.util.stream.Collectors.toList());
+        exploreIndex = 0;
+        renderExplorePlaylist();
+        if (!exploreFiltered.isEmpty()) loadExploreVideo(0);
+        else { if (lblExploreCount != null) lblExploreCount.setText("Aucune vidéo pour ce filtre."); }
+    }
+
+    @FXML
+    private void resetExploreFeed() {
+        if (tfExploreFilter != null) tfExploreFilter.clear();
+        exploreFiltered = new java.util.ArrayList<>(ALL_VIDEOS);
+        exploreIndex = 0;
+        renderExplorePlaylist();
+        loadExploreVideo(0);
+    }
+
+    // ── Performance Tracker ───────────────────────────────────────────────────
+
+    private static final List<String> PERF_EXERCISES = List.of(
+        "Développé couché avec barre", "Développé incliné haltères", "Dips pectoraux",
+        "Tractions", "Rowing barre", "Tirage poulie haute",
+        "Squat barre", "Presse à cuisses", "Fentes haltères",
+        "Développé militaire", "Élévations latérales",
+        "Curl biceps haltères", "Curl barre EZ",
+        "Extension triceps poulie", "Dips triceps banc",
+        "Crunch abdominaux", "Planche", "Course à pied"
+    );
+
+    @FXML
+    private void togglePerfForm() {
+        if (perfFormBox == null) return;
+        boolean visible = perfFormBox.isVisible();
+        perfFormBox.setVisible(!visible);
+        perfFormBox.setManaged(!visible);
+        if (!visible) {
+            perfCurrentExercises.clear();
+            perfAddExerciseBlock();
+            if (tfPerfDate != null) tfPerfDate.setText(java.time.LocalDate.now().toString());
+            if (tfPerfLabel != null) tfPerfLabel.clear();
+            if (lblPerfStatus != null) lblPerfStatus.setText("");
+        }
+    }
+
+    @FXML
+    private void perfCancelForm() {
+        if (perfFormBox != null) { perfFormBox.setVisible(false); perfFormBox.setManaged(false); }
+    }
+
+    @FXML
+    private void perfAddExercise() { perfAddExerciseBlock(); }
+
+    private void perfAddExerciseBlock() {
+        perfCurrentExercises.add(new PerfExEntry("", new java.util.ArrayList<>(List.of(new PerfSet(0, 0)))));
+        renderPerfExerciseBlocks();
+    }
+
+    private void renderPerfExerciseBlocks() {
+        if (perfExercisesBox == null) return;
+        perfExercisesBox.getChildren().clear();
+
+        for (int exIdx = 0; exIdx < perfCurrentExercises.size(); exIdx++) {
+            final int ei = exIdx;
+            PerfExEntry entry = perfCurrentExercises.get(ei);
+
+            VBox block = new VBox(6);
+            block.setStyle("-fx-background-color:#f8fafc;-fx-border-color:#dce9ee;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:10;");
+
+            // Exercise selector
+            HBox selRow = new HBox(6);
+            selRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            javafx.scene.control.ComboBox<String> exSel = new javafx.scene.control.ComboBox<>();
+            exSel.getItems().addAll(PERF_EXERCISES);
+            exSel.setPromptText("Choisir un exercice...");
+            exSel.setPrefWidth(280);
+            exSel.setStyle("-fx-font-size:11px;");
+            if (!entry.exerciseName().isEmpty()) exSel.setValue(entry.exerciseName());
+            exSel.setOnAction(e -> {
+                if (exSel.getValue() != null) {
+                    perfCurrentExercises.set(ei, new PerfExEntry(exSel.getValue(), new java.util.ArrayList<>(perfCurrentExercises.get(ei).sets())));
+                }
+            });
+
+            javafx.scene.control.Button removeEx = new javafx.scene.control.Button("✕");
+            removeEx.setStyle("-fx-background-color:#fee2e2;-fx-text-fill:#991b1b;-fx-font-weight:700;-fx-background-radius:6;-fx-border-radius:6;-fx-padding:3 7;");
+            removeEx.setOnAction(e -> { perfCurrentExercises.remove(ei); renderPerfExerciseBlocks(); });
+            selRow.getChildren().addAll(exSel, removeEx);
+            block.getChildren().add(selRow);
+
+            // Sets
+            List<PerfSet> sets = entry.sets();
+            for (int si = 0; si < sets.size(); si++) {
+                final int sIdx = si;
+                HBox setRow = new HBox(6);
+                setRow.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+                javafx.scene.control.Label setLbl = new javafx.scene.control.Label("S" + (si + 1));
+                setLbl.setStyle("-fx-font-size:10px;-fx-font-weight:700;-fx-text-fill:#64748b;-fx-min-width:20;");
+
+                javafx.scene.control.TextField weightFld = new javafx.scene.control.TextField(sets.get(si).weightKg() > 0 ? String.valueOf(sets.get(si).weightKg()) : "");
+                weightFld.setPromptText("Poids kg");
+                weightFld.setPrefWidth(80);
+                weightFld.setStyle("-fx-font-size:11px;-fx-border-color:#dce9ee;-fx-border-radius:7;-fx-background-radius:7;-fx-padding:4 6;");
+
+                javafx.scene.control.TextField repsFld = new javafx.scene.control.TextField(sets.get(si).reps() > 0 ? String.valueOf(sets.get(si).reps()) : "");
+                repsFld.setPromptText("Reps");
+                repsFld.setPrefWidth(60);
+                repsFld.setStyle("-fx-font-size:11px;-fx-border-color:#dce9ee;-fx-border-radius:7;-fx-background-radius:7;-fx-padding:4 6;");
+
+                // Update on change
+                weightFld.textProperty().addListener((obs, o, n) -> updatePerfSet(ei, sIdx, n, repsFld.getText()));
+                repsFld.textProperty().addListener((obs, o, n) -> updatePerfSet(ei, sIdx, weightFld.getText(), n));
+
+                javafx.scene.control.Button delSet = new javafx.scene.control.Button("−");
+                delSet.setStyle("-fx-background-color:#f1f5f9;-fx-border-radius:6;-fx-background-radius:6;-fx-padding:3 7;-fx-font-weight:700;");
+                delSet.setOnAction(e -> {
+                    if (perfCurrentExercises.get(ei).sets().size() > 1) {
+                        perfCurrentExercises.get(ei).sets().remove(sIdx);
+                        renderPerfExerciseBlocks();
+                    }
+                });
+
+                setRow.getChildren().addAll(setLbl, weightFld, repsFld, delSet);
+                block.getChildren().add(setRow);
+            }
+
+            // Add set button
+            javafx.scene.control.Button addSet = new javafx.scene.control.Button("+ Série");
+            addSet.setStyle("-fx-background-color:#e8f5f0;-fx-text-fill:#1a6b5a;-fx-font-weight:700;-fx-font-size:10px;-fx-background-radius:7;-fx-border-radius:7;-fx-padding:3 8;");
+            addSet.setOnAction(e -> {
+                perfCurrentExercises.get(ei).sets().add(new PerfSet(0, 0));
+                renderPerfExerciseBlocks();
+            });
+            block.getChildren().add(addSet);
+            perfExercisesBox.getChildren().add(block);
+        }
+    }
+
+    private void updatePerfSet(int exIdx, int setIdx, String weightStr, String repsStr) {
+        try {
+            double w = weightStr.isBlank() ? 0 : Double.parseDouble(weightStr.replace(",", "."));
+            int r    = repsStr.isBlank()   ? 0 : Integer.parseInt(repsStr.trim());
+            List<PerfSet> sets = perfCurrentExercises.get(exIdx).sets();
+            if (setIdx < sets.size()) sets.set(setIdx, new PerfSet(w, r));
+        } catch (NumberFormatException ignored) {}
+    }
+
+    @FXML
+    private void perfSaveSession() {
+        if (lblPerfStatus == null) return;
+        String date  = tfPerfDate  != null ? tfPerfDate.getText().trim()  : java.time.LocalDate.now().toString();
+        String label = tfPerfLabel != null ? tfPerfLabel.getText().trim()  : "Séance du " + date;
+        if (label.isEmpty()) label = "Séance du " + date;
+
+        List<PerfExEntry> valid = perfCurrentExercises.stream()
+            .filter(e -> !e.exerciseName().isEmpty())
+            .filter(e -> e.sets().stream().anyMatch(s -> s.weightKg() > 0 || s.reps() > 0))
+            .toList();
+
+        if (valid.isEmpty()) {
+            lblPerfStatus.setStyle("-fx-text-fill:#991b1b;");
+            lblPerfStatus.setText("⚠ Ajoute au moins un exercice avec des données.");
+            return;
+        }
+
+        perfHistory.add(0, new PerfSession(date, label, valid));
+        lblPerfStatus.setStyle("-fx-text-fill:#065f46;-fx-font-weight:700;");
+        lblPerfStatus.setText("✅ Séance enregistrée !");
+
+        // Refresh UI
+        renderPerfHistory();
+        refreshPerfChart();
+        populatePerfExerciseCombo();
+
+        // Close form after 1.5s
+        javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(1.5));
+        pause.setOnFinished(e -> {
+            if (perfFormBox != null) { perfFormBox.setVisible(false); perfFormBox.setManaged(false); }
+        });
+        pause.play();
+    }
+
+    private void populatePerfExerciseCombo() {
+        if (cbPerfExercise == null) return;
+        String current = cbPerfExercise.getValue();
+        cbPerfExercise.getItems().clear();
+        // Only exercises that have data
+        perfHistory.stream()
+            .flatMap(s -> s.exercises().stream())
+            .map(PerfExEntry::exerciseName)
+            .distinct()
+            .sorted()
+            .forEach(name -> cbPerfExercise.getItems().add(name));
+        if (current != null && cbPerfExercise.getItems().contains(current))
+            cbPerfExercise.setValue(current);
+    }
+
+    @FXML
+    private void perfShowWeight() { perfChartMetric = "weight"; refreshPerfChart(); }
+
+    @FXML
+    private void perfShowVolume() { perfChartMetric = "volume"; refreshPerfChart(); }
+
+    private void refreshPerfChart() {
+        if (cbPerfExercise == null) return;
+        String selected = cbPerfExercise.getValue();
+        if (selected == null || selected.isEmpty()) return;
+        renderPerfChart(selected);
+    }
+
+    private void renderPerfChart(String exerciseName) {
+        if (perfChartBox == null) return;
+        perfChartBox.getChildren().clear();
+
+        // Collect weekly data: week → max weight or total volume
+        java.util.Map<String, Double> weekData = new java.util.LinkedHashMap<>();
+        for (PerfSession session : perfHistory) {
+            for (PerfExEntry ex : session.exercises()) {
+                if (!ex.exerciseName().equals(exerciseName)) continue;
+                // Compute week label
+                String weekLabel;
+                try {
+                    java.time.LocalDate d = java.time.LocalDate.parse(session.date());
+                    weekLabel = "S" + d.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR) + " " + d.getYear();
+                } catch (Exception e) { weekLabel = session.date(); }
+
+                double value;
+                if ("weight".equals(perfChartMetric)) {
+                    value = ex.sets().stream().mapToDouble(PerfSet::weightKg).max().orElse(0);
+                } else {
+                    value = ex.sets().stream().mapToDouble(s -> s.weightKg() * s.reps()).sum();
+                }
+                weekData.merge(weekLabel, value, Math::max);
+            }
+        }
+
+        if (weekData.isEmpty()) {
+            if (lblPerfChartEmpty != null) {
+                lblPerfChartEmpty.setText("Aucune donnée pour " + exerciseName + ".");
+                lblPerfChartEmpty.setVisible(true);
+            }
+            return;
+        }
+        if (lblPerfChartEmpty != null) lblPerfChartEmpty.setVisible(false);
+
+        double maxVal = weekData.values().stream().mapToDouble(Double::doubleValue).max().orElse(1);
+        String unit   = "weight".equals(perfChartMetric) ? " kg" : " kg×reps";
+        double barMaxWidth = 420.0;
+
+        // Title
+        javafx.scene.control.Label chartTitle = new javafx.scene.control.Label(
+            exerciseName + " — " + ("weight".equals(perfChartMetric) ? "Poids max" : "Volume total"));
+        chartTitle.setStyle("-fx-font-weight:800;-fx-font-size:12px;-fx-text-fill:#0b3a3d;-fx-padding:0 0 4 0;");
+        perfChartBox.getChildren().add(chartTitle);
+
+        // Bars
+        for (java.util.Map.Entry<String, Double> entry : weekData.entrySet()) {
+            double val     = entry.getValue();
+            double ratio   = maxVal > 0 ? val / maxVal : 0;
+            double barW    = Math.max(4, ratio * barMaxWidth);
+
+            HBox row = new HBox(8);
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+
+            // Week label
+            javafx.scene.control.Label weekLbl = new javafx.scene.control.Label(entry.getKey());
+            weekLbl.setStyle("-fx-font-size:10px;-fx-text-fill:#64748b;-fx-min-width:60;");
+
+            // Bar
+            javafx.scene.layout.StackPane barPane = new javafx.scene.layout.StackPane();
+            barPane.setPrefHeight(22);
+            barPane.setPrefWidth(barMaxWidth);
+            barPane.setStyle("-fx-background-color:#f1f5f9;-fx-background-radius:6;");
+
+            javafx.scene.layout.Region bar = new javafx.scene.layout.Region();
+            bar.setPrefHeight(22);
+            bar.setPrefWidth(barW);
+            bar.setStyle("-fx-background-color:linear-gradient(to right,#0b3a3d,#1a6b5a);-fx-background-radius:6;");
+            barPane.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            barPane.getChildren().add(bar);
+
+            // Value label
+            javafx.scene.control.Label valLbl = new javafx.scene.control.Label(
+                String.format("%.1f", val) + unit);
+            valLbl.setStyle("-fx-font-size:10px;-fx-font-weight:700;-fx-text-fill:#0b3a3d;");
+
+            row.getChildren().addAll(weekLbl, barPane, valLbl);
+            perfChartBox.getChildren().add(row);
+        }
+    }
+
+    private void renderPerfHistory() {
+        if (perfHistoryBox == null) return;
+        perfHistoryBox.getChildren().clear();
+
+        if (perfHistory.isEmpty()) {
+            javafx.scene.control.Label empty = new javafx.scene.control.Label("Aucune séance enregistrée.");
+            empty.setStyle("-fx-font-size:11px;-fx-text-fill:#94a3b8;");
+            perfHistoryBox.getChildren().add(empty);
+            return;
+        }
+
+        for (PerfSession session : perfHistory) {
+            VBox card = new VBox(5);
+            card.setStyle("-fx-background-color:#fff;-fx-border-color:#dce9ee;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:8 10;");
+
+            HBox header = new HBox(8);
+            header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            javafx.scene.control.Label dateLbl = new javafx.scene.control.Label(session.label());
+            dateLbl.setStyle("-fx-font-weight:700;-fx-font-size:11px;-fx-text-fill:#0b3a3d;");
+            javafx.scene.layout.HBox.setHgrow(dateLbl, javafx.scene.layout.Priority.ALWAYS);
+
+            // Week badge
+            String weekBadge = "";
+            try {
+                java.time.LocalDate d = java.time.LocalDate.parse(session.date());
+                weekBadge = "S" + d.get(java.time.temporal.IsoFields.WEEK_OF_WEEK_BASED_YEAR);
+            } catch (Exception ignored) { weekBadge = session.date(); }
+            javafx.scene.control.Label weekLbl = new javafx.scene.control.Label(weekBadge);
+            weekLbl.setStyle("-fx-font-size:10px;-fx-background-color:#f1f5f9;-fx-text-fill:#64748b;-fx-background-radius:999;-fx-padding:2 7;");
+            header.getChildren().addAll(dateLbl, weekLbl);
+
+            // Exercise tags
+            javafx.scene.layout.FlowPane tags = new javafx.scene.layout.FlowPane(5, 4);
+            for (PerfExEntry ex : session.exercises()) {
+                double maxW = ex.sets().stream().mapToDouble(PerfSet::weightKg).max().orElse(0);
+                javafx.scene.control.Label tag = new javafx.scene.control.Label(
+                    ex.exerciseName() + (maxW > 0 ? " · " + String.format("%.1f", maxW) + "kg" : ""));
+                tag.setStyle("-fx-font-size:10px;-fx-background-color:#e8f5f0;-fx-text-fill:#1a6b5a;-fx-background-radius:999;-fx-padding:2 8;-fx-font-weight:600;");
+                tags.getChildren().add(tag);
+            }
+
+            card.getChildren().addAll(header, tags);
+            perfHistoryBox.getChildren().add(card);
+        }
+    }
+
+    // ── renderCoachCards ──────────────────────────────────────────────────────
     private record CoachData(String id, String name, String specialty, String phone, String slots, String imagePath, String email) {
         // slots format: "Lun-Ven 18h-21h | Sam 10h-13h"
         // Returns list of (dayLabel, timeRange) pairs for the next 14 days
