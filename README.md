@@ -264,30 +264,6 @@ mvn clean javafx:run
 
 ---
 
-# 📸 Screenshots
-
-## Dashboard
-
-Modern fitness dashboard interface.
-
-## Events Management
-
-Smart reservation and QR event system.
-
-## Diet Planner
-
-Nutrition and meal planning interface.
-
-## Forum & Blog
-
-Community interaction system.
-
-## Training Plans
-
-Workout and fitness organization system.
-
----
-
 # 💡 Project Vision
 
 Fitopia was designed to create a complete digital wellness ecosystem combining fitness, nutrition, wellness activities, and community interaction into one modern platform.
