@@ -243,7 +243,7 @@ The database manages:
 
 ## Clone Repository
 
-git clone [https://github.com/your-username/fitopia.git](https://github.com/your-username/fitopia.git)
+git clone [https://github.com/your-username/fitopia.git](https://https://github.com/emnabh05/FitopiaJAVA.git)
 
 ---
 
