@@ -38,7 +38,7 @@ Fitopia aims to:
 * JavaFX
 * Maven
 * JDBC
-* MySQL / MariaDB
+* MySQL 
 * Scene Builder
 * CSS
 
